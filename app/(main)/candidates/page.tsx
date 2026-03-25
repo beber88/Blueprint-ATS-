@@ -58,19 +58,25 @@ export default function CandidatesPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Reset file input so same file can be re-uploaded
+    e.target.value = "";
+
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
 
     try {
       const res = await fetch("/api/cv/upload", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Upload failed");
+        return;
+      }
       toast.success(`CV uploaded! ${data.candidate.full_name} added.`);
       setUploadOpen(false);
       fetchCandidates();
     } catch {
-      toast.error("Failed to upload CV");
+      toast.error("Network error. Please check your connection and try again.");
     } finally {
       setUploading(false);
     }

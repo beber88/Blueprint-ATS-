@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/gmail/client";
 import { sendWhatsApp } from "@/lib/twilio/client";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = createAdminClient();

@@ -52,25 +52,48 @@ export default function JobDetailPage() {
   const runBatchScoring = async () => {
     if (!job) return;
     setScoring(true);
-    const candidates = job.applications.filter((a) => a.ai_score === null);
+    const unscored = job.applications.filter((a) => a.ai_score === null);
+
+    if (unscored.length === 0) {
+      toast.info("All candidates have already been scored");
+      setScoring(false);
+      return;
+    }
+
     let scored = 0;
-    for (const app of candidates) {
+    let failed = 0;
+    for (const app of unscored) {
       try {
-        await fetch("/api/cv/score", {
+        const res = await fetch("/api/cv/score", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ candidateId: app.candidate_id, jobId: job.id }),
         });
-        scored++;
+        if (res.ok) {
+          scored++;
+        } else {
+          const data = await res.json();
+          console.error("Score failed:", data.error);
+          failed++;
+        }
       } catch {
-        console.error("Failed to score", app.candidate_id);
+        failed++;
       }
+      // Show progress
+      toast.info(`Scoring: ${scored + failed}/${unscored.length}`, { id: "scoring-progress" });
     }
-    toast.success(`Scored ${scored} candidates`);
+
+    if (failed > 0) {
+      toast.warning(`Scored ${scored} candidates, ${failed} failed`);
+    } else {
+      toast.success(`Successfully scored ${scored} candidates`);
+    }
     setScoring(false);
     // Refresh
     const res = await fetch(`/api/jobs/${params.id}`);
-    setJob(await res.json());
+    if (res.ok) {
+      setJob(await res.json());
+    }
   };
 
   if (loading) return <PageLoading />;

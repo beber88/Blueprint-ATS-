@@ -50,6 +50,9 @@ export function getStatusColor(status: string): string {
     active: "bg-green-100 text-green-800",
     paused: "bg-yellow-100 text-yellow-800",
     closed: "bg-gray-100 text-gray-800",
+    scored: "bg-electric-100 text-electric-800",
+    sent: "bg-green-100 text-green-800",
+    failed: "bg-red-100 text-red-800",
   };
   return colors[status] || "bg-gray-100 text-gray-800";
 }
@@ -67,6 +70,14 @@ export function getStatusLabel(status: string): string {
     active: "Active",
     paused: "Paused",
     closed: "Closed",
+    cv_uploaded: "CV Uploaded",
+    ai_scored: "AI Scored",
+    candidate_created: "Candidate Created",
+    message_sent: "Message Sent",
+    message_failed: "Message Failed",
+    scored: "Scored",
+    sent: "Sent",
+    failed: "Failed",
   };
-  return labels[status] || status;
+  return labels[status] || status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 }

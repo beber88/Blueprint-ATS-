@@ -199,7 +199,7 @@ export default function DashboardPage() {
                         {job.candidate_count} candidates
                       </p>
                     </div>
-                    {job.top_score > 0 && (
+                    {job.top_score != null && job.top_score > 0 && (
                       <span className="text-sm font-medium text-green-600">
                         Top: {job.top_score}
                       </span>

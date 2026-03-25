@@ -115,7 +115,7 @@ export interface DashboardStats {
   interviews_scheduled: number;
   approved_this_month: number;
   pipeline_by_status: { status: string; count: number }[];
-  top_jobs: { id: string; title: string; candidate_count: number; top_score: number }[];
+  top_jobs: { id: string; title: string; candidate_count: number; top_score: number | null }[];
   recent_activity: ActivityLog[];
 }
 

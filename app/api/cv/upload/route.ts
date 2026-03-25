@@ -5,6 +5,11 @@ import { parseCV } from "@/lib/claude/client";
 const pdfParse = require("pdf-parse");
 import mammoth from "mammoth";
 
+export const dynamic = "force-dynamic";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx"];
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -15,9 +20,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "File too large. Maximum size is 10MB." },
+        { status: 400 }
+      );
+    }
+
+    // Validate file extension
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+      return NextResponse.json(
+        { error: "Unsupported file type. Please upload PDF or DOCX." },
+        { status: 400 }
+      );
+    }
+
     const supabase = createAdminClient();
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const ext = file.name.split(".").pop()?.toLowerCase();
     const fileId = crypto.randomUUID();
     const fileName = `cvs/${fileId}.${ext}`;
 
@@ -30,29 +51,50 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
+      return NextResponse.json(
+        { error: `Failed to upload file: ${uploadError.message}` },
+        { status: 500 }
+      );
     }
 
     const { data: { publicUrl } } = supabase.storage.from("cvs").getPublicUrl(fileName);
 
     // Extract text from file
     let cvText = "";
-    if (ext === "pdf") {
-      const pdfData = await pdfParse(fileBuffer);
-      cvText = pdfData.text;
-    } else if (ext === "docx" || ext === "doc") {
-      const result = await mammoth.extractRawText({ buffer: fileBuffer });
-      cvText = result.value;
-    } else {
-      return NextResponse.json({ error: "Unsupported file type. Please upload PDF or DOCX" }, { status: 400 });
+    try {
+      if (ext === "pdf") {
+        const pdfData = await pdfParse(fileBuffer);
+        cvText = pdfData.text;
+      } else if (ext === "docx" || ext === "doc") {
+        const result = await mammoth.extractRawText({ buffer: fileBuffer });
+        cvText = result.value;
+      }
+    } catch (extractError) {
+      console.error("Text extraction error:", extractError);
+      return NextResponse.json(
+        { error: "Failed to extract text from file. The file may be corrupted or password-protected." },
+        { status: 400 }
+      );
     }
 
     if (!cvText.trim()) {
-      return NextResponse.json({ error: "Could not extract text from file" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Could not extract text from file. The file may be empty or contain only images." },
+        { status: 400 }
+      );
     }
 
     // Parse CV with Claude AI
-    const parsed = await parseCV(cvText);
+    let parsed;
+    try {
+      parsed = await parseCV(cvText);
+    } catch (aiError) {
+      console.error("AI parsing error:", aiError);
+      return NextResponse.json(
+        { error: "AI failed to parse the CV. Please try again or add the candidate manually." },
+        { status: 500 }
+      );
+    }
 
     // Save candidate to database
     const { data: candidate, error: dbError } = await supabase
@@ -77,7 +119,10 @@ export async function POST(request: NextRequest) {
 
     if (dbError) {
       console.error("DB error:", dbError);
-      return NextResponse.json({ error: "Failed to save candidate" }, { status: 500 });
+      return NextResponse.json(
+        { error: `Failed to save candidate: ${dbError.message}` },
+        { status: 500 }
+      );
     }
 
     // Log activity
@@ -100,7 +145,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("CV upload error:", error);
     return NextResponse.json(
-      { error: "Failed to process CV" },
+      { error: error instanceof Error ? error.message : "Failed to process CV" },
       { status: 500 }
     );
   }

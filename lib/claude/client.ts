@@ -5,7 +5,41 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+function extractJSON<T>(text: string): T {
+  // Try direct parse first
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    // noop
+  }
+
+  // Try to extract from markdown code block
+  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    try {
+      return JSON.parse(codeBlockMatch[1].trim()) as T;
+    } catch {
+      // noop
+    }
+  }
+
+  // Try to find outermost JSON object
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[0]) as T;
+    } catch {
+      // noop
+    }
+  }
+
+  throw new Error("Failed to extract JSON from response");
+}
+
 export async function parseCV(cvText: string): Promise<CVParseResult> {
+  // Truncate very long CVs to avoid token limits
+  const truncated = cvText.length > 15000 ? cvText.slice(0, 15000) + "\n...[truncated]" : cvText;
+
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 2000,
@@ -33,7 +67,7 @@ export async function parseCV(cvText: string): Promise<CVParseResult> {
 }
 
 CV Text:
-${cvText}`,
+${truncated}`,
       },
     ],
   });
@@ -43,16 +77,20 @@ ${cvText}`,
     throw new Error("Unexpected response type from Claude");
   }
 
-  try {
-    return JSON.parse(content.text) as CVParseResult;
-  } catch {
-    // Try to extract JSON from the response
-    const jsonMatch = content.text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]) as CVParseResult;
-    }
-    throw new Error("Failed to parse Claude response as JSON");
-  }
+  const parsed = extractJSON<CVParseResult>(content.text);
+
+  // Ensure required fields have defaults
+  return {
+    full_name: parsed.full_name || "Unknown",
+    email: parsed.email || null,
+    phone: parsed.phone || null,
+    location: parsed.location || null,
+    experience_years: parsed.experience_years ?? 0,
+    education: parsed.education || "",
+    skills: Array.isArray(parsed.skills) ? parsed.skills : [],
+    certifications: Array.isArray(parsed.certifications) ? parsed.certifications : [],
+    previous_roles: Array.isArray(parsed.previous_roles) ? parsed.previous_roles : [],
+  };
 }
 
 export async function scoreCandidate(
@@ -99,13 +137,16 @@ Return ONLY valid JSON:
     throw new Error("Unexpected response type from Claude");
   }
 
-  try {
-    return JSON.parse(content.text) as AIScoreResult;
-  } catch {
-    const jsonMatch = content.text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]) as AIScoreResult;
-    }
-    throw new Error("Failed to parse Claude response as JSON");
-  }
+  const parsed = extractJSON<AIScoreResult>(content.text);
+
+  // Ensure required fields have valid values
+  return {
+    score: Math.min(100, Math.max(0, Math.round(parsed.score ?? 0))),
+    reasoning: parsed.reasoning || "",
+    strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+    weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses : [],
+    recommendation: ["strong_yes", "yes", "maybe", "no"].includes(parsed.recommendation)
+      ? parsed.recommendation
+      : "maybe",
+  };
 }

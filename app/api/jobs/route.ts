@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const supabase = createAdminClient();
@@ -21,8 +23,8 @@ export async function GET() {
       ...job,
       candidate_count: job.applications?.length || 0,
       top_score: job.applications?.length
-        ? Math.max(...job.applications.map((a: { ai_score: number | null }) => a.ai_score || 0))
-        : 0,
+        ? Math.max(...job.applications.map((a: { ai_score: number | null }) => a.ai_score ?? 0))
+        : null,
     }));
 
     return NextResponse.json(jobs);
