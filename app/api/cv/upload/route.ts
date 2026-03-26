@@ -1,14 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { parseCV } from "@/lib/claude/client";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse");
-import mammoth from "mammoth";
 
 export const dynamic = "force-dynamic";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx"];
+
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  // pdf-parse v2 uses PDFParse class, not a function
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { PDFParse } = require("pdf-parse");
+  const parser = new PDFParse({ data: buffer, verbosity: 0 });
+  await parser.load();
+  const result = await parser.getText();
+  // Use per-page text to avoid "-- 1 of N --" separators in result.text
+  if (result.pages && result.pages.length > 0) {
+    return result.pages.map((p: { text: string }) => p.text).join("\n");
+  }
+  return result.text || "";
+}
+
+async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mammoth = require("mammoth");
+  const result = await mammoth.extractRawText({ buffer });
+  return result.value || "";
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,16 +95,18 @@ export async function POST(request: NextRequest) {
     let cvText = "";
     try {
       if (ext === "pdf") {
-        const pdfData = await pdfParse(fileBuffer);
-        cvText = pdfData.text;
+        cvText = await extractTextFromPDF(fileBuffer);
       } else if (ext === "docx" || ext === "doc") {
-        const result = await mammoth.extractRawText({ buffer: fileBuffer });
-        cvText = result.value;
+        cvText = await extractTextFromDOCX(fileBuffer);
       }
     } catch (extractError) {
-      console.error("CV Upload: Text extraction failed", { ext, error: extractError instanceof Error ? extractError.message : extractError });
+      console.error("CV Upload: Text extraction failed", {
+        ext,
+        error: extractError instanceof Error ? extractError.message : extractError,
+        stack: extractError instanceof Error ? extractError.stack : undefined,
+      });
       return NextResponse.json(
-        { error: "Failed to extract text from file. The file may be corrupted or password-protected." },
+        { error: `Failed to extract text from ${ext?.toUpperCase()} file. The file may be corrupted or password-protected.` },
         { status: 400 }
       );
     }
@@ -105,7 +125,10 @@ export async function POST(request: NextRequest) {
     try {
       parsed = await parseCV(cvText);
     } catch (aiError) {
-      console.error("CV Upload: AI parsing failed", { error: aiError instanceof Error ? aiError.message : aiError, stack: aiError instanceof Error ? aiError.stack : undefined });
+      console.error("CV Upload: AI parsing failed", {
+        error: aiError instanceof Error ? aiError.message : aiError,
+        stack: aiError instanceof Error ? aiError.stack : undefined,
+      });
       return NextResponse.json(
         { error: "AI failed to parse the CV. Please try again or add the candidate manually." },
         { status: 500 }
@@ -163,7 +186,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ candidate, parsed });
   } catch (error) {
-    console.error("CV Upload: Unhandled error", { error: error instanceof Error ? error.message : error, stack: error instanceof Error ? error.stack : undefined });
+    console.error("CV Upload: Unhandled error", {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to process CV" },
       { status: 500 }
