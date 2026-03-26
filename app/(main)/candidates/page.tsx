@@ -454,13 +454,13 @@ export default function CandidatesPage() {
                 <p className="text-xs text-slate-400">
                   PDF, DOC, DOCX -- תמיכה במספר קבצים בו-זמנית
                 </p>
-                <Input
+                <input
                   type="file"
                   accept=".pdf,.doc,.docx"
                   multiple
                   onChange={handleUpload}
                   disabled={uploading}
-                  className="absolute inset-0 opacity-0 cursor-pointer h-full"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
               </div>
               {uploading && (
