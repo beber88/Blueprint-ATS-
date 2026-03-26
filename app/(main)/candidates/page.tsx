@@ -445,22 +445,24 @@ export default function CandidatesPage() {
             </DialogHeader>
             <div className="space-y-4 py-3">
               <div className="border-2 border-dashed border-slate-300 rounded-xl p-12 text-center hover:border-electric-400 hover:bg-electric-50/30 transition-all duration-200 cursor-pointer relative group">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-electric-50 group-hover:bg-electric-100 transition-colors mb-5">
-                  <FileUp className="h-8 w-8 text-electric-600" />
+                <div className="pointer-events-none">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-electric-50 group-hover:bg-electric-100 transition-colors mb-5">
+                    <FileUp className="h-8 w-8 text-electric-600" />
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700 mb-1.5">
+                    גררו קבצים לכאן, או לחצו לבחירה
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    PDF, DOC, DOCX -- תמיכה במספר קבצים בו-זמנית
+                  </p>
                 </div>
-                <p className="text-sm font-semibold text-slate-700 mb-1.5">
-                  גררו קבצים לכאן, או לחצו לבחירה
-                </p>
-                <p className="text-xs text-slate-400">
-                  PDF, DOC, DOCX -- תמיכה במספר קבצים בו-זמנית
-                </p>
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
                   multiple
                   onChange={handleUpload}
                   disabled={uploading}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="absolute inset-0 z-10 w-full h-full opacity-0 cursor-pointer"
                 />
               </div>
               {uploading && (
