@@ -45,7 +45,7 @@ export default function CandidatesPage() {
       const data = await res.json();
       setCandidates(data.candidates || []);
     } catch {
-      toast.error("Failed to load candidates");
+      toast.error("שגיאה בטעינת מועמדים");
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ export default function CandidatesPage() {
 
     for (let i = 0; i < totalFiles; i++) {
       setUploadProgress(
-        totalFiles > 1 ? `Uploading ${i + 1}/${totalFiles} CVs...` : "Uploading and parsing CV with AI..."
+        totalFiles > 1 ? `מעלה ${i + 1}/${totalFiles} קו״ח...` : "מעלה ומנתח קו״ח עם AI..."
       );
 
       const formData = new FormData();
@@ -81,27 +81,27 @@ export default function CandidatesPage() {
         if (!res.ok) {
           failCount++;
           if (totalFiles === 1) {
-            toast.error(data.error || "Upload failed");
+            toast.error(data.error || "ההעלאה נכשלה");
           }
         } else {
           successCount++;
           if (totalFiles === 1) {
-            toast.success(`CV uploaded! ${data.candidate.full_name} added.`);
+            toast.success(`קו״ח הועלה! ${data.candidate.full_name} נוסף/ה.`);
           }
         }
       } catch {
         failCount++;
         if (totalFiles === 1) {
-          toast.error("Network error. Please check your connection and try again.");
+          toast.error("שגיאת רשת. בדקו את החיבור ונסו שוב.");
         }
       }
     }
 
     if (totalFiles > 1) {
       if (failCount === 0) {
-        toast.success(`Uploaded ${successCount}/${totalFiles} CVs successfully`);
+        toast.success(`הועלו ${successCount}/${totalFiles} קו״ח בהצלחה`);
       } else {
-        toast.warning(`Uploaded ${successCount}/${totalFiles} CVs successfully, ${failCount} failed`);
+        toast.warning(`הועלו ${successCount}/${totalFiles} קו״ח בהצלחה, ${failCount} נכשלו`);
       }
     }
 
@@ -115,7 +115,7 @@ export default function CandidatesPage() {
 
   const handleManualCreate = async () => {
     if (!manualForm.full_name) {
-      toast.error("Name is required");
+      toast.error("שם הוא שדה חובה");
       return;
     }
     try {
@@ -125,12 +125,12 @@ export default function CandidatesPage() {
         body: JSON.stringify(manualForm),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("Candidate created!");
+      toast.success("המועמד/ת נוצר/ה!");
       setManualOpen(false);
       setManualForm({ full_name: "", email: "", phone: "", location: "", notes: "" });
       fetchCandidates();
     } catch {
-      toast.error("Failed to create candidate");
+      toast.error("שגיאה ביצירת מועמד/ת");
     }
   };
 
@@ -141,10 +141,10 @@ export default function CandidatesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      toast.success("Status updated");
+      toast.success("הסטטוס עודכן");
       fetchCandidates();
     } catch {
-      toast.error("Failed to update status");
+      toast.error("שגיאה בעדכון סטטוס");
     }
   };
 
@@ -362,7 +362,7 @@ export default function CandidatesPage() {
                 <Input
                   value={manualForm.full_name}
                   onChange={(e) => setManualForm({ ...manualForm, full_name: e.target.value })}
-                  placeholder="John Doe"
+                  placeholder="ישראל ישראלי"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">

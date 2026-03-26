@@ -154,7 +154,7 @@ export default function SettingsPage() {
                   <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as "email" | "whatsapp" })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="email">Email</SelectItem>
+                      <SelectItem value="email">אימייל</SelectItem>
                       <SelectItem value="whatsapp">WhatsApp</SelectItem>
                     </SelectContent>
                   </Select>

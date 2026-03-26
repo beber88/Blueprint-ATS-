@@ -33,7 +33,7 @@ export default function InterviewsPage() {
       const res = await fetch("/api/interviews");
       setInterviews(await res.json());
     } catch {
-      toast.error("Failed to load interviews");
+      toast.error("שגיאה בטעינת ראיונות");
     } finally {
       setLoading(false);
     }
@@ -57,11 +57,11 @@ export default function InterviewsPage() {
         }),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("Interview scheduled!");
+      toast.success("הראיון נקבע!");
       setCreateOpen(false);
       fetchInterviews();
     } catch {
-      toast.error("Failed to schedule interview");
+      toast.error("שגיאה בקביעת ראיון");
     }
   };
 
@@ -72,10 +72,10 @@ export default function InterviewsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ outcome, notes }),
       });
-      toast.success("Interview updated");
+      toast.success("הראיון עודכן");
       fetchInterviews();
     } catch {
-      toast.error("Failed to update interview");
+      toast.error("שגיאה בעדכון ראיון");
     }
   };
 
@@ -93,12 +93,12 @@ export default function InterviewsPage() {
 
   return (
     <div>
-      <Header title="Interviews" subtitle={`${upcoming.length} upcoming`} />
+      <Header title="ראיונות" subtitle={`${upcoming.length} קרובים`} />
       <div className="p-6 space-y-6">
         <div className="flex justify-end">
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Schedule Interview
+            קביעת ראיון
           </Button>
         </div>
 
@@ -107,12 +107,12 @@ export default function InterviewsPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Upcoming Interviews
+              ראיונות קרובים
             </CardTitle>
           </CardHeader>
           <CardContent>
             {upcoming.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No upcoming interviews</p>
+              <p className="text-center text-muted-foreground py-8">אין ראיונות קרובים</p>
             ) : (
               <div className="space-y-3">
                 {upcoming.map((interview) => {
@@ -167,7 +167,7 @@ export default function InterviewsPage() {
         {past.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Past Interviews</CardTitle>
+              <CardTitle className="text-lg">ראיונות קודמים</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -191,10 +191,10 @@ export default function InterviewsPage() {
                         ) : (
                           <>
                             <Button size="sm" variant="outline" onClick={() => updateOutcome(interview.id, "passed", "")}>
-                              Pass
+                              עבר
                             </Button>
                             <Button size="sm" variant="outline" onClick={() => updateOutcome(interview.id, "failed", "")}>
-                              Fail
+                              נכשל
                             </Button>
                           </>
                         )}
@@ -210,13 +210,13 @@ export default function InterviewsPage() {
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Schedule Interview</DialogTitle>
+              <DialogTitle>קביעת ראיון</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Candidate</Label>
+                <Label>מועמד/ת</Label>
                 <Select value={form.candidate_id} onValueChange={(v) => setForm({ ...form, candidate_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Select candidate" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="בחר מועמד/ת" /></SelectTrigger>
                   <SelectContent>
                     {candidates.map((c) => (
                       <SelectItem key={c.id} value={c.id}>{c.full_name}</SelectItem>
@@ -225,9 +225,9 @@ export default function InterviewsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Job</Label>
+                <Label>משרה</Label>
                 <Select value={form.job_id} onValueChange={(v) => setForm({ ...form, job_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Select job" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="בחר משרה" /></SelectTrigger>
                   <SelectContent>
                     {jobs.map((j) => (
                       <SelectItem key={j.id} value={j.id}>{j.title}</SelectItem>
@@ -237,39 +237,39 @@ export default function InterviewsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Date & Time</Label>
+                  <Label>תאריך ושעה</Label>
                   <Input type="datetime-local" value={form.scheduled_at} onChange={(e) => setForm({ ...form, scheduled_at: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Duration (min)</Label>
+                  <Label>משך (דקות)</Label>
                   <Input type="number" value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Type</Label>
+                  <Label>סוג</Label>
                   <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="in-person">In-Person</SelectItem>
-                      <SelectItem value="video">Video</SelectItem>
-                      <SelectItem value="phone">Phone</SelectItem>
+                      <SelectItem value="in-person">פרונטלי</SelectItem>
+                      <SelectItem value="video">וידאו</SelectItem>
+                      <SelectItem value="phone">טלפוני</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Interviewer</Label>
+                  <Label>מראיין/ת</Label>
                   <Input value={form.interviewer} onChange={(e) => setForm({ ...form, interviewer: e.target.value })} />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Notes</Label>
+                <Label>הערות</Label>
                 <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreate}>Schedule</Button>
+              <Button variant="outline" onClick={() => setCreateOpen(false)}>ביטול</Button>
+              <Button onClick={handleCreate}>קבע ראיון</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

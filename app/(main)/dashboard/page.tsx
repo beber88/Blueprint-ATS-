@@ -129,7 +129,7 @@ export default function DashboardPage() {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
                     data={stats.pipeline_by_status.map((item) => ({
-                      name: item.status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+                      name: getStatusLabel(item.status),
                       count: item.count,
                       status: item.status,
                     }))}
@@ -151,7 +151,7 @@ export default function DashboardPage() {
                 </ResponsiveContainer>
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  No candidates yet
+                  אין מועמדים עדיין
                 </p>
               )}
             </CardContent>
