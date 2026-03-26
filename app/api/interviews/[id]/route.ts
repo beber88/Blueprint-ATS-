@@ -25,7 +25,12 @@ export async function PATCH(
 
     // If outcome is set, update candidate status
     if (body.outcome && data.application?.candidate_id) {
-      const newStatus = body.outcome === "passed" ? "interviewed" : "rejected";
+      const outcomeStatusMap: Record<string, string> = {
+        passed: "interviewed",
+        failed: "rejected",
+        cancelled: "shortlisted",
+      };
+      const newStatus = outcomeStatusMap[body.outcome] || "interviewed";
       await supabase
         .from("candidates")
         .update({ status: newStatus, updated_at: new Date().toISOString() })

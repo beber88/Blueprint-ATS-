@@ -66,6 +66,20 @@ export async function POST(request: NextRequest) {
     } catch (sendError) {
       console.error("Send error:", sendError);
       status = "failed";
+
+      // Log failed message
+      await supabase.from("messages_sent").insert({
+        candidate_id: candidateId,
+        template_id: templateId || null,
+        channel,
+        to_address: toAddress,
+        subject,
+        body: messageBody,
+        status: "failed",
+      });
+
+      const errorMsg = sendError instanceof Error ? sendError.message : "Failed to send message";
+      return NextResponse.json({ error: errorMsg, status: "failed" }, { status: 500 });
     }
 
     // Log message

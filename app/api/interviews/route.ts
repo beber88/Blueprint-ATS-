@@ -48,13 +48,20 @@ export async function POST(request: NextRequest) {
       if (existing) {
         applicationId = existing.id;
       } else {
-        const { data: newApp } = await supabase
+        const { data: newApp, error: appError } = await supabase
           .from("applications")
           .insert({ candidate_id: body.candidate_id, job_id: body.job_id, status: "interview_scheduled" })
           .select()
           .single();
-        applicationId = newApp?.id;
+        if (appError || !newApp) {
+          return NextResponse.json({ error: "Failed to create application for interview" }, { status: 500 });
+        }
+        applicationId = newApp.id;
       }
+    }
+
+    if (!applicationId) {
+      return NextResponse.json({ error: "application_id, or candidate_id and job_id are required" }, { status: 400 });
     }
 
     const { data, error } = await supabase

@@ -7,7 +7,13 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient();
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      console.error("OAuth callback error:", error);
+      return NextResponse.redirect(new URL("/login?error=auth_failed", request.url));
+    }
+  } else {
+    return NextResponse.redirect(new URL("/login?error=no_code", request.url));
   }
 
   return NextResponse.redirect(new URL("/dashboard", request.url));

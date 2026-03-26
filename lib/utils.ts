@@ -75,6 +75,8 @@ export function getStatusLabel(status: string): string {
     candidate_created: "Candidate Created",
     message_sent: "Message Sent",
     message_failed: "Message Failed",
+    status_changed: "Status Changed",
+    interview_completed: "Interview Completed",
     scored: "Scored",
     sent: "Sent",
     failed: "Failed",

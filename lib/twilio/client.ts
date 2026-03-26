@@ -1,14 +1,22 @@
 import twilio from "twilio";
 
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+function getTwilioClient() {
+  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+    throw new Error("Twilio is not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN.");
+  }
+  return twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+}
 
 export async function sendWhatsApp(
   to: string,
   body: string
 ): Promise<string> {
+  const client = getTwilioClient();
+
+  if (!process.env.TWILIO_WHATSAPP_FROM) {
+    throw new Error("TWILIO_WHATSAPP_FROM is not configured.");
+  }
+
   // Format phone number to international format
   let formattedTo = to.replace(/[\s\-\(\)]/g, "");
   if (!formattedTo.startsWith("+")) {
@@ -20,7 +28,7 @@ export async function sendWhatsApp(
   }
 
   const message = await client.messages.create({
-    from: process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+14155238886",
+    from: process.env.TWILIO_WHATSAPP_FROM,
     to: `whatsapp:${formattedTo}`,
     body,
   });

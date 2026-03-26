@@ -47,21 +47,45 @@ export async function POST(request: NextRequest) {
       candidate.education || ""
     );
 
-    // Upsert application with score
-    const { data: application, error: appError } = await supabase
+    // Check if application already exists
+    const { data: existingApp } = await supabase
       .from("applications")
-      .upsert(
-        {
+      .select("id, status")
+      .eq("candidate_id", candidateId)
+      .eq("job_id", jobId)
+      .single();
+
+    let application;
+    let appError;
+
+    if (existingApp) {
+      // Update existing - don't downgrade status if already more advanced
+      const advancedStatuses = ["interview_scheduled", "interviewed", "approved"];
+      const newStatus = advancedStatuses.includes(existingApp.status) ? existingApp.status : "scored";
+      const result2 = await supabase
+        .from("applications")
+        .update({ ai_score: result.score, ai_reasoning: result.reasoning, status: newStatus })
+        .eq("id", existingApp.id)
+        .select()
+        .single();
+      application = result2.data;
+      appError = result2.error;
+    } else {
+      // Insert new
+      const result2 = await supabase
+        .from("applications")
+        .insert({
           candidate_id: candidateId,
           job_id: jobId,
           ai_score: result.score,
           ai_reasoning: result.reasoning,
           status: "scored",
-        },
-        { onConflict: "candidate_id,job_id" }
-      )
-      .select()
-      .single();
+        })
+        .select()
+        .single();
+      application = result2.data;
+      appError = result2.error;
+    }
 
     if (appError) {
       console.error("Application error:", appError);

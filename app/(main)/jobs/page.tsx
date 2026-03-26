@@ -108,7 +108,7 @@ export default function JobsPage() {
                         <Users className="h-3 w-3" />
                         {job.candidate_count || 0} candidates
                       </span>
-                      {(job.top_score || 0) > 0 && (
+                      {job.top_score != null && job.top_score > 0 && (
                         <span className="flex items-center gap-1 text-green-600">
                           <Trophy className="h-3 w-3" />
                           Top: {job.top_score}
