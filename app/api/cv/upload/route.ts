@@ -12,6 +12,16 @@ const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx"];
 
 export async function POST(request: NextRequest) {
   try {
+    // Check required env vars
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error("CV Upload: Missing Supabase env vars");
+      return NextResponse.json({ error: "Server misconfigured: Supabase credentials missing" }, { status: 500 });
+    }
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error("CV Upload: Missing ANTHROPIC_API_KEY");
+      return NextResponse.json({ error: "Server misconfigured: AI service not configured" }, { status: 500 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const jobId = formData.get("jobId") as string | null;
@@ -19,6 +29,8 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
+
+    console.log(`CV Upload: Processing file "${file.name}" (${file.size} bytes, type: ${file.type})`);
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
@@ -50,12 +62,14 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
-      console.error("Upload error:", uploadError);
+      console.error("CV Upload: Storage upload failed", { error: uploadError.message, fileName, bucket: "cvs" });
       return NextResponse.json(
         { error: `Failed to upload file: ${uploadError.message}` },
         { status: 500 }
       );
     }
+
+    console.log(`CV Upload: File stored as ${fileName}`);
 
     const { data: { publicUrl } } = supabase.storage.from("cvs").getPublicUrl(fileName);
 
@@ -70,12 +84,14 @@ export async function POST(request: NextRequest) {
         cvText = result.value;
       }
     } catch (extractError) {
-      console.error("Text extraction error:", extractError);
+      console.error("CV Upload: Text extraction failed", { ext, error: extractError instanceof Error ? extractError.message : extractError });
       return NextResponse.json(
         { error: "Failed to extract text from file. The file may be corrupted or password-protected." },
         { status: 400 }
       );
     }
+
+    console.log(`CV Upload: Extracted ${cvText.length} chars of text from ${ext} file`);
 
     if (!cvText.trim()) {
       return NextResponse.json(
@@ -89,12 +105,14 @@ export async function POST(request: NextRequest) {
     try {
       parsed = await parseCV(cvText);
     } catch (aiError) {
-      console.error("AI parsing error:", aiError);
+      console.error("CV Upload: AI parsing failed", { error: aiError instanceof Error ? aiError.message : aiError, stack: aiError instanceof Error ? aiError.stack : undefined });
       return NextResponse.json(
         { error: "AI failed to parse the CV. Please try again or add the candidate manually." },
         { status: 500 }
       );
     }
+
+    console.log(`CV Upload: AI parsed candidate "${parsed.full_name}", ${parsed.skills?.length || 0} skills, ${parsed.experience_years || 0} yrs exp`);
 
     // Save candidate to database
     const { data: candidate, error: dbError } = await supabase
@@ -118,12 +136,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (dbError) {
-      console.error("DB error:", dbError);
+      console.error("CV Upload: DB insert failed", { error: dbError.message, code: dbError.code, details: dbError.details });
       return NextResponse.json(
         { error: `Failed to save candidate: ${dbError.message}` },
         { status: 500 }
       );
     }
+
+    console.log(`CV Upload: Candidate saved with ID ${candidate.id}`);
 
     // Log activity
     await supabase.from("activity_log").insert({
@@ -143,7 +163,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ candidate, parsed });
   } catch (error) {
-    console.error("CV upload error:", error);
+    console.error("CV Upload: Unhandled error", { error: error instanceof Error ? error.message : error, stack: error instanceof Error ? error.stack : undefined });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to process CV" },
       { status: 500 }

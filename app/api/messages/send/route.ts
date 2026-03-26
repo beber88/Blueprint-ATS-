@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: sentMessage, status });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Messages Send: Unhandled error", { error: error instanceof Error ? error.message : error, stack: error instanceof Error ? error.stack : undefined });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

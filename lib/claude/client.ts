@@ -1,9 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { CVParseResult, AIScoreResult } from "@/types";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+function getAnthropicClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    console.error("FATAL: Missing ANTHROPIC_API_KEY env var");
+    throw new Error("Claude AI is not configured. Missing ANTHROPIC_API_KEY.");
+  }
+  return new Anthropic({ apiKey });
+}
 
 function extractJSON<T>(text: string): T {
   // Try direct parse first
@@ -40,6 +45,7 @@ export async function parseCV(cvText: string): Promise<CVParseResult> {
   // Truncate very long CVs to avoid token limits
   const truncated = cvText.length > 15000 ? cvText.slice(0, 15000) + "\n...[truncated]" : cvText;
 
+  const anthropic = getAnthropicClient();
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 2000,
@@ -102,6 +108,7 @@ export async function scoreCandidate(
   previousRoles: { title: string; company: string; duration: string; description: string }[],
   education: string
 ): Promise<AIScoreResult> {
+  const anthropic = getAnthropicClient();
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 1500,

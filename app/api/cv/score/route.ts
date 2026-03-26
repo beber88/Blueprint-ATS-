@@ -6,6 +6,11 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error("CV Score: Missing ANTHROPIC_API_KEY");
+      return NextResponse.json({ error: "AI service not configured" }, { status: 500 });
+    }
+
     const { candidateId, jobId } = await request.json();
 
     if (!candidateId || !jobId) {
@@ -101,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ application, score: result });
   } catch (error) {
-    console.error("Scoring error:", error);
-    return NextResponse.json({ error: "Failed to score candidate" }, { status: 500 });
+    console.error("CV Score: Unhandled error", { error: error instanceof Error ? error.message : error, stack: error instanceof Error ? error.stack : undefined });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Failed to score candidate" }, { status: 500 });
   }
 }
