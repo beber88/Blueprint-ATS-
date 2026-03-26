@@ -6,14 +6,13 @@ import Link from "next/link";
 import { Header } from "@/components/shared/header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageLoading } from "@/components/shared/loading";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Zap, MapPin, Clock, Building, GitCompare } from "lucide-react";
+import { ArrowRight, Zap, MapPin, Clock, Building, GitCompare, Users, FileText } from "lucide-react";
 import { Job, Application, Candidate } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
@@ -92,7 +91,6 @@ export default function JobDetailPage() {
       } catch {
         failed++;
       }
-      // Show progress
       toast.info(`מדרג: ${scored + failed}/${unscored.length}`, { id: "scoring-progress" });
     }
 
@@ -102,7 +100,6 @@ export default function JobDetailPage() {
       toast.success(`דורגו ${scored} מועמדים בהצלחה`);
     }
     setScoring(false);
-    // Refresh
     const res = await fetch(`/api/jobs/${params.id}`);
     if (res.ok) {
       setJob(await res.json());
@@ -110,70 +107,116 @@ export default function JobDetailPage() {
   };
 
   if (loading) return <PageLoading />;
-  if (!job) return <div className="p-6">משרה לא נמצאה</div>;
+  if (!job) return <div className="p-6 text-center text-gray-500">משרה לא נמצאה</div>;
+
+  const employmentTypeLabels: Record<string, string> = {
+    "full-time": "משרה מלאה",
+    "part-time": "משרה חלקית",
+    contract: "חוזה",
+    internship: "התמחות",
+  };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       <Header title={job.title} subtitle={job.department || "פרטי משרה"} />
-      <div className="p-6 space-y-6">
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          חזרה
-        </Button>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between flex-wrap gap-4">
+      <div className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
+        {/* Top Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="text-gray-500 hover:text-gray-900 gap-2 rounded-xl px-3"
+          >
+            <ArrowRight className="h-4 w-4" />
+            חזרה למשרות
+          </Button>
+          <div className="flex items-center gap-3">
+            <Select value={job.status} onValueChange={updateStatus}>
+              <SelectTrigger className="w-36 rounded-xl bg-white shadow-sm border-gray-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">פעיל</SelectItem>
+                <SelectItem value="paused">מושהה</SelectItem>
+                <SelectItem value="closed">סגור</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={runBatchScoring}
+              disabled={scoring}
+              className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-sm gap-2 px-5"
+            >
+              <Zap className="h-4 w-4" />
+              {scoring ? "מדרג..." : "דירוג AI"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Job Info Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6">
+            <div className="flex items-start justify-between mb-1">
               <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-2xl font-bold">{job.title}</h2>
+                <div className="flex items-center gap-3 mb-3">
+                  <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
                   <StatusBadge status={job.status} />
                 </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                   {job.department && (
-                    <span className="flex items-center gap-1"><Building className="h-4 w-4" />{job.department}</span>
+                    <span className="flex items-center gap-1.5">
+                      <Building className="h-4 w-4 text-gray-400" />
+                      {job.department}
+                    </span>
                   )}
                   {job.location && (
-                    <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{job.location}</span>
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4 text-gray-400" />
+                      {job.location}
+                    </span>
                   )}
-                  <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{job.employment_type}</span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4 text-gray-400" />
+                    {employmentTypeLabels[job.employment_type] || job.employment_type}
+                  </span>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Select value={job.status} onValueChange={updateStatus}>
-                  <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">פעיל</SelectItem>
-                    <SelectItem value="paused">מושהה</SelectItem>
-                    <SelectItem value="closed">סגור</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button onClick={runBatchScoring} disabled={scoring}>
-                  <Zap className="mr-2 h-4 w-4" />
-                  {scoring ? "מדרג..." : "הפעל דירוג AI"}
-                </Button>
+            </div>
+          </div>
+
+          {(job.description || job.requirements) && (
+            <div className="border-t border-gray-100 p-6 space-y-5">
+              {job.description && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-gray-400" />
+                    תיאור המשרה
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{job.description}</p>
+                </div>
+              )}
+              {job.requirements && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-800 mb-2">דרישות</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{job.requirements}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Candidates Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="flex items-center justify-between p-5 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Users className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">מועמדים</h2>
+                <p className="text-sm text-gray-500">{job.applications?.length || 0} מועמדויות</p>
               </div>
             </div>
-            {job.description && (
-              <div className="mt-4">
-                <h3 className="font-medium mb-1">תיאור</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{job.description}</p>
-              </div>
-            )}
-            {job.requirements && (
-              <div className="mt-4">
-                <h3 className="font-medium mb-1">דרישות</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{job.requirements}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">
-              מועמדים ({job.applications?.length || 0})
-            </CardTitle>
             <Button
               variant={compareMode ? "default" : "outline"}
               size="sm"
@@ -181,59 +224,102 @@ export default function JobDetailPage() {
                 setCompareMode(!compareMode);
                 if (compareMode) setSelectedCandidates(new Set());
               }}
+              className={`rounded-xl gap-2 transition-colors ${compareMode ? "bg-blue-500 hover:bg-blue-600 text-white" : "border-gray-200"}`}
             >
-              <GitCompare className="mr-2 h-4 w-4" />
-              השוואה
+              <GitCompare className="h-4 w-4" />
+              {compareMode ? "ביטול השוואה" : "השוואה"}
             </Button>
-          </CardHeader>
-          <CardContent>
-            {(job.applications || []).length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">טרם הוגשו מועמדויות</p>
-            ) : (
-              <div className="space-y-2">
-                {job.applications.map((app) => (
-                  <div key={app.id} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50">
-                    {compareMode && (
-                      <Checkbox
-                        checked={selectedCandidates.has(app.id)}
-                        onCheckedChange={() => toggleCandidate(app.id)}
-                      />
-                    )}
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-electric-100 text-electric-700 text-xs">
-                        {app.candidate?.full_name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <Link href={`/candidates/${app.candidate_id}`} className="font-medium hover:text-electric-500">
-                        {app.candidate?.full_name}
-                      </Link>
-                      <p className="text-sm text-muted-foreground">
-                        הוגש {formatDate(app.applied_at)}
-                        {app.candidate?.experience_years && ` • ${app.candidate.experience_years} שנות ניסיון`}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {app.ai_score !== null ? (
-                        <ScoreBadge score={app.ai_score} size="sm" />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">לא דורג</span>
-                      )}
-                      <StatusBadge status={app.status} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
 
+          {(job.applications || []).length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Users className="h-7 w-7 text-gray-300" />
+              </div>
+              <p className="text-gray-500 font-medium">טרם הוגשו מועמדויות</p>
+              <p className="text-sm text-gray-400 mt-1">מועמדים שיגישו מועמדות יופיעו כאן</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/50 text-right">
+                    {compareMode && <th className="py-3 px-4 w-12"></th>}
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">מועמד/ת</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">ציון</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">סטטוס</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">ניסיון</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">תאריך הגשה</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {job.applications.map((app) => (
+                    <tr
+                      key={app.id}
+                      className={`hover:bg-gray-50/80 transition-colors ${
+                        compareMode && selectedCandidates.has(app.id) ? "bg-blue-50/60" : ""
+                      }`}
+                    >
+                      {compareMode && (
+                        <td className="py-3.5 px-4">
+                          <Checkbox
+                            checked={selectedCandidates.has(app.id)}
+                            onCheckedChange={() => toggleCandidate(app.id)}
+                          />
+                        </td>
+                      )}
+                      <td className="py-3.5 px-5">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarFallback className="bg-blue-50 text-blue-600 text-xs font-semibold">
+                              {app.candidate?.full_name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <Link
+                            href={`/candidates/${app.candidate_id}`}
+                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                          >
+                            {app.candidate?.full_name}
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-5">
+                        {app.ai_score !== null ? (
+                          <ScoreBadge score={app.ai_score} size="sm" />
+                        ) : (
+                          <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg">לא דורג</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-5">
+                        <StatusBadge status={app.status} />
+                      </td>
+                      <td className="py-3.5 px-5 text-sm text-gray-600">
+                        {app.candidate?.experience_years != null
+                          ? `${app.candidate.experience_years} שנים`
+                          : "-"}
+                      </td>
+                      <td className="py-3.5 px-5 text-sm text-gray-500">
+                        {formatDate(app.applied_at)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Comparison Panel */}
         {compareMode && selectedCandidates.size >= 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">השוואת מועמדים</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-5 border-b border-gray-100 bg-gray-50/50">
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <GitCompare className="h-5 w-5 text-blue-500" />
+                השוואת מועמדים
+                <span className="text-sm font-normal text-gray-500">({selectedCandidates.size} נבחרו)</span>
+              </h2>
+            </div>
+            <div className="p-5">
               <div
                 className="grid gap-4"
                 style={{ gridTemplateColumns: `repeat(${selectedCandidates.size}, minmax(0, 1fr))` }}
@@ -241,53 +327,58 @@ export default function JobDetailPage() {
                 {job.applications
                   .filter((app) => selectedCandidates.has(app.id))
                   .map((app) => (
-                    <div key={app.id} className="space-y-3 border rounded-lg p-4">
-                      <div>
-                        <h4 className="font-semibold text-base">{app.candidate?.full_name}</h4>
+                    <div key={app.id} className="bg-gray-50 rounded-xl p-5 space-y-4 border border-gray-100">
+                      <div className="text-center pb-4 border-b border-gray-200">
+                        <Avatar className="h-14 w-14 mx-auto mb-3">
+                          <AvatarFallback className="bg-blue-100 text-blue-600 font-bold text-base">
+                            {app.candidate?.full_name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h4 className="font-bold text-gray-900">{app.candidate?.full_name}</h4>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">ציון AI</p>
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">ציון AI</p>
                         {app.ai_score !== null ? (
                           <ScoreBadge score={app.ai_score} size="sm" />
                         ) : (
-                          <span className="text-sm text-muted-foreground">לא דורג</span>
+                          <span className="text-sm text-gray-400">לא דורג</span>
                         )}
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">נימוק AI</p>
-                        <p className="text-sm mt-0.5">{app.ai_reasoning || "לא זמין"}</p>
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">נימוק AI</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{app.ai_reasoning || "לא זמין"}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">ניסיון</p>
-                        <p className="text-sm mt-0.5">
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">ניסיון</p>
+                        <p className="text-sm text-gray-700">
                           {app.candidate?.experience_years != null
                             ? `${app.candidate.experience_years} שנים`
                             : "לא זמין"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">כישורים</p>
-                        <div className="flex flex-wrap gap-1 mt-0.5">
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">כישורים</p>
+                        <div className="flex flex-wrap gap-1.5">
                           {app.candidate?.skills && app.candidate.skills.length > 0 ? (
                             app.candidate.skills.map((skill) => (
-                              <Badge key={skill} variant="secondary" className="text-xs">
+                              <Badge key={skill} variant="secondary" className="text-xs bg-white shadow-sm border border-gray-100">
                                 {skill}
                               </Badge>
                             ))
                           ) : (
-                            <span className="text-sm text-muted-foreground">לא זמין</span>
+                            <span className="text-sm text-gray-400">לא זמין</span>
                           )}
                         </div>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">השכלה</p>
-                        <p className="text-sm mt-0.5">{app.candidate?.education || "לא זמין"}</p>
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">השכלה</p>
+                        <p className="text-sm text-gray-700">{app.candidate?.education || "לא זמין"}</p>
                       </div>
                     </div>
                   ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
     </div>

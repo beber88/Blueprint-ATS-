@@ -3,13 +3,11 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/shared/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { PageLoading } from "@/components/shared/loading";
 import { Plus, Calendar, Clock, User, Video, Phone, MapPin } from "lucide-react";
 import { Interview, Candidate, Job } from "@/types";
@@ -42,7 +40,7 @@ export default function InterviewsPage() {
   useEffect(() => { fetchInterviews(); }, []);
 
   useEffect(() => {
-    fetch("/api/candidates").then((res) => res.json()).then(setCandidates).catch(() => {});
+    fetch("/api/candidates").then((res) => res.json()).then((data) => setCandidates(data.candidates || [])).catch(() => {});
     fetch("/api/jobs").then((res) => res.json()).then(setJobs).catch(() => {});
   }, []);
 
@@ -85,6 +83,12 @@ export default function InterviewsPage() {
     phone: Phone,
   };
 
+  const typeLabels: Record<string, string> = {
+    "in-person": "פרונטלי",
+    video: "וידאו",
+    phone: "טלפוני",
+  };
+
   const now = new Date();
   const upcoming = interviews.filter((i) => i.scheduled_at && new Date(i.scheduled_at) >= now);
   const past = interviews.filter((i) => i.scheduled_at && new Date(i.scheduled_at) < now);
@@ -92,61 +96,87 @@ export default function InterviewsPage() {
   if (loading) return <PageLoading />;
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       <Header title="ראיונות" subtitle={`${upcoming.length} קרובים`} />
-      <div className="p-6 space-y-6">
-        <div className="flex justify-end">
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
+
+      <div className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">ראיונות</h1>
+            <p className="text-sm text-gray-500 mt-1">{upcoming.length} ראיונות קרובים</p>
+          </div>
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6 py-2.5 shadow-sm transition-colors"
+          >
+            <Plus className="ml-2 h-4 w-4" />
             קביעת ראיון
           </Button>
         </div>
 
-        {/* Upcoming */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              ראיונות קרובים
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        {/* Upcoming Interviews */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-5 border-b border-gray-100 flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-blue-500" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">ראיונות קרובים</h2>
+              <p className="text-sm text-gray-500">{upcoming.length} ראיונות מתוכננים</p>
+            </div>
+          </div>
+          <div className="p-5">
             {upcoming.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">אין ראיונות קרובים</p>
+              <div className="text-center py-12">
+                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="h-7 w-7 text-gray-300" />
+                </div>
+                <p className="text-gray-500 font-medium">אין ראיונות קרובים</p>
+                <p className="text-sm text-gray-400 mt-1">קבעו ראיון חדש כדי להתחיל</p>
+              </div>
             ) : (
               <div className="space-y-3">
                 {upcoming.map((interview) => {
-                  const TypeIcon = typeIcons[interview.type] || MapPin;
+                  const TypeIcon = typeIcons[interview.type as keyof typeof typeIcons] || MapPin;
                   const app = interview.application as Interview["application"];
+                  const scheduledDate = interview.scheduled_at ? new Date(interview.scheduled_at) : null;
                   return (
-                    <div key={interview.id} className="flex items-center gap-4 p-4 rounded-lg border">
-                      <div className="flex flex-col items-center justify-center bg-electric-50 rounded-lg p-3 min-w-[60px]">
-                        <span className="text-lg font-bold text-electric-600">
-                          {interview.scheduled_at ? new Date(interview.scheduled_at).getDate() : "?"}
+                    <div
+                      key={interview.id}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:shadow-sm transition-shadow bg-white"
+                    >
+                      {/* Date Badge */}
+                      <div className="flex flex-col items-center justify-center bg-blue-50 rounded-xl p-3 min-w-[64px]">
+                        <span className="text-xl font-bold text-blue-600">
+                          {scheduledDate ? scheduledDate.getDate() : "?"}
                         </span>
-                        <span className="text-xs text-electric-500">
-                          {interview.scheduled_at ? new Date(interview.scheduled_at).toLocaleString("en", { month: "short" }) : ""}
+                        <span className="text-xs font-medium text-blue-500">
+                          {scheduledDate ? scheduledDate.toLocaleString("he-IL", { month: "short" }) : ""}
                         </span>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Link href={`/candidates/${app?.candidate?.id}`} className="font-semibold hover:text-electric-500">
-                            {app?.candidate?.full_name || "Unknown"}
+
+                      {/* Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Link
+                            href={`/candidates/${app?.candidate?.id}`}
+                            className="font-semibold text-gray-900 hover:text-blue-600 transition-colors truncate"
+                          >
+                            {app?.candidate?.full_name || "לא ידוע"}
                           </Link>
-                          <Badge variant="outline" className="text-xs">
-                            <TypeIcon className="h-3 w-3 mr-1" />
-                            {interview.type}
-                          </Badge>
+                          <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-lg font-medium">
+                            <TypeIcon className="h-3 w-3" />
+                            {typeLabels[interview.type] || interview.type}
+                          </span>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {app?.job?.title || "Unknown Job"}
-                        </p>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                        <p className="text-sm text-gray-500 truncate">{app?.job?.title || "משרה לא ידועה"}</p>
+                        <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-400">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : "TBD"}
+                            {scheduledDate ? formatDateTime(interview.scheduled_at!) : "TBD"}
                           </span>
-                          <span>{interview.duration_minutes} min</span>
+                          <span>{interview.duration_minutes} דקות</span>
                           {interview.interviewer && (
                             <span className="flex items-center gap-1">
                               <User className="h-3 w-3" />
@@ -160,63 +190,87 @@ export default function InterviewsPage() {
                 })}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Past */}
+        {/* Past Interviews */}
         {past.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">ראיונות קודמים</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {past.map((interview) => {
-                  const app = interview.application as Interview["application"];
-                  return (
-                    <div key={interview.id} className="flex items-center justify-between p-4 rounded-lg border">
-                      <div>
-                        <Link href={`/candidates/${app?.candidate?.id}`} className="font-medium hover:text-electric-500">
-                          {app?.candidate?.full_name || "Unknown"}
-                        </Link>
-                        <p className="text-sm text-muted-foreground">
-                          {app?.job?.title} &middot; {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : ""}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        {interview.outcome ? (
-                          <Badge variant={interview.outcome === "passed" ? "default" : "destructive"}>
-                            {interview.outcome}
-                          </Badge>
-                        ) : (
-                          <>
-                            <Button size="sm" variant="outline" onClick={() => updateOutcome(interview.id, "passed", "")}>
-                              עבר
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => updateOutcome(interview.id, "failed", "")}>
-                              נכשל
-                            </Button>
-                          </>
-                        )}
-                      </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-5 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900">ראיונות קודמים</h2>
+              <p className="text-sm text-gray-500">{past.length} ראיונות שהתקיימו</p>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {past.map((interview) => {
+                const app = interview.application as Interview["application"];
+                return (
+                  <div
+                    key={interview.id}
+                    className="flex items-center justify-between p-4 px-5 hover:bg-gray-50/50 transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <Link
+                        href={`/candidates/${app?.candidate?.id}`}
+                        className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                      >
+                        {app?.candidate?.full_name || "לא ידוע"}
+                      </Link>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        {app?.job?.title} &middot; {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : ""}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+                    <div className="flex items-center gap-2 mr-4">
+                      {interview.outcome ? (
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold ${
+                            interview.outcome === "passed"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                              : "bg-red-50 text-red-700 border border-red-100"
+                          }`}
+                        >
+                          {interview.outcome === "passed" ? "עבר" : "נכשל"}
+                        </span>
+                      ) : (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateOutcome(interview.id, "passed", "")}
+                            className="rounded-lg text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                          >
+                            עבר
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateOutcome(interview.id, "failed", "")}
+                            className="rounded-lg text-xs border-red-200 text-red-700 hover:bg-red-50"
+                          >
+                            נכשל
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
 
+        {/* Schedule Dialog */}
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>קביעת ראיון</DialogTitle>
+          <DialogContent className="max-w-lg rounded-2xl p-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-4 border-b border-gray-100">
+              <DialogTitle className="text-xl font-bold text-gray-900">קביעת ראיון</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="p-6 space-y-4">
               <div className="space-y-2">
-                <Label>מועמד/ת</Label>
+                <Label className="text-sm font-semibold text-gray-700">מועמד/ת</Label>
                 <Select value={form.candidate_id} onValueChange={(v) => setForm({ ...form, candidate_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="בחר מועמד/ת" /></SelectTrigger>
+                  <SelectTrigger className="rounded-xl border-gray-200">
+                    <SelectValue placeholder="בחרו מועמד/ת" />
+                  </SelectTrigger>
                   <SelectContent>
                     {candidates.map((c) => (
                       <SelectItem key={c.id} value={c.id}>{c.full_name}</SelectItem>
@@ -225,9 +279,11 @@ export default function InterviewsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>משרה</Label>
+                <Label className="text-sm font-semibold text-gray-700">משרה</Label>
                 <Select value={form.job_id} onValueChange={(v) => setForm({ ...form, job_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="בחר משרה" /></SelectTrigger>
+                  <SelectTrigger className="rounded-xl border-gray-200">
+                    <SelectValue placeholder="בחרו משרה" />
+                  </SelectTrigger>
                   <SelectContent>
                     {jobs.map((j) => (
                       <SelectItem key={j.id} value={j.id}>{j.title}</SelectItem>
@@ -237,19 +293,31 @@ export default function InterviewsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>תאריך ושעה</Label>
-                  <Input type="datetime-local" value={form.scheduled_at} onChange={(e) => setForm({ ...form, scheduled_at: e.target.value })} />
+                  <Label className="text-sm font-semibold text-gray-700">תאריך ושעה</Label>
+                  <Input
+                    type="datetime-local"
+                    value={form.scheduled_at}
+                    onChange={(e) => setForm({ ...form, scheduled_at: e.target.value })}
+                    className="rounded-xl border-gray-200"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>משך (דקות)</Label>
-                  <Input type="number" value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })} />
+                  <Label className="text-sm font-semibold text-gray-700">משך (דקות)</Label>
+                  <Input
+                    type="number"
+                    value={form.duration_minutes}
+                    onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
+                    className="rounded-xl border-gray-200"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>סוג</Label>
+                  <Label className="text-sm font-semibold text-gray-700">סוג ראיון</Label>
                   <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="rounded-xl border-gray-200">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="in-person">פרונטלי</SelectItem>
                       <SelectItem value="video">וידאו</SelectItem>
@@ -258,18 +326,32 @@ export default function InterviewsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>מראיין/ת</Label>
-                  <Input value={form.interviewer} onChange={(e) => setForm({ ...form, interviewer: e.target.value })} />
+                  <Label className="text-sm font-semibold text-gray-700">מראיין/ת</Label>
+                  <Input
+                    value={form.interviewer}
+                    onChange={(e) => setForm({ ...form, interviewer: e.target.value })}
+                    className="rounded-xl border-gray-200"
+                    placeholder="שם המראיין/ת"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>הערות</Label>
-                <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+                <Label className="text-sm font-semibold text-gray-700">הערות</Label>
+                <Textarea
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  className="rounded-xl border-gray-200 resize-none"
+                  rows={3}
+                />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>ביטול</Button>
-              <Button onClick={handleCreate}>קבע ראיון</Button>
+            <DialogFooter className="p-6 pt-4 border-t border-gray-100 gap-2">
+              <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-xl px-5">
+                ביטול
+              </Button>
+              <Button onClick={handleCreate} className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6">
+                קביעת ראיון
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

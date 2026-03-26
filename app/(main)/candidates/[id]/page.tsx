@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Header } from "@/components/shared/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
@@ -14,7 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { PageLoading } from "@/components/shared/loading";
 import {
   Mail, Phone, MapPin, ExternalLink, FileText, Briefcase, GraduationCap,
-  Calendar, MessageSquare, ArrowLeft, Save,
+  Calendar, MessageSquare, ArrowRight, Save, Clock, User, Award,
+  Send, Video, PhoneCall, Building2, Hash,
 } from "lucide-react";
 import Link from "next/link";
 import { Candidate, Application, Interview, MessageSent, ActivityLog } from "@/types";
@@ -26,6 +25,50 @@ interface CandidateDetail extends Candidate {
   interviews: Interview[];
   messages: MessageSent[];
   activity_log: ActivityLog[];
+}
+
+const avatarColors = [
+  { bg: "bg-blue-500", text: "text-white" },
+  { bg: "bg-emerald-500", text: "text-white" },
+  { bg: "bg-violet-500", text: "text-white" },
+  { bg: "bg-amber-500", text: "text-white" },
+  { bg: "bg-rose-500", text: "text-white" },
+  { bg: "bg-cyan-500", text: "text-white" },
+  { bg: "bg-indigo-500", text: "text-white" },
+  { bg: "bg-teal-500", text: "text-white" },
+];
+
+function getAvatarColor(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return avatarColors[Math.abs(hash) % avatarColors.length];
+}
+
+function getInitials(name: string) {
+  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+}
+
+const skillColors = [
+  "bg-blue-50 text-blue-700 ring-blue-200/60",
+  "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
+  "bg-violet-50 text-violet-700 ring-violet-200/60",
+  "bg-amber-50 text-amber-700 ring-amber-200/60",
+  "bg-rose-50 text-rose-700 ring-rose-200/60",
+  "bg-cyan-50 text-cyan-700 ring-cyan-200/60",
+  "bg-indigo-50 text-indigo-700 ring-indigo-200/60",
+  "bg-teal-50 text-teal-700 ring-teal-200/60",
+  "bg-pink-50 text-pink-700 ring-pink-200/60",
+  "bg-orange-50 text-orange-700 ring-orange-200/60",
+];
+
+function getSkillColor(skill: string) {
+  let hash = 0;
+  for (let i = 0; i < skill.length; i++) {
+    hash = skill.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return skillColors[Math.abs(hash) % skillColors.length];
 }
 
 export default function CandidateProfilePage() {
@@ -81,318 +124,481 @@ export default function CandidateProfilePage() {
     "interviewed", "approved", "rejected", "keep_for_future",
   ];
 
+  const avatarStyle = getAvatarColor(candidate.full_name);
+
+  const topScore = (() => {
+    const apps = candidate.applications || [];
+    const scores = apps.map((a) => a.ai_score).filter((s): s is number => s !== null);
+    return scores.length > 0 ? Math.max(...scores) : null;
+  })();
+
+  const interviewTypeIcon = (type: string) => {
+    switch (type) {
+      case "video": return <Video className="h-4 w-4" />;
+      case "phone": return <PhoneCall className="h-4 w-4" />;
+      default: return <Building2 className="h-4 w-4" />;
+    }
+  };
+
+  const channelIcon = (channel: string) => {
+    switch (channel) {
+      case "email": return <Mail className="h-4 w-4" />;
+      case "whatsapp": return <MessageSquare className="h-4 w-4" />;
+      default: return <Send className="h-4 w-4" />;
+    }
+  };
+
   return (
-    <div>
-      <Header title={candidate.full_name} subtitle="פרופיל מועמד/ת" />
-      <div className="p-6 space-y-6">
-        {/* Back button */}
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          חזרה
-        </Button>
+    <div className="min-h-screen bg-slate-50/50">
+      {/* Hero Section */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="px-8 py-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.back()}
+            className="text-slate-500 hover:text-slate-700 -mr-2 mb-4"
+          >
+            <ArrowRight className="ml-1 h-4 w-4" />
+            חזרה למועמדים
+          </Button>
 
-        {/* Profile Header */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between flex-wrap gap-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold">{candidate.full_name}</h2>
-                  <StatusBadge status={candidate.status} />
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
-                  {candidate.email && (
-                    <a href={`mailto:${candidate.email}`} className="flex items-center gap-1 hover:text-electric-500">
-                      <Mail className="h-4 w-4" />
-                      {candidate.email}
-                    </a>
-                  )}
-                  {candidate.phone && (
-                    <a href={`tel:${candidate.phone}`} className="flex items-center gap-1 hover:text-electric-500">
-                      <Phone className="h-4 w-4" />
-                      {candidate.phone}
-                    </a>
-                  )}
-                  {candidate.location && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {candidate.location}
-                    </span>
-                  )}
-                  {candidate.linkedin_url && (
-                    <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-electric-500">
-                      <ExternalLink className="h-4 w-4" />
-                      לינקדאין
-                    </a>
-                  )}
-                  {candidate.cv_file_url && (
-                    <a href={candidate.cv_file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-electric-500">
-                      <FileText className="h-4 w-4" />
-                      צפייה בקורות חיים
-                    </a>
-                  )}
-                </div>
-              </div>
+          <div className="flex items-start gap-6 pb-2">
+            {/* Large Avatar */}
+            <div className={`flex items-center justify-center h-20 w-20 rounded-2xl ${avatarStyle.bg} ${avatarStyle.text} text-2xl font-bold shadow-lg shrink-0`}>
+              {getInitials(candidate.full_name)}
+            </div>
 
-              <div className="flex items-center gap-3">
-                <Select value={candidate.status} onValueChange={updateStatus}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Link href={`/messages?candidateId=${candidate.id}`}>
-                  <Button variant="outline">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    שליחת הודעה
-                  </Button>
-                </Link>
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{candidate.full_name}</h1>
+                    <StatusBadge status={candidate.status} className="text-sm px-3 py-1" />
+                    {topScore !== null && (
+                      <ScoreBadge score={topScore} size="md" />
+                    )}
+                  </div>
+
+                  {/* Contact Row */}
+                  <div className="flex items-center gap-5 text-sm text-slate-500 flex-wrap mt-1">
+                    {candidate.email && (
+                      <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
+                        <Mail className="h-4 w-4 text-slate-400" />
+                        {candidate.email}
+                      </a>
+                    )}
+                    {candidate.phone && (
+                      <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
+                        <Phone className="h-4 w-4 text-slate-400" />
+                        {candidate.phone}
+                      </a>
+                    )}
+                    {candidate.location && (
+                      <span className="flex items-center gap-1.5">
+                        <MapPin className="h-4 w-4 text-slate-400" />
+                        {candidate.location}
+                      </span>
+                    )}
+                    {candidate.linkedin_url && (
+                      <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
+                        <ExternalLink className="h-4 w-4 text-slate-400" />
+                        לינקדאין
+                      </a>
+                    )}
+                    {candidate.cv_file_url && (
+                      <a href={candidate.cv_file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
+                        <FileText className="h-4 w-4 text-slate-400" />
+                        קורות חיים
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <Link href={`/messages?candidateId=${candidate.id}`}>
+                    <Button variant="outline" className="h-10 rounded-lg border-slate-200 shadow-sm hover:shadow-md transition-all">
+                      <MessageSquare className="ml-2 h-4 w-4" />
+                      שליחת הודעה
+                    </Button>
+                  </Link>
+                  <Select value={candidate.status} onValueChange={updateStatus}>
+                    <SelectTrigger className="w-52 h-10 rounded-lg border-slate-200 shadow-sm text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+      </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="overview">
-          <TabsList>
-            <TabsTrigger value="overview">סקירה</TabsTrigger>
-            <TabsTrigger value="applications">מועמדויות ({candidate.applications?.length || 0})</TabsTrigger>
-            <TabsTrigger value="interviews">ראיונות ({candidate.interviews?.length || 0})</TabsTrigger>
-            <TabsTrigger value="messages">הודעות ({candidate.messages?.length || 0})</TabsTrigger>
-            <TabsTrigger value="activity">פעילות</TabsTrigger>
+      {/* Tabs */}
+      <div className="px-8 py-6">
+        <Tabs defaultValue="overview" dir="rtl">
+          <TabsList className="bg-white rounded-xl shadow-sm border border-slate-200 p-1 h-auto mb-6">
+            <TabsTrigger value="overview" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+              סקירה
+            </TabsTrigger>
+            <TabsTrigger value="applications" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+              מועמדויות
+              <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
+                {candidate.applications?.length || 0}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="interviews" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+              ראיונות
+              <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
+                {candidate.interviews?.length || 0}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+              הודעות
+              <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
+                {candidate.messages?.length || 0}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+              פעילות
+            </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              {/* Skills */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">כישורים</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {(candidate.skills || []).map((skill) => (
-                      <Badge key={skill} variant="secondary">{skill}</Badge>
-                    ))}
-                    {(!candidate.skills || candidate.skills.length === 0) && (
-                      <p className="text-sm text-muted-foreground">לא צוינו כישורים</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+          <TabsContent value="overview" className="space-y-6 mt-0">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Skills Card */}
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Hash className="h-5 w-5 text-slate-400" />
+                  <h3 className="text-base font-semibold text-slate-900">כישורים</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(candidate.skills || []).map((skill) => (
+                    <span
+                      key={skill}
+                      className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium ring-1 ring-inset ${getSkillColor(skill)}`}
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                  {(!candidate.skills || candidate.skills.length === 0) && (
+                    <p className="text-sm text-slate-400">לא צוינו כישורים</p>
+                  )}
+                </div>
+              </div>
 
-              {/* Summary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">סיכום</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{candidate.experience_years || 0} שנים ניסיון</span>
+              {/* Summary Card */}
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <User className="h-5 w-5 text-slate-400" />
+                  <h3 className="text-base font-semibold text-slate-900">סיכום</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-blue-100">
+                      <Briefcase className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium">ניסיון</p>
+                      <p className="text-sm font-semibold text-slate-900">{candidate.experience_years || 0} שנים</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{candidate.education || "לא צוין"}</span>
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-violet-100">
+                      <GraduationCap className="h-4 w-4 text-violet-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium">השכלה</p>
+                      <p className="text-sm font-semibold text-slate-900">{candidate.education || "לא צוין"}</p>
+                    </div>
                   </div>
                   {candidate.certifications && candidate.certifications.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium mb-1">הסמכות:</p>
-                      <div className="flex flex-wrap gap-1">
+                    <div className="p-3 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-amber-100">
+                          <Award className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium">הסמכות</p>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mt-1 mr-12">
                         {candidate.certifications.map((cert) => (
-                          <Badge key={cert} variant="outline" className="text-xs">{cert}</Badge>
+                          <Badge key={cert} variant="outline" className="text-xs rounded-md">
+                            {cert}
+                          </Badge>
                         ))}
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
             {/* Experience Timeline */}
             {candidate.previous_roles && candidate.previous_roles.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">ניסיון</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {candidate.previous_roles.map((role, i) => (
-                      <div key={i} className="relative pl-6 border-l-2 border-electric-200 pb-4 last:pb-0">
-                        <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-electric-500" />
-                        <h4 className="font-semibold">{role.title}</h4>
-                        <p className="text-sm text-muted-foreground">{role.company} &middot; {role.duration}</p>
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-5">
+                  <Briefcase className="h-5 w-5 text-slate-400" />
+                  <h3 className="text-base font-semibold text-slate-900">ניסיון תעסוקתי</h3>
+                </div>
+                <div className="space-y-0">
+                  {candidate.previous_roles.map((role, i) => (
+                    <div key={i} className="relative pr-8 pb-6 last:pb-0">
+                      {/* Timeline line */}
+                      {i < candidate.previous_roles!.length - 1 && (
+                        <div className="absolute right-[11px] top-6 bottom-0 w-0.5 bg-slate-200" />
+                      )}
+                      {/* Timeline dot */}
+                      <div className="absolute right-0 top-1 h-6 w-6 rounded-full bg-electric-100 flex items-center justify-center ring-4 ring-white">
+                        <div className="h-2.5 w-2.5 rounded-full bg-electric-500" />
+                      </div>
+                      <div className="bg-slate-50 rounded-lg p-4">
+                        <h4 className="font-semibold text-slate-900">{role.title}</h4>
+                        <p className="text-sm text-slate-500 mt-0.5">
+                          {role.company}
+                          <span className="mx-2 text-slate-300">&middot;</span>
+                          {role.duration}
+                        </p>
                         {role.description && (
-                          <p className="text-sm mt-1">{role.description}</p>
+                          <p className="text-sm text-slate-600 mt-2 leading-relaxed">{role.description}</p>
                         )}
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
-            {/* Notes */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">הערות</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="הוסיפו הערות על מועמד/ת זו..."
-                  rows={4}
-                />
-                <Button onClick={saveNotes} size="sm">
-                  <Save className="mr-2 h-4 w-4" />
+            {/* Notes Card */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <FileText className="h-5 w-5 text-slate-400" />
+                <h3 className="text-base font-semibold text-slate-900">הערות</h3>
+              </div>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="הוסיפו הערות על מועמד/ת זו..."
+                rows={4}
+                className="resize-none rounded-lg border-slate-200 focus:ring-2 focus:ring-electric-500/20 focus:border-electric-400"
+              />
+              <div className="mt-3 flex justify-end">
+                <Button
+                  onClick={saveNotes}
+                  size="sm"
+                  className="rounded-lg bg-electric-600 hover:bg-electric-700"
+                >
+                  <Save className="ml-2 h-4 w-4" />
                   שמירת הערות
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Applications Tab */}
-          <TabsContent value="applications" className="space-y-4">
+          <TabsContent value="applications" className="space-y-4 mt-0">
             {(candidate.applications || []).length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  אין מועמדויות עדיין
-                </CardContent>
-              </Card>
+              <div className="bg-white rounded-xl shadow-sm">
+                <div className="py-16 text-center">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
+                    <Briefcase className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <p className="text-sm text-slate-500">אין מועמדויות עדיין</p>
+                </div>
+              </div>
             ) : (
               candidate.applications.map((app) => (
-                <Card key={app.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Link href={`/jobs/${app.job_id}`} className="font-semibold hover:text-electric-500">
+                <div key={app.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <Link
+                          href={`/jobs/${app.job_id}`}
+                          className="text-base font-semibold text-slate-900 hover:text-electric-600 transition-colors"
+                        >
                           {app.job?.title || "משרה לא ידועה"}
                         </Link>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-slate-500 mt-1">
+                          <Calendar className="inline h-3.5 w-3.5 ml-1 -mt-0.5" />
                           הוגש ב-{formatDate(app.applied_at)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {app.ai_score !== null && <ScoreBadge score={app.ai_score} />}
+                      <div className="flex items-center gap-3 shrink-0">
+                        {app.ai_score !== null && <ScoreBadge score={app.ai_score} size="md" />}
                         <StatusBadge status={app.status} />
                       </div>
                     </div>
                     {app.ai_reasoning && (
-                      <p className="text-sm mt-2 text-muted-foreground">{app.ai_reasoning}</p>
+                      <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <p className="text-xs font-medium text-slate-500 mb-1">הערכת AI</p>
+                        <p className="text-sm text-slate-600 leading-relaxed">{app.ai_reasoning}</p>
+                      </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))
             )}
           </TabsContent>
 
           {/* Interviews Tab */}
-          <TabsContent value="interviews" className="space-y-4">
+          <TabsContent value="interviews" className="space-y-4 mt-0">
             {(candidate.interviews || []).length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  אין ראיונות מתוכננים
-                </CardContent>
-              </Card>
+              <div className="bg-white rounded-xl shadow-sm">
+                <div className="py-16 text-center">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
+                    <Calendar className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <p className="text-sm text-slate-500">אין ראיונות מתוכננים</p>
+                </div>
+              </div>
             ) : (
               candidate.interviews.map((interview) => (
-                <Card key={interview.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">
-                            {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : "TBD"}
-                          </span>
+                <div key={interview.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center justify-center h-11 w-11 rounded-xl bg-electric-50 text-electric-600 shrink-0">
+                          {interviewTypeIcon(interview.type)}
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {interview.type} &middot; {interview.duration_minutes} min
-                          {interview.interviewer && ` &middot; ${interview.interviewer}`}
-                        </p>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-900">
+                              {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : "טרם נקבע"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3.5 w-3.5" />
+                              {interview.duration_minutes} דקות
+                            </span>
+                            <span className="capitalize">{interview.type}</span>
+                            {interview.interviewer && (
+                              <span className="flex items-center gap-1">
+                                <User className="h-3.5 w-3.5" />
+                                {interview.interviewer}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       {interview.outcome && (
-                        <Badge variant={interview.outcome === "passed" ? "default" : "destructive"}>
-                          {interview.outcome}
+                        <Badge
+                          variant={interview.outcome === "passed" ? "default" : "destructive"}
+                          className="text-sm px-3 py-1 rounded-lg"
+                        >
+                          {interview.outcome === "passed" ? "עבר" : interview.outcome === "failed" ? "נכשל" : interview.outcome}
                         </Badge>
                       )}
                     </div>
                     {interview.notes && (
-                      <p className="text-sm mt-2">{interview.notes}</p>
+                      <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <p className="text-sm text-slate-600 leading-relaxed">{interview.notes}</p>
+                      </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))
             )}
           </TabsContent>
 
           {/* Messages Tab */}
-          <TabsContent value="messages" className="space-y-4">
+          <TabsContent value="messages" className="space-y-4 mt-0">
             {(candidate.messages || []).length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  טרם נשלחו הודעות
-                </CardContent>
-              </Card>
+              <div className="bg-white rounded-xl shadow-sm">
+                <div className="py-16 text-center">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
+                    <MessageSquare className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <p className="text-sm text-slate-500">טרם נשלחו הודעות</p>
+                </div>
+              </div>
             ) : (
               candidate.messages.map((msg) => (
-                <Card key={msg.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{msg.channel}</Badge>
-                          {msg.subject && <span className="font-medium">{msg.subject}</span>}
+                <div key={msg.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                        <div className={`flex items-center justify-center h-11 w-11 rounded-xl shrink-0 ${
+                          msg.channel === "email" ? "bg-blue-50 text-blue-600" : "bg-emerald-50 text-emerald-600"
+                        }`}>
+                          {channelIcon(msg.channel)}
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                          {msg.body}
-                        </p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge
+                              variant="outline"
+                              className={`text-xs rounded-md ${
+                                msg.channel === "email" ? "border-blue-200 text-blue-700 bg-blue-50" : "border-emerald-200 text-emerald-700 bg-emerald-50"
+                              }`}
+                            >
+                              {msg.channel === "email" ? "אימייל" : "וואטסאפ"}
+                            </Badge>
+                            {msg.subject && (
+                              <span className="font-semibold text-slate-900 truncate">{msg.subject}</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
+                            {msg.body}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-left shrink-0">
                         <StatusBadge status={msg.status} />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-slate-400 mt-1.5">
                           {formatDateTime(msg.sent_at)}
                         </p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))
             )}
           </TabsContent>
 
           {/* Activity Tab */}
-          <TabsContent value="activity">
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
+          <TabsContent value="activity" className="mt-0">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              {(!candidate.activity_log || candidate.activity_log.length === 0) ? (
+                <div className="py-12 text-center">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
+                    <Clock className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <p className="text-sm text-slate-500">אין פעילות רשומה</p>
+                </div>
+              ) : (
+                <div className="space-y-0">
                   {(candidate.activity_log || [])
                     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                    .map((activity) => (
-                      <div key={activity.id} className="flex items-start gap-3 border-b last:border-0 pb-3">
-                        <div className="mt-1.5 h-2 w-2 rounded-full bg-electric-500 shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{getStatusLabel(activity.action)}</p>
-                          <p className="text-xs text-muted-foreground">
+                    .map((activity, i) => (
+                      <div key={activity.id} className="relative pr-8 py-4 first:pt-0 last:pb-0">
+                        {/* Timeline line */}
+                        {i < candidate.activity_log.length - 1 && (
+                          <div className="absolute right-[11px] top-8 bottom-0 w-0.5 bg-slate-200" />
+                        )}
+                        {/* Timeline dot */}
+                        <div className="absolute right-0 top-[18px] first:top-0 h-6 w-6 rounded-full bg-electric-50 flex items-center justify-center ring-4 ring-white">
+                          <div className="h-2 w-2 rounded-full bg-electric-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-slate-900">{getStatusLabel(activity.action)}</p>
+                          <p className="text-xs text-slate-400">
                             {formatDateTime(activity.created_at)}
                           </p>
                         </div>
                       </div>
                     ))}
-                  {(!candidate.activity_log || candidate.activity_log.length === 0) && (
-                    <p className="text-sm text-muted-foreground text-center">אין פעילות רשומה</p>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </div>

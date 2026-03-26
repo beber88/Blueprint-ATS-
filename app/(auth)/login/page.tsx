@@ -3,11 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -38,75 +34,86 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-navy-900 via-navy-800 to-electric-900">
-      <Card className="w-full max-w-md mx-4 shadow-2xl">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-electric-500">
-            <FileText className="h-8 w-8 text-white" />
+    <div className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4" dir="rtl">
+      <div className="w-full max-w-sm">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-14 h-14 bg-[#3B82F6] rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/25">
+              <span className="text-white text-2xl font-bold">B</span>
+            </div>
+            <h1 className="text-xl font-bold text-gray-900">Blueprint ATS</h1>
+            <p className="text-sm text-gray-500 mt-1">מערכת ניהול מועמדים</p>
           </div>
-          <div>
-            <CardTitle className="text-2xl font-bold text-navy-900">
-              התחברות ל-Blueprint ATS
-            </CardTitle>
-            <CardDescription className="text-base">
-              הזינו פרטי התחברות כדי להמשיך
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-5">
             {error && (
-              <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+              <div className="rounded-xl bg-red-50 border border-red-100 p-3.5 text-sm text-red-600 text-center">
                 {error}
               </div>
             )}
+
             <div className="space-y-2">
-              <Label htmlFor="email">אימייל</Label>
-              <Input
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
+                כתובת מייל
+              </label>
+              <input
                 id="email"
                 type="email"
                 placeholder="admin@blueprint.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="password">סיסמה</Label>
-              <Input
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                סיסמה
+              </label>
+              <input
                 id="password"
                 type="password"
                 placeholder="הזינו סיסמה"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold py-3 rounded-xl transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+            >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   מתחבר...
                 </>
               ) : (
-                "התחברות"
+                "התחבר"
               )}
-            </Button>
+            </button>
           </form>
 
-          <div className="relative my-4">
+          {/* Divider */}
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <div className="w-full border-t border-gray-200" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-muted-foreground">או</span>
+            <div className="relative flex justify-center">
+              <span className="bg-white px-4 text-sm text-gray-400">או</span>
             </div>
           </div>
 
-          <Button
+          {/* Google Button */}
+          <button
             type="button"
-            variant="outline"
-            className="w-full"
             disabled={loading}
             onClick={async () => {
               setLoading(true);
@@ -118,8 +125,9 @@ export default function LoginPage() {
                 },
               });
             }}
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl border border-gray-200 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
                 fill="#4285F4"
@@ -138,9 +146,9 @@ export default function LoginPage() {
               />
             </svg>
             המשך עם Google
-          </Button>
-        </CardContent>
-      </Card>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

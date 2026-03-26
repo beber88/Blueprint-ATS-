@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { DashboardStats } from "@/types";
 import { formatDateTime, getStatusLabel } from "@/lib/utils";
+import { ScoreBadge } from "@/components/shared/score-badge";
 
 const STATUS_COLORS: Record<string, string> = {
   new: "#6b7280",
@@ -24,6 +25,17 @@ const STATUS_COLORS: Record<string, string> = {
   approved: "#22c55e",
   rejected: "#ef4444",
   keep_for_future: "#f59e0b",
+};
+
+const STATUS_DOT_COLORS: Record<string, string> = {
+  new: "bg-gray-500",
+  reviewed: "bg-blue-500",
+  shortlisted: "bg-indigo-500",
+  interview_scheduled: "bg-purple-600",
+  interviewed: "bg-violet-500",
+  approved: "bg-green-500",
+  rejected: "bg-red-500",
+  keep_for_future: "bg-amber-500",
 };
 
 export default function DashboardPage() {
@@ -47,6 +59,7 @@ export default function DashboardPage() {
       icon: Users,
       color: "text-blue-600",
       bg: "bg-blue-50",
+      iconBg: "bg-blue-100",
     },
     {
       title: "חדשים השבוע",
@@ -54,6 +67,7 @@ export default function DashboardPage() {
       icon: UserPlus,
       color: "text-green-600",
       bg: "bg-green-50",
+      iconBg: "bg-green-100",
     },
     {
       title: "ראיונות מתוכננים",
@@ -61,34 +75,50 @@ export default function DashboardPage() {
       icon: Calendar,
       color: "text-purple-600",
       bg: "bg-purple-50",
+      iconBg: "bg-purple-100",
     },
     {
       title: "אושרו החודש",
       value: stats?.approved_this_month || 0,
       icon: CheckCircle,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
+      color: "text-amber-600",
+      bg: "bg-amber-50",
+      iconBg: "bg-amber-100",
     },
   ];
 
+  const todayDate = new Date().toLocaleDateString("he-IL", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <div>
-      <Header title="לוח בקרה" subtitle="סקירת תהליך הגיוס" />
-      <div className="p-6 space-y-6">
+      <Header title="דשבורד" subtitle={todayDate} />
+      <div className="p-8 space-y-6">
         {/* KPI Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {kpis.map((kpi) => (
-            <Card key={kpi.title}>
+            <Card
+              key={kpi.title}
+              className="rounded-xl shadow-sm border-0 overflow-hidden"
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">
                       {kpi.title}
                     </p>
-                    <p className="text-3xl font-bold mt-1">{kpi.value}</p>
+                    <p className="text-4xl font-bold tracking-tight">
+                      {kpi.value}
+                    </p>
                   </div>
-                  <div className={`rounded-lg p-3 ${kpi.bg}`}>
-                    <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
+                  <div
+                    className={`rounded-2xl p-4 ${kpi.iconBg}`}
+                  >
+                    <kpi.icon className={`h-7 w-7 ${kpi.color}`} />
                   </div>
                 </div>
               </CardContent>
@@ -99,34 +129,38 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="flex gap-3">
           <Link href="/candidates?upload=true">
-            <Button>
+            <Button className="rounded-lg">
               <Upload className="mr-2 h-4 w-4" />
               העלאת קו״ח
             </Button>
           </Link>
           <Link href="/jobs?new=true">
-            <Button variant="outline">
+            <Button variant="outline" className="rounded-lg">
               <Briefcase className="mr-2 h-4 w-4" />
               משרה חדשה
             </Button>
           </Link>
           <Link href="/interviews?new=true">
-            <Button variant="outline">
+            <Button variant="outline" className="rounded-lg">
               <Plus className="mr-2 h-4 w-4" />
               קביעת ראיון
             </Button>
           </Link>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Pipeline by Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">סקירת Pipeline</CardTitle>
+        {/* Pipeline + Status Breakdown */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Pipeline Chart */}
+          <Card className="lg:col-span-2 rounded-xl shadow-sm border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold">
+                סקירת Pipeline
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              {stats?.pipeline_by_status && stats.pipeline_by_status.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
+              {stats?.pipeline_by_status &&
+              stats.pipeline_by_status.length > 0 ? (
+                <ResponsiveContainer width="100%" height={320}>
                   <BarChart
                     data={stats.pipeline_by_status.map((item) => ({
                       name: getStatusLabel(item.status),
@@ -137,9 +171,20 @@ export default function DashboardPage() {
                     margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
                   >
                     <XAxis type="number" allowDecimals={false} />
-                    <YAxis type="category" dataKey="name" width={95} tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      width={95}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: "12px",
+                        border: "none",
+                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                      }}
+                    />
+                    <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={24}>
                       {stats.pipeline_by_status.map((item) => (
                         <Cell
                           key={item.status}
@@ -150,34 +195,89 @@ export default function DashboardPage() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  אין מועמדים עדיין
-                </p>
+                <div className="flex items-center justify-center h-[320px]">
+                  <p className="text-sm text-muted-foreground">
+                    אין מועמדים עדיין
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
 
+          {/* Status Breakdown */}
+          <Card className="rounded-xl shadow-sm border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold">
+                פילוח לפי סטטוס
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats?.pipeline_by_status &&
+              stats.pipeline_by_status.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {stats.pipeline_by_status.map((item) => (
+                    <div
+                      key={item.status}
+                      className="rounded-xl bg-gray-50 p-3 flex flex-col gap-1"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`h-2.5 w-2.5 rounded-full ${
+                            STATUS_DOT_COLORS[item.status] || "bg-gray-400"
+                          }`}
+                        />
+                        <span className="text-xs text-muted-foreground truncate">
+                          {getStatusLabel(item.status)}
+                        </span>
+                      </div>
+                      <span className="text-2xl font-bold pr-4">
+                        {item.count}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-40">
+                  <p className="text-sm text-muted-foreground">אין נתונים</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity + Active Jobs */}
+        <div className="grid gap-6 lg:grid-cols-2">
           {/* Recent Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Activity className="h-5 w-5" />
+          <Card className="rounded-xl shadow-sm border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <div className="rounded-lg bg-blue-50 p-1.5">
+                  <Activity className="h-4 w-4 text-blue-600" />
+                </div>
                 פעילות אחרונה
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-1">
                 {(stats?.recent_activity || []).map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-3 text-sm border-b last:border-0 pb-3 last:pb-0"
+                    className="flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="mt-1 h-2 w-2 rounded-full bg-electric-500 shrink-0" />
+                    <div className="shrink-0 rounded-full bg-blue-100 p-2">
+                      <Activity className="h-4 w-4 text-blue-600" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">
-                        {(activity as unknown as { candidate?: { full_name: string } }).candidate?.full_name || "Unknown"}
+                      <p className="text-sm font-medium truncate">
+                        {
+                          (
+                            activity as unknown as {
+                              candidate?: { full_name: string };
+                            }
+                          ).candidate?.full_name || "Unknown"
+                        }
                       </p>
-                      <p className="text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         {getStatusLabel(activity.action)}
                       </p>
                     </div>
@@ -186,47 +286,64 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 ))}
-                {(!stats?.recent_activity || stats.recent_activity.length === 0) && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    אין פעילות אחרונה
-                  </p>
+                {(!stats?.recent_activity ||
+                  stats.recent_activity.length === 0) && (
+                  <div className="flex items-center justify-center h-40">
+                    <p className="text-sm text-muted-foreground">
+                      אין פעילות אחרונה
+                    </p>
+                  </div>
                 )}
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Top Jobs */}
-        {stats?.top_jobs && stats.top_jobs.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">משרות פעילות</CardTitle>
+          {/* Active Jobs */}
+          <Card className="rounded-xl shadow-sm border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <div className="rounded-lg bg-purple-50 p-1.5">
+                  <Briefcase className="h-4 w-4 text-purple-600" />
+                </div>
+                משרות פעילות
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {stats.top_jobs.map((job) => (
-                  <Link
-                    key={job.id}
-                    href={`/jobs/${job.id}`}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div>
-                      <p className="font-medium">{job.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {job.candidate_count} מועמדים
-                      </p>
-                    </div>
-                    {job.top_score != null && job.top_score > 0 && (
-                      <span className="text-sm font-medium text-green-600">
-                        ציון עליון: {job.top_score}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </div>
+              {stats?.top_jobs && stats.top_jobs.length > 0 ? (
+                <div className="space-y-2">
+                  {stats.top_jobs.map((job) => (
+                    <Link
+                      key={job.id}
+                      href={`/jobs/${job.id}`}
+                      className="flex items-center justify-between rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition-colors group"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm group-hover:text-blue-600 transition-colors truncate">
+                          {job.title}
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
+                            {job.candidate_count} מועמדים
+                          </span>
+                        </div>
+                      </div>
+                      {job.top_score != null && job.top_score > 0 && (
+                        <ScoreBadge score={job.top_score} size="sm" />
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-40">
+                  <p className="text-sm text-muted-foreground">
+                    אין משרות פעילות
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
-        )}
+        </div>
       </div>
     </div>
   );

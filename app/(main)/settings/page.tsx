@@ -3,15 +3,12 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/shared/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Mail, MessageCircle, Settings as SettingsIcon } from "lucide-react";
+import { Plus, Mail, MessageCircle, Settings as SettingsIcon, CheckCircle2, AlertCircle } from "lucide-react";
 import { MessageTemplate } from "@/types";
 import { toast } from "sonner";
 
@@ -54,105 +51,155 @@ export default function SettingsPage() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       <Header title="הגדרות" subtitle="הגדרת אינטגרציות ותבניות" />
-      <div className="p-6 space-y-6 max-w-4xl">
-        {/* Integration Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <SettingsIcon className="h-5 w-5" />
-              אינטגרציות
-            </CardTitle>
-            <CardDescription>
-              הגדרת חיבורים לשירותים חיצוניים
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg border">
-              <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Gmail</p>
-                  <p className="text-sm text-muted-foreground">שליחת אימייל באמצעות OAuth2</p>
-                </div>
-              </div>
-              <Badge variant={process.env.NEXT_PUBLIC_GMAIL_CONFIGURED ? "default" : "secondary"}>
-                הגדרה ב-.env.local
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between p-4 rounded-lg border">
-              <div className="flex items-center gap-3">
-                <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Twilio WhatsApp</p>
-                  <p className="text-sm text-muted-foreground">WhatsApp Business API</p>
-                </div>
-              </div>
-              <Badge variant="secondary">הגדרה ב-.env.local</Badge>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Separator />
+      <div className="p-6 lg:p-8 space-y-6 max-w-4xl mx-auto">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">הגדרות</h1>
+          <p className="text-sm text-gray-500 mt-1">הגדרת אינטגרציות ותבניות הודעות</p>
+        </div>
+
+        {/* Integration Status */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-5 border-b border-gray-100 flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+              <SettingsIcon className="h-5 w-5 text-gray-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">אינטגרציות</h2>
+              <p className="text-sm text-gray-500">הגדרת חיבורים לשירותים חיצוניים</p>
+            </div>
+          </div>
+          <div className="p-5 space-y-3">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100">
+                  <Mail className="h-5 w-5 text-gray-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Gmail</p>
+                  <p className="text-sm text-gray-500">שליחת אימייל באמצעות OAuth2</p>
+                </div>
+              </div>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                process.env.NEXT_PUBLIC_GMAIL_CONFIGURED
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                  : "bg-gray-100 text-gray-600 border border-gray-200"
+              }`}>
+                {process.env.NEXT_PUBLIC_GMAIL_CONFIGURED ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                ) : (
+                  <AlertCircle className="h-3.5 w-3.5" />
+                )}
+                הגדרה ב-.env.local
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100">
+                  <MessageCircle className="h-5 w-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Twilio WhatsApp</p>
+                  <p className="text-sm text-gray-500">WhatsApp Business API</p>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                <AlertCircle className="h-3.5 w-3.5" />
+                הגדרה ב-.env.local
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Message Templates */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">תבניות הודעות</CardTitle>
-                <CardDescription>יצירה וניהול תבניות הודעות</CardDescription>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Mail className="h-5 w-5 text-blue-500" />
               </div>
-              <Button onClick={() => setCreateOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                תבנית חדשה
-              </Button>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">תבניות הודעות</h2>
+                <p className="text-sm text-gray-500">יצירה וניהול תבניות הודעות</p>
+              </div>
             </div>
-          </CardHeader>
-          <CardContent>
+            <Button
+              onClick={() => setCreateOpen(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-5 shadow-sm transition-colors"
+            >
+              <Plus className="ml-2 h-4 w-4" />
+              תבנית חדשה
+            </Button>
+          </div>
+          <div className="p-5">
             {templates.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                אין תבניות עדיין
-              </p>
+              <div className="text-center py-12">
+                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Mail className="h-7 w-7 text-gray-300" />
+                </div>
+                <p className="text-gray-500 font-medium">אין תבניות עדיין</p>
+                <p className="text-sm text-gray-400 mt-1">צרו תבנית ראשונה כדי להתחיל</p>
+              </div>
             ) : (
               <div className="space-y-3">
                 {templates.map((template) => (
-                  <div key={template.id} className="flex items-start justify-between p-4 rounded-lg border">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-medium">{template.name}</p>
-                        <Badge variant="outline" className="text-xs">{template.type}</Badge>
-                        <Badge variant="secondary" className="text-xs">{template.category}</Badge>
+                  <div
+                    key={template.id}
+                    className="flex items-start justify-between p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100/50 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <p className="font-semibold text-gray-900">{template.name}</p>
+                        <span className="inline-flex items-center gap-1 text-xs bg-white text-gray-600 px-2.5 py-0.5 rounded-lg font-medium border border-gray-200">
+                          {template.type === "email" ? (
+                            <Mail className="h-3 w-3" />
+                          ) : (
+                            <MessageCircle className="h-3 w-3" />
+                          )}
+                          {template.type === "email" ? "אימייל" : "WhatsApp"}
+                        </span>
+                        <span className="text-xs bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-lg font-medium">
+                          {template.category}
+                        </span>
                       </div>
                       {template.subject && (
-                        <p className="text-sm text-muted-foreground">{template.subject}</p>
+                        <p className="text-sm text-gray-600 font-medium">{template.subject}</p>
                       )}
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{template.body}</p>
+                      <p className="text-sm text-gray-500 line-clamp-2 mt-1 leading-relaxed">{template.body}</p>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Create Template Dialog */}
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>יצירת תבנית הודעה</DialogTitle>
+          <DialogContent className="max-w-2xl rounded-2xl p-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-4 border-b border-gray-100">
+              <DialogTitle className="text-xl font-bold text-gray-900">יצירת תבנית הודעה</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>שם תבנית *</Label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  <Label className="text-sm font-semibold text-gray-700">שם תבנית *</Label>
+                  <Input
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="rounded-xl border-gray-200"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>סוג</Label>
+                  <Label className="text-sm font-semibold text-gray-700">סוג</Label>
                   <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as "email" | "whatsapp" })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="rounded-xl border-gray-200">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="email">אימייל</SelectItem>
                       <SelectItem value="whatsapp">WhatsApp</SelectItem>
@@ -160,9 +207,11 @@ export default function SettingsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>קטגוריה</Label>
+                  <Label className="text-sm font-semibold text-gray-700">קטגוריה</Label>
                   <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as MessageTemplate["category"] })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="rounded-xl border-gray-200">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="interview_invite">הזמנה לראיון</SelectItem>
                       <SelectItem value="rejection">דחייה</SelectItem>
@@ -175,22 +224,45 @@ export default function SettingsPage() {
               </div>
               {form.type === "email" && (
                 <div className="space-y-2">
-                  <Label>נושא</Label>
-                  <Input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="השתמשו ב-{{variable_name}} למשתנים" />
+                  <Label className="text-sm font-semibold text-gray-700">נושא</Label>
+                  <Input
+                    value={form.subject}
+                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                    placeholder="השתמשו ב-{{variable_name}} למשתנים"
+                    className="rounded-xl border-gray-200"
+                  />
                 </div>
               )}
               <div className="space-y-2">
-                <Label>תוכן *</Label>
-                <Textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} rows={8} placeholder="השתמשו ב-{{candidate_name}}, {{job_title}} וכו׳" />
+                <Label className="text-sm font-semibold text-gray-700">תוכן *</Label>
+                <Textarea
+                  value={form.body}
+                  onChange={(e) => setForm({ ...form, body: e.target.value })}
+                  rows={6}
+                  placeholder="השתמשו ב-{{candidate_name}}, {{job_title}} וכו׳"
+                  className="rounded-xl border-gray-200 resize-none"
+                />
               </div>
               <div className="space-y-2">
-                <Label>משתנים (מופרדים בפסיקים)</Label>
-                <Input value={form.variables} onChange={(e) => setForm({ ...form, variables: e.target.value })} placeholder="candidate_name, job_title, interview_date" />
+                <Label className="text-sm font-semibold text-gray-700">משתנים (מופרדים בפסיקים)</Label>
+                <Input
+                  value={form.variables}
+                  onChange={(e) => setForm({ ...form, variables: e.target.value })}
+                  placeholder="candidate_name, job_title, interview_date"
+                  className="rounded-xl border-gray-200"
+                />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>ביטול</Button>
-              <Button onClick={handleCreateTemplate}>יצירה</Button>
+            <DialogFooter className="p-6 pt-4 border-t border-gray-100 gap-2">
+              <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-xl px-5">
+                ביטול
+              </Button>
+              <Button
+                onClick={handleCreateTemplate}
+                className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6"
+              >
+                יצירה
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -10,14 +10,13 @@ import {
   MessageSquare,
   Settings,
   LogOut,
-  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 const navigation = [
-  { name: "לוח בקרה", href: "/dashboard", icon: LayoutDashboard },
+  { name: "דשבורד", href: "/dashboard", icon: LayoutDashboard },
   { name: "מועמדים", href: "/candidates", icon: Users },
   { name: "משרות", href: "/jobs", icon: Briefcase },
   { name: "ראיונות", href: "/interviews", icon: Calendar },
@@ -36,16 +35,21 @@ export function Sidebar() {
   };
 
   return (
-    <div className="flex h-full w-64 flex-col bg-navy-900 text-white">
-      <div className="flex h-16 items-center gap-2 px-6 border-b border-navy-700">
-        <FileText className="h-8 w-8 text-electric-400" />
-        <div>
-          <h1 className="text-lg font-bold text-white">Blueprint</h1>
-          <p className="text-xs text-navy-300">ATS</p>
+    <aside className="flex h-full flex-col" style={{ width: '260px', minWidth: '260px', backgroundColor: '#0F172A' }}>
+      {/* Logo */}
+      <div className="flex h-16 items-center px-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ backgroundColor: '#3B82F6' }}>
+            <span className="text-sm font-bold text-white">B</span>
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-white tracking-tight">Blueprint ATS</h1>
+          </div>
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1 px-3 pt-4">
         {navigation.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + "/");
@@ -54,28 +58,30 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-electric-500 text-white"
-                  : "text-navy-200 hover:bg-navy-800 hover:text-white"
+                  ? "text-white shadow-lg"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
               )}
+              style={isActive ? { backgroundColor: '#3B82F6' } : undefined}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className="h-5 w-5 shrink-0" />
               {item.name}
             </Link>
           );
         })}
       </nav>
 
-      <div className="border-t border-navy-700 p-3">
+      {/* Logout */}
+      <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-navy-300 hover:bg-navy-800 hover:text-white transition-colors"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
         >
           <LogOut className="h-5 w-5" />
           התנתק
         </button>
       </div>
-    </div>
+    </aside>
   );
 }

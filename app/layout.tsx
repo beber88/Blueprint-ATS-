@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "sonner";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: "Blueprint ATS",
@@ -21,9 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="he" dir="rtl">
-      <body className={`${geistSans.variable} font-sans antialiased`}>
+      <body className="antialiased">
         {children}
-        <Toaster position="top-right" richColors />
+        <Toaster position="top-left" richColors closeButton />
       </body>
     </html>
   );
