@@ -242,7 +242,7 @@ export default function CandidateProfilePage() {
             {/* Notes */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Notes</CardTitle>
+                <CardTitle className="text-lg">הערות</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Textarea
@@ -299,7 +299,7 @@ export default function CandidateProfilePage() {
             {(candidate.interviews || []).length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
-                  No interviews scheduled
+                  אין ראיונות מתוכננים
                 </CardContent>
               </Card>
             ) : (
@@ -339,7 +339,7 @@ export default function CandidateProfilePage() {
             {(candidate.messages || []).length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
-                  No messages sent
+                  טרם נשלחו הודעות
                 </CardContent>
               </Card>
             ) : (
@@ -388,7 +388,7 @@ export default function CandidateProfilePage() {
                       </div>
                     ))}
                   {(!candidate.activity_log || candidate.activity_log.length === 0) && (
-                    <p className="text-sm text-muted-foreground text-center">No activity recorded</p>
+                    <p className="text-sm text-muted-foreground text-center">אין פעילות רשומה</p>
                   )}
                 </div>
               </CardContent>
