@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { parseCV } from "@/lib/claude/client";
+// pdf-parse v1.1.1 - use direct import to avoid test file that requires canvas
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
 export const dynamic = "force-dynamic";
 
@@ -8,17 +11,8 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx"];
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  // pdf-parse v2 uses PDFParse class, not a function
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { PDFParse } = require("pdf-parse");
-  const parser = new PDFParse({ data: buffer, verbosity: 0 });
-  await parser.load();
-  const result = await parser.getText();
-  // Use per-page text to avoid "-- 1 of N --" separators in result.text
-  if (result.pages && result.pages.length > 0) {
-    return result.pages.map((p: { text: string }) => p.text).join("\n");
-  }
-  return result.text || "";
+  const pdfData = await pdfParse(buffer);
+  return pdfData.text || "";
 }
 
 async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
