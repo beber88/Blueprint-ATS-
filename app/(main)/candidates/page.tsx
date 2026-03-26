@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,7 @@ export default function CandidatesPage() {
   const [manualOpen, setManualOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [manualForm, setManualForm] = useState({
     full_name: "", email: "", phone: "", location: "", notes: "",
   });
@@ -54,61 +55,32 @@ export default function CandidatesPage() {
     fetchCandidates();
   }, [fetchCandidates]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    // Reset file input so same file can be re-uploaded
-    e.target.value = "";
-
-    const totalFiles = files.length;
     setUploading(true);
-    let successCount = 0;
-    let failCount = 0;
+    setUploadProgress("מעלה ומנתח קו״ח עם AI...");
 
-    for (let i = 0; i < totalFiles; i++) {
-      setUploadProgress(
-        totalFiles > 1 ? `מעלה ${i + 1}/${totalFiles} קו״ח...` : "מעלה ומנתח קו״ח עם AI..."
-      );
+    const formData = new FormData();
+    formData.append("file", file);
 
-      const formData = new FormData();
-      formData.append("file", files[i]);
-
-      try {
-        const res = await fetch("/api/cv/upload", { method: "POST", body: formData });
-        const data = await res.json();
-        if (!res.ok) {
-          failCount++;
-          if (totalFiles === 1) {
-            toast.error(data.error || "ההעלאה נכשלה");
-          }
-        } else {
-          successCount++;
-          if (totalFiles === 1) {
-            toast.success(`קו״ח הועלה! ${data.candidate.full_name} נוסף/ה.`);
-          }
-        }
-      } catch {
-        failCount++;
-        if (totalFiles === 1) {
-          toast.error("שגיאת רשת. בדקו את החיבור ונסו שוב.");
-        }
-      }
-    }
-
-    if (totalFiles > 1) {
-      if (failCount === 0) {
-        toast.success(`הועלו ${successCount}/${totalFiles} קו״ח בהצלחה`);
+    try {
+      const res = await fetch("/api/cv/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "ההעלאה נכשלה");
       } else {
-        toast.warning(`הועלו ${successCount}/${totalFiles} קו״ח בהצלחה, ${failCount} נכשלו`);
+        toast.success(`קו״ח הועלה! ${data.candidate.full_name} נוסף/ה.`);
+        setUploadOpen(false);
+        fetchCandidates();
       }
-    }
-
-    setUploadProgress("");
-    setUploading(false);
-    if (successCount > 0) {
-      setUploadOpen(false);
-      fetchCandidates();
+    } catch (err) {
+      toast.error("שגיאת רשת: " + (err instanceof Error ? err.message : "בדקו את החיבור ונסו שוב."));
+    } finally {
+      setUploading(false);
+      setUploadProgress("");
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -436,39 +408,43 @@ export default function CandidatesPage() {
           </div>
         )}
 
+        {/* Hidden file input with ref */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx"
+          className="hidden"
+          onChange={handleFileUpload}
+        />
+
         {/* Upload Dialog */}
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
           <DialogContent className="sm:max-w-md rounded-xl">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold text-slate-900">העלאת קו״ח</DialogTitle>
-              <p className="text-sm text-slate-500 mt-1">גררו קבצים או לחצו לבחירת קורות חיים</p>
+              <p className="text-sm text-slate-500 mt-1">לחצו לבחירת קורות חיים</p>
             </DialogHeader>
             <div className="space-y-4 py-3">
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-12 text-center hover:border-electric-400 hover:bg-electric-50/30 transition-all duration-200 cursor-pointer relative group">
-                <div className="pointer-events-none">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-electric-50 group-hover:bg-electric-100 transition-colors mb-5">
-                    <FileUp className="h-8 w-8 text-electric-600" />
-                  </div>
-                  <p className="text-sm font-semibold text-slate-700 mb-1.5">
-                    גררו קבצים לכאן, או לחצו לבחירה
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    PDF, DOC, DOCX -- תמיכה במספר קבצים בו-זמנית
-                  </p>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full border-2 border-dashed border-slate-300 rounded-xl p-12 text-center hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 mb-5">
+                  <FileUp className="h-8 w-8 text-blue-600" />
                 </div>
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  multiple
-                  onChange={handleUpload}
-                  disabled={uploading}
-                  className="absolute inset-0 z-10 w-full h-full opacity-0 cursor-pointer"
-                />
-              </div>
+                <p className="text-sm font-semibold text-slate-700 mb-1.5">
+                  לחצו כאן לבחירת קובץ
+                </p>
+                <p className="text-xs text-slate-400">
+                  PDF, DOC, DOCX
+                </p>
+              </button>
               {uploading && (
-                <div className="flex items-center justify-center gap-3 py-3 bg-electric-50 rounded-lg">
-                  <div className="h-5 w-5 border-2 border-electric-600 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-sm font-medium text-electric-700">
+                <div className="flex items-center justify-center gap-3 py-3 bg-blue-50 rounded-lg">
+                  <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm font-medium text-blue-700">
                     {uploadProgress || "מעלה ומנתח קו״ח עם AI..."}
                   </p>
                 </div>
