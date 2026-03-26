@@ -46,10 +46,10 @@ export default function LoginPage() {
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-navy-900">
-              Blueprint ATS
+              התחברות ל-Blueprint ATS
             </CardTitle>
             <CardDescription className="text-base">
-              Applicant Tracking System
+              הזינו פרטי התחברות כדי להמשיך
             </CardDescription>
           </div>
         </CardHeader>
@@ -61,7 +61,7 @@ export default function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">אימייל</Label>
               <Input
                 id="email"
                 type="email"
@@ -72,11 +72,11 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">סיסמה</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="הזינו סיסמה"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -86,10 +86,10 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  מתחבר...
                 </>
               ) : (
-                "Sign In"
+                "התחברות"
               )}
             </Button>
           </form>
@@ -137,7 +137,7 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
-            Continue with Google
+            המשך עם Google
           </Button>
         </CardContent>
       </Card>

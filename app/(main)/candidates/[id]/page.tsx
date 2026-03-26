@@ -42,7 +42,7 @@ export default function CandidateProfilePage() {
         setCandidate(data);
         setNotes(data.notes || "");
       })
-      .catch(() => toast.error("Failed to load candidate"))
+      .catch(() => toast.error("טעינת המועמד/ת נכשלה"))
       .finally(() => setLoading(false));
   }, [params.id]);
 
@@ -54,9 +54,9 @@ export default function CandidateProfilePage() {
         body: JSON.stringify({ status }),
       });
       setCandidate((prev) => prev ? { ...prev, status: status as Candidate["status"] } : null);
-      toast.success("Status updated");
+      toast.success("הסטטוס עודכן");
     } catch {
-      toast.error("Failed to update status");
+      toast.error("עדכון הסטטוס נכשל");
     }
   };
 
@@ -67,14 +67,14 @@ export default function CandidateProfilePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notes }),
       });
-      toast.success("Notes saved");
+      toast.success("ההערות נשמרו");
     } catch {
-      toast.error("Failed to save notes");
+      toast.error("שמירת ההערות נכשלה");
     }
   };
 
   if (loading) return <PageLoading />;
-  if (!candidate) return <div className="p-6">Candidate not found</div>;
+  if (!candidate) return <div className="p-6">המועמד/ת לא נמצא/ה</div>;
 
   const statuses = [
     "new", "reviewed", "shortlisted", "interview_scheduled",
@@ -83,12 +83,12 @@ export default function CandidateProfilePage() {
 
   return (
     <div>
-      <Header title={candidate.full_name} subtitle="Candidate Profile" />
+      <Header title={candidate.full_name} subtitle="פרופיל מועמד/ת" />
       <div className="p-6 space-y-6">
         {/* Back button */}
         <Button variant="ghost" onClick={() => router.back()}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          חזרה
         </Button>
 
         {/* Profile Header */}
@@ -122,13 +122,13 @@ export default function CandidateProfilePage() {
                   {candidate.linkedin_url && (
                     <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-electric-500">
                       <ExternalLink className="h-4 w-4" />
-                      LinkedIn
+                      לינקדאין
                     </a>
                   )}
                   {candidate.cv_file_url && (
                     <a href={candidate.cv_file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-electric-500">
                       <FileText className="h-4 w-4" />
-                      View CV
+                      צפייה בקורות חיים
                     </a>
                   )}
                 </div>
@@ -150,7 +150,7 @@ export default function CandidateProfilePage() {
                 <Link href={`/messages?candidateId=${candidate.id}`}>
                   <Button variant="outline">
                     <MessageSquare className="mr-2 h-4 w-4" />
-                    Send Message
+                    שליחת הודעה
                   </Button>
                 </Link>
               </div>
@@ -161,11 +161,11 @@ export default function CandidateProfilePage() {
         {/* Tabs */}
         <Tabs defaultValue="overview">
           <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="applications">Applications ({candidate.applications?.length || 0})</TabsTrigger>
-            <TabsTrigger value="interviews">Interviews ({candidate.interviews?.length || 0})</TabsTrigger>
-            <TabsTrigger value="messages">Messages ({candidate.messages?.length || 0})</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsTrigger value="overview">סקירה</TabsTrigger>
+            <TabsTrigger value="applications">מועמדויות ({candidate.applications?.length || 0})</TabsTrigger>
+            <TabsTrigger value="interviews">ראיונות ({candidate.interviews?.length || 0})</TabsTrigger>
+            <TabsTrigger value="messages">הודעות ({candidate.messages?.length || 0})</TabsTrigger>
+            <TabsTrigger value="activity">פעילות</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -174,7 +174,7 @@ export default function CandidateProfilePage() {
               {/* Skills */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Skills</CardTitle>
+                  <CardTitle className="text-lg">כישורים</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
@@ -182,7 +182,7 @@ export default function CandidateProfilePage() {
                       <Badge key={skill} variant="secondary">{skill}</Badge>
                     ))}
                     {(!candidate.skills || candidate.skills.length === 0) && (
-                      <p className="text-sm text-muted-foreground">No skills listed</p>
+                      <p className="text-sm text-muted-foreground">לא צוינו כישורים</p>
                     )}
                   </div>
                 </CardContent>
@@ -191,20 +191,20 @@ export default function CandidateProfilePage() {
               {/* Summary */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Summary</CardTitle>
+                  <CardTitle className="text-lg">סיכום</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{candidate.experience_years || 0} years experience</span>
+                    <span className="text-sm">{candidate.experience_years || 0} שנים ניסיון</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{candidate.education || "Not specified"}</span>
+                    <span className="text-sm">{candidate.education || "לא צוין"}</span>
                   </div>
                   {candidate.certifications && candidate.certifications.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium mb-1">Certifications:</p>
+                      <p className="text-sm font-medium mb-1">הסמכות:</p>
                       <div className="flex flex-wrap gap-1">
                         {candidate.certifications.map((cert) => (
                           <Badge key={cert} variant="outline" className="text-xs">{cert}</Badge>
@@ -220,7 +220,7 @@ export default function CandidateProfilePage() {
             {candidate.previous_roles && candidate.previous_roles.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Experience</CardTitle>
+                  <CardTitle className="text-lg">ניסיון</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -248,12 +248,12 @@ export default function CandidateProfilePage() {
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Add notes about this candidate..."
+                  placeholder="הוסיפו הערות על מועמד/ת זו..."
                   rows={4}
                 />
                 <Button onClick={saveNotes} size="sm">
                   <Save className="mr-2 h-4 w-4" />
-                  Save Notes
+                  שמירת הערות
                 </Button>
               </CardContent>
             </Card>
@@ -264,7 +264,7 @@ export default function CandidateProfilePage() {
             {(candidate.applications || []).length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
-                  No applications yet
+                  אין מועמדויות עדיין
                 </CardContent>
               </Card>
             ) : (
@@ -274,10 +274,10 @@ export default function CandidateProfilePage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <Link href={`/jobs/${app.job_id}`} className="font-semibold hover:text-electric-500">
-                          {app.job?.title || "Unknown Job"}
+                          {app.job?.title || "משרה לא ידועה"}
                         </Link>
                         <p className="text-sm text-muted-foreground">
-                          Applied {formatDate(app.applied_at)}
+                          הוגש ב-{formatDate(app.applied_at)}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">

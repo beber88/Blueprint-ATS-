@@ -30,7 +30,7 @@ export default function SettingsPage() {
 
   const handleCreateTemplate = async () => {
     if (!form.name || !form.body) {
-      toast.error("Name and body are required");
+      toast.error("שם ותוכן הם שדות חובה");
       return;
     }
     try {
@@ -43,29 +43,29 @@ export default function SettingsPage() {
         }),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("Template created!");
+      toast.success("התבנית נוצרה!");
       setCreateOpen(false);
       setForm({ name: "", type: "email", category: "general", subject: "", body: "", variables: "" });
       const updated = await fetch("/api/templates").then((r) => r.json());
       setTemplates(updated);
     } catch {
-      toast.error("Failed to create template");
+      toast.error("יצירת התבנית נכשלה");
     }
   };
 
   return (
     <div>
-      <Header title="Settings" subtitle="Configure your ATS" />
+      <Header title="הגדרות" subtitle="הגדרת אינטגרציות ותבניות" />
       <div className="p-6 space-y-6 max-w-4xl">
         {/* Integration Status */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <SettingsIcon className="h-5 w-5" />
-              Integrations
+              אינטגרציות
             </CardTitle>
             <CardDescription>
-              Configure your external service connections
+              הגדרת חיבורים לשירותים חיצוניים
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -74,11 +74,11 @@ export default function SettingsPage() {
                 <Mail className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="font-medium">Gmail</p>
-                  <p className="text-sm text-muted-foreground">OAuth2 email sending</p>
+                  <p className="text-sm text-muted-foreground">שליחת אימייל באמצעות OAuth2</p>
                 </div>
               </div>
               <Badge variant={process.env.NEXT_PUBLIC_GMAIL_CONFIGURED ? "default" : "secondary"}>
-                Configure in .env.local
+                הגדרה ב-.env.local
               </Badge>
             </div>
             <div className="flex items-center justify-between p-4 rounded-lg border">
@@ -89,7 +89,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-muted-foreground">WhatsApp Business API</p>
                 </div>
               </div>
-              <Badge variant="secondary">Configure in .env.local</Badge>
+              <Badge variant="secondary">הגדרה ב-.env.local</Badge>
             </div>
           </CardContent>
         </Card>
@@ -101,19 +101,19 @@ export default function SettingsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg">Message Templates</CardTitle>
-                <CardDescription>Create and manage message templates</CardDescription>
+                <CardTitle className="text-lg">תבניות הודעות</CardTitle>
+                <CardDescription>יצירה וניהול תבניות הודעות</CardDescription>
               </div>
               <Button onClick={() => setCreateOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                New Template
+                תבנית חדשה
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             {templates.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                No templates yet
+                אין תבניות עדיין
               </p>
             ) : (
               <div className="space-y-3">
@@ -141,16 +141,16 @@ export default function SettingsPage() {
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create Message Template</DialogTitle>
+              <DialogTitle>יצירת תבנית הודעה</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Name *</Label>
+                  <Label>שם תבנית *</Label>
                   <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Type</Label>
+                  <Label>סוג</Label>
                   <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as "email" | "whatsapp" })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -160,37 +160,37 @@ export default function SettingsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Category</Label>
+                  <Label>קטגוריה</Label>
                   <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as MessageTemplate["category"] })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="interview_invite">Interview Invite</SelectItem>
-                      <SelectItem value="rejection">Rejection</SelectItem>
-                      <SelectItem value="next_stage">Next Stage</SelectItem>
-                      <SelectItem value="offer">Offer</SelectItem>
-                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="interview_invite">הזמנה לראיון</SelectItem>
+                      <SelectItem value="rejection">דחייה</SelectItem>
+                      <SelectItem value="next_stage">שלב הבא</SelectItem>
+                      <SelectItem value="offer">הצעה</SelectItem>
+                      <SelectItem value="general">כללי</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               {form.type === "email" && (
                 <div className="space-y-2">
-                  <Label>Subject</Label>
-                  <Input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="Use {{variable_name}} for variables" />
+                  <Label>נושא</Label>
+                  <Input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="השתמשו ב-{{variable_name}} למשתנים" />
                 </div>
               )}
               <div className="space-y-2">
-                <Label>Body *</Label>
-                <Textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} rows={8} placeholder="Use {{candidate_name}}, {{job_title}}, etc." />
+                <Label>תוכן *</Label>
+                <Textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} rows={8} placeholder="השתמשו ב-{{candidate_name}}, {{job_title}} וכו׳" />
               </div>
               <div className="space-y-2">
-                <Label>Variables (comma-separated)</Label>
+                <Label>משתנים (מופרדים בפסיקים)</Label>
                 <Input value={form.variables} onChange={(e) => setForm({ ...form, variables: e.target.value })} placeholder="candidate_name, job_title, interview_date" />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreateTemplate}>Create Template</Button>
+              <Button variant="outline" onClick={() => setCreateOpen(false)}>ביטול</Button>
+              <Button onClick={handleCreateTemplate}>יצירה</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

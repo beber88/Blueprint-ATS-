@@ -71,7 +71,7 @@ export default function MessagesPage() {
 
   const handleSend = async () => {
     if (!candidateId) {
-      toast.error("Please enter a candidate ID");
+      toast.error("נא להזין מזהה מועמד/ת");
       return;
     }
     setSending(true);
@@ -92,10 +92,10 @@ export default function MessagesPage() {
         const err = await res.json();
         throw new Error(err.error);
       }
-      toast.success("Message sent!");
+      toast.success("ההודעה נשלחה!");
       setComposeOpen(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send");
+      toast.error(err instanceof Error ? err.message : "השליחה נכשלה");
     } finally {
       setSending(false);
     }
@@ -105,24 +105,24 @@ export default function MessagesPage() {
 
   return (
     <div>
-      <Header title="Messages" subtitle="Send emails and WhatsApp messages" />
+      <Header title="הודעות" subtitle="שליחת הודעות למועמדים" />
       <div className="p-6 space-y-6">
         <div className="flex justify-end">
           <Button onClick={() => setComposeOpen(true)}>
             <Send className="mr-2 h-4 w-4" />
-            Compose Message
+            חיבור הודעה
           </Button>
         </div>
 
         <Tabs defaultValue="templates">
           <TabsList>
-            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="templates">תבניות</TabsTrigger>
           </TabsList>
           <TabsContent value="templates" className="space-y-4">
             {templates.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
-                  No templates yet. Add templates in Settings.
+                  אין תבניות עדיין. הוסיפו תבניות בהגדרות.
                 </CardContent>
               </Card>
             ) : (
@@ -157,7 +157,7 @@ export default function MessagesPage() {
                           setComposeOpen(true);
                         }}
                       >
-                        Use Template
+                        שימוש בתבנית
                       </Button>
                     </CardContent>
                   </Card>
@@ -171,16 +171,16 @@ export default function MessagesPage() {
         <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Compose Message</DialogTitle>
+              <DialogTitle>חיבור הודעה</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Candidate ID</Label>
-                  <Input value={candidateId} onChange={(e) => setCandidateId(e.target.value)} placeholder="Paste candidate ID" />
+                  <Label>מזהה מועמד/ת</Label>
+                  <Input value={candidateId} onChange={(e) => setCandidateId(e.target.value)} placeholder="הדביקו מזהה מועמד/ת" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Channel</Label>
+                  <Label>ערוץ</Label>
                   <Select value={channel} onValueChange={(v) => setChannel(v as "email" | "whatsapp")}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -192,9 +192,9 @@ export default function MessagesPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Template (optional)</Label>
+                <Label>תבנית (אופציונלי)</Label>
                 <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
-                  <SelectTrigger><SelectValue placeholder="Select a template" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="בחרו תבנית" /></SelectTrigger>
                   <SelectContent>
                     {templates.filter((t) => t.type === channel).map((t) => (
                       <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
@@ -205,7 +205,7 @@ export default function MessagesPage() {
 
               {Object.keys(variables).length > 0 && (
                 <div className="space-y-2">
-                  <Label>Variables</Label>
+                  <Label>משתנים</Label>
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(variables).map(([key, value]) => (
                       <div key={key}>
@@ -223,28 +223,28 @@ export default function MessagesPage() {
 
               {channel === "email" && (
                 <div className="space-y-2">
-                  <Label>Subject</Label>
+                  <Label>נושא</Label>
                   <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label>Message</Label>
+                <Label>הודעה</Label>
                 <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={6} />
               </div>
 
               {/* Preview */}
               <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-xs font-medium text-muted-foreground mb-2">Preview</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2">תצוגה מקדימה</p>
                 {preview.subject && <p className="font-medium text-sm mb-1">{preview.subject}</p>}
                 <p className="text-sm whitespace-pre-wrap">{preview.body}</p>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setComposeOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setComposeOpen(false)}>ביטול</Button>
               <Button onClick={handleSend} disabled={sending}>
                 <Send className="mr-2 h-4 w-4" />
-                {sending ? "Sending..." : "Send Message"}
+                {sending ? "שולח..." : "שליחת הודעה"}
               </Button>
             </DialogFooter>
           </DialogContent>
