@@ -31,7 +31,7 @@ export default function JobsPage() {
       const data = await res.json();
       setJobs(data || []);
     } catch {
-      toast.error("Failed to load jobs");
+      toast.error("שגיאה בטעינת משרות");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function JobsPage() {
 
   const handleCreate = async () => {
     if (!form.title) {
-      toast.error("Job title is required");
+      toast.error("שם משרה הוא שדה חובה");
       return;
     }
     try {
@@ -51,12 +51,12 @@ export default function JobsPage() {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("Job created!");
+      toast.success("!המשרה נוצרה");
       setCreateOpen(false);
       setForm({ title: "", department: "", description: "", requirements: "", location: "", employment_type: "full-time" });
       fetchJobs();
     } catch {
-      toast.error("Failed to create job");
+      toast.error("שגיאה ביצירת משרה");
     }
   };
 
@@ -77,10 +77,10 @@ export default function JobsPage() {
           <Card>
             <CardContent className="p-12 text-center">
               <Briefcase className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No jobs yet</p>
+              <p className="text-muted-foreground">אין משרות עדיין</p>
               <Button className="mt-4" onClick={() => setCreateOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create First Job
+                צור משרה ראשונה
               </Button>
             </CardContent>
           </Card>
@@ -106,12 +106,12 @@ export default function JobsPage() {
                       )}
                       <span className="flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        {job.candidate_count || 0} candidates
+                        {job.candidate_count || 0} מועמדים
                       </span>
                       {job.top_score != null && job.top_score > 0 && (
                         <span className="flex items-center gap-1 text-green-600">
                           <Trophy className="h-3 w-3" />
-                          Top: {job.top_score}
+                          ציון עליון: {job.top_score}
                         </span>
                       )}
                     </div>
@@ -130,49 +130,49 @@ export default function JobsPage() {
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create New Job</DialogTitle>
+              <DialogTitle>יצירת משרה חדשה</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Job Title *</Label>
-                  <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Senior Developer" />
+                  <Label>כותרת משרה *</Label>
+                  <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="למשל מפתח בכיר" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Department</Label>
-                  <Input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="e.g. Engineering" />
+                  <Label>מחלקה</Label>
+                  <Input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="למשל הנדסה" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Location</Label>
-                  <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Tel Aviv" />
+                  <Label>מיקום</Label>
+                  <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="למשל תל אביב" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Employment Type</Label>
+                  <Label>סוג העסקה</Label>
                   <Select value={form.employment_type} onValueChange={(v) => setForm({ ...form, employment_type: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="full-time">Full-time</SelectItem>
-                      <SelectItem value="part-time">Part-time</SelectItem>
-                      <SelectItem value="contract">Contract</SelectItem>
-                      <SelectItem value="internship">Internship</SelectItem>
+                      <SelectItem value="full-time">משרה מלאה</SelectItem>
+                      <SelectItem value="part-time">משרה חלקית</SelectItem>
+                      <SelectItem value="contract">חוזה</SelectItem>
+                      <SelectItem value="internship">התמחות</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Description</Label>
+                <Label>תיאור</Label>
                 <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} />
               </div>
               <div className="space-y-2">
-                <Label>Requirements</Label>
+                <Label>דרישות</Label>
                 <Textarea value={form.requirements} onChange={(e) => setForm({ ...form, requirements: e.target.value })} rows={3} />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreate}>Create Job</Button>
+              <Button variant="outline" onClick={() => setCreateOpen(false)}>ביטול</Button>
+              <Button onClick={handleCreate}>יצירת משרה</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

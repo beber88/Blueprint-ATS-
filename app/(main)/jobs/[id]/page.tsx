@@ -44,7 +44,7 @@ export default function JobDetailPage() {
     fetch(`/api/jobs/${params.id}`)
       .then((res) => res.json())
       .then(setJob)
-      .catch(() => toast.error("Failed to load job"))
+      .catch(() => toast.error("שגיאה בטעינת משרה"))
       .finally(() => setLoading(false));
   }, [params.id]);
 
@@ -56,9 +56,9 @@ export default function JobDetailPage() {
         body: JSON.stringify({ status }),
       });
       setJob((prev) => prev ? { ...prev, status: status as Job["status"] } : null);
-      toast.success("Job status updated");
+      toast.success("סטטוס המשרה עודכן");
     } catch {
-      toast.error("Failed to update job");
+      toast.error("שגיאה בעדכון משרה");
     }
   };
 
@@ -68,7 +68,7 @@ export default function JobDetailPage() {
     const unscored = job.applications.filter((a) => a.ai_score === null);
 
     if (unscored.length === 0) {
-      toast.info("All candidates have already been scored");
+      toast.info("כל המועמדים כבר דורגו");
       setScoring(false);
       return;
     }
@@ -93,13 +93,13 @@ export default function JobDetailPage() {
         failed++;
       }
       // Show progress
-      toast.info(`Scoring: ${scored + failed}/${unscored.length}`, { id: "scoring-progress" });
+      toast.info(`מדרג: ${scored + failed}/${unscored.length}`, { id: "scoring-progress" });
     }
 
     if (failed > 0) {
-      toast.warning(`Scored ${scored} candidates, ${failed} failed`);
+      toast.warning(`דורגו ${scored} מועמדים, ${failed} נכשלו`);
     } else {
-      toast.success(`Successfully scored ${scored} candidates`);
+      toast.success(`דורגו ${scored} מועמדים בהצלחה`);
     }
     setScoring(false);
     // Refresh
@@ -110,15 +110,15 @@ export default function JobDetailPage() {
   };
 
   if (loading) return <PageLoading />;
-  if (!job) return <div className="p-6">Job not found</div>;
+  if (!job) return <div className="p-6">משרה לא נמצאה</div>;
 
   return (
     <div>
-      <Header title={job.title} subtitle={job.department || "Job Details"} />
+      <Header title={job.title} subtitle={job.department || "פרטי משרה"} />
       <div className="p-6 space-y-6">
         <Button variant="ghost" onClick={() => router.back()}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          חזרה
         </Button>
 
         <Card>
@@ -143,26 +143,26 @@ export default function JobDetailPage() {
                 <Select value={job.status} onValueChange={updateStatus}>
                   <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="paused">Paused</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
+                    <SelectItem value="active">פעיל</SelectItem>
+                    <SelectItem value="paused">מושהה</SelectItem>
+                    <SelectItem value="closed">סגור</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button onClick={runBatchScoring} disabled={scoring}>
                   <Zap className="mr-2 h-4 w-4" />
-                  {scoring ? "Scoring..." : "Run AI Scoring"}
+                  {scoring ? "מדרג..." : "הפעל דירוג AI"}
                 </Button>
               </div>
             </div>
             {job.description && (
               <div className="mt-4">
-                <h3 className="font-medium mb-1">Description</h3>
+                <h3 className="font-medium mb-1">תיאור</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">{job.description}</p>
               </div>
             )}
             {job.requirements && (
               <div className="mt-4">
-                <h3 className="font-medium mb-1">Requirements</h3>
+                <h3 className="font-medium mb-1">דרישות</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">{job.requirements}</p>
               </div>
             )}
@@ -172,7 +172,7 @@ export default function JobDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg">
-              Candidates ({job.applications?.length || 0})
+              מועמדים ({job.applications?.length || 0})
             </CardTitle>
             <Button
               variant={compareMode ? "default" : "outline"}
@@ -183,12 +183,12 @@ export default function JobDetailPage() {
               }}
             >
               <GitCompare className="mr-2 h-4 w-4" />
-              Compare
+              השוואה
             </Button>
           </CardHeader>
           <CardContent>
             {(job.applications || []).length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No candidates applied yet</p>
+              <p className="text-center text-muted-foreground py-8">טרם הוגשו מועמדויות</p>
             ) : (
               <div className="space-y-2">
                 {job.applications.map((app) => (
@@ -209,15 +209,15 @@ export default function JobDetailPage() {
                         {app.candidate?.full_name}
                       </Link>
                       <p className="text-sm text-muted-foreground">
-                        Applied {formatDate(app.applied_at)}
-                        {app.candidate?.experience_years && ` • ${app.candidate.experience_years} yrs exp`}
+                        הוגש {formatDate(app.applied_at)}
+                        {app.candidate?.experience_years && ` • ${app.candidate.experience_years} שנות ניסיון`}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
                       {app.ai_score !== null ? (
                         <ScoreBadge score={app.ai_score} size="sm" />
                       ) : (
-                        <span className="text-xs text-muted-foreground">Not scored</span>
+                        <span className="text-xs text-muted-foreground">לא דורג</span>
                       )}
                       <StatusBadge status={app.status} />
                     </div>
@@ -231,7 +231,7 @@ export default function JobDetailPage() {
         {compareMode && selectedCandidates.size >= 2 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Candidate Comparison</CardTitle>
+              <CardTitle className="text-lg">השוואת מועמדים</CardTitle>
             </CardHeader>
             <CardContent>
               <div
@@ -246,27 +246,27 @@ export default function JobDetailPage() {
                         <h4 className="font-semibold text-base">{app.candidate?.full_name}</h4>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">AI Score</p>
+                        <p className="text-xs text-muted-foreground font-medium">ציון AI</p>
                         {app.ai_score !== null ? (
                           <ScoreBadge score={app.ai_score} size="sm" />
                         ) : (
-                          <span className="text-sm text-muted-foreground">Not scored</span>
+                          <span className="text-sm text-muted-foreground">לא דורג</span>
                         )}
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">AI Reasoning</p>
-                        <p className="text-sm mt-0.5">{app.ai_reasoning || "N/A"}</p>
+                        <p className="text-xs text-muted-foreground font-medium">נימוק AI</p>
+                        <p className="text-sm mt-0.5">{app.ai_reasoning || "לא זמין"}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">Experience</p>
+                        <p className="text-xs text-muted-foreground font-medium">ניסיון</p>
                         <p className="text-sm mt-0.5">
                           {app.candidate?.experience_years != null
-                            ? `${app.candidate.experience_years} years`
-                            : "N/A"}
+                            ? `${app.candidate.experience_years} שנים`
+                            : "לא זמין"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">Skills</p>
+                        <p className="text-xs text-muted-foreground font-medium">כישורים</p>
                         <div className="flex flex-wrap gap-1 mt-0.5">
                           {app.candidate?.skills && app.candidate.skills.length > 0 ? (
                             app.candidate.skills.map((skill) => (
@@ -275,13 +275,13 @@ export default function JobDetailPage() {
                               </Badge>
                             ))
                           ) : (
-                            <span className="text-sm text-muted-foreground">N/A</span>
+                            <span className="text-sm text-muted-foreground">לא זמין</span>
                           )}
                         </div>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground font-medium">Education</p>
-                        <p className="text-sm mt-0.5">{app.candidate?.education || "N/A"}</p>
+                        <p className="text-xs text-muted-foreground font-medium">השכלה</p>
+                        <p className="text-sm mt-0.5">{app.candidate?.education || "לא זמין"}</p>
                       </div>
                     </div>
                   ))}
