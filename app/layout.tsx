@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="he" dir="rtl">
       <body className={`${geistSans.variable} font-sans antialiased`}>
         {children}
         <Toaster position="top-right" richColors />

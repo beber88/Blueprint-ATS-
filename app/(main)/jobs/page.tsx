@@ -62,12 +62,12 @@ export default function JobsPage() {
 
   return (
     <div>
-      <Header title="Jobs" subtitle={`${jobs.length} job postings`} />
+      <Header title="משרות" subtitle={`${jobs.length} משרות`} />
       <div className="p-6 space-y-4">
         <div className="flex justify-end">
           <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Job
+            <Plus className="ml-2 h-4 w-4" />
+            משרה חדשה
           </Button>
         </div>
 

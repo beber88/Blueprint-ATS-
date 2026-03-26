@@ -17,12 +17,12 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Candidates", href: "/candidates", icon: Users },
-  { name: "Jobs", href: "/jobs", icon: Briefcase },
-  { name: "Interviews", href: "/interviews", icon: Calendar },
-  { name: "Messages", href: "/messages", icon: MessageSquare },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "לוח בקרה", href: "/dashboard", icon: LayoutDashboard },
+  { name: "מועמדים", href: "/candidates", icon: Users },
+  { name: "משרות", href: "/jobs", icon: Briefcase },
+  { name: "ראיונות", href: "/interviews", icon: Calendar },
+  { name: "הודעות", href: "/messages", icon: MessageSquare },
+  { name: "הגדרות", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -73,7 +73,7 @@ export function Sidebar() {
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-navy-300 hover:bg-navy-800 hover:text-white transition-colors"
         >
           <LogOut className="h-5 w-5" />
-          Logout
+          התנתק
         </button>
       </div>
     </div>

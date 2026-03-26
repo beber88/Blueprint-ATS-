@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { PageLoading } from "@/components/shared/loading";
 import { Plus, Calendar, Clock, User, Video, Phone, MapPin } from "lucide-react";
-import { Interview } from "@/types";
+import { Interview, Candidate, Job } from "@/types";
 import { formatDateTime } from "@/lib/utils";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -21,6 +21,8 @@ export default function InterviewsPage() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [form, setForm] = useState({
     candidate_id: "", job_id: "", scheduled_at: "", duration_minutes: "60",
     interviewer: "", type: "in-person", notes: "",
@@ -38,6 +40,11 @@ export default function InterviewsPage() {
   };
 
   useEffect(() => { fetchInterviews(); }, []);
+
+  useEffect(() => {
+    fetch("/api/candidates").then((res) => res.json()).then(setCandidates).catch(() => {});
+    fetch("/api/jobs").then((res) => res.json()).then(setJobs).catch(() => {});
+  }, []);
 
   const handleCreate = async () => {
     try {
@@ -207,12 +214,26 @@ export default function InterviewsPage() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Candidate ID</Label>
-                <Input value={form.candidate_id} onChange={(e) => setForm({ ...form, candidate_id: e.target.value })} placeholder="Paste candidate ID" />
+                <Label>Candidate</Label>
+                <Select value={form.candidate_id} onValueChange={(v) => setForm({ ...form, candidate_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select candidate" /></SelectTrigger>
+                  <SelectContent>
+                    {candidates.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.full_name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <Label>Job ID</Label>
-                <Input value={form.job_id} onChange={(e) => setForm({ ...form, job_id: e.target.value })} placeholder="Paste job ID" />
+                <Label>Job</Label>
+                <Select value={form.job_id} onValueChange={(v) => setForm({ ...form, job_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select job" /></SelectTrigger>
+                  <SelectContent>
+                    {jobs.map((j) => (
+                      <SelectItem key={j.id} value={j.id}>{j.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

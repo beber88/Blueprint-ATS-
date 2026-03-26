@@ -4,14 +4,27 @@ import { useEffect, useState } from "react";
 import { Header } from "@/components/shared/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/shared/status-badge";
 import { PageLoading } from "@/components/shared/loading";
 import {
   Users, UserPlus, Calendar, CheckCircle, Upload, Briefcase, Plus, Activity,
 } from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+} from "recharts";
 import Link from "next/link";
 import { DashboardStats } from "@/types";
 import { formatDateTime, getStatusLabel } from "@/lib/utils";
+
+const STATUS_COLORS: Record<string, string> = {
+  new: "#6b7280",
+  reviewed: "#3b82f6",
+  shortlisted: "#6366f1",
+  interview_scheduled: "#9333ea",
+  interviewed: "#8b5cf6",
+  approved: "#22c55e",
+  rejected: "#ef4444",
+  keep_for_future: "#f59e0b",
+};
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -29,28 +42,28 @@ export default function DashboardPage() {
 
   const kpis = [
     {
-      title: "Total Candidates",
+      title: "סה״כ מועמדים",
       value: stats?.total_candidates || 0,
       icon: Users,
       color: "text-blue-600",
       bg: "bg-blue-50",
     },
     {
-      title: "New This Week",
+      title: "חדשים השבוע",
       value: stats?.new_this_week || 0,
       icon: UserPlus,
       color: "text-green-600",
       bg: "bg-green-50",
     },
     {
-      title: "Interviews Scheduled",
+      title: "ראיונות מתוכננים",
       value: stats?.interviews_scheduled || 0,
       icon: Calendar,
       color: "text-purple-600",
       bg: "bg-purple-50",
     },
     {
-      title: "Approved This Month",
+      title: "אושרו החודש",
       value: stats?.approved_this_month || 0,
       icon: CheckCircle,
       color: "text-emerald-600",
@@ -60,7 +73,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <Header title="Dashboard" subtitle="Overview of your hiring pipeline" />
+      <Header title="לוח בקרה" subtitle="סקירת תהליך הגיוס" />
       <div className="p-6 space-y-6">
         {/* KPI Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -88,19 +101,19 @@ export default function DashboardPage() {
           <Link href="/candidates?upload=true">
             <Button>
               <Upload className="mr-2 h-4 w-4" />
-              Upload CV
+              העלאת קו״ח
             </Button>
           </Link>
           <Link href="/jobs?new=true">
             <Button variant="outline">
               <Briefcase className="mr-2 h-4 w-4" />
-              New Job
+              משרה חדשה
             </Button>
           </Link>
           <Link href="/interviews?new=true">
             <Button variant="outline">
               <Plus className="mr-2 h-4 w-4" />
-              Schedule Interview
+              קביעת ראיון
             </Button>
           </Link>
         </div>
@@ -109,34 +122,38 @@ export default function DashboardPage() {
           {/* Pipeline by Status */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Pipeline Overview</CardTitle>
+              <CardTitle className="text-lg">סקירת Pipeline</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {(stats?.pipeline_by_status || []).map((item) => (
-                  <div key={item.status} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <StatusBadge status={item.status} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{item.count}</span>
-                      <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-electric-500 rounded-full"
-                          style={{
-                            width: `${Math.min(100, (item.count / Math.max(stats?.total_candidates || 1, 1)) * 100)}%`,
-                          }}
+              {stats?.pipeline_by_status && stats.pipeline_by_status.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={stats.pipeline_by_status.map((item) => ({
+                      name: item.status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+                      count: item.count,
+                      status: item.status,
+                    }))}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                  >
+                    <XAxis type="number" allowDecimals={false} />
+                    <YAxis type="category" dataKey="name" width={95} tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                      {stats.pipeline_by_status.map((item) => (
+                        <Cell
+                          key={item.status}
+                          fill={STATUS_COLORS[item.status] || "#6b7280"}
                         />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {(!stats?.pipeline_by_status || stats.pipeline_by_status.length === 0) && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    No candidates yet
-                  </p>
-                )}
-              </div>
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No candidates yet
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -145,7 +162,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Activity className="h-5 w-5" />
-                Recent Activity
+                פעילות אחרונה
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -171,7 +188,7 @@ export default function DashboardPage() {
                 ))}
                 {(!stats?.recent_activity || stats.recent_activity.length === 0) && (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    No recent activity
+                    אין פעילות אחרונה
                   </p>
                 )}
               </div>
@@ -183,7 +200,7 @@ export default function DashboardPage() {
         {stats?.top_jobs && stats.top_jobs.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Active Jobs</CardTitle>
+              <CardTitle className="text-lg">משרות פעילות</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -196,12 +213,12 @@ export default function DashboardPage() {
                     <div>
                       <p className="font-medium">{job.title}</p>
                       <p className="text-sm text-muted-foreground">
-                        {job.candidate_count} candidates
+                        {job.candidate_count} מועמדים
                       </p>
                     </div>
                     {job.top_score != null && job.top_score > 0 && (
                       <span className="text-sm font-medium text-green-600">
-                        Top: {job.top_score}
+                        ציון עליון: {job.top_score}
                       </span>
                     )}
                   </Link>

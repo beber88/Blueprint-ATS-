@@ -57,6 +57,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate email format
+    if (channel === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(toAddress)) {
+        return NextResponse.json(
+          { error: "Invalid email address format" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate phone number (must contain at least 7 digits)
+    if (channel === "whatsapp") {
+      const digitCount = (toAddress.match(/\d/g) || []).length;
+      if (digitCount < 7) {
+        return NextResponse.json(
+          { error: "Invalid phone number: must contain at least 7 digits" },
+          { status: 400 }
+        );
+      }
+    }
+
     try {
       if (channel === "email") {
         await sendEmail(toAddress, subject, messageBody);

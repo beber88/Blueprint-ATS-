@@ -31,6 +31,7 @@ export default function CandidatesPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [manualForm, setManualForm] = useState({
     full_name: "", email: "", phone: "", location: "", notes: "",
   });
@@ -55,30 +56,60 @@ export default function CandidatesPage() {
   }, [fetchCandidates]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     // Reset file input so same file can be re-uploaded
     e.target.value = "";
 
+    const totalFiles = files.length;
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+    let successCount = 0;
+    let failCount = 0;
 
-    try {
-      const res = await fetch("/api/cv/upload", { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.error || "Upload failed");
-        return;
+    for (let i = 0; i < totalFiles; i++) {
+      setUploadProgress(
+        totalFiles > 1 ? `Uploading ${i + 1}/${totalFiles} CVs...` : "Uploading and parsing CV with AI..."
+      );
+
+      const formData = new FormData();
+      formData.append("file", files[i]);
+
+      try {
+        const res = await fetch("/api/cv/upload", { method: "POST", body: formData });
+        const data = await res.json();
+        if (!res.ok) {
+          failCount++;
+          if (totalFiles === 1) {
+            toast.error(data.error || "Upload failed");
+          }
+        } else {
+          successCount++;
+          if (totalFiles === 1) {
+            toast.success(`CV uploaded! ${data.candidate.full_name} added.`);
+          }
+        }
+      } catch {
+        failCount++;
+        if (totalFiles === 1) {
+          toast.error("Network error. Please check your connection and try again.");
+        }
       }
-      toast.success(`CV uploaded! ${data.candidate.full_name} added.`);
+    }
+
+    if (totalFiles > 1) {
+      if (failCount === 0) {
+        toast.success(`Uploaded ${successCount}/${totalFiles} CVs successfully`);
+      } else {
+        toast.warning(`Uploaded ${successCount}/${totalFiles} CVs successfully, ${failCount} failed`);
+      }
+    }
+
+    setUploadProgress("");
+    setUploading(false);
+    if (successCount > 0) {
       setUploadOpen(false);
       fetchCandidates();
-    } catch {
-      toast.error("Network error. Please check your connection and try again.");
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -134,7 +165,7 @@ export default function CandidatesPage() {
 
   return (
     <div>
-      <Header title="Candidates" subtitle={`${candidates.length} total candidates`} />
+      <Header title="מועמדים" subtitle={`${candidates.length} מועמדים בסה״כ`} />
       <div className="p-6 space-y-4">
         {/* Actions Bar */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -142,7 +173,7 @@ export default function CandidatesPage() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search by name, email, or skills..."
+                placeholder="חיפוש לפי שם, אימייל או כישורים..."
                 className="pl-9"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -150,10 +181,10 @@ export default function CandidatesPage() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="סינון לפי סטטוס" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="all">כל הסטטוסים</SelectItem>
                 {statuses.map((s) => (
                   <SelectItem key={s} value={s}>
                     {s.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -164,12 +195,12 @@ export default function CandidatesPage() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setManualOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Manually
+              <Plus className="ml-2 h-4 w-4" />
+              הוספה ידנית
             </Button>
             <Button onClick={() => setUploadOpen(true)}>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload CV
+              <Upload className="ml-2 h-4 w-4" />
+              העלאת קו״ח
             </Button>
           </div>
         </div>
@@ -184,11 +215,11 @@ export default function CandidatesPage() {
         ) : candidates.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
-              <p className="text-muted-foreground">No candidates found</p>
+              <p className="text-muted-foreground">לא נמצאו מועמדים</p>
               <div className="mt-4 flex gap-2 justify-center">
                 <Button onClick={() => setUploadOpen(true)}>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload First CV
+                  <Upload className="ml-2 h-4 w-4" />
+                  העלו קו״ח כדי להתחיל
                 </Button>
               </div>
             </CardContent>
@@ -246,7 +277,7 @@ export default function CandidatesPage() {
                             ))}
                             {candidate.skills.length > 5 && (
                               <span className="text-xs text-muted-foreground">
-                                +{candidate.skills.length - 5} more
+                                +{candidate.skills.length - 5} נוספים
                               </span>
                             )}
                           </div>
@@ -265,8 +296,8 @@ export default function CandidatesPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
                               <Link href={`/candidates/${candidate.id}`}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Profile
+                                <Eye className="ml-2 h-4 w-4" />
+                                צפייה בפרופיל
                               </Link>
                             </DropdownMenuItem>
                             {statuses.map((s) => (
@@ -275,7 +306,7 @@ export default function CandidatesPage() {
                                 onClick={() => handleStatusChange(candidate.id, s)}
                                 disabled={candidate.status === s}
                               >
-                                Set: {s.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                                קבע: {s.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                               </DropdownMenuItem>
                             ))}
                           </DropdownMenuContent>
@@ -293,17 +324,18 @@ export default function CandidatesPage() {
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Upload CV</DialogTitle>
+              <DialogTitle>העלאת קו״ח</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="border-2 border-dashed rounded-lg p-8 text-center">
                 <Upload className="mx-auto h-10 w-10 text-muted-foreground mb-4" />
                 <p className="text-sm text-muted-foreground mb-2">
-                  Drop a PDF or DOCX file here, or click to browse
+                  גררו קבצי PDF או DOCX לכאן, או לחצו לבחירה (תמיכה במספר קבצים)
                 </p>
                 <Input
                   type="file"
                   accept=".pdf,.doc,.docx"
+                  multiple
                   onChange={handleUpload}
                   disabled={uploading}
                   className="max-w-xs mx-auto"
@@ -311,7 +343,7 @@ export default function CandidatesPage() {
               </div>
               {uploading && (
                 <p className="text-sm text-center text-muted-foreground">
-                  Uploading and parsing CV with AI...
+                  {uploadProgress || "מעלה ומנתח קו״ח עם AI..."}
                 </p>
               )}
             </div>
@@ -322,11 +354,11 @@ export default function CandidatesPage() {
         <Dialog open={manualOpen} onOpenChange={setManualOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add Candidate Manually</DialogTitle>
+              <DialogTitle>הוספת מועמד ידנית</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Full Name *</Label>
+                <Label>שם מלא *</Label>
                 <Input
                   value={manualForm.full_name}
                   onChange={(e) => setManualForm({ ...manualForm, full_name: e.target.value })}
@@ -335,7 +367,7 @@ export default function CandidatesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Email</Label>
+                  <Label>אימייל</Label>
                   <Input
                     type="email"
                     value={manualForm.email}
@@ -343,7 +375,7 @@ export default function CandidatesPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone</Label>
+                  <Label>טלפון</Label>
                   <Input
                     value={manualForm.phone}
                     onChange={(e) => setManualForm({ ...manualForm, phone: e.target.value })}
@@ -351,14 +383,14 @@ export default function CandidatesPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Location</Label>
+                <Label>מיקום</Label>
                 <Input
                   value={manualForm.location}
                   onChange={(e) => setManualForm({ ...manualForm, location: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Notes</Label>
+                <Label>הערות</Label>
                 <Textarea
                   value={manualForm.notes}
                   onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })}
@@ -367,9 +399,9 @@ export default function CandidatesPage() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setManualOpen(false)}>
-                Cancel
+                ביטול
               </Button>
-              <Button onClick={handleManualCreate}>Create Candidate</Button>
+              <Button onClick={handleManualCreate}>יצירת מועמד</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
