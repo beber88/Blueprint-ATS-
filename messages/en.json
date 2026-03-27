@@ -1,0 +1,216 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "candidates": "Candidates",
+    "jobs": "Jobs",
+    "interviews": "Interviews",
+    "messages": "Messages",
+    "templates": "Templates",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "total_candidates": "Total Candidates",
+    "new_this_week": "New This Week",
+    "interviews_scheduled": "Interviews Scheduled",
+    "approved_this_month": "Approved This Month",
+    "pipeline": "Candidate Pipeline",
+    "recent_activity": "Recent Activity",
+    "top_jobs": "Top Jobs"
+  },
+  "candidates": {
+    "title": "Candidates",
+    "add_manual": "Add Manually",
+    "upload_cv": "Upload CV",
+    "search_placeholder": "Search by name, email or skills...",
+    "all_statuses": "All Statuses",
+    "all_jobs": "All Jobs",
+    "no_candidates": "No candidates yet",
+    "upload_first": "Upload your first CV",
+    "total": "Total",
+    "table": {
+      "candidate": "Candidate",
+      "job": "Job",
+      "status": "Status",
+      "ai_score": "AI Score",
+      "experience": "Experience",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view_profile": "View Profile",
+      "change_status": "Change Status"
+    },
+    "bulk": {
+      "selected": "Selected",
+      "send_email": "Send Email",
+      "cancel": "Cancel Selection"
+    },
+    "status": {
+      "new": "New",
+      "reviewed": "Reviewed",
+      "shortlisted": "Shortlisted",
+      "interview_scheduled": "Interview Scheduled",
+      "interviewed": "Interviewed",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "keep_for_future": "Keep for Future"
+    },
+    "not_assigned": "Not Assigned",
+    "years": "years",
+    "clear_filters": "Clear All"
+  },
+  "profile": {
+    "overview": "Overview",
+    "ai_analysis": "AI Analysis",
+    "applications": "Applications",
+    "interviews": "Interviews",
+    "history": "History",
+    "run_ai_analysis": "Run AI Analysis",
+    "skills": "Skills",
+    "experience": "Experience",
+    "education": "Education",
+    "certifications": "Certifications",
+    "strengths": "Strengths",
+    "weaknesses": "Weaknesses",
+    "scorecard": "Scorecard",
+    "verdict": "Verdict",
+    "interview_questions": "Interview Questions",
+    "interviewer_notes": "Interviewer Notes",
+    "no_analysis": "No AI analysis has been performed for this candidate yet",
+    "total_score": "Total Score",
+    "recommendation": "Recommendation",
+    "level": "Level",
+    "profile_snapshot": "Profile Snapshot"
+  },
+  "jobs": {
+    "title": "Jobs",
+    "new_job": "New Job",
+    "no_jobs": "No jobs yet",
+    "candidates_count": "Candidates",
+    "top_score": "Top Score",
+    "view_candidates": "View Candidates",
+    "all": "All",
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "closed": "Closed"
+    },
+    "form": {
+      "title": "Job Title",
+      "department": "Department",
+      "location": "Location",
+      "type": "Job Type",
+      "description": "Job Description",
+      "requirements": "Requirements",
+      "create": "Create Job",
+      "cancel": "Cancel",
+      "full_time": "Full Time",
+      "part_time": "Part Time",
+      "contract": "Contract",
+      "internship": "Internship"
+    }
+  },
+  "interviews": {
+    "title": "Interviews",
+    "new_interview": "Schedule Interview",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "no_upcoming": "No upcoming interviews",
+    "passed": "Passed",
+    "failed": "Failed",
+    "minutes": "minutes",
+    "form": {
+      "candidate": "Candidate",
+      "job": "Job",
+      "date_time": "Date & Time",
+      "duration": "Duration (minutes)",
+      "type": "Type",
+      "interviewer": "Interviewer",
+      "notes": "Notes",
+      "cancel": "Cancel",
+      "schedule": "Schedule Interview",
+      "in_person": "In Person",
+      "video": "Video",
+      "phone": "Phone",
+      "select_candidate": "Select Candidate",
+      "select_job": "Select Job"
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "new_message": "New Message",
+    "templates_section": "Message Templates",
+    "templates_available": "Available Templates",
+    "no_templates": "No templates yet",
+    "use_template": "Use Template",
+    "sent_messages": "Sent Messages",
+    "no_sent": "No messages sent yet",
+    "select_candidate": "Select Candidate",
+    "search_candidate": "Search candidate...",
+    "channel": "Channel",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "template": "Template",
+    "select_template": "Select Template",
+    "variables": "Variables",
+    "subject": "Subject",
+    "body": "Body",
+    "preview": "Preview",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "cancel": "Cancel"
+  },
+  "templates": {
+    "title": "Message Templates",
+    "new_template": "New Template",
+    "all": "All",
+    "no_templates": "No templates",
+    "form": {
+      "name": "Template Name",
+      "channel": "Channel",
+      "category": "Category",
+      "subject": "Subject",
+      "body": "Content",
+      "variables": "Variables (comma separated)",
+      "create": "Create",
+      "cancel": "Cancel"
+    },
+    "category": {
+      "interview_invite": "Interview Invite",
+      "rejection": "Rejection",
+      "next_stage": "Next Stage",
+      "offer": "Job Offer",
+      "general": "General"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure Integrations",
+    "integrations": "Integrations",
+    "integration_desc": "Configure connections to external services",
+    "gmail_desc": "Send email via OAuth2",
+    "whatsapp_desc": "WhatsApp Business API",
+    "env_config": "Configure in .env.local",
+    "language": "Language"
+  },
+  "auth": {
+    "login_title": "Welcome to Blueprint ATS",
+    "login_subtitle": "Manage your recruitment process smartly",
+    "email": "Email Address",
+    "password": "Password",
+    "login_btn": "Log In",
+    "google_btn": "Continue with Google",
+    "or": "or",
+    "logging_in": "Logging in..."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "back": "Back",
+    "logout": "Log Out"
+  }
+}

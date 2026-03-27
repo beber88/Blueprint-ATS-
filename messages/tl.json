@@ -1,0 +1,216 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "candidates": "Mga Kandidato",
+    "jobs": "Mga Trabaho",
+    "interviews": "Mga Panayam",
+    "messages": "Mga Mensahe",
+    "templates": "Mga Template",
+    "settings": "Mga Setting"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "total_candidates": "Kabuuang Kandidato",
+    "new_this_week": "Bago Ngayong Linggo",
+    "interviews_scheduled": "Nakaiskedyul na Panayam",
+    "approved_this_month": "Naaprubahan Ngayong Buwan",
+    "pipeline": "Pipeline ng Kandidato",
+    "recent_activity": "Kamakailang Aktibidad",
+    "top_jobs": "Nangungunang Trabaho"
+  },
+  "candidates": {
+    "title": "Mga Kandidato",
+    "add_manual": "Magdagdag nang Manu-mano",
+    "upload_cv": "Mag-upload ng CV",
+    "search_placeholder": "Maghanap ayon sa pangalan, email o kasanayan...",
+    "all_statuses": "Lahat ng Status",
+    "all_jobs": "Lahat ng Trabaho",
+    "no_candidates": "Wala pang kandidato",
+    "upload_first": "Mag-upload ng unang CV",
+    "total": "Kabuuan",
+    "table": {
+      "candidate": "Kandidato",
+      "job": "Trabaho",
+      "status": "Status",
+      "ai_score": "AI Score",
+      "experience": "Karanasan",
+      "actions": "Mga Aksyon"
+    },
+    "actions": {
+      "view_profile": "Tingnan ang Profile",
+      "change_status": "Baguhin ang Status"
+    },
+    "bulk": {
+      "selected": "Napili",
+      "send_email": "Magpadala ng Email",
+      "cancel": "Kanselahin ang Pagpili"
+    },
+    "status": {
+      "new": "Bago",
+      "reviewed": "Nasuri",
+      "shortlisted": "Nasa Shortlist",
+      "interview_scheduled": "Nakaiskedyul ang Panayam",
+      "interviewed": "Na-interview",
+      "approved": "Naaprubahan",
+      "rejected": "Tinanggihan",
+      "keep_for_future": "Itabi para sa Hinaharap"
+    },
+    "not_assigned": "Hindi Nakatalaga",
+    "years": "taon",
+    "clear_filters": "I-clear Lahat"
+  },
+  "profile": {
+    "overview": "Pangkalahatang-tanaw",
+    "ai_analysis": "AI Analysis",
+    "applications": "Mga Aplikasyon",
+    "interviews": "Mga Panayam",
+    "history": "Kasaysayan",
+    "run_ai_analysis": "Patakbuhin ang AI Analysis",
+    "skills": "Mga Kasanayan",
+    "experience": "Karanasan",
+    "education": "Edukasyon",
+    "certifications": "Mga Sertipikasyon",
+    "strengths": "Mga Kalakasan",
+    "weaknesses": "Mga Kahinaan",
+    "scorecard": "Scorecard",
+    "verdict": "Hatol",
+    "interview_questions": "Mga Tanong sa Panayam",
+    "interviewer_notes": "Mga Tala ng Tagapanayam",
+    "no_analysis": "Wala pang AI analysis na ginawa para sa kandidatong ito",
+    "total_score": "Kabuuang Score",
+    "recommendation": "Rekomendasyon",
+    "level": "Antas",
+    "profile_snapshot": "Profile Snapshot"
+  },
+  "jobs": {
+    "title": "Mga Trabaho",
+    "new_job": "Bagong Trabaho",
+    "no_jobs": "Wala pang trabaho",
+    "candidates_count": "Mga Kandidato",
+    "top_score": "Pinakamataas na Score",
+    "view_candidates": "Tingnan ang mga Kandidato",
+    "all": "Lahat",
+    "status": {
+      "active": "Aktibo",
+      "paused": "Naka-pause",
+      "closed": "Sarado"
+    },
+    "form": {
+      "title": "Titulo ng Trabaho",
+      "department": "Departamento",
+      "location": "Lokasyon",
+      "type": "Uri ng Trabaho",
+      "description": "Paglalarawan ng Trabaho",
+      "requirements": "Mga Kinakailangan",
+      "create": "Lumikha ng Trabaho",
+      "cancel": "Kanselahin",
+      "full_time": "Full Time",
+      "part_time": "Part Time",
+      "contract": "Kontrata",
+      "internship": "Internship"
+    }
+  },
+  "interviews": {
+    "title": "Mga Panayam",
+    "new_interview": "Mag-iskedyul ng Panayam",
+    "upcoming": "Paparating",
+    "past": "Nakaraan",
+    "no_upcoming": "Walang paparating na panayam",
+    "passed": "Pumasa",
+    "failed": "Hindi Pumasa",
+    "minutes": "minuto",
+    "form": {
+      "candidate": "Kandidato",
+      "job": "Trabaho",
+      "date_time": "Petsa at Oras",
+      "duration": "Tagal (minuto)",
+      "type": "Uri",
+      "interviewer": "Tagapanayam",
+      "notes": "Mga Tala",
+      "cancel": "Kanselahin",
+      "schedule": "Mag-iskedyul ng Panayam",
+      "in_person": "Personal",
+      "video": "Video",
+      "phone": "Telepono",
+      "select_candidate": "Pumili ng Kandidato",
+      "select_job": "Pumili ng Trabaho"
+    }
+  },
+  "messages": {
+    "title": "Mga Mensahe",
+    "new_message": "Bagong Mensahe",
+    "templates_section": "Mga Template ng Mensahe",
+    "templates_available": "Mga Available na Template",
+    "no_templates": "Wala pang template",
+    "use_template": "Gamitin ang Template",
+    "sent_messages": "Mga Naipadala na Mensahe",
+    "no_sent": "Wala pang naipadala na mensahe",
+    "select_candidate": "Pumili ng Kandidato",
+    "search_candidate": "Maghanap ng kandidato...",
+    "channel": "Channel",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "template": "Template",
+    "select_template": "Pumili ng Template",
+    "variables": "Mga Variable",
+    "subject": "Paksa",
+    "body": "Nilalaman",
+    "preview": "Preview",
+    "send": "Ipadala ang Mensahe",
+    "sending": "Ipinapadala...",
+    "cancel": "Kanselahin"
+  },
+  "templates": {
+    "title": "Mga Template ng Mensahe",
+    "new_template": "Bagong Template",
+    "all": "Lahat",
+    "no_templates": "Walang template",
+    "form": {
+      "name": "Pangalan ng Template",
+      "channel": "Channel",
+      "category": "Kategorya",
+      "subject": "Paksa",
+      "body": "Nilalaman",
+      "variables": "Mga Variable (pinaghihiwalay ng kuwit)",
+      "create": "Lumikha",
+      "cancel": "Kanselahin"
+    },
+    "category": {
+      "interview_invite": "Imbitasyon sa Panayam",
+      "rejection": "Pagtanggi",
+      "next_stage": "Susunod na Yugto",
+      "offer": "Alok ng Trabaho",
+      "general": "Pangkalahatan"
+    }
+  },
+  "settings": {
+    "title": "Mga Setting",
+    "subtitle": "I-configure ang mga Integrasyon",
+    "integrations": "Mga Integrasyon",
+    "integration_desc": "I-configure ang mga koneksyon sa mga external na serbisyo",
+    "gmail_desc": "Magpadala ng email gamit ang OAuth2",
+    "whatsapp_desc": "WhatsApp Business API",
+    "env_config": "I-configure sa .env.local",
+    "language": "Wika"
+  },
+  "auth": {
+    "login_title": "Maligayang pagdating sa Blueprint ATS",
+    "login_subtitle": "Pamahalaan ang proseso ng recruitment nang matalino",
+    "email": "Email Address",
+    "password": "Password",
+    "login_btn": "Mag-log In",
+    "google_btn": "Magpatuloy gamit ang Google",
+    "or": "o",
+    "logging_in": "Nagla-log in..."
+  },
+  "common": {
+    "loading": "Naglo-load...",
+    "error": "Error",
+    "success": "Tagumpay",
+    "save": "I-save",
+    "cancel": "Kanselahin",
+    "delete": "Tanggalin",
+    "back": "Bumalik",
+    "logout": "Mag-log Out"
+  }
+}

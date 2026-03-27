@@ -1,0 +1,216 @@
+{
+  "nav": {
+    "dashboard": "דשבורד",
+    "candidates": "מועמדים",
+    "jobs": "משרות",
+    "interviews": "ראיונות",
+    "messages": "הודעות",
+    "templates": "תבניות",
+    "settings": "הגדרות"
+  },
+  "dashboard": {
+    "title": "דשבורד",
+    "total_candidates": "סה\"כ מועמדים",
+    "new_this_week": "חדשים השבוע",
+    "interviews_scheduled": "ראיונות מתוכננים",
+    "approved_this_month": "אושרו החודש",
+    "pipeline": "צנרת מועמדים",
+    "recent_activity": "פעילות אחרונה",
+    "top_jobs": "משרות מובילות"
+  },
+  "candidates": {
+    "title": "מועמדים",
+    "add_manual": "הוסף ידנית",
+    "upload_cv": "העלה קורות חיים",
+    "search_placeholder": "חיפוש לפי שם, אימייל או כישורים...",
+    "all_statuses": "כל הסטטוסים",
+    "all_jobs": "כל המשרות",
+    "no_candidates": "אין מועמדים עדיין",
+    "upload_first": "העלה קורות חיים ראשונים",
+    "total": "סה\"כ",
+    "table": {
+      "candidate": "מועמד",
+      "job": "משרה",
+      "status": "סטטוס",
+      "ai_score": "ציון AI",
+      "experience": "ניסיון",
+      "actions": "פעולות"
+    },
+    "actions": {
+      "view_profile": "צפה בפרופיל",
+      "change_status": "שנה סטטוס"
+    },
+    "bulk": {
+      "selected": "נבחרו",
+      "send_email": "שלח אימייל",
+      "cancel": "בטל בחירה"
+    },
+    "status": {
+      "new": "חדש",
+      "reviewed": "נסקר",
+      "shortlisted": "ברשימה הקצרה",
+      "interview_scheduled": "ראיון מתוכנן",
+      "interviewed": "רואיין",
+      "approved": "אושר",
+      "rejected": "נדחה",
+      "keep_for_future": "לעתיד"
+    },
+    "not_assigned": "לא משויך",
+    "years": "שנים",
+    "clear_filters": "נקה הכל"
+  },
+  "profile": {
+    "overview": "סקירה",
+    "ai_analysis": "ניתוח AI",
+    "applications": "בקשות",
+    "interviews": "ראיונות",
+    "history": "היסטוריה",
+    "run_ai_analysis": "הפעל ניתוח AI",
+    "skills": "כישורים",
+    "experience": "ניסיון",
+    "education": "השכלה",
+    "certifications": "תעודות",
+    "strengths": "חוזקות",
+    "weaknesses": "חולשות",
+    "scorecard": "כרטיס ציונים",
+    "verdict": "המלצה",
+    "interview_questions": "שאלות לראיון",
+    "interviewer_notes": "הערות למראיין",
+    "no_analysis": "טרם בוצע ניתוח AI למועמד זה",
+    "total_score": "ציון כולל",
+    "recommendation": "המלצה",
+    "level": "רמה",
+    "profile_snapshot": "תמונת פרופיל"
+  },
+  "jobs": {
+    "title": "משרות",
+    "new_job": "משרה חדשה",
+    "no_jobs": "אין משרות עדיין",
+    "candidates_count": "מועמדים",
+    "top_score": "ציון מקסימלי",
+    "view_candidates": "צפה במועמדים",
+    "all": "הכל",
+    "status": {
+      "active": "פעיל",
+      "paused": "מושהה",
+      "closed": "סגור"
+    },
+    "form": {
+      "title": "כותרת משרה",
+      "department": "מחלקה",
+      "location": "מיקום",
+      "type": "סוג משרה",
+      "description": "תיאור תפקיד",
+      "requirements": "דרישות",
+      "create": "יצירת משרה",
+      "cancel": "ביטול",
+      "full_time": "משרה מלאה",
+      "part_time": "משרה חלקית",
+      "contract": "חוזה",
+      "internship": "התמחות"
+    }
+  },
+  "interviews": {
+    "title": "ראיונות",
+    "new_interview": "קביעת ראיון",
+    "upcoming": "קרובים",
+    "past": "קודמים",
+    "no_upcoming": "אין ראיונות קרובים",
+    "passed": "עבר",
+    "failed": "נכשל",
+    "minutes": "דקות",
+    "form": {
+      "candidate": "מועמד/ת",
+      "job": "משרה",
+      "date_time": "תאריך ושעה",
+      "duration": "משך (דקות)",
+      "type": "סוג",
+      "interviewer": "מראיין/ת",
+      "notes": "הערות",
+      "cancel": "ביטול",
+      "schedule": "קבע ראיון",
+      "in_person": "פרונטלי",
+      "video": "וידאו",
+      "phone": "טלפוני",
+      "select_candidate": "בחרו מועמד/ת",
+      "select_job": "בחרו משרה"
+    }
+  },
+  "messages": {
+    "title": "הודעות",
+    "new_message": "הודעה חדשה",
+    "templates_section": "תבניות הודעות",
+    "templates_available": "תבניות זמינות",
+    "no_templates": "אין תבניות עדיין",
+    "use_template": "שימוש בתבנית",
+    "sent_messages": "הודעות שנשלחו",
+    "no_sent": "טרם נשלחו הודעות",
+    "select_candidate": "בחר מועמד/ת",
+    "search_candidate": "חפש מועמד...",
+    "channel": "ערוץ",
+    "email": "אימייל",
+    "whatsapp": "WhatsApp",
+    "template": "תבנית",
+    "select_template": "בחרו תבנית",
+    "variables": "משתנים",
+    "subject": "נושא",
+    "body": "הודעה",
+    "preview": "תצוגה מקדימה",
+    "send": "שליחת הודעה",
+    "sending": "שולח...",
+    "cancel": "ביטול"
+  },
+  "templates": {
+    "title": "תבניות הודעות",
+    "new_template": "תבנית חדשה",
+    "all": "הכל",
+    "no_templates": "אין תבניות",
+    "form": {
+      "name": "שם תבנית",
+      "channel": "ערוץ",
+      "category": "קטגוריה",
+      "subject": "נושא",
+      "body": "תוכן",
+      "variables": "משתנים (מופרדים בפסיקים)",
+      "create": "יצירה",
+      "cancel": "ביטול"
+    },
+    "category": {
+      "interview_invite": "זימון לראיון",
+      "rejection": "דחייה",
+      "next_stage": "מעבר לשלב",
+      "offer": "הצעת עבודה",
+      "general": "כללי"
+    }
+  },
+  "settings": {
+    "title": "הגדרות",
+    "subtitle": "הגדרת אינטגרציות",
+    "integrations": "אינטגרציות",
+    "integration_desc": "הגדרת חיבורים לשירותים חיצוניים",
+    "gmail_desc": "שליחת אימייל באמצעות OAuth2",
+    "whatsapp_desc": "WhatsApp Business API",
+    "env_config": "הגדרה ב-.env.local",
+    "language": "שפה"
+  },
+  "auth": {
+    "login_title": "ברוך הבא ל-Blueprint ATS",
+    "login_subtitle": "נהל את תהליך הגיוס בצורה חכמה",
+    "email": "כתובת אימייל",
+    "password": "סיסמה",
+    "login_btn": "התחבר",
+    "google_btn": "המשך עם Google",
+    "or": "או",
+    "logging_in": "מתחבר..."
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "delete": "מחק",
+    "back": "חזרה",
+    "logout": "התנתק"
+  }
+}

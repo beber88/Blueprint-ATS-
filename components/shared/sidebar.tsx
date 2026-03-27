@@ -7,20 +7,23 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/lib/i18n/context";
+import { LanguageSwitcher } from "@/components/shared/language-switcher";
 
 const navigation = [
-  { name: "דשבורד", href: "/dashboard", icon: LayoutDashboard },
-  { name: "מועמדים", href: "/candidates", icon: Users },
-  { name: "משרות", href: "/jobs", icon: Briefcase },
-  { name: "ראיונות", href: "/interviews", icon: Calendar },
-  { name: "הודעות", href: "/messages", icon: MessageSquare },
-  { name: "תבניות", href: "/templates", icon: FileText },
-  { name: "הגדרות", href: "/settings", icon: Settings },
+  { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { key: "nav.candidates", href: "/candidates", icon: Users },
+  { key: "nav.jobs", href: "/jobs", icon: Briefcase },
+  { key: "nav.interviews", href: "/interviews", icon: Calendar },
+  { key: "nav.messages", href: "/messages", icon: MessageSquare },
+  { key: "nav.templates", href: "/templates", icon: FileText },
+  { key: "nav.settings", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -42,7 +45,7 @@ export function Sidebar() {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
               className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150"
               style={isActive ? {
@@ -56,22 +59,25 @@ export function Sidebar() {
               onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
             >
               <item.icon className="h-5 w-5 shrink-0" />
-              {item.name}
+              {t(item.key)}
             </Link>
           );
         })}
       </nav>
 
       <div className="px-3 pb-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="py-3">
+          <LanguageSwitcher />
+        </div>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-3 py-2.5 mt-3 text-sm font-medium rounded-lg transition-all duration-150"
+          className="flex w-full items-center gap-3 px-3 py-2.5 mt-1 text-sm font-medium rounded-lg transition-all duration-150"
           style={{ color: 'rgba(255,255,255,0.5)' }}
           onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
         >
           <LogOut className="h-5 w-5" />
-          התנתק
+          {t("common.logout")}
         </button>
       </div>
     </aside>
