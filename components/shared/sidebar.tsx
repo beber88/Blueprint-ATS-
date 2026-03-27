@@ -3,15 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Users,
-  Briefcase,
-  Calendar,
-  MessageSquare,
-  Settings,
-  LogOut,
+  LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, Settings, LogOut, FileText,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -21,6 +14,7 @@ const navigation = [
   { name: "משרות", href: "/jobs", icon: Briefcase },
   { name: "ראיונות", href: "/interviews", icon: Calendar },
   { name: "הודעות", href: "/messages", icon: MessageSquare },
+  { name: "תבניות", href: "/templates", icon: FileText },
   { name: "הגדרות", href: "/settings", icon: Settings },
 ];
 
@@ -35,35 +29,31 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex h-full flex-col" style={{ width: '260px', minWidth: '260px', backgroundColor: '#0F172A' }}>
-      {/* Logo */}
-      <div className="flex h-16 items-center px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ backgroundColor: '#3B82F6' }}>
-            <span className="text-sm font-bold text-white">B</span>
-          </div>
-          <div>
-            <h1 className="text-base font-bold text-white tracking-tight">Blueprint ATS</h1>
-          </div>
+    <aside className="flex h-full flex-col" style={{ width: '240px', minWidth: '240px', background: 'var(--navy)' }}>
+      <div className="flex items-center gap-3 px-5 h-16">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
+          <span className="text-sm font-bold text-white">B</span>
         </div>
+        <span className="text-base font-bold text-white tracking-tight">Blueprint ATS</span>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 pt-4">
+      <nav className="flex-1 px-3 pt-4 space-y-0.5">
         {navigation.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.name}
               href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                isActive
-                  ? "text-white shadow-lg"
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
-              )}
-              style={isActive ? { backgroundColor: '#3B82F6' } : undefined}
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150"
+              style={isActive ? {
+                background: 'rgba(59,130,246,0.15)',
+                color: '#fff',
+                borderRight: '3px solid var(--blue)',
+              } : {
+                color: 'rgba(255,255,255,0.6)',
+              }}
+              onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+              onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
             >
               <item.icon className="h-5 w-5 shrink-0" />
               {item.name}
@@ -72,11 +62,13 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <div className="px-3 pb-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+          className="flex w-full items-center gap-3 px-3 py-2.5 mt-3 text-sm font-medium rounded-lg transition-all duration-150"
+          style={{ color: 'rgba(255,255,255,0.5)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
         >
           <LogOut className="h-5 w-5" />
           התנתק
