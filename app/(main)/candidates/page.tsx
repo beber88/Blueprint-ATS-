@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Upload, Search, Plus, MoreHorizontal, Eye, Users,
+  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
@@ -38,9 +38,15 @@ export default function CandidatesPage() {
   const [jobs, setJobs] = useState<{id: string; title: string; status: string}[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("all");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [bulkEmailOpen, setBulkEmailOpen] = useState(false);
+  const [bulkTemplate, setBulkTemplate] = useState("");
+  const [bulkSending, setBulkSending] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState("");
+  const [templates, setTemplates] = useState<{id: string; name: string; type: string}[]>([]);
 
   useEffect(() => {
     fetch("/api/jobs").then(r => r.json()).then(setJobs).catch(() => {});
+    fetch("/api/templates").then(r => r.json()).then(setTemplates).catch(() => {});
   }, []);
 
   const fetchCandidates = useCallback(async () => {
@@ -123,6 +129,31 @@ export default function CandidatesPage() {
       fetchCandidates();
     } catch {
       toast.error("שגיאה בעדכון סטטוס");
+    }
+  };
+
+  const handleBulkEmail = async () => {
+    if (!bulkTemplate) { toast.error("בחרו תבנית"); return; }
+    setBulkSending(true);
+    const ids = Array.from(selectedRows);
+    setBulkProgress(`שולח 0/${ids.length}...`);
+    try {
+      const res = await fetch("/api/messages/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidateIds: ids, templateId: bulkTemplate, channel: "email" }),
+      });
+      const data = await res.json();
+      toast.success(`נשלחו ${data.sent}/${data.total} הודעות`);
+      if (data.failed > 0) toast.warning(`${data.failed} נכשלו`);
+      setSelectedRows(new Set());
+      setBulkEmailOpen(false);
+      fetchCandidates();
+    } catch {
+      toast.error("שגיאה בשליחה");
+    } finally {
+      setBulkSending(false);
+      setBulkProgress("");
     }
   };
 
@@ -342,8 +373,11 @@ export default function CandidatesPage() {
         {selectedRows.size > 0 && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded-xl text-white text-sm font-medium" style={{ background: 'var(--navy)', boxShadow: 'var(--shadow-md)', zIndex: 50 }}>
             <span>{selectedRows.size} נבחרו</span>
-            <button className="px-3 py-1 rounded-md text-xs" style={{ background: 'rgba(255,255,255,0.15)' }}>שנה סטטוס</button>
-            <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1 rounded-md text-xs" style={{ background: 'rgba(255,255,255,0.1)' }}>בטל בחירה</button>
+            <button onClick={() => setBulkEmailOpen(true)} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--blue)' }}>
+              <Mail className="inline h-3 w-3 ml-1" /> שלח אימייל
+            </button>
+            <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)' }}>שנה סטטוס</button>
+            <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.1)' }}>בטל</button>
           </div>
         )}
       </div>
@@ -430,6 +464,44 @@ export default function CandidatesPage() {
               className="rounded-lg bg-electric-600 hover:bg-electric-700"
             >
               יצירת מועמד
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Email Dialog */}
+      <Dialog open={bulkEmailOpen} onOpenChange={setBulkEmailOpen}>
+        <DialogContent className="sm:max-w-md rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>
+              שליחת אימייל ל-{selectedRows.size} מועמדים
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-3">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">בחרו תבנית</Label>
+              <Select value={bulkTemplate} onValueChange={setBulkTemplate}>
+                <SelectTrigger className="rounded-lg">
+                  <SelectValue placeholder="בחרו תבנית אימייל" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.filter(t => t.type === "email").map(t => (
+                    <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {bulkSending && (
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--blue-light)' }}>
+                <div className="h-4 w-4 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--gray-200)', borderTopColor: 'var(--blue)' }} />
+                <span className="text-sm font-medium" style={{ color: 'var(--blue)' }}>{bulkProgress}</span>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setBulkEmailOpen(false)} className="rounded-lg">ביטול</Button>
+            <Button onClick={handleBulkEmail} disabled={bulkSending} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+              {bulkSending ? "שולח..." : "שלח"}
             </Button>
           </DialogFooter>
         </DialogContent>
