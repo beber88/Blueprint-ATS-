@@ -13,7 +13,7 @@ import { PageLoading } from "@/components/shared/loading";
 import {
   Mail, Phone, MapPin, ExternalLink, FileText, Briefcase, GraduationCap,
   Calendar, MessageSquare, ArrowRight, Save, Clock, User, Award,
-  Send, Video, PhoneCall, Building2, Hash,
+  Send, Video, PhoneCall, Building2, Hash, CheckCircle, XCircle, Brain,
 } from "lucide-react";
 import Link from "next/link";
 import { Candidate, Application, Interview, MessageSent, ActivityLog } from "@/types";
@@ -148,6 +148,30 @@ export default function CandidateProfilePage() {
     }
   };
 
+  const handleRunAnalysis = async () => {
+    if (!candidate) return;
+    const jobApp = candidate.applications?.[0];
+    if (!jobApp?.job_id) {
+      toast.error("יש לשייך את המועמד למשרה לפני ניתוח");
+      return;
+    }
+    toast.info("מריץ ניתוח AI...");
+    try {
+      const res = await fetch("/api/cv/score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidateId: candidate.id, jobId: jobApp.job_id }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success("ניתוח AI הושלם!");
+      const refreshRes = await fetch(`/api/candidates/${candidate.id}`);
+      const refreshData = await refreshRes.json();
+      setCandidate(refreshData);
+    } catch {
+      toast.error("שגיאה בניתוח AI");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/50">
       {/* Hero Section */}
@@ -249,6 +273,10 @@ export default function CandidateProfilePage() {
           <TabsList className="bg-white rounded-xl shadow-sm border border-slate-200 p-1 h-auto mb-6">
             <TabsTrigger value="overview" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
               סקירה
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+              <Brain className="h-4 w-4 ml-1.5" />
+              ניתוח AI
             </TabsTrigger>
             <TabsTrigger value="applications" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
               מועמדויות
@@ -402,6 +430,145 @@ export default function CandidateProfilePage() {
                 </Button>
               </div>
             </div>
+          </TabsContent>
+
+          {/* AI Analysis Tab */}
+          <TabsContent value="analysis" className="space-y-6 mt-0">
+            {(candidate as unknown as Record<string, unknown>).ai_analysis ? (() => {
+              const analysis = (candidate as unknown as Record<string, unknown>).ai_analysis as Record<string, unknown>;
+              const verdict = analysis.verdict as Record<string, unknown> | undefined;
+              const scorecard = analysis.scorecard as { criterion: string; max: number; score: number; notes: string }[] | undefined;
+              const questions = analysis.interview_questions as { question: string; type: string; purpose: string }[] | undefined;
+              return (
+                <>
+                  {/* Profile Snapshot */}
+                  {analysis.profile_snapshot && (
+                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>תמונת פרופיל</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {Object.entries(analysis.profile_snapshot as Record<string, string>).map(([key, val]) => (
+                          <div key={key} className="p-3 rounded-lg" style={{ background: 'var(--gray-50)' }}>
+                            <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>{key}</p>
+                            <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{val}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Strengths & Weaknesses */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold mb-3" style={{ color: 'var(--green)' }}>חוזקות</h3>
+                      <ul className="space-y-2">
+                        {((analysis.strengths as string[]) || []).map((s, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <CheckCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: 'var(--green)' }} />
+                            <span style={{ color: 'var(--gray-600)' }}>{s}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold mb-3" style={{ color: 'var(--red)' }}>חולשות</h3>
+                      <ul className="space-y-2">
+                        {((analysis.weaknesses as string[]) || []).map((w, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <XCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: 'var(--red)' }} />
+                            <span style={{ color: 'var(--gray-600)' }}>{w}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Scorecard */}
+                  {scorecard && scorecard.length > 0 && (
+                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>כרטיס ציון</h3>
+                      <div className="space-y-3">
+                        {scorecard.map((item, i) => (
+                          <div key={i} className="flex items-center gap-4">
+                            <span className="text-sm w-44 shrink-0 font-medium" style={{ color: 'var(--gray-600)' }}>{item.criterion}</span>
+                            <div className="flex-1 h-2.5 rounded-full" style={{ background: 'var(--gray-100)' }}>
+                              <div className="h-2.5 rounded-full transition-all" style={{
+                                width: `${(item.score / item.max) * 100}%`,
+                                background: item.score / item.max >= 0.7 ? 'var(--green)' : item.score / item.max >= 0.4 ? 'var(--amber)' : 'var(--red)',
+                              }} />
+                            </div>
+                            <span className="text-sm font-bold w-16 text-left" style={{ color: 'var(--navy)' }}>{item.score}/{item.max}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Verdict */}
+                  {verdict && (
+                    <div className="rounded-xl p-6" style={{
+                      boxShadow: 'var(--shadow-sm)',
+                      background: verdict.recommendation === 'HIRE' ? 'var(--green-light)' : verdict.recommendation === 'REJECT' ? 'var(--red-light)' : 'var(--amber-light)',
+                    }}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>המלצה</p>
+                          <p className="text-2xl font-bold" style={{
+                            color: verdict.recommendation === 'HIRE' ? 'var(--green)' : verdict.recommendation === 'REJECT' ? 'var(--red)' : 'var(--amber)',
+                          }}>
+                            {verdict.recommendation as string}
+                          </p>
+                        </div>
+                        <div className="text-left">
+                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>ציון כולל</p>
+                          <p className="text-4xl font-bold" style={{ color: 'var(--navy)' }}>
+                            {(analysis.total_score as number) || (verdict.score as number) || 0}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-sm mt-3" style={{ color: 'var(--gray-600)' }}>
+                        רמה: {verdict.level as string} &bull; {verdict.summary as string}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Interview Questions */}
+                  {questions && questions.length > 0 && (
+                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>שאלות מומלצות לראיון</h3>
+                      <div className="space-y-3">
+                        {questions.map((q, i) => (
+                          <div key={i} className="p-4 rounded-lg" style={{ background: 'var(--gray-50)' }}>
+                            <span className="text-xs px-2 py-0.5 rounded font-medium mb-1 inline-block" style={{
+                              background: q.type === 'Technical' ? 'var(--blue-light)' : q.type === 'Behavioral' ? 'var(--purple-light)' : 'var(--amber-light)',
+                              color: q.type === 'Technical' ? 'var(--blue)' : q.type === 'Behavioral' ? 'var(--purple)' : 'var(--amber)',
+                            }}>{q.type}</span>
+                            <p className="text-sm font-medium mt-1" style={{ color: 'var(--navy)' }}>{q.question}</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--gray-400)' }}>{q.purpose}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Interviewer Notes */}
+                  {analysis.interviewer_notes && (
+                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold mb-2" style={{ color: 'var(--navy)' }}>הערות למראיין</h3>
+                      <p className="text-sm" style={{ color: 'var(--gray-600)' }}>{analysis.interviewer_notes as string}</p>
+                    </div>
+                  )}
+                </>
+              );
+            })() : (
+              <div className="bg-white rounded-xl p-16 text-center" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                <Brain className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--gray-300)' }} />
+                <p className="font-semibold text-lg mb-2" style={{ color: 'var(--navy)' }}>אין ניתוח AI עדיין</p>
+                <p className="text-sm mb-4" style={{ color: 'var(--gray-400)' }}>הפעילו ניתוח AI כדי לקבל הערכה מקיפה</p>
+                <Button onClick={handleRunAnalysis} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+                  <Brain className="ml-2 h-4 w-4" /> הפעל ניתוח AI
+                </Button>
+              </div>
+            )}
           </TabsContent>
 
           {/* Applications Tab */}
