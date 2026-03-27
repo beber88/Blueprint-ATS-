@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { parseCV } from "@/lib/claude/client";
+import { parseCV, analyzeCV } from "@/lib/claude/client";
 // pdf-parse v1.1.1 - use direct import to avoid test file that requires canvas
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
@@ -162,6 +162,30 @@ export async function POST(request: NextRequest) {
 
     console.log(`CV Upload: Candidate saved with ID ${candidate.id}`);
 
+    // Run full AI analysis
+    let aiAnalysis = null;
+    let jobTitle: string | undefined;
+    if (jobId) {
+      const { data: job } = await supabase.from("jobs").select("title").eq("id", jobId).single();
+      jobTitle = job?.title;
+    }
+    try {
+      aiAnalysis = await analyzeCV(cvText, jobTitle);
+      console.log(`CV Upload: AI analysis complete, verdict: ${JSON.stringify((aiAnalysis as Record<string, unknown>)?.verdict)}`);
+    } catch (analysisError) {
+      console.error("CV Upload: AI analysis failed (non-fatal)", {
+        error: analysisError instanceof Error ? analysisError.message : analysisError,
+      });
+    }
+
+    // Update candidate with job_id and ai_analysis
+    if (jobId || aiAnalysis) {
+      const updateData: Record<string, unknown> = {};
+      if (jobId) updateData.job_id = jobId;
+      if (aiAnalysis) updateData.ai_analysis = aiAnalysis;
+      await supabase.from("candidates").update(updateData).eq("id", candidate.id);
+    }
+
     // Log activity
     await supabase.from("activity_log").insert({
       candidate_id: candidate.id,
@@ -169,16 +193,20 @@ export async function POST(request: NextRequest) {
       details: { file_name: file.name, source: "cv_upload" },
     });
 
-    // If jobId provided, create application
+    // If jobId provided, create application with score from analysis
     if (jobId) {
+      const totalScore = aiAnalysis ? (aiAnalysis as Record<string, unknown>).total_score as number || 0 : 0;
+      const verdict = aiAnalysis ? (aiAnalysis as Record<string, unknown>).verdict as Record<string, unknown> : null;
       await supabase.from("applications").insert({
         candidate_id: candidate.id,
         job_id: jobId,
-        status: "new",
+        ai_score: totalScore || null,
+        ai_reasoning: verdict?.summary as string || null,
+        status: totalScore ? "scored" : "new",
       });
     }
 
-    return NextResponse.json({ candidate, parsed });
+    return NextResponse.json({ candidate: { ...candidate, ai_analysis: aiAnalysis }, parsed });
   } catch (error) {
     console.error("CV Upload: Unhandled error", {
       error: error instanceof Error ? error.message : error,

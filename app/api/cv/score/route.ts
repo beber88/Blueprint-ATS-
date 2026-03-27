@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { scoreCandidate } from "@/lib/claude/client";
+import { analyzeCV } from "@/lib/claude/client";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Fetch candidate
     const { data: candidate, error: candError } = await supabase
       .from("candidates")
       .select("*")
@@ -30,7 +29,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Candidate not found" }, { status: 404 });
     }
 
-    // Fetch job
     const { data: job, error: jobError } = await supabase
       .from("jobs")
       .select("*")
@@ -41,16 +39,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
-    // Score with AI
-    const result = await scoreCandidate(
-      job.title,
-      job.requirements || job.description || "",
-      candidate.full_name,
-      candidate.experience_years || 0,
-      candidate.skills || [],
-      candidate.previous_roles || [],
-      candidate.education || ""
-    );
+    // Run comprehensive AI analysis
+    const cvText = candidate.cv_raw_text || [
+      `Name: ${candidate.full_name}`,
+      `Experience: ${candidate.experience_years || 0} years`,
+      `Skills: ${(candidate.skills || []).join(", ")}`,
+      `Education: ${candidate.education || "N/A"}`,
+      `Previous Roles: ${JSON.stringify(candidate.previous_roles || [])}`,
+    ].join("\n");
+
+    const analysis = await analyzeCV(cvText, job.title);
+    const totalScore = (analysis.total_score as number) || 0;
+    const verdict = analysis.verdict as Record<string, unknown> | undefined;
+
+    // Save analysis to candidate
+    await supabase.from("candidates").update({ ai_analysis: analysis }).eq("id", candidateId);
 
     // Check if application already exists
     const { data: existingApp } = await supabase
@@ -64,26 +67,28 @@ export async function POST(request: NextRequest) {
     let appError;
 
     if (existingApp) {
-      // Update existing - don't downgrade status if already more advanced
       const advancedStatuses = ["interview_scheduled", "interviewed", "approved"];
       const newStatus = advancedStatuses.includes(existingApp.status) ? existingApp.status : "scored";
       const result2 = await supabase
         .from("applications")
-        .update({ ai_score: result.score, ai_reasoning: result.reasoning, status: newStatus })
+        .update({
+          ai_score: totalScore,
+          ai_reasoning: (verdict?.summary as string) || "",
+          status: newStatus,
+        })
         .eq("id", existingApp.id)
         .select()
         .single();
       application = result2.data;
       appError = result2.error;
     } else {
-      // Insert new
       const result2 = await supabase
         .from("applications")
         .insert({
           candidate_id: candidateId,
           job_id: jobId,
-          ai_score: result.score,
-          ai_reasoning: result.reasoning,
+          ai_score: totalScore,
+          ai_reasoning: (verdict?.summary as string) || "",
           status: "scored",
         })
         .select()
@@ -97,14 +102,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to save score" }, { status: 500 });
     }
 
-    // Log activity
     await supabase.from("activity_log").insert({
       candidate_id: candidateId,
       action: "ai_scored",
-      details: { job_id: jobId, score: result.score, recommendation: result.recommendation },
+      details: { job_id: jobId, score: totalScore, recommendation: verdict?.recommendation },
     });
 
-    return NextResponse.json({ application, score: result });
+    return NextResponse.json({ application, analysis });
   } catch (error) {
     console.error("CV Score: Unhandled error", { error: error instanceof Error ? error.message : error, stack: error instanceof Error ? error.stack : undefined });
     return NextResponse.json({ error: error instanceof Error ? error.message : "Failed to score candidate" }, { status: 500 });

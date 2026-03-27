@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from("candidates")
-      .select("*, applications(id, job_id, ai_score, status, job:jobs(title))", { count: "exact" });
+      .select("*, job:jobs(id, title), applications(id, job_id, ai_score, status, job:jobs(title))", { count: "exact" });
 
     if (status) {
       query = query.eq("status", status);
@@ -27,8 +27,14 @@ export async function GET(request: NextRequest) {
       query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,skills.cs.{${search}}`);
     }
 
+    const contactStatus = searchParams.get("contactStatus");
+
     if (jobId) {
-      query = query.eq("applications.job_id", jobId);
+      query = query.or(`job_id.eq.${jobId},applications.job_id.eq.${jobId}`);
+    }
+
+    if (contactStatus) {
+      query = query.eq("contact_status", contactStatus);
     }
 
     query = query.order("created_at", { ascending: false }).range(offset, offset + limit - 1);

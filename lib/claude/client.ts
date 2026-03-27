@@ -157,3 +157,61 @@ Return ONLY valid JSON:
       : "maybe",
   };
 }
+
+export async function analyzeCV(cvText: string, jobTitle?: string): Promise<Record<string, unknown>> {
+  const truncated = cvText.length > 15000 ? cvText.slice(0, 15000) + "\n...[truncated]" : cvText;
+  const anthropic = getAnthropicClient();
+
+  const analysisPrompt = `You are a senior HR consultant and expert recruiter.
+Analyze this CV for the position of: ${jobTitle || 'General Position'}
+
+Return ONLY valid JSON with this exact structure:
+{
+  "profile_snapshot": {
+    "education": "string",
+    "certifications": "string",
+    "total_experience": "string",
+    "current_status": "string"
+  },
+  "strengths": ["strength1", "strength2", "strength3"],
+  "weaknesses": ["weakness1", "weakness2", "weakness3"],
+  "scorecard": [
+    {"criterion": "Technical Qualifications", "max": 25, "score": 0, "notes": ""},
+    {"criterion": "Relevant Experience", "max": 25, "score": 0, "notes": ""},
+    {"criterion": "Tools & Software", "max": 15, "score": 0, "notes": ""},
+    {"criterion": "Communication Skills", "max": 15, "score": 0, "notes": ""},
+    {"criterion": "Leadership & Management", "max": 10, "score": 0, "notes": ""},
+    {"criterion": "Problem Solving", "max": 10, "score": 0, "notes": ""}
+  ],
+  "total_score": 0,
+  "experience_gaps": ["gap1", "gap2"],
+  "interview_questions": [
+    {"question": "string", "type": "Technical|Behavioral|Clarification", "purpose": "string"}
+  ],
+  "verdict": {
+    "score": 0,
+    "recommendation": "HIRE|HOLD|REJECT",
+    "level": "Junior|Mid|Senior",
+    "summary": "one line reason"
+  },
+  "interviewer_notes": "string"
+}
+
+CV Text:
+${truncated}
+
+Important: Base analysis strictly on CV content. Flag missing info as "Not mentioned". Be direct and honest about weaknesses.`;
+
+  const message = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 3000,
+    messages: [{ role: "user", content: analysisPrompt }],
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") {
+    throw new Error("Unexpected response type from Claude");
+  }
+
+  return extractJSON<Record<string, unknown>>(content.text);
+}

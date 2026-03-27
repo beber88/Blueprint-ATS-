@@ -9,23 +9,28 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("jobs")
-      .select(`
-        *,
-        applications(id, ai_score)
-      `)
+      .select(`*, applications(id, ai_score, status)`)
       .order("created_at", { ascending: false });
 
     if (error) {
       return NextResponse.json({ error: "Failed to fetch jobs" }, { status: 500 });
     }
 
-    const jobs = (data || []).map((job) => ({
-      ...job,
-      candidate_count: job.applications?.length || 0,
-      top_score: job.applications?.length
-        ? Math.max(...job.applications.map((a: { ai_score: number | null }) => a.ai_score ?? 0))
-        : null,
-    }));
+    const jobs = (data || []).map((job) => {
+      const apps = job.applications || [];
+      const statusCounts: Record<string, number> = {};
+      apps.forEach((a: { status: string }) => {
+        statusCounts[a.status] = (statusCounts[a.status] || 0) + 1;
+      });
+      return {
+        ...job,
+        candidate_count: apps.length,
+        top_score: apps.length
+          ? Math.max(...apps.map((a: { ai_score: number | null }) => a.ai_score ?? 0))
+          : null,
+        status_breakdown: statusCounts,
+      };
+    });
 
     return NextResponse.json(jobs);
   } catch (error) {
