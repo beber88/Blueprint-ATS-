@@ -417,7 +417,7 @@ export default function CandidateProfilePage() {
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="הוסיפו הערות על מועמד/ת זו..."
+                placeholder={t("interviews.form.notes")}
                 rows={4}
                 className="resize-none rounded-lg border-slate-200 focus:ring-2 focus:ring-electric-500/20 focus:border-electric-400"
               />
@@ -709,7 +709,7 @@ export default function CandidateProfilePage() {
                                 msg.channel === "email" ? "border-blue-200 text-blue-700 bg-blue-50" : "border-emerald-200 text-emerald-700 bg-emerald-50"
                               }`}
                             >
-                              {msg.channel === "email" ? "אימייל" : "וואטסאפ"}
+                              {msg.channel === "email" ? t("candidates.bulk.send_email") : "WhatsApp"}
                             </Badge>
                             {msg.subject && (
                               <span className="font-semibold text-slate-900 truncate">{msg.subject}</span>

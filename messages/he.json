@@ -96,6 +96,9 @@
     "interview_questions": "שאלות לראיון",
     "interviewer_notes": "הערות למראיין",
     "no_analysis": "טרם בוצע ניתוח AI למועמד זה",
+    "run_analysis_btn": "הפעל ניתוח עכשיו",
+    "send_message": "שלח הודעה",
+    "schedule_interview": "קבע ראיון",
     "total_score": "ציון כולל",
     "recommendation": "המלצה",
     "level": "רמה",
@@ -272,6 +275,8 @@
     "back": "חזרה",
     "logout": "התנתק",
     "clear_filters": "נקה פילטרים",
-    "no_results": "לא נמצאו תוצאות"
+    "no_results": "לא נמצאו תוצאות",
+    "passed": "עבר",
+    "failed": "נכשל"
   }
 }
