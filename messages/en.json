@@ -6,7 +6,8 @@
     "interviews": "Interviews",
     "messages": "Messages",
     "templates": "Templates",
-    "settings": "Settings"
+    "settings": "Settings",
+    "ai_agent": "AI Assistant"
   },
   "dashboard": {
     "title": "Dashboard",
