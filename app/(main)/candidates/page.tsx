@@ -254,7 +254,7 @@ export default function CandidatesPage() {
         <div className="flex gap-2 flex-wrap items-center">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-44 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--gray-200)' }}>
-              <SelectValue placeholder="סטטוס" />
+              <SelectValue placeholder={t("candidates.table.status")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t("candidates.all_statuses")}</SelectItem>
@@ -408,7 +408,7 @@ export default function CandidatesPage() {
               <Input
                 value={manualForm.full_name}
                 onChange={(e) => setManualForm({ ...manualForm, full_name: e.target.value })}
-                placeholder="ישראל ישראלי"
+                placeholder="John Doe"
                 className="h-11 rounded-lg"
               />
             </div>
@@ -438,7 +438,7 @@ export default function CandidatesPage() {
               <Input
                 value={manualForm.location}
                 onChange={(e) => setManualForm({ ...manualForm, location: e.target.value })}
-                placeholder="תל אביב"
+                placeholder="Tel Aviv"
                 className="h-11 rounded-lg"
               />
             </div>
@@ -447,7 +447,7 @@ export default function CandidatesPage() {
               <Textarea
                 value={manualForm.notes}
                 onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })}
-                placeholder="הערות נוספות על המועמד/ת..."
+                placeholder={t("interviews.form.notes")}
                 rows={3}
                 className="resize-none rounded-lg"
               />
