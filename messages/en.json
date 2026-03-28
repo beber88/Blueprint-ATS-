@@ -16,7 +16,11 @@
     "approved_this_month": "Approved This Month",
     "pipeline": "Candidate Pipeline",
     "recent_activity": "Recent Activity",
-    "top_jobs": "Top Jobs"
+    "top_jobs": "Top Jobs",
+    "upload_cv": "Upload CV",
+    "new_job": "New Job",
+    "schedule_interview": "Schedule Interview",
+    "status_breakdown": "Status Breakdown"
   },
   "candidates": {
     "title": "Candidates",
@@ -43,7 +47,9 @@
     "bulk": {
       "selected": "Selected",
       "send_email": "Send Email",
-      "cancel": "Cancel Selection"
+      "cancel": "Cancel Selection",
+      "change_status": "Change Status",
+      "select_template": "Select email template"
     },
     "status": {
       "new": "New",
@@ -57,7 +63,20 @@
     },
     "not_assigned": "Not Assigned",
     "years": "years",
-    "clear_filters": "Clear All"
+    "clear_filters": "Clear All",
+    "add_manual_description": "Fill in the details to create a new candidate",
+    "form": {
+      "email": "Email",
+      "full_name": "Full Name",
+      "location": "Location",
+      "phone": "Phone"
+    },
+    "toast": {
+      "created": "Candidate created!",
+      "cv_uploaded": "CV uploaded successfully!",
+      "emails_sent": "Emails sent",
+      "status_updated": "Status updated"
+    }
   },
   "profile": {
     "overview": "Overview",
@@ -107,24 +126,40 @@
       "full_time": "Full Time",
       "part_time": "Part Time",
       "contract": "Contract",
+      "project": "Project",
       "internship": "Internship"
-    }
+    },
+    "error_loading": "Error loading jobs",
+    "error_title_required": "Job title is required",
+    "created_success": "Job created!",
+    "error_creating": "Error creating job"
   },
   "interviews": {
     "title": "Interviews",
+    "schedule": "Schedule Interview",
     "new_interview": "Schedule Interview",
-    "upcoming": "Upcoming",
-    "past": "Past",
+    "upcoming": "Upcoming Interviews",
+    "past": "Past Interviews",
     "no_upcoming": "No upcoming interviews",
     "passed": "Passed",
     "failed": "Failed",
     "minutes": "minutes",
+    "outcome": {
+      "passed": "Passed",
+      "failed": "Failed"
+    },
+    "type": {
+      "in_person": "In Person",
+      "video": "Video",
+      "phone": "Phone"
+    },
     "form": {
       "candidate": "Candidate",
       "job": "Job",
+      "date": "Date & Time",
       "date_time": "Date & Time",
       "duration": "Duration (minutes)",
-      "type": "Type",
+      "type": "Interview Type",
       "interviewer": "Interviewer",
       "notes": "Notes",
       "cancel": "Cancel",
@@ -134,11 +169,17 @@
       "phone": "Phone",
       "select_candidate": "Select Candidate",
       "select_job": "Select Job"
-    }
+    },
+    "error_loading": "Error loading interviews",
+    "created_success": "Interview scheduled!",
+    "error_creating": "Error scheduling interview",
+    "updated_success": "Interview updated",
+    "error_updating": "Error updating interview"
   },
   "messages": {
     "title": "Messages",
     "new_message": "New Message",
+    "compose": "Compose Message",
     "templates_section": "Message Templates",
     "templates_available": "Available Templates",
     "no_templates": "No templates yet",
@@ -147,9 +188,10 @@
     "no_sent": "No messages sent yet",
     "select_candidate": "Select Candidate",
     "search_candidate": "Search candidate...",
-    "channel": "Channel",
-    "email": "Email",
-    "whatsapp": "WhatsApp",
+    "channel": {
+      "email": "Email",
+      "whatsapp": "WhatsApp"
+    },
     "template": "Template",
     "select_template": "Select Template",
     "variables": "Variables",
@@ -158,13 +200,17 @@
     "preview": "Preview",
     "send": "Send Message",
     "sending": "Sending...",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "sent_success": "Message sent!",
+    "send_error": "Failed to send message"
   },
   "templates": {
     "title": "Message Templates",
     "new_template": "New Template",
     "all": "All",
+    "all_channels": "All",
     "no_templates": "No templates",
+    "variables_hint": "Variables (comma separated)",
     "form": {
       "name": "Template Name",
       "channel": "Channel",
@@ -173,6 +219,7 @@
       "body": "Content",
       "variables": "Variables (comma separated)",
       "create": "Create",
+      "save": "Create",
       "cancel": "Cancel"
     },
     "category": {
@@ -181,6 +228,15 @@
       "next_stage": "Next Stage",
       "offer": "Job Offer",
       "general": "General"
+    },
+    "subtitle": "Manage message templates",
+    "no_templates_hint": "Create your first template",
+    "categories": {
+      "general": "General",
+      "interview_invite": "Interview Invite",
+      "next_stage": "Next Stage",
+      "offer": "Job Offer",
+      "rejection": "Rejection"
     }
   },
   "settings": {
@@ -191,7 +247,10 @@
     "gmail_desc": "Send email via OAuth2",
     "whatsapp_desc": "WhatsApp Business API",
     "env_config": "Configure in .env.local",
-    "language": "Language"
+    "language": "Language",
+    "gmail": "Gmail",
+    "whatsapp": "WhatsApp",
+    "integrations_subtitle": "Configure external service connections"
   },
   "auth": {
     "login_title": "Welcome to Blueprint ATS",
@@ -211,6 +270,8 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "back": "Back",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "clear_filters": "Clear Filters",
+    "no_results": "No results found"
   }
 }

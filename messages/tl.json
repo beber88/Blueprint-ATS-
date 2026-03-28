@@ -16,7 +16,11 @@
     "approved_this_month": "Naaprubahan Ngayong Buwan",
     "pipeline": "Pipeline ng Kandidato",
     "recent_activity": "Kamakailang Aktibidad",
-    "top_jobs": "Nangungunang Trabaho"
+    "top_jobs": "Nangungunang Trabaho",
+    "upload_cv": "Mag-upload ng CV",
+    "new_job": "Bagong Trabaho",
+    "schedule_interview": "Mag-iskedyul ng Panayam",
+    "status_breakdown": "Breakdown ng Status"
   },
   "candidates": {
     "title": "Mga Kandidato",
@@ -43,7 +47,9 @@
     "bulk": {
       "selected": "Napili",
       "send_email": "Magpadala ng Email",
-      "cancel": "Kanselahin ang Pagpili"
+      "cancel": "Kanselahin ang Pagpili",
+      "change_status": "Baguhin ang Status",
+      "select_template": "Pumili ng email template"
     },
     "status": {
       "new": "Bago",
@@ -57,7 +63,20 @@
     },
     "not_assigned": "Hindi Nakatalaga",
     "years": "taon",
-    "clear_filters": "I-clear Lahat"
+    "clear_filters": "I-clear Lahat",
+    "add_manual_description": "Punan ang mga detalye para gumawa ng bagong kandidato",
+    "form": {
+      "email": "Email",
+      "full_name": "Buong Pangalan",
+      "location": "Lokasyon",
+      "phone": "Telepono"
+    },
+    "toast": {
+      "created": "Nagawa ang kandidato!",
+      "cv_uploaded": "Matagumpay na na-upload ang CV!",
+      "emails_sent": "Naipadala ang mga email",
+      "status_updated": "Na-update ang status"
+    }
   },
   "profile": {
     "overview": "Pangkalahatang-tanaw",
@@ -107,24 +126,40 @@
       "full_time": "Full Time",
       "part_time": "Part Time",
       "contract": "Kontrata",
+      "project": "Proyekto",
       "internship": "Internship"
-    }
+    },
+    "error_loading": "Error sa pag-load ng mga trabaho",
+    "error_title_required": "Kinakailangan ang pamagat ng trabaho",
+    "created_success": "Nagawa ang trabaho!",
+    "error_creating": "Error sa paggawa ng trabaho"
   },
   "interviews": {
     "title": "Mga Panayam",
+    "schedule": "Mag-iskedyul ng Panayam",
     "new_interview": "Mag-iskedyul ng Panayam",
-    "upcoming": "Paparating",
-    "past": "Nakaraan",
+    "upcoming": "Mga Paparating na Panayam",
+    "past": "Mga Nakaraang Panayam",
     "no_upcoming": "Walang paparating na panayam",
     "passed": "Pumasa",
     "failed": "Hindi Pumasa",
     "minutes": "minuto",
+    "outcome": {
+      "passed": "Pumasa",
+      "failed": "Hindi Pumasa"
+    },
+    "type": {
+      "in_person": "Personal",
+      "video": "Video",
+      "phone": "Telepono"
+    },
     "form": {
       "candidate": "Kandidato",
       "job": "Trabaho",
+      "date": "Petsa at Oras",
       "date_time": "Petsa at Oras",
       "duration": "Tagal (minuto)",
-      "type": "Uri",
+      "type": "Uri ng Panayam",
       "interviewer": "Tagapanayam",
       "notes": "Mga Tala",
       "cancel": "Kanselahin",
@@ -134,11 +169,17 @@
       "phone": "Telepono",
       "select_candidate": "Pumili ng Kandidato",
       "select_job": "Pumili ng Trabaho"
-    }
+    },
+    "error_loading": "Error sa pag-load ng mga panayam",
+    "created_success": "Naiskedyul ang panayam!",
+    "error_creating": "Error sa pag-iskedyul ng panayam",
+    "updated_success": "Na-update ang panayam",
+    "error_updating": "Error sa pag-update ng panayam"
   },
   "messages": {
     "title": "Mga Mensahe",
     "new_message": "Bagong Mensahe",
+    "compose": "Bumuo ng Mensahe",
     "templates_section": "Mga Template ng Mensahe",
     "templates_available": "Mga Available na Template",
     "no_templates": "Wala pang template",
@@ -147,9 +188,10 @@
     "no_sent": "Wala pang naipadala na mensahe",
     "select_candidate": "Pumili ng Kandidato",
     "search_candidate": "Maghanap ng kandidato...",
-    "channel": "Channel",
-    "email": "Email",
-    "whatsapp": "WhatsApp",
+    "channel": {
+      "email": "Email",
+      "whatsapp": "WhatsApp"
+    },
     "template": "Template",
     "select_template": "Pumili ng Template",
     "variables": "Mga Variable",
@@ -158,13 +200,17 @@
     "preview": "Preview",
     "send": "Ipadala ang Mensahe",
     "sending": "Ipinapadala...",
-    "cancel": "Kanselahin"
+    "cancel": "Kanselahin",
+    "sent_success": "Naipadala ang mensahe!",
+    "send_error": "Nabigong ipadala ang mensahe"
   },
   "templates": {
     "title": "Mga Template ng Mensahe",
     "new_template": "Bagong Template",
     "all": "Lahat",
+    "all_channels": "Lahat",
     "no_templates": "Walang template",
+    "variables_hint": "Mga Variable (pinaghihiwalay ng kuwit)",
     "form": {
       "name": "Pangalan ng Template",
       "channel": "Channel",
@@ -173,6 +219,7 @@
       "body": "Nilalaman",
       "variables": "Mga Variable (pinaghihiwalay ng kuwit)",
       "create": "Lumikha",
+      "save": "Lumikha",
       "cancel": "Kanselahin"
     },
     "category": {
@@ -181,6 +228,15 @@
       "next_stage": "Susunod na Yugto",
       "offer": "Alok ng Trabaho",
       "general": "Pangkalahatan"
+    },
+    "subtitle": "Pamahalaan ang mga template ng mensahe",
+    "no_templates_hint": "Gumawa ng unang template",
+    "categories": {
+      "general": "Pangkalahatan",
+      "interview_invite": "Imbitasyon sa Panayam",
+      "next_stage": "Susunod na Yugto",
+      "offer": "Alok sa Trabaho",
+      "rejection": "Pagtanggi"
     }
   },
   "settings": {
@@ -191,7 +247,10 @@
     "gmail_desc": "Magpadala ng email gamit ang OAuth2",
     "whatsapp_desc": "WhatsApp Business API",
     "env_config": "I-configure sa .env.local",
-    "language": "Wika"
+    "language": "Wika",
+    "gmail": "Gmail",
+    "whatsapp": "WhatsApp",
+    "integrations_subtitle": "I-configure ang mga external na koneksyon"
   },
   "auth": {
     "login_title": "Maligayang pagdating sa Blueprint ATS",
@@ -211,6 +270,8 @@
     "cancel": "Kanselahin",
     "delete": "Tanggalin",
     "back": "Bumalik",
-    "logout": "Mag-log Out"
+    "logout": "Mag-log Out",
+    "clear_filters": "I-clear ang Mga Filter",
+    "no_results": "Walang nahanap na resulta"
   }
 }

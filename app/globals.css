@@ -76,6 +76,10 @@
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+[lang="he"] { font-family: 'Heebo', sans-serif; direction: rtl; }
+[lang="en"] { font-family: 'Inter', sans-serif; direction: ltr; }
+[lang="tl"] { font-family: 'Inter', sans-serif; direction: ltr; }
+
 button, a, input, select, textarea { transition: all 0.15s ease; }
 
 *:focus-visible {

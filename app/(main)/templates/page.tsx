@@ -10,8 +10,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Plus, Mail, MessageCircle, FileText } from "lucide-react";
 import { MessageTemplate } from "@/types";
 import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function TemplatesPage() {
+  const { t } = useI18n();
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [channelFilter, setChannelFilter] = useState("all");
@@ -51,11 +53,11 @@ export default function TemplatesPage() {
   };
 
   const categoryLabels: Record<string, string> = {
-    interview_invite: "זימון ראיון",
-    rejection: "דחייה",
-    next_stage: "מעבר לשלב",
-    offer: "הצעת עבודה",
-    general: "כללי",
+    interview_invite: t("templates.category.interview_invite"),
+    rejection: t("templates.category.rejection"),
+    next_stage: t("templates.category.next_stage"),
+    offer: t("templates.category.offer"),
+    general: t("templates.category.general"),
   };
 
   const filtered = templates.filter(t => channelFilter === "all" || t.type === channelFilter);
@@ -65,11 +67,11 @@ export default function TemplatesPage() {
       <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>תבניות הודעות</h1>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("templates.title")}</h1>
             <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{templates.length} תבניות</p>
           </div>
           <Button onClick={() => setCreateOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
-            <Plus className="ml-2 h-4 w-4" /> תבנית חדשה
+            <Plus className="ml-2 h-4 w-4" /> {t("templates.new_template")}
           </Button>
         </div>
       </div>
@@ -84,7 +86,7 @@ export default function TemplatesPage() {
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
               style={channelFilter === ch ? { background: 'var(--blue)', color: '#fff' } : { background: 'var(--gray-100)', color: 'var(--gray-600)' }}
             >
-              {ch === "all" ? "הכל" : ch === "email" ? "אימייל" : "WhatsApp"}
+              {ch === "all" ? t("templates.all_channels") : ch === "email" ? t("messages.channel.email") : "WhatsApp"}
             </button>
           ))}
         </div>
@@ -105,7 +107,7 @@ export default function TemplatesPage() {
                   <div className="flex gap-1.5">
                     <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded" style={{ background: template.type === 'email' ? 'var(--blue-light)' : 'var(--green-light)', color: template.type === 'email' ? 'var(--blue)' : 'var(--green)' }}>
                       {template.type === 'email' ? <Mail className="h-3 w-3" /> : <MessageCircle className="h-3 w-3" />}
-                      {template.type === 'email' ? 'אימייל' : 'WhatsApp'}
+                      {template.type === 'email' ? t("messages.channel.email") : 'WhatsApp'}
                     </span>
                     <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: 'var(--purple-light)', color: 'var(--purple)' }}>
                       {categoryLabels[template.category] || template.category}
@@ -124,56 +126,56 @@ export default function TemplatesPage() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="max-w-2xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>תבנית חדשה</DialogTitle>
+            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>{t("templates.new_template")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium">שם תבנית *</Label>
+                <Label className="text-sm font-medium">{t("templates.form.name")} *</Label>
                 <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="rounded-lg" />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium">ערוץ</Label>
+                <Label className="text-sm font-medium">{t("templates.form.channel")}</Label>
                 <Select value={form.type} onValueChange={v => setForm({ ...form, type: v as "email" | "whatsapp" })}>
                   <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="email">אימייל</SelectItem>
+                    <SelectItem value="email">{t("messages.channel.email")}</SelectItem>
                     <SelectItem value="whatsapp">WhatsApp</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium">קטגוריה</Label>
+                <Label className="text-sm font-medium">{t("templates.form.category")}</Label>
                 <Select value={form.category} onValueChange={v => setForm({ ...form, category: v as MessageTemplate["category"] })}>
                   <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="interview_invite">זימון ראיון</SelectItem>
-                    <SelectItem value="rejection">דחייה</SelectItem>
-                    <SelectItem value="next_stage">מעבר לשלב</SelectItem>
-                    <SelectItem value="offer">הצעת עבודה</SelectItem>
-                    <SelectItem value="general">כללי</SelectItem>
+                    <SelectItem value="interview_invite">{t("templates.category.interview_invite")}</SelectItem>
+                    <SelectItem value="rejection">{t("templates.category.rejection")}</SelectItem>
+                    <SelectItem value="next_stage">{t("templates.category.next_stage")}</SelectItem>
+                    <SelectItem value="offer">{t("templates.category.offer")}</SelectItem>
+                    <SelectItem value="general">{t("templates.category.general")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             {form.type === "email" && (
               <div className="space-y-2">
-                <Label className="text-sm font-medium">נושא</Label>
+                <Label className="text-sm font-medium">{t("templates.form.subject")}</Label>
                 <Input value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className="rounded-lg" />
               </div>
             )}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">תוכן *</Label>
+              <Label className="text-sm font-medium">{t("templates.form.body")} *</Label>
               <Textarea value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} rows={6} className="rounded-lg" placeholder="השתמשו ב-{{שם_מועמד}}, {{תפקיד}}, {{תאריך}}" />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">משתנים (מופרדים בפסיקים)</Label>
+              <Label className="text-sm font-medium">{t("templates.variables_hint")}</Label>
               <Input value={form.variables} onChange={e => setForm({ ...form, variables: e.target.value })} className="rounded-lg" placeholder="שם_מועמד, תפקיד, תאריך" />
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-lg">ביטול</Button>
-            <Button onClick={handleCreate} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>יצירה</Button>
+            <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-lg">{t("common.cancel")}</Button>
+            <Button onClick={handleCreate} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>{t("templates.form.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

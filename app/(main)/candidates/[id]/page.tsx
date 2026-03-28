@@ -19,6 +19,7 @@ import Link from "next/link";
 import { Candidate, Application, Interview, MessageSent, ActivityLog } from "@/types";
 import { formatDate, formatDateTime, getStatusLabel } from "@/lib/utils";
 import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n/context";
 
 interface CandidateDetail extends Candidate {
   applications: (Application & { job?: { id: string; title: string } })[];
@@ -74,6 +75,7 @@ function getSkillColor(skill: string) {
 export default function CandidateProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useI18n();
   const [candidate, setCandidate] = useState<CandidateDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState("");
@@ -85,7 +87,7 @@ export default function CandidateProfilePage() {
         setCandidate(data);
         setNotes(data.notes || "");
       })
-      .catch(() => toast.error("טעינת המועמד/ת נכשלה"))
+      .catch(() => toast.error(t("common.error")))
       .finally(() => setLoading(false));
   }, [params.id]);
 
@@ -97,9 +99,9 @@ export default function CandidateProfilePage() {
         body: JSON.stringify({ status }),
       });
       setCandidate((prev) => prev ? { ...prev, status: status as Candidate["status"] } : null);
-      toast.success("הסטטוס עודכן");
+      toast.success(t("candidates.toast.status_updated"));
     } catch {
-      toast.error("עדכון הסטטוס נכשל");
+      toast.error(t("common.error"));
     }
   };
 
@@ -110,14 +112,14 @@ export default function CandidateProfilePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notes }),
       });
-      toast.success("ההערות נשמרו");
+      toast.success(t("common.save"));
     } catch {
-      toast.error("שמירת ההערות נכשלה");
+      toast.error(t("common.error"));
     }
   };
 
   if (loading) return <PageLoading />;
-  if (!candidate) return <div className="p-6">המועמד/ת לא נמצא/ה</div>;
+  if (!candidate) return <div className="p-6">{t("candidates.no_candidates")}</div>;
 
   const statuses = [
     "new", "reviewed", "shortlisted", "interview_scheduled",
@@ -152,10 +154,10 @@ export default function CandidateProfilePage() {
     if (!candidate) return;
     const jobApp = candidate.applications?.[0];
     if (!jobApp?.job_id) {
-      toast.error("יש לשייך את המועמד למשרה לפני ניתוח");
+      toast.error(t("common.error"));
       return;
     }
-    toast.info("מריץ ניתוח AI...");
+    toast.info(t("common.loading"));
     try {
       const res = await fetch("/api/cv/score", {
         method: "POST",
@@ -163,12 +165,12 @@ export default function CandidateProfilePage() {
         body: JSON.stringify({ candidateId: candidate.id, jobId: jobApp.job_id }),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("ניתוח AI הושלם!");
+      toast.success(t("profile.ai_analysis"));
       const refreshRes = await fetch(`/api/candidates/${candidate.id}`);
       const refreshData = await refreshRes.json();
       setCandidate(refreshData);
     } catch {
-      toast.error("שגיאה בניתוח AI");
+      toast.error(t("common.error"));
     }
   };
 
@@ -184,7 +186,7 @@ export default function CandidateProfilePage() {
             className="text-slate-500 hover:text-slate-700 -mr-2 mb-4"
           >
             <ArrowRight className="ml-1 h-4 w-4" />
-            חזרה למועמדים
+            {t("common.back")}
           </Button>
 
           <div className="flex items-start gap-6 pb-2">
@@ -228,13 +230,13 @@ export default function CandidateProfilePage() {
                     {candidate.linkedin_url && (
                       <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
                         <ExternalLink className="h-4 w-4 text-slate-400" />
-                        לינקדאין
+                        LinkedIn
                       </a>
                     )}
                     {candidate.cv_file_url && (
                       <a href={candidate.cv_file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
                         <FileText className="h-4 w-4 text-slate-400" />
-                        קורות חיים
+                        {t("candidates.upload_cv")}
                       </a>
                     )}
                   </div>
@@ -245,7 +247,7 @@ export default function CandidateProfilePage() {
                   <Link href={`/messages?candidateId=${candidate.id}`}>
                     <Button variant="outline" className="h-10 rounded-lg border-slate-200 shadow-sm hover:shadow-md transition-all">
                       <MessageSquare className="ml-2 h-4 w-4" />
-                      שליחת הודעה
+                      {t("profile.send_message")}
                     </Button>
                   </Link>
                   <Select value={candidate.status} onValueChange={updateStatus}>
@@ -272,32 +274,32 @@ export default function CandidateProfilePage() {
         <Tabs defaultValue="overview" dir="rtl">
           <TabsList className="bg-white rounded-xl shadow-sm border border-slate-200 p-1 h-auto mb-6">
             <TabsTrigger value="overview" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
-              סקירה
+              {t("profile.overview")}
             </TabsTrigger>
             <TabsTrigger value="analysis" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
               <Brain className="h-4 w-4 ml-1.5" />
-              ניתוח AI
+              {t("profile.ai_analysis")}
             </TabsTrigger>
             <TabsTrigger value="applications" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
-              מועמדויות
+              {t("profile.applications")}
               <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
                 {candidate.applications?.length || 0}
               </span>
             </TabsTrigger>
             <TabsTrigger value="interviews" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
-              ראיונות
+              {t("profile.interviews")}
               <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
                 {candidate.interviews?.length || 0}
               </span>
             </TabsTrigger>
             <TabsTrigger value="messages" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
-              הודעות
+              {t("profile.send_message")}
               <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
                 {candidate.messages?.length || 0}
               </span>
             </TabsTrigger>
             <TabsTrigger value="activity" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
-              פעילות
+              {t("profile.history")}
             </TabsTrigger>
           </TabsList>
 
@@ -308,7 +310,7 @@ export default function CandidateProfilePage() {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Hash className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-base font-semibold text-slate-900">כישורים</h3>
+                  <h3 className="text-base font-semibold text-slate-900">{t("profile.skills")}</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {(candidate.skills || []).map((skill) => (
@@ -320,7 +322,7 @@ export default function CandidateProfilePage() {
                     </span>
                   ))}
                   {(!candidate.skills || candidate.skills.length === 0) && (
-                    <p className="text-sm text-slate-400">לא צוינו כישורים</p>
+                    <p className="text-sm text-slate-400">{t("candidates.not_assigned")}</p>
                   )}
                 </div>
               </div>
@@ -329,7 +331,7 @@ export default function CandidateProfilePage() {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <User className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-base font-semibold text-slate-900">סיכום</h3>
+                  <h3 className="text-base font-semibold text-slate-900">{t("profile.overview")}</h3>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
@@ -337,8 +339,8 @@ export default function CandidateProfilePage() {
                       <Briefcase className="h-4 w-4 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">ניסיון</p>
-                      <p className="text-sm font-semibold text-slate-900">{candidate.experience_years || 0} שנים</p>
+                      <p className="text-xs text-slate-500 font-medium">{t("profile.experience")}</p>
+                      <p className="text-sm font-semibold text-slate-900">{candidate.experience_years || 0} {t("candidates.years")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
@@ -346,8 +348,8 @@ export default function CandidateProfilePage() {
                       <GraduationCap className="h-4 w-4 text-violet-600" />
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">השכלה</p>
-                      <p className="text-sm font-semibold text-slate-900">{candidate.education || "לא צוין"}</p>
+                      <p className="text-xs text-slate-500 font-medium">{t("profile.education")}</p>
+                      <p className="text-sm font-semibold text-slate-900">{candidate.education || t("candidates.not_assigned")}</p>
                     </div>
                   </div>
                   {candidate.certifications && candidate.certifications.length > 0 && (
@@ -356,7 +358,7 @@ export default function CandidateProfilePage() {
                         <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-amber-100">
                           <Award className="h-4 w-4 text-amber-600" />
                         </div>
-                        <p className="text-xs text-slate-500 font-medium">הסמכות</p>
+                        <p className="text-xs text-slate-500 font-medium">{t("profile.certifications")}</p>
                       </div>
                       <div className="flex flex-wrap gap-1.5 mt-1 mr-12">
                         {candidate.certifications.map((cert) => (
@@ -376,7 +378,7 @@ export default function CandidateProfilePage() {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Briefcase className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-base font-semibold text-slate-900">ניסיון תעסוקתי</h3>
+                  <h3 className="text-base font-semibold text-slate-900">{t("profile.experience")}</h3>
                 </div>
                 <div className="space-y-0">
                   {candidate.previous_roles.map((role, i) => (
@@ -410,7 +412,7 @@ export default function CandidateProfilePage() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FileText className="h-5 w-5 text-slate-400" />
-                <h3 className="text-base font-semibold text-slate-900">הערות</h3>
+                <h3 className="text-base font-semibold text-slate-900">{t("interviews.form.notes")}</h3>
               </div>
               <Textarea
                 value={notes}
@@ -426,7 +428,7 @@ export default function CandidateProfilePage() {
                   className="rounded-lg bg-electric-600 hover:bg-electric-700"
                 >
                   <Save className="ml-2 h-4 w-4" />
-                  שמירת הערות
+                  {t("common.save")}
                 </Button>
               </div>
             </div>
@@ -444,7 +446,7 @@ export default function CandidateProfilePage() {
                   {/* Profile Snapshot */}
                   {analysis.profile_snapshot && (
                     <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>תמונת פרופיל</h3>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>{t("profile.overview")}</h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {Object.entries(analysis.profile_snapshot as Record<string, string>).map(([key, val]) => (
                           <div key={key} className="p-3 rounded-lg" style={{ background: 'var(--gray-50)' }}>
@@ -459,7 +461,7 @@ export default function CandidateProfilePage() {
                   {/* Strengths & Weaknesses */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold mb-3" style={{ color: 'var(--green)' }}>חוזקות</h3>
+                      <h3 className="font-bold mb-3" style={{ color: 'var(--green)' }}>{t("profile.strengths")}</h3>
                       <ul className="space-y-2">
                         {((analysis.strengths as string[]) || []).map((s, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm">
@@ -470,7 +472,7 @@ export default function CandidateProfilePage() {
                       </ul>
                     </div>
                     <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold mb-3" style={{ color: 'var(--red)' }}>חולשות</h3>
+                      <h3 className="font-bold mb-3" style={{ color: 'var(--red)' }}>{t("profile.weaknesses")}</h3>
                       <ul className="space-y-2">
                         {((analysis.weaknesses as string[]) || []).map((w, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm">
@@ -485,7 +487,7 @@ export default function CandidateProfilePage() {
                   {/* Scorecard */}
                   {scorecard && scorecard.length > 0 && (
                     <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>כרטיס ציון</h3>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>{t("profile.scorecard")}</h3>
                       <div className="space-y-3">
                         {scorecard.map((item, i) => (
                           <div key={i} className="flex items-center gap-4">
@@ -511,7 +513,7 @@ export default function CandidateProfilePage() {
                     }}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>המלצה</p>
+                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>{t("profile.verdict")}</p>
                           <p className="text-2xl font-bold" style={{
                             color: verdict.recommendation === 'HIRE' ? 'var(--green)' : verdict.recommendation === 'REJECT' ? 'var(--red)' : 'var(--amber)',
                           }}>
@@ -519,7 +521,7 @@ export default function CandidateProfilePage() {
                           </p>
                         </div>
                         <div className="text-left">
-                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>ציון כולל</p>
+                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.ai_score")}</p>
                           <p className="text-4xl font-bold" style={{ color: 'var(--navy)' }}>
                             {(analysis.total_score as number) || (verdict.score as number) || 0}
                           </p>
@@ -534,7 +536,7 @@ export default function CandidateProfilePage() {
                   {/* Interview Questions */}
                   {questions && questions.length > 0 && (
                     <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>שאלות מומלצות לראיון</h3>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>{t("profile.interview_questions")}</h3>
                       <div className="space-y-3">
                         {questions.map((q, i) => (
                           <div key={i} className="p-4 rounded-lg" style={{ background: 'var(--gray-50)' }}>
@@ -553,7 +555,7 @@ export default function CandidateProfilePage() {
                   {/* Interviewer Notes */}
                   {analysis.interviewer_notes && (
                     <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold mb-2" style={{ color: 'var(--navy)' }}>הערות למראיין</h3>
+                      <h3 className="font-bold mb-2" style={{ color: 'var(--navy)' }}>{t("profile.interviewer_notes")}</h3>
                       <p className="text-sm" style={{ color: 'var(--gray-600)' }}>{analysis.interviewer_notes as string}</p>
                     </div>
                   )}
@@ -562,10 +564,10 @@ export default function CandidateProfilePage() {
             })() : (
               <div className="bg-white rounded-xl p-16 text-center" style={{ boxShadow: 'var(--shadow-sm)' }}>
                 <Brain className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--gray-300)' }} />
-                <p className="font-semibold text-lg mb-2" style={{ color: 'var(--navy)' }}>אין ניתוח AI עדיין</p>
-                <p className="text-sm mb-4" style={{ color: 'var(--gray-400)' }}>הפעילו ניתוח AI כדי לקבל הערכה מקיפה</p>
+                <p className="font-semibold text-lg mb-2" style={{ color: 'var(--navy)' }}>{t("profile.no_analysis")}</p>
+                <p className="text-sm mb-4" style={{ color: 'var(--gray-400)' }}>{t("profile.run_ai_analysis")}</p>
                 <Button onClick={handleRunAnalysis} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
-                  <Brain className="ml-2 h-4 w-4" /> הפעל ניתוח AI
+                  <Brain className="ml-2 h-4 w-4" /> {t("profile.run_analysis_btn")}
                 </Button>
               </div>
             )}
@@ -579,7 +581,7 @@ export default function CandidateProfilePage() {
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
                     <Briefcase className="h-8 w-8 text-slate-300" />
                   </div>
-                  <p className="text-sm text-slate-500">אין מועמדויות עדיין</p>
+                  <p className="text-sm text-slate-500">{t("candidates.no_candidates")}</p>
                 </div>
               </div>
             ) : (
@@ -592,7 +594,7 @@ export default function CandidateProfilePage() {
                           href={`/jobs/${app.job_id}`}
                           className="text-base font-semibold text-slate-900 hover:text-electric-600 transition-colors"
                         >
-                          {app.job?.title || "משרה לא ידועה"}
+                          {app.job?.title || t("candidates.not_assigned")}
                         </Link>
                         <p className="text-sm text-slate-500 mt-1">
                           <Calendar className="inline h-3.5 w-3.5 ml-1 -mt-0.5" />
@@ -606,7 +608,7 @@ export default function CandidateProfilePage() {
                     </div>
                     {app.ai_reasoning && (
                       <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <p className="text-xs font-medium text-slate-500 mb-1">הערכת AI</p>
+                        <p className="text-xs font-medium text-slate-500 mb-1">{t("profile.ai_analysis")}</p>
                         <p className="text-sm text-slate-600 leading-relaxed">{app.ai_reasoning}</p>
                       </div>
                     )}
@@ -624,7 +626,7 @@ export default function CandidateProfilePage() {
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
                     <Calendar className="h-8 w-8 text-slate-300" />
                   </div>
-                  <p className="text-sm text-slate-500">אין ראיונות מתוכננים</p>
+                  <p className="text-sm text-slate-500">{t("profile.interviews")}</p>
                 </div>
               </div>
             ) : (
@@ -639,7 +641,7 @@ export default function CandidateProfilePage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-slate-900">
-                              {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : "טרם נקבע"}
+                              {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : t("candidates.not_assigned")}
                             </span>
                           </div>
                           <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
@@ -662,7 +664,7 @@ export default function CandidateProfilePage() {
                           variant={interview.outcome === "passed" ? "default" : "destructive"}
                           className="text-sm px-3 py-1 rounded-lg"
                         >
-                          {interview.outcome === "passed" ? "עבר" : interview.outcome === "failed" ? "נכשל" : interview.outcome}
+                          {interview.outcome === "passed" ? t("common.passed") : interview.outcome === "failed" ? t("common.failed") : interview.outcome}
                         </Badge>
                       )}
                     </div>
@@ -685,7 +687,7 @@ export default function CandidateProfilePage() {
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
                     <MessageSquare className="h-8 w-8 text-slate-300" />
                   </div>
-                  <p className="text-sm text-slate-500">טרם נשלחו הודעות</p>
+                  <p className="text-sm text-slate-500">{t("profile.send_message")}</p>
                 </div>
               </div>
             ) : (
@@ -739,7 +741,7 @@ export default function CandidateProfilePage() {
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
                     <Clock className="h-8 w-8 text-slate-300" />
                   </div>
-                  <p className="text-sm text-slate-500">אין פעילות רשומה</p>
+                  <p className="text-sm text-slate-500">{t("profile.history")}</p>
                 </div>
               ) : (
                 <div className="space-y-0">

@@ -13,13 +13,14 @@ import { TableLoading } from "@/components/shared/loading";
 import { Plus, Users, Trophy, MapPin, Briefcase, ArrowLeft } from "lucide-react";
 import { Job } from "@/types";
 import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n/context";
 
-const employmentTypeLabels: Record<string, string> = {
-  "full-time": "משרה מלאה",
-  "part-time": "משרה חלקית",
-  contract: "חוזה",
+const getEmploymentTypeLabels = (t: (key: string) => string): Record<string, string> => ({
+  "full-time": t("jobs.form.full_time"),
+  "part-time": t("jobs.form.part_time"),
+  contract: t("jobs.form.project"),
   internship: "התמחות",
-};
+});
 
 const statusColors: Record<string, { bg: string; color: string }> = {
   new: { bg: "#94A3B8", color: "#94A3B8" },
@@ -33,6 +34,8 @@ const statusColors: Record<string, { bg: string; color: string }> = {
 };
 
 export default function JobsPage() {
+  const { t } = useI18n();
+  const employmentTypeLabels = getEmploymentTypeLabels(t);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
@@ -48,7 +51,7 @@ export default function JobsPage() {
       const data = await res.json();
       setJobs(data || []);
     } catch {
-      toast.error("שגיאה בטעינת משרות");
+      toast.error(t("jobs.error_loading"));
     } finally {
       setLoading(false);
     }
@@ -58,7 +61,7 @@ export default function JobsPage() {
 
   const handleCreate = async () => {
     if (!form.title) {
-      toast.error("שם משרה הוא שדה חובה");
+      toast.error(t("jobs.error_title_required"));
       return;
     }
     try {
@@ -68,12 +71,12 @@ export default function JobsPage() {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("!המשרה נוצרה");
+      toast.success(t("jobs.created_success"));
       setCreateOpen(false);
       setForm({ title: "", department: "", description: "", requirements: "", location: "", employment_type: "full-time" });
       fetchJobs();
     } catch {
-      toast.error("שגיאה ביצירת משרה");
+      toast.error(t("jobs.error_creating"));
     }
   };
 
@@ -87,7 +90,7 @@ export default function JobsPage() {
       <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>משרות</h1>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("jobs.title")}</h1>
             <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{jobs.length} משרות במערכת</p>
           </div>
           <Button
@@ -96,7 +99,7 @@ export default function JobsPage() {
             style={{ background: 'var(--blue)' }}
           >
             <Plus className="ml-2 h-4 w-4" />
-            משרה חדשה
+            {t("jobs.new_job")}
           </Button>
         </div>
       </div>
@@ -105,10 +108,10 @@ export default function JobsPage() {
         {/* Status Filter Pills */}
         <div className="flex gap-2">
           {[
-            { value: "all", label: "הכל" },
-            { value: "active", label: "פעיל" },
-            { value: "paused", label: "מושהה" },
-            { value: "closed", label: "סגור" },
+            { value: "all", label: t("candidates.all_statuses") },
+            { value: "active", label: t("jobs.status.active") },
+            { value: "paused", label: t("jobs.status.paused") },
+            { value: "closed", label: t("jobs.status.closed") },
           ].map((opt) => (
             <button
               key={opt.value}
@@ -140,7 +143,7 @@ export default function JobsPage() {
                 <Briefcase className="h-8 w-8" style={{ color: 'var(--blue)' }} />
               </div>
               <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--navy)' }}>
-                אין משרות {statusFilter !== "all" ? "בסטטוס זה" : "עדיין"}
+                {t("jobs.no_jobs")} {statusFilter !== "all" ? "" : ""}
               </h3>
               <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--gray-400)' }}>
                 {statusFilter !== "all"
@@ -230,14 +233,14 @@ export default function JobsPage() {
                     <span className="inline-flex items-center gap-1.5">
                       <Users className="h-3.5 w-3.5" style={{ color: 'var(--gray-400)' }} />
                       <span className="font-semibold">{candidateCount}</span>
-                      <span style={{ color: 'var(--gray-400)' }}>מועמדים</span>
+                      <span style={{ color: 'var(--gray-400)' }}>{t("jobs.candidates_count")}</span>
                     </span>
                     {topScore != null && topScore > 0 && (
                       <>
                         <span style={{ color: 'var(--gray-200)' }}>|</span>
                         <span className="inline-flex items-center gap-1.5">
                           <Trophy className="h-3.5 w-3.5" style={{ color: 'var(--green)' }} />
-                          <span style={{ color: 'var(--gray-400)' }}>ציון מקסימלי:</span>
+                          <span style={{ color: 'var(--gray-400)' }}>{t("jobs.top_score")}:</span>
                           <span className="font-semibold" style={{ color: 'var(--green)' }}>{topScore}</span>
                         </span>
                       </>
@@ -270,7 +273,7 @@ export default function JobsPage() {
                       className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
                       style={{ color: 'var(--blue)' }}
                     >
-                      צפה במועמדים
+                      {t("jobs.view_candidates")}
                       <ArrowLeft className="h-3.5 w-3.5" />
                     </Link>
                   </div>
@@ -285,13 +288,13 @@ export default function JobsPage() {
           <DialogContent className="max-w-2xl rounded-xl">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>
-                יצירת משרה חדשה
+                {t("jobs.form.create")}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-5 py-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">כותרת משרה *</Label>
+                  <Label className="text-sm font-medium">{t("jobs.form.title")} *</Label>
                   <Input
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -300,7 +303,7 @@ export default function JobsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">מחלקה</Label>
+                  <Label className="text-sm font-medium">{t("jobs.form.department")}</Label>
                   <Input
                     value={form.department}
                     onChange={(e) => setForm({ ...form, department: e.target.value })}
@@ -311,7 +314,7 @@ export default function JobsPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">מיקום</Label>
+                  <Label className="text-sm font-medium">{t("jobs.form.location")}</Label>
                   <Input
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
@@ -320,22 +323,22 @@ export default function JobsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">סוג העסקה</Label>
+                  <Label className="text-sm font-medium">{t("jobs.form.type")}</Label>
                   <Select value={form.employment_type} onValueChange={(v) => setForm({ ...form, employment_type: v })}>
                     <SelectTrigger className="rounded-lg">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="full-time">משרה מלאה</SelectItem>
-                      <SelectItem value="part-time">משרה חלקית</SelectItem>
-                      <SelectItem value="contract">חוזה</SelectItem>
+                      <SelectItem value="full-time">{t("jobs.form.full_time")}</SelectItem>
+                      <SelectItem value="part-time">{t("jobs.form.part_time")}</SelectItem>
+                      <SelectItem value="contract">{t("jobs.form.project")}</SelectItem>
                       <SelectItem value="internship">התמחות</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium">תיאור</Label>
+                <Label className="text-sm font-medium">{t("jobs.form.description")}</Label>
                 <Textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -344,7 +347,7 @@ export default function JobsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium">דרישות</Label>
+                <Label className="text-sm font-medium">{t("jobs.form.requirements")}</Label>
                 <Textarea
                   value={form.requirements}
                   onChange={(e) => setForm({ ...form, requirements: e.target.value })}
@@ -355,14 +358,14 @@ export default function JobsPage() {
             </div>
             <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-lg px-5">
-                ביטול
+                {t("common.cancel")}
               </Button>
               <Button
                 onClick={handleCreate}
                 className="rounded-lg text-white px-6"
                 style={{ background: 'var(--blue)' }}
               >
-                יצירת משרה
+                {t("jobs.form.create")}
               </Button>
             </DialogFooter>
           </DialogContent>

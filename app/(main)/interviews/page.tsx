@@ -14,8 +14,10 @@ import { Interview, Candidate, Job } from "@/types";
 import { formatDateTime } from "@/lib/utils";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function InterviewsPage() {
+  const { t } = useI18n();
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
@@ -31,7 +33,7 @@ export default function InterviewsPage() {
       const res = await fetch("/api/interviews");
       setInterviews(await res.json());
     } catch {
-      toast.error("שגיאה בטעינת ראיונות");
+      toast.error(t("interviews.error_loading"));
     } finally {
       setLoading(false);
     }
@@ -55,11 +57,11 @@ export default function InterviewsPage() {
         }),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("הראיון נקבע!");
+      toast.success(t("interviews.created_success"));
       setCreateOpen(false);
       fetchInterviews();
     } catch {
-      toast.error("שגיאה בקביעת ראיון");
+      toast.error(t("interviews.error_creating"));
     }
   };
 
@@ -70,10 +72,10 @@ export default function InterviewsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ outcome, notes }),
       });
-      toast.success("הראיון עודכן");
+      toast.success(t("interviews.updated_success"));
       fetchInterviews();
     } catch {
-      toast.error("שגיאה בעדכון ראיון");
+      toast.error(t("interviews.error_updating"));
     }
   };
 
@@ -84,9 +86,9 @@ export default function InterviewsPage() {
   };
 
   const typeLabels: Record<string, string> = {
-    "in-person": "פרונטלי",
-    video: "וידאו",
-    phone: "טלפוני",
+    "in-person": t("interviews.type.in_person"),
+    video: t("interviews.type.video"),
+    phone: t("interviews.type.phone"),
   };
 
   const now = new Date();
@@ -97,21 +99,21 @@ export default function InterviewsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
-      <Header title="ראיונות" subtitle={`${upcoming.length} קרובים`} />
+      <Header title={t("interviews.title")} subtitle={`${upcoming.length} ${t("interviews.upcoming")}`} />
 
       <div className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">ראיונות</h1>
-            <p className="text-sm text-gray-500 mt-1">{upcoming.length} ראיונות קרובים</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t("interviews.title")}</h1>
+            <p className="text-sm text-gray-500 mt-1">{upcoming.length} {t("interviews.upcoming")}</p>
           </div>
           <Button
             onClick={() => setCreateOpen(true)}
             className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6 py-2.5 shadow-sm transition-colors"
           >
             <Plus className="ml-2 h-4 w-4" />
-            קביעת ראיון
+            {t("interviews.schedule")}
           </Button>
         </div>
 
@@ -122,8 +124,8 @@ export default function InterviewsPage() {
               <Calendar className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">ראיונות קרובים</h2>
-              <p className="text-sm text-gray-500">{upcoming.length} ראיונות מתוכננים</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("interviews.upcoming")}</h2>
+              <p className="text-sm text-gray-500">{upcoming.length} {t("interviews.upcoming")}</p>
             </div>
           </div>
           <div className="p-5">
@@ -132,7 +134,7 @@ export default function InterviewsPage() {
                 <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Calendar className="h-7 w-7 text-gray-300" />
                 </div>
-                <p className="text-gray-500 font-medium">אין ראיונות קרובים</p>
+                <p className="text-gray-500 font-medium">{t("common.no_results")}</p>
                 <p className="text-sm text-gray-400 mt-1">קבעו ראיון חדש כדי להתחיל</p>
               </div>
             ) : (
@@ -197,7 +199,7 @@ export default function InterviewsPage() {
         {past.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-5 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">ראיונות קודמים</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t("interviews.past")}</h2>
               <p className="text-sm text-gray-500">{past.length} ראיונות שהתקיימו</p>
             </div>
             <div className="divide-y divide-gray-50">
@@ -228,7 +230,7 @@ export default function InterviewsPage() {
                               : "bg-red-50 text-red-700 border border-red-100"
                           }`}
                         >
-                          {interview.outcome === "passed" ? "עבר" : "נכשל"}
+                          {interview.outcome === "passed" ? t("interviews.outcome.passed") : t("interviews.outcome.failed")}
                         </span>
                       ) : (
                         <>
@@ -238,7 +240,7 @@ export default function InterviewsPage() {
                             onClick={() => updateOutcome(interview.id, "passed", "")}
                             className="rounded-lg text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                           >
-                            עבר
+                            {t("interviews.outcome.passed")}
                           </Button>
                           <Button
                             size="sm"
@@ -246,7 +248,7 @@ export default function InterviewsPage() {
                             onClick={() => updateOutcome(interview.id, "failed", "")}
                             className="rounded-lg text-xs border-red-200 text-red-700 hover:bg-red-50"
                           >
-                            נכשל
+                            {t("interviews.outcome.failed")}
                           </Button>
                         </>
                       )}
@@ -262,14 +264,14 @@ export default function InterviewsPage() {
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent className="max-w-lg rounded-2xl p-0 overflow-hidden">
             <DialogHeader className="p-6 pb-4 border-b border-gray-100">
-              <DialogTitle className="text-xl font-bold text-gray-900">קביעת ראיון</DialogTitle>
+              <DialogTitle className="text-xl font-bold text-gray-900">{t("interviews.schedule")}</DialogTitle>
             </DialogHeader>
             <div className="p-6 space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-gray-700">מועמד/ת</Label>
+                <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.candidate")}</Label>
                 <Select value={form.candidate_id} onValueChange={(v) => setForm({ ...form, candidate_id: v })}>
                   <SelectTrigger className="rounded-xl border-gray-200">
-                    <SelectValue placeholder="בחרו מועמד/ת" />
+                    <SelectValue placeholder={t("messages.select_candidate")} />
                   </SelectTrigger>
                   <SelectContent>
                     {candidates.map((c) => (
@@ -279,10 +281,10 @@ export default function InterviewsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-gray-700">משרה</Label>
+                <Label className="text-sm font-semibold text-gray-700">{t("nav.jobs")}</Label>
                 <Select value={form.job_id} onValueChange={(v) => setForm({ ...form, job_id: v })}>
                   <SelectTrigger className="rounded-xl border-gray-200">
-                    <SelectValue placeholder="בחרו משרה" />
+                    <SelectValue placeholder={t("messages.select_template")} />
                   </SelectTrigger>
                   <SelectContent>
                     {jobs.map((j) => (
@@ -293,7 +295,7 @@ export default function InterviewsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">תאריך ושעה</Label>
+                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.date")}</Label>
                   <Input
                     type="datetime-local"
                     value={form.scheduled_at}
@@ -302,7 +304,7 @@ export default function InterviewsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">משך (דקות)</Label>
+                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.duration")}</Label>
                   <Input
                     type="number"
                     value={form.duration_minutes}
@@ -313,20 +315,20 @@ export default function InterviewsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">סוג ראיון</Label>
+                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.type")}</Label>
                   <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
                     <SelectTrigger className="rounded-xl border-gray-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="in-person">פרונטלי</SelectItem>
-                      <SelectItem value="video">וידאו</SelectItem>
-                      <SelectItem value="phone">טלפוני</SelectItem>
+                      <SelectItem value="in-person">{t("interviews.type.in_person")}</SelectItem>
+                      <SelectItem value="video">{t("interviews.type.video")}</SelectItem>
+                      <SelectItem value="phone">{t("interviews.type.phone")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">מראיין/ת</Label>
+                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.interviewer")}</Label>
                   <Input
                     value={form.interviewer}
                     onChange={(e) => setForm({ ...form, interviewer: e.target.value })}
@@ -336,7 +338,7 @@ export default function InterviewsPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-gray-700">הערות</Label>
+                <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.notes")}</Label>
                 <Textarea
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -347,10 +349,10 @@ export default function InterviewsPage() {
             </div>
             <DialogFooter className="p-6 pt-4 border-t border-gray-100 gap-2">
               <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-xl px-5">
-                ביטול
+                {t("common.cancel")}
               </Button>
               <Button onClick={handleCreate} className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6">
-                קביעת ראיון
+                {t("interviews.schedule")}
               </Button>
             </DialogFooter>
           </DialogContent>

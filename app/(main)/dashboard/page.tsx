@@ -15,6 +15,7 @@ import Link from "next/link";
 import { DashboardStats } from "@/types";
 import { formatDateTime, getStatusLabel } from "@/lib/utils";
 import { ScoreBadge } from "@/components/shared/score-badge";
+import { useI18n } from "@/lib/i18n/context";
 
 const STATUS_COLORS: Record<string, string> = {
   new: "#6b7280",
@@ -39,6 +40,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
 };
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,7 @@ export default function DashboardPage() {
 
   const kpis = [
     {
-      title: "סה״כ מועמדים",
+      title: t("dashboard.total_candidates"),
       value: stats?.total_candidates || 0,
       icon: Users,
       color: "text-blue-600",
@@ -62,7 +64,7 @@ export default function DashboardPage() {
       iconBg: "bg-blue-100",
     },
     {
-      title: "חדשים השבוע",
+      title: t("dashboard.new_this_week"),
       value: stats?.new_this_week || 0,
       icon: UserPlus,
       color: "text-green-600",
@@ -70,7 +72,7 @@ export default function DashboardPage() {
       iconBg: "bg-green-100",
     },
     {
-      title: "ראיונות מתוכננים",
+      title: t("dashboard.interviews_scheduled"),
       value: stats?.interviews_scheduled || 0,
       icon: Calendar,
       color: "text-purple-600",
@@ -78,7 +80,7 @@ export default function DashboardPage() {
       iconBg: "bg-purple-100",
     },
     {
-      title: "אושרו החודש",
+      title: t("dashboard.approved_this_month"),
       value: stats?.approved_this_month || 0,
       icon: CheckCircle,
       color: "text-amber-600",
@@ -96,7 +98,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <Header title="דשבורד" subtitle={todayDate} />
+      <Header title={t("dashboard.title")} subtitle={todayDate} />
       <div className="p-8 space-y-6">
         {/* KPI Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -131,19 +133,19 @@ export default function DashboardPage() {
           <Link href="/candidates?upload=true">
             <Button className="rounded-lg">
               <Upload className="mr-2 h-4 w-4" />
-              העלאת קו״ח
+              {t("dashboard.upload_cv")}
             </Button>
           </Link>
           <Link href="/jobs?new=true">
             <Button variant="outline" className="rounded-lg">
               <Briefcase className="mr-2 h-4 w-4" />
-              משרה חדשה
+              {t("dashboard.new_job")}
             </Button>
           </Link>
           <Link href="/interviews?new=true">
             <Button variant="outline" className="rounded-lg">
               <Plus className="mr-2 h-4 w-4" />
-              קביעת ראיון
+              {t("dashboard.schedule_interview")}
             </Button>
           </Link>
         </div>
@@ -154,7 +156,7 @@ export default function DashboardPage() {
           <Card className="lg:col-span-2 rounded-xl shadow-sm border-0">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold">
-                סקירת Pipeline
+                {t("dashboard.pipeline")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -197,7 +199,7 @@ export default function DashboardPage() {
               ) : (
                 <div className="flex items-center justify-center h-[320px]">
                   <p className="text-sm text-muted-foreground">
-                    אין מועמדים עדיין
+                    {t("candidates.no_candidates")}
                   </p>
                 </div>
               )}
@@ -208,7 +210,7 @@ export default function DashboardPage() {
           <Card className="rounded-xl shadow-sm border-0">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold">
-                פילוח לפי סטטוס
+                {t("dashboard.status_breakdown")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -238,7 +240,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-40">
-                  <p className="text-sm text-muted-foreground">אין נתונים</p>
+                  <p className="text-sm text-muted-foreground">{t("common.no_results")}</p>
                 </div>
               )}
             </CardContent>
@@ -254,7 +256,7 @@ export default function DashboardPage() {
                 <div className="rounded-lg bg-blue-50 p-1.5">
                   <Activity className="h-4 w-4 text-blue-600" />
                 </div>
-                פעילות אחרונה
+                {t("dashboard.recent_activity")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -290,7 +292,7 @@ export default function DashboardPage() {
                   stats.recent_activity.length === 0) && (
                   <div className="flex items-center justify-center h-40">
                     <p className="text-sm text-muted-foreground">
-                      אין פעילות אחרונה
+                      {t("common.no_results")}
                     </p>
                   </div>
                 )}
@@ -305,7 +307,7 @@ export default function DashboardPage() {
                 <div className="rounded-lg bg-purple-50 p-1.5">
                   <Briefcase className="h-4 w-4 text-purple-600" />
                 </div>
-                משרות פעילות
+                {t("dashboard.top_jobs")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -324,7 +326,7 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-1.5 mt-1">
                           <Users className="h-3.5 w-3.5 text-muted-foreground" />
                           <span className="text-xs text-muted-foreground">
-                            {job.candidate_count} מועמדים
+                            {job.candidate_count} {t("jobs.candidates_count")}
                           </span>
                         </div>
                       </div>
@@ -337,7 +339,7 @@ export default function DashboardPage() {
               ) : (
                 <div className="flex items-center justify-center h-40">
                   <p className="text-sm text-muted-foreground">
-                    אין משרות פעילות
+                    {t("common.no_results")}
                   </p>
                 </div>
               )}

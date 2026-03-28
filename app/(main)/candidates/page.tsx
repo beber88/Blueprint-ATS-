@@ -21,8 +21,10 @@ import {
 import { Candidate } from "@/types";
 import { toast } from "sonner";
 import { getStatusLabel } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function CandidatesPage() {
+  const { t } = useI18n();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -59,7 +61,7 @@ export default function CandidatesPage() {
       const data = await res.json();
       setCandidates(data.candidates || []);
     } catch {
-      toast.error("שגיאה בטעינת מועמדים");
+      toast.error(t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -74,7 +76,7 @@ export default function CandidatesPage() {
     if (!file) return;
 
     setUploading(true);
-    setUploadProgress("מעלה ומנתח קו״ח עם AI...");
+    setUploadProgress(t("common.loading"));
 
     const formData = new FormData();
     formData.append("file", file);
@@ -83,13 +85,13 @@ export default function CandidatesPage() {
       const res = await fetch("/api/cv/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "ההעלאה נכשלה");
+        toast.error(data.error || t("common.error"));
       } else {
-        toast.success(`קו״ח הועלה! ${data.candidate.full_name} נוסף/ה.`);
+        toast.success(t("candidates.toast.cv_uploaded"));
         fetchCandidates();
       }
-    } catch (err) {
-      toast.error("שגיאת רשת: " + (err instanceof Error ? err.message : "בדקו את החיבור ונסו שוב."));
+    } catch {
+      toast.error(t("common.error"));
     } finally {
       setUploading(false);
       setUploadProgress("");
@@ -99,7 +101,7 @@ export default function CandidatesPage() {
 
   const handleManualCreate = async () => {
     if (!manualForm.full_name) {
-      toast.error("שם הוא שדה חובה");
+      toast.error(t("common.error"));
       return;
     }
     try {
@@ -109,12 +111,12 @@ export default function CandidatesPage() {
         body: JSON.stringify(manualForm),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("המועמד/ת נוצר/ה!");
+      toast.success(t("candidates.toast.created"));
       setManualOpen(false);
       setManualForm({ full_name: "", email: "", phone: "", location: "", notes: "" });
       fetchCandidates();
     } catch {
-      toast.error("שגיאה ביצירת מועמד/ת");
+      toast.error(t("common.error"));
     }
   };
 
@@ -125,18 +127,18 @@ export default function CandidatesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      toast.success("הסטטוס עודכן");
+      toast.success(t("candidates.toast.status_updated"));
       fetchCandidates();
     } catch {
-      toast.error("שגיאה בעדכון סטטוס");
+      toast.error(t("common.error"));
     }
   };
 
   const handleBulkEmail = async () => {
-    if (!bulkTemplate) { toast.error("בחרו תבנית"); return; }
+    if (!bulkTemplate) { toast.error(t("common.error")); return; }
     setBulkSending(true);
     const ids = Array.from(selectedRows);
-    setBulkProgress(`שולח 0/${ids.length}...`);
+    setBulkProgress(t("common.loading"));
     try {
       const res = await fetch("/api/messages/send", {
         method: "POST",
@@ -144,13 +146,13 @@ export default function CandidatesPage() {
         body: JSON.stringify({ candidateIds: ids, templateId: bulkTemplate, channel: "email" }),
       });
       const data = await res.json();
-      toast.success(`נשלחו ${data.sent}/${data.total} הודעות`);
-      if (data.failed > 0) toast.warning(`${data.failed} נכשלו`);
+      toast.success(t("candidates.toast.emails_sent"));
+      if (data.failed > 0) toast.warning(t("common.error"));
       setSelectedRows(new Set());
       setBulkEmailOpen(false);
       fetchCandidates();
     } catch {
-      toast.error("שגיאה בשליחה");
+      toast.error(t("common.error"));
     } finally {
       setBulkSending(false);
       setBulkProgress("");
@@ -200,15 +202,15 @@ export default function CandidatesPage() {
       <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>מועמדים</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>סה״כ {candidates.length} מועמדים</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("candidates.title")}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{candidates.length} {t("candidates.title")}</p>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => setManualOpen(true)} className="rounded-lg">
-              <Plus className="ml-2 h-4 w-4" /> הוסף ידנית
+              <Plus className="ml-2 h-4 w-4" /> {t("candidates.add_manual")}
             </Button>
             <Button onClick={() => fileInputRef.current?.click()} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
-              <Upload className="ml-2 h-4 w-4" /> העלה קורות חיים
+              <Upload className="ml-2 h-4 w-4" /> {t("candidates.upload_cv")}
             </Button>
           </div>
         </div>
@@ -220,7 +222,7 @@ export default function CandidatesPage() {
             className="px-4 py-2 text-sm font-medium rounded-t-lg whitespace-nowrap transition-colors"
             style={selectedJob === "all" ? { background: 'var(--blue)', color: '#fff' } : { color: 'var(--gray-600)', background: 'var(--gray-100)' }}
           >
-            הכל
+            {t("candidates.all_jobs")}
           </button>
           {jobs.filter(j => j.status === "active").map(job => (
             <button
@@ -240,7 +242,7 @@ export default function CandidatesPage() {
         <div className="relative">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--gray-400)' }} />
           <Input
-            placeholder="חיפוש לפי שם, מייל, כישורים..."
+            placeholder={t("candidates.search_placeholder")}
             className="pr-10 h-11 rounded-lg"
             style={{ borderColor: 'var(--gray-200)' }}
             value={search}
@@ -255,13 +257,13 @@ export default function CandidatesPage() {
               <SelectValue placeholder="סטטוס" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">כל הסטטוסים</SelectItem>
+              <SelectItem value="all">{t("candidates.all_statuses")}</SelectItem>
               {statuses.map(s => <SelectItem key={s} value={s}>{getStatusLabel(s)}</SelectItem>)}
             </SelectContent>
           </Select>
           {(statusFilter !== "all" || selectedJob !== "all") && (
             <button onClick={() => { setStatusFilter("all"); setSelectedJob("all"); }} className="text-sm font-medium" style={{ color: 'var(--blue)' }}>
-              נקה הכל
+              {t("common.clear_filters")}
             </button>
           )}
         </div>
@@ -272,10 +274,10 @@ export default function CandidatesPage() {
             <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'var(--gray-100)' }}>
               <Users className="h-8 w-8" style={{ color: 'var(--gray-400)' }} />
             </div>
-            <p className="font-semibold text-lg" style={{ color: 'var(--navy)' }}>אין מועמדים עדיין</p>
-            <p className="text-sm mt-1 mb-4" style={{ color: 'var(--gray-400)' }}>העלו קורות חיים ראשונים כדי להתחיל</p>
+            <p className="font-semibold text-lg" style={{ color: 'var(--navy)' }}>{t("candidates.no_candidates")}</p>
+            <p className="text-sm mt-1 mb-4" style={{ color: 'var(--gray-400)' }}>{t("candidates.upload_first")}</p>
             <Button onClick={() => fileInputRef.current?.click()} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
-              <Upload className="ml-2 h-4 w-4" /> העלה קורות חיים
+              <Upload className="ml-2 h-4 w-4" /> {t("candidates.upload_cv")}
             </Button>
           </div>
         ) : (
@@ -289,12 +291,12 @@ export default function CandidatesPage() {
                       else setSelectedRows(new Set());
                     }} />
                   </th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>מועמד</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>משרה</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>סטטוס</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>ציון AI</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>ניסיון</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>פעולות</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.candidate")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.job")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.status")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.ai_score")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.experience")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -329,7 +331,7 @@ export default function CandidatesPage() {
                         {jobTitle ? (
                           <span className="text-xs font-medium px-2.5 py-1 rounded-md" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>{jobTitle}</span>
                         ) : (
-                          <span className="text-xs" style={{ color: 'var(--gray-400)' }}>לא משויך</span>
+                          <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{t("candidates.not_assigned")}</span>
                         )}
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={candidate.status} /></td>
@@ -338,7 +340,7 @@ export default function CandidatesPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-sm" style={{ color: 'var(--gray-600)' }}>
-                          {candidate.experience_years ? `${candidate.experience_years} שנים` : "--"}
+                          {candidate.experience_years ? `${candidate.experience_years} ${t("candidates.years")}` : "--"}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -350,7 +352,7 @@ export default function CandidatesPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="rounded-lg">
                             <DropdownMenuItem asChild>
-                              <Link href={`/candidates/${candidate.id}`}><Eye className="ml-2 h-4 w-4" /> צפה בפרופיל</Link>
+                              <Link href={`/candidates/${candidate.id}`}><Eye className="ml-2 h-4 w-4" /> {t("candidates.actions.view_profile")}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             {statuses.map(s => (
@@ -372,12 +374,12 @@ export default function CandidatesPage() {
         {/* Bulk Actions Bar */}
         {selectedRows.size > 0 && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded-xl text-white text-sm font-medium" style={{ background: 'var(--navy)', boxShadow: 'var(--shadow-md)', zIndex: 50 }}>
-            <span>{selectedRows.size} נבחרו</span>
+            <span>{selectedRows.size} {t("candidates.bulk.selected")}</span>
             <button onClick={() => setBulkEmailOpen(true)} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--blue)' }}>
-              <Mail className="inline h-3 w-3 ml-1" /> שלח אימייל
+              <Mail className="inline h-3 w-3 ml-1" /> {t("candidates.bulk.send_email")}
             </button>
-            <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)' }}>שנה סטטוס</button>
-            <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.1)' }}>בטל</button>
+            <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)' }}>{t("candidates.bulk.change_status")}</button>
+            <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.1)' }}>{t("candidates.bulk.cancel")}</button>
           </div>
         )}
       </div>
@@ -387,8 +389,8 @@ export default function CandidatesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.4)' }}>
           <div className="bg-white rounded-xl p-8 text-center" style={{ boxShadow: 'var(--shadow-md)' }}>
             <div className="h-8 w-8 border-3 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--gray-200)', borderTopColor: 'var(--blue)' }} />
-            <p className="font-medium" style={{ color: 'var(--navy)' }}>{uploadProgress || "מעלה ומנתח קו״ח עם AI..."}</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--gray-400)' }}>זה עשוי לקחת מספר שניות</p>
+            <p className="font-medium" style={{ color: 'var(--navy)' }}>{uploadProgress || t("common.loading")}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--gray-400)' }}>{t("common.loading")}</p>
           </div>
         </div>
       )}
@@ -397,12 +399,12 @@ export default function CandidatesPage() {
       <Dialog open={manualOpen} onOpenChange={setManualOpen}>
         <DialogContent className="sm:max-w-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-slate-900">הוספת מועמד ידנית</DialogTitle>
-            <p className="text-sm text-slate-500 mt-1">מלאו את הפרטים ליצירת רשומת מועמד חדשה</p>
+            <DialogTitle className="text-xl font-semibold text-slate-900">{t("candidates.add_manual")}</DialogTitle>
+            <p className="text-sm text-slate-500 mt-1">{t("candidates.add_manual_description")}</p>
           </DialogHeader>
           <div className="space-y-5 py-3">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">שם מלא <span className="text-red-500">*</span></Label>
+              <Label className="text-sm font-medium text-slate-700">{t("candidates.form.full_name")} <span className="text-red-500">*</span></Label>
               <Input
                 value={manualForm.full_name}
                 onChange={(e) => setManualForm({ ...manualForm, full_name: e.target.value })}
@@ -412,7 +414,7 @@ export default function CandidatesPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700">אימייל</Label>
+                <Label className="text-sm font-medium text-slate-700">{t("candidates.form.email")}</Label>
                 <Input
                   type="email"
                   value={manualForm.email}
@@ -422,7 +424,7 @@ export default function CandidatesPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700">טלפון</Label>
+                <Label className="text-sm font-medium text-slate-700">{t("candidates.form.phone")}</Label>
                 <Input
                   value={manualForm.phone}
                   onChange={(e) => setManualForm({ ...manualForm, phone: e.target.value })}
@@ -432,7 +434,7 @@ export default function CandidatesPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">מיקום</Label>
+              <Label className="text-sm font-medium text-slate-700">{t("candidates.form.location")}</Label>
               <Input
                 value={manualForm.location}
                 onChange={(e) => setManualForm({ ...manualForm, location: e.target.value })}
@@ -441,7 +443,7 @@ export default function CandidatesPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">הערות</Label>
+              <Label className="text-sm font-medium text-slate-700">{t("interviews.form.notes")}</Label>
               <Textarea
                 value={manualForm.notes}
                 onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })}
@@ -457,13 +459,13 @@ export default function CandidatesPage() {
               onClick={() => setManualOpen(false)}
               className="rounded-lg"
             >
-              ביטול
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleManualCreate}
               className="rounded-lg bg-electric-600 hover:bg-electric-700"
             >
-              יצירת מועמד
+              {t("candidates.add_manual")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -474,15 +476,15 @@ export default function CandidatesPage() {
         <DialogContent className="sm:max-w-md rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>
-              שליחת אימייל ל-{selectedRows.size} מועמדים
+              {t("candidates.bulk.send_email")} ({selectedRows.size})
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-3">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">בחרו תבנית</Label>
+              <Label className="text-sm font-medium">{t("candidates.bulk.select_template")}</Label>
               <Select value={bulkTemplate} onValueChange={setBulkTemplate}>
                 <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder="בחרו תבנית אימייל" />
+                  <SelectValue placeholder={t("candidates.bulk.select_template")} />
                 </SelectTrigger>
                 <SelectContent>
                   {templates.filter(t => t.type === "email").map(t => (
@@ -499,9 +501,9 @@ export default function CandidatesPage() {
             )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setBulkEmailOpen(false)} className="rounded-lg">ביטול</Button>
+            <Button variant="outline" onClick={() => setBulkEmailOpen(false)} className="rounded-lg">{t("common.cancel")}</Button>
             <Button onClick={handleBulkEmail} disabled={bulkSending} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
-              {bulkSending ? "שולח..." : "שלח"}
+              {bulkSending ? t("common.loading") : t("candidates.bulk.send_email")}
             </Button>
           </DialogFooter>
         </DialogContent>

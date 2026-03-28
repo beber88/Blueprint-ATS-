@@ -16,7 +16,11 @@
     "approved_this_month": "אושרו החודש",
     "pipeline": "צנרת מועמדים",
     "recent_activity": "פעילות אחרונה",
-    "top_jobs": "משרות מובילות"
+    "top_jobs": "משרות מובילות",
+    "upload_cv": "העלאת קו״ח",
+    "new_job": "משרה חדשה",
+    "schedule_interview": "קביעת ראיון",
+    "status_breakdown": "פילוח סטטוסים"
   },
   "candidates": {
     "title": "מועמדים",
@@ -43,7 +47,9 @@
     "bulk": {
       "selected": "נבחרו",
       "send_email": "שלח אימייל",
-      "cancel": "בטל בחירה"
+      "cancel": "בטל בחירה",
+      "change_status": "שנה סטטוס",
+      "select_template": "בחרו תבנית אימייל"
     },
     "status": {
       "new": "חדש",
@@ -57,7 +63,20 @@
     },
     "not_assigned": "לא משויך",
     "years": "שנים",
-    "clear_filters": "נקה הכל"
+    "clear_filters": "נקה הכל",
+    "add_manual_description": "מלאו את הפרטים ליצירת רשומת מועמד חדשה",
+    "form": {
+      "email": "אימייל",
+      "full_name": "שם מלא",
+      "location": "מיקום",
+      "phone": "טלפון"
+    },
+    "toast": {
+      "created": "המועמד/ת נוצר/ה!",
+      "cv_uploaded": "קו״ח הועלה בהצלחה!",
+      "emails_sent": "הודעות נשלחו",
+      "status_updated": "הסטטוס עודכן"
+    }
   },
   "profile": {
     "overview": "סקירה",
@@ -107,24 +126,40 @@
       "full_time": "משרה מלאה",
       "part_time": "משרה חלקית",
       "contract": "חוזה",
+      "project": "פרויקט",
       "internship": "התמחות"
-    }
+    },
+    "error_loading": "שגיאה בטעינת משרות",
+    "error_title_required": "שם משרה הוא שדה חובה",
+    "created_success": "המשרה נוצרה!",
+    "error_creating": "שגיאה ביצירת משרה"
   },
   "interviews": {
     "title": "ראיונות",
+    "schedule": "קביעת ראיון",
     "new_interview": "קביעת ראיון",
-    "upcoming": "קרובים",
-    "past": "קודמים",
+    "upcoming": "ראיונות קרובים",
+    "past": "ראיונות קודמים",
     "no_upcoming": "אין ראיונות קרובים",
     "passed": "עבר",
     "failed": "נכשל",
     "minutes": "דקות",
+    "outcome": {
+      "passed": "עבר",
+      "failed": "נכשל"
+    },
+    "type": {
+      "in_person": "פרונטלי",
+      "video": "וידאו",
+      "phone": "טלפוני"
+    },
     "form": {
       "candidate": "מועמד/ת",
       "job": "משרה",
+      "date": "תאריך ושעה",
       "date_time": "תאריך ושעה",
       "duration": "משך (דקות)",
-      "type": "סוג",
+      "type": "סוג ראיון",
       "interviewer": "מראיין/ת",
       "notes": "הערות",
       "cancel": "ביטול",
@@ -134,11 +169,17 @@
       "phone": "טלפוני",
       "select_candidate": "בחרו מועמד/ת",
       "select_job": "בחרו משרה"
-    }
+    },
+    "error_loading": "שגיאה בטעינת ראיונות",
+    "created_success": "הראיון נקבע!",
+    "error_creating": "שגיאה בקביעת ראיון",
+    "updated_success": "הראיון עודכן",
+    "error_updating": "שגיאה בעדכון ראיון"
   },
   "messages": {
     "title": "הודעות",
     "new_message": "הודעה חדשה",
+    "compose": "חיבור הודעה",
     "templates_section": "תבניות הודעות",
     "templates_available": "תבניות זמינות",
     "no_templates": "אין תבניות עדיין",
@@ -147,9 +188,10 @@
     "no_sent": "טרם נשלחו הודעות",
     "select_candidate": "בחר מועמד/ת",
     "search_candidate": "חפש מועמד...",
-    "channel": "ערוץ",
-    "email": "אימייל",
-    "whatsapp": "WhatsApp",
+    "channel": {
+      "email": "אימייל",
+      "whatsapp": "WhatsApp"
+    },
     "template": "תבנית",
     "select_template": "בחרו תבנית",
     "variables": "משתנים",
@@ -158,13 +200,17 @@
     "preview": "תצוגה מקדימה",
     "send": "שליחת הודעה",
     "sending": "שולח...",
-    "cancel": "ביטול"
+    "cancel": "ביטול",
+    "sent_success": "ההודעה נשלחה!",
+    "send_error": "השליחה נכשלה"
   },
   "templates": {
     "title": "תבניות הודעות",
     "new_template": "תבנית חדשה",
     "all": "הכל",
+    "all_channels": "הכל",
     "no_templates": "אין תבניות",
+    "variables_hint": "משתנים (מופרדים בפסיקים)",
     "form": {
       "name": "שם תבנית",
       "channel": "ערוץ",
@@ -173,6 +219,7 @@
       "body": "תוכן",
       "variables": "משתנים (מופרדים בפסיקים)",
       "create": "יצירה",
+      "save": "יצירה",
       "cancel": "ביטול"
     },
     "category": {
@@ -181,6 +228,15 @@
       "next_stage": "מעבר לשלב",
       "offer": "הצעת עבודה",
       "general": "כללי"
+    },
+    "subtitle": "ניהול תבניות הודעות",
+    "no_templates_hint": "צרו תבנית ראשונה",
+    "categories": {
+      "general": "כללי",
+      "interview_invite": "זימון ראיון",
+      "next_stage": "מעבר לשלב",
+      "offer": "הצעת עבודה",
+      "rejection": "דחייה"
     }
   },
   "settings": {
@@ -191,7 +247,10 @@
     "gmail_desc": "שליחת אימייל באמצעות OAuth2",
     "whatsapp_desc": "WhatsApp Business API",
     "env_config": "הגדרה ב-.env.local",
-    "language": "שפה"
+    "language": "שפה",
+    "gmail": "Gmail",
+    "whatsapp": "WhatsApp",
+    "integrations_subtitle": "הגדרת חיבורים לשירותים חיצוניים"
   },
   "auth": {
     "login_title": "ברוך הבא ל-Blueprint ATS",
@@ -211,6 +270,8 @@
     "cancel": "ביטול",
     "delete": "מחק",
     "back": "חזרה",
-    "logout": "התנתק"
+    "logout": "התנתק",
+    "clear_filters": "נקה פילטרים",
+    "no_results": "לא נמצאו תוצאות"
   }
 }

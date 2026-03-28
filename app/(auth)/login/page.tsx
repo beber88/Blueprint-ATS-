@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,7 @@ export default function LoginPage() {
               <span className="text-white text-2xl font-bold">B</span>
             </div>
             <h1 className="text-xl font-bold text-gray-900">Blueprint ATS</h1>
-            <p className="text-sm text-gray-500 mt-1">מערכת ניהול מועמדים</p>
+            <p className="text-sm text-gray-500 mt-1">{t("auth.login_subtitle")}</p>
           </div>
 
           {/* Form */}
@@ -57,7 +59,7 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                כתובת מייל
+                {t("auth.email")}
               </label>
               <input
                 id="email"
@@ -72,7 +74,7 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
-                סיסמה
+                {t("auth.password")}
               </label>
               <input
                 id="password"
@@ -93,10 +95,10 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  מתחבר...
+                  {t("auth.logging_in")}
                 </>
               ) : (
-                "התחבר"
+                t("auth.login_btn")
               )}
             </button>
           </form>
@@ -107,7 +109,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-white px-4 text-sm text-gray-400">או</span>
+              <span className="bg-white px-4 text-sm text-gray-400">{t("auth.or")}</span>
             </div>
           </div>
 
@@ -145,7 +147,7 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
-            המשך עם Google
+            {t("auth.google_btn")}
           </button>
         </div>
       </div>

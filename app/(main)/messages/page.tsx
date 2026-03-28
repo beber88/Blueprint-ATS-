@@ -10,8 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Send, Mail, MessageCircle, Clock, User, Search } from "lucide-react";
 import { MessageTemplate } from "@/types";
 import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function MessagesPage() {
+  const { t } = useI18n();
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [composeOpen, setComposeOpen] = useState(false);
   const [channel, setChannel] = useState<"email" | "whatsapp">("email");
@@ -97,7 +99,7 @@ export default function MessagesPage() {
 
   const handleSend = async () => {
     if (!selectedCandidate) {
-      toast.error("נא לבחור מועמד/ת");
+      toast.error(t("messages.select_candidate"));
       return;
     }
     setSending(true);
@@ -118,7 +120,7 @@ export default function MessagesPage() {
         const err = await res.json();
         throw new Error(err.error);
       }
-      toast.success("ההודעה נשלחה!");
+      toast.success(t("messages.sent_success"));
       // Add to sent messages locally
       const candidate = candidates.find((c) => c.id === selectedCandidate);
       setSentMessages((prev) => [
@@ -136,7 +138,7 @@ export default function MessagesPage() {
       setSelectedCandidate("");
       setCandidateSearch("");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "השליחה נכשלה");
+      toast.error(err instanceof Error ? err.message : t("messages.send_error"));
     } finally {
       setSending(false);
     }
@@ -158,7 +160,7 @@ export default function MessagesPage() {
       <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>הודעות</h1>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("messages.title")}</h1>
             <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>ניהול ושליחת הודעות למועמדים</p>
           </div>
           <Button
@@ -167,7 +169,7 @@ export default function MessagesPage() {
             style={{ background: 'var(--blue)' }}
           >
             <Send className="ml-2 h-4 w-4" />
-            הודעה חדשה
+            {t("messages.new_message")}
           </Button>
         </div>
       </div>
@@ -180,7 +182,7 @@ export default function MessagesPage() {
               <Mail className="h-5 w-5" style={{ color: 'var(--blue)' }} />
             </div>
             <div>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--navy)' }}>תבניות הודעות</h2>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--navy)' }}>{t("templates.title")}</h2>
               <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{templates.length} תבניות זמינות</p>
             </div>
           </div>
@@ -210,7 +212,7 @@ export default function MessagesPage() {
                           ) : (
                             <MessageCircle className="h-3 w-3" />
                           )}
-                          {template.type === "email" ? "אימייל" : "WhatsApp"}
+                          {template.type === "email" ? t("messages.channel.email") : "WhatsApp"}
                         </span>
                         <span className="text-xs px-2.5 py-0.5 rounded-lg font-medium" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
                           {template.category}
@@ -233,7 +235,7 @@ export default function MessagesPage() {
                         setComposeOpen(true);
                       }}
                     >
-                      שימוש בתבנית
+                      {t("messages.select_template")}
                     </Button>
                   </div>
                 ))}
@@ -279,7 +281,7 @@ export default function MessagesPage() {
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-lg font-medium" style={{ background: 'var(--gray-100)', color: 'var(--gray-600)' }}>
                           {msg.channel === "email" ? <Mail className="h-3 w-3" /> : <MessageCircle className="h-3 w-3" />}
-                          {msg.channel === "email" ? "אימייל" : "WhatsApp"}
+                          {msg.channel === "email" ? t("messages.channel.email") : "WhatsApp"}
                         </span>
                       </td>
                       <td className="px-4 py-3" style={{ color: 'var(--gray-600)' }}>{msg.subject}</td>
@@ -298,15 +300,15 @@ export default function MessagesPage() {
         <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
           <DialogContent className="max-w-2xl rounded-2xl p-0 overflow-hidden">
             <DialogHeader className="p-6 pb-4 border-b" style={{ borderColor: 'var(--gray-100)' }}>
-              <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>חיבור הודעה</DialogTitle>
+              <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>{t("messages.compose")}</DialogTitle>
             </DialogHeader>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>מועמד/ת</Label>
+                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>{t("messages.select_candidate")}</Label>
                   <Select value={selectedCandidate} onValueChange={handleCandidateSelect}>
                     <SelectTrigger className="rounded-xl" style={{ borderColor: 'var(--gray-200)' }}>
-                      <SelectValue placeholder="בחרו מועמד/ת" />
+                      <SelectValue placeholder={t("messages.select_candidate")} />
                     </SelectTrigger>
                     <SelectContent>
                       <div className="px-2 pb-2">
@@ -340,7 +342,7 @@ export default function MessagesPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="email">אימייל</SelectItem>
+                      <SelectItem value="email">{t("messages.channel.email")}</SelectItem>
                       <SelectItem value="whatsapp">WhatsApp</SelectItem>
                     </SelectContent>
                   </Select>
@@ -351,7 +353,7 @@ export default function MessagesPage() {
                 <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>תבנית (אופציונלי)</Label>
                 <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
                   <SelectTrigger className="rounded-xl" style={{ borderColor: 'var(--gray-200)' }}>
-                    <SelectValue placeholder="בחרו תבנית" />
+                    <SelectValue placeholder={t("messages.select_template")} />
                   </SelectTrigger>
                   <SelectContent>
                     {templates.filter((t) => t.type === channel).map((t) => (
@@ -383,7 +385,7 @@ export default function MessagesPage() {
 
               {channel === "email" && (
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>נושא</Label>
+                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>{t("messages.subject")}</Label>
                   <Input
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
@@ -394,7 +396,7 @@ export default function MessagesPage() {
               )}
 
               <div className="space-y-2">
-                <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>הודעה</Label>
+                <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>{t("messages.body")}</Label>
                 <Textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
@@ -406,7 +408,7 @@ export default function MessagesPage() {
 
               {/* Preview */}
               <div className="rounded-xl border p-4" style={{ background: 'var(--gray-50)', borderColor: 'var(--gray-100)' }}>
-                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--gray-500)' }}>תצוגה מקדימה</p>
+                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--gray-500)' }}>{t("messages.preview")}</p>
                 {preview.subject && (
                   <p className="font-medium text-sm mb-1" style={{ color: 'var(--navy)' }}>{preview.subject}</p>
                 )}
@@ -415,7 +417,7 @@ export default function MessagesPage() {
             </div>
             <DialogFooter className="p-6 pt-4 border-t gap-2" style={{ borderColor: 'var(--gray-100)' }}>
               <Button variant="outline" onClick={() => setComposeOpen(false)} className="rounded-xl px-5">
-                ביטול
+                {t("common.cancel")}
               </Button>
               <Button
                 onClick={handleSend}
@@ -424,7 +426,7 @@ export default function MessagesPage() {
                 style={{ background: 'var(--blue)' }}
               >
                 <Send className="h-4 w-4" />
-                {sending ? "שולח..." : "שליחת הודעה"}
+                {sending ? t("common.loading") : t("messages.send")}
               </Button>
             </DialogFooter>
           </DialogContent>
