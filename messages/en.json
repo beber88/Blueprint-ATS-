@@ -96,6 +96,9 @@
     "interview_questions": "Interview Questions",
     "interviewer_notes": "Interviewer Notes",
     "no_analysis": "No AI analysis has been performed for this candidate yet",
+    "run_analysis_btn": "Run Analysis Now",
+    "send_message": "Send Message",
+    "schedule_interview": "Schedule Interview",
     "total_score": "Total Score",
     "recommendation": "Recommendation",
     "level": "Level",
@@ -272,6 +275,8 @@
     "back": "Back",
     "logout": "Log Out",
     "clear_filters": "Clear Filters",
-    "no_results": "No results found"
+    "no_results": "No results found",
+    "passed": "Passed",
+    "failed": "Failed"
   }
 }
