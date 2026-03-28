@@ -96,6 +96,9 @@
     "interview_questions": "Mga Tanong sa Panayam",
     "interviewer_notes": "Mga Tala ng Tagapanayam",
     "no_analysis": "Wala pang AI analysis na ginawa para sa kandidatong ito",
+    "run_analysis_btn": "Patakbuhin ang Pagsusuri Ngayon",
+    "send_message": "Magpadala ng Mensahe",
+    "schedule_interview": "Mag-iskedyul ng Panayam",
     "total_score": "Kabuuang Score",
     "recommendation": "Rekomendasyon",
     "level": "Antas",
@@ -272,6 +275,8 @@
     "back": "Bumalik",
     "logout": "Mag-log Out",
     "clear_filters": "I-clear ang Mga Filter",
-    "no_results": "Walang nahanap na resulta"
+    "no_results": "Walang nahanap na resulta",
+    "passed": "Pumasa",
+    "failed": "Nabigo"
   }
 }
