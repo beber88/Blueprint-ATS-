@@ -247,3 +247,58 @@ Important: Base analysis strictly on CV content. Flag missing info as "Not menti
 
   return extractJSON<Record<string, unknown>>(content.text);
 }
+
+export interface DocumentClassification {
+  document_type: "cv" | "portfolio" | "certification" | "license" | "reference_letter" | "id_document" | "education_certificate" | "other";
+  confidence: number;
+  person_name: string | null;
+  person_email: string | null;
+  description: string;
+  reasoning: string;
+}
+
+export async function classifyDocument(text: string, fileName: string): Promise<DocumentClassification> {
+  const truncated = text.length > 5000 ? text.slice(0, 5000) + "\n...[truncated]" : text;
+  const anthropic = getAnthropicClient();
+
+  const message = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 1000,
+    messages: [{
+      role: "user",
+      content: `You are a document classification expert. Analyze this document and determine what type it is.
+
+File name: ${fileName}
+
+Document text (first 5000 chars):
+${truncated}
+
+Return ONLY valid JSON:
+{
+  "document_type": "cv | portfolio | certification | license | reference_letter | id_document | education_certificate | other",
+  "confidence": number 0-100,
+  "person_name": "full name of the person this document belongs to, or null",
+  "person_email": "email if found in document, or null",
+  "description": "brief description of what this document contains",
+  "reasoning": "1 sentence explaining why you classified it this way"
+}
+
+Classification rules:
+- "cv" = Resume/CV with work experience, education, skills
+- "portfolio" = Collection of projects, designs, work samples, images described
+- "certification" = Professional certification, training completion, course certificate
+- "license" = Professional license (engineering, architecture, accounting, etc.)
+- "reference_letter" = Letter of recommendation from employer/colleague
+- "id_document" = ID card, passport, or similar identity document
+- "education_certificate" = University degree, diploma, academic transcript
+- "other" = Anything that doesn't fit above categories
+
+CRITICAL: Extract the person's name accurately. Check for name in header, signature, or "prepared by" sections.`
+    }],
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") throw new Error("Unexpected response type");
+
+  return extractJSON<DocumentClassification>(content.text);
+}

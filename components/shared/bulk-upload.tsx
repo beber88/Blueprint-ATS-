@@ -7,13 +7,15 @@ import { useI18n } from "@/lib/i18n/context";
 
 interface UploadResult {
   fileName: string;
-  status: "pending" | "uploading" | "success" | "duplicate" | "error";
+  status: "pending" | "uploading" | "success" | "duplicate" | "error" | "attached";
   candidateName?: string;
   suggestedJob?: string;
   confidence?: number;
   error?: string;
   existingName?: string;
   existingId?: string;
+  documentType?: string;
+  attachedTo?: string;
 }
 
 interface BulkUploadProps {
@@ -94,13 +96,32 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
             status: "error",
             error: data.error || "Upload failed",
           };
+        } else if (data.document_type && data.document_type !== "cv" && data.attached_to) {
+          // Non-CV document attached to existing candidate
+          uploadResults[i] = {
+            ...uploadResults[i],
+            status: "attached",
+            documentType: data.document_type,
+            attachedTo: data.attached_to.full_name,
+            candidateName: data.attached_to.full_name,
+          };
+        } else if (data.document_type && data.document_type !== "cv" && data.unmatched) {
+          // Non-CV but no matching candidate
+          uploadResults[i] = {
+            ...uploadResults[i],
+            status: "error",
+            documentType: data.document_type,
+            error: data.message || "No matching candidate found",
+          };
         } else {
+          // CV successfully processed
           uploadResults[i] = {
             ...uploadResults[i],
             status: "success",
             candidateName: data.candidate?.full_name || data.parsed?.full_name,
-            suggestedJob: data.parsed?.suggested_job_category,
+            suggestedJob: data.parsed?.suggested_job_category || (data.parsed?.job_categories || [])[0],
             confidence: data.parsed?.suggested_job_confidence,
+            documentType: "cv",
           };
         }
       } catch {
@@ -115,6 +136,7 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
   };
 
   const successCount = results.filter(r => r.status === "success").length;
+  const attachedCount = results.filter(r => r.status === "attached").length;
   const dupCount = results.filter(r => r.status === "duplicate").length;
   const errorCount = results.filter(r => r.status === "error").length;
 
@@ -185,6 +207,7 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
                     <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style={{ background: "var(--gray-50)" }}>
                       {r.status === "uploading" && <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--blue)" }} />}
                       {r.status === "success" && <CheckCircle className="h-4 w-4" style={{ color: "var(--green)" }} />}
+                      {r.status === "attached" && <CheckCircle className="h-4 w-4" style={{ color: "var(--blue)" }} />}
                       {r.status === "duplicate" && <AlertTriangle className="h-4 w-4" style={{ color: "var(--amber)" }} />}
                       {r.status === "error" && <XCircle className="h-4 w-4" style={{ color: "var(--red)" }} />}
                       {r.status === "pending" && <div className="h-4 w-4 rounded-full" style={{ background: "var(--gray-200)" }} />}
@@ -203,10 +226,14 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
           ) : (
             /* Results summary */
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-3">
                 <div className="p-4 rounded-xl text-center" style={{ background: "var(--green-light)" }}>
                   <p className="text-2xl font-bold" style={{ color: "var(--green)" }}>{successCount}</p>
                   <p className="text-xs font-medium" style={{ color: "var(--green)" }}>{l.success}</p>
+                </div>
+                <div className="p-4 rounded-xl text-center" style={{ background: "var(--blue-light)" }}>
+                  <p className="text-2xl font-bold" style={{ color: "var(--blue)" }}>{attachedCount}</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--blue)" }}>{locale === "he" ? "צורפו לתיק" : "Attached"}</p>
                 </div>
                 <div className="p-4 rounded-xl text-center" style={{ background: "var(--amber-light)" }}>
                   <p className="text-2xl font-bold" style={{ color: "var(--amber)" }}>{dupCount}</p>
