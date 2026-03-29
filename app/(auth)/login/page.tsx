@@ -79,7 +79,7 @@ export default function LoginPage() {
               <input
                 id="password"
                 type="password"
-                placeholder="הזינו סיסמה"
+                placeholder={t("auth.password_placeholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

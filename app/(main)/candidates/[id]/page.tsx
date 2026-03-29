@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -152,7 +152,7 @@ export default function CandidateProfilePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setCandidate(prev => prev ? { ...prev, documents: data.documents } as CandidateDetail : null);
-      toast.success(locale === "he" ? "המסמך הועלה" : "Document uploaded");
+      toast.success(t("common.document_uploaded"));
     } catch { toast.error(t("common.error")); }
     finally { setUploadingDoc(false); if (e.target) e.target.value = ""; }
   };
@@ -451,7 +451,7 @@ export default function CandidateProfilePage() {
             <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-base font-semibold" style={{ color: 'var(--navy)' }}>
-                  {locale === "he" ? "סיווג מקצועי" : "Professional Classification"}
+                  {t("common.professional_classification")}
                 </h3>
                 <Button variant="outline" size="sm" className="rounded-lg text-xs" onClick={() => setEditingCategories(!editingCategories)}>
                   {editingCategories ? t("common.cancel") : t("common.edit")}
@@ -492,7 +492,7 @@ export default function CandidateProfilePage() {
                     );
                   })}
                   {selectedCategories.length === 0 && !(((candidate as unknown as Record<string, unknown>)?.job_categories as string[] | undefined)?.length) && (
-                    <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{locale === "he" ? "לא סווג עדיין" : "Not classified yet"}</span>
+                    <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{t("common.not_classified")}</span>
                   )}
                 </div>
               )}
@@ -502,23 +502,23 @@ export default function CandidateProfilePage() {
             <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-base font-semibold" style={{ color: 'var(--navy)' }}>
-                  {locale === "he" ? "מסמכים" : "Documents"}
+                  {t("common.documents")}
                 </h3>
               </div>
 
               {/* Upload buttons */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {[
-                  { type: "portfolio", label_he: "תיק עבודות", label_en: "Portfolio" },
-                  { type: "certification", label_he: "הסמכה", label_en: "Certification" },
-                  { type: "license", label_he: "רישיון", label_en: "License" },
-                  { type: "other", label_he: "מסמך אחר", label_en: "Other Document" },
+                  { type: "portfolio", labelKey: "common.portfolio" },
+                  { type: "certification", labelKey: "common.certification" },
+                  { type: "license", labelKey: "common.license" },
+                  { type: "other", labelKey: "common.other_document" },
                 ].map(dt => (
                   <label key={dt.type} className="cursor-pointer">
                     <input type="file" className="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={e => handleDocUpload(e, dt.type)} disabled={uploadingDoc} />
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" style={{ borderColor: 'var(--gray-200)', color: 'var(--gray-600)' }}>
                       <Upload className="h-3 w-3" />
-                      {locale === "he" ? dt.label_he : dt.label_en}
+                      {t(dt.labelKey)}
                     </span>
                   </label>
                 ))}
@@ -541,7 +541,7 @@ export default function CandidateProfilePage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{locale === "he" ? "אין מסמכים נוספים" : "No additional documents"}</p>
+                <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{t("common.no_documents")}</p>
               )}
             </div>
 

@@ -33,7 +33,7 @@ const navigation: { key: string; href: string; icon: LucideIcon; adminOnly?: boo
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const { theme, setTheme } = useTheme();
   const { user, isAdmin } = useUser();
 
@@ -44,7 +44,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex h-full flex-col" style={{ width: '240px', minWidth: '240px', background: 'var(--navy)' }}>
+    <aside className="flex h-full flex-col" style={{ width: '240px', minWidth: '240px', background: '#0F172A' }}>
       <div className="flex items-center gap-3 px-5 h-16">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
           <span className="text-sm font-bold text-white">B</span>
@@ -87,7 +87,7 @@ export function Sidebar() {
           style={{ color: 'rgba(255,255,255,0.5)' }}
         >
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          {theme === "dark" ? (locale === "he" ? "מצב יום" : "Light") : (locale === "he" ? "מצב לילה" : "Dark")}
+          {theme === "dark" ? t("common.light_mode") : t("common.dark_mode")}
         </button>
         {user && (
           <div className="flex items-center gap-3 px-3 py-2 mb-2">

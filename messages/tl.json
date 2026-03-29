@@ -287,7 +287,9 @@
     "language": "Wika",
     "gmail": "Gmail",
     "whatsapp": "WhatsApp",
-    "integrations_subtitle": "I-configure ang mga external na koneksyon"
+    "integrations_subtitle": "I-configure ang mga external na koneksyon",
+    "variables_placeholder": "Gamitin ang {{variable}} para sa mga variable",
+    "body_placeholder": "Gamitin ang {{pangalan}}, {{posisyon}}, atbp."
   },
   "auth": {
     "login_title": "Maligayang pagdating sa Blueprint ATS",
@@ -297,7 +299,8 @@
     "login_btn": "Mag-log In",
     "google_btn": "Magpatuloy gamit ang Google",
     "or": "o",
-    "logging_in": "Nagla-log in..."
+    "logging_in": "Nagla-log in...",
+    "password_placeholder": "Ilagay ang password"
   },
   "common": {
     "loading": "Naglo-load...",
@@ -340,11 +343,31 @@
     "ai_reasoning": "AI Reasoning",
     "job_details": "Mga Detalye ng Trabaho",
     "job_not_found": "Hindi nahanap ang trabaho",
-    "minutes": "min"
+    "minutes": "min",
+    "thinking": "Nag-iisip...",
+    "bulk_upload": "Bulk Upload",
+    "all_professions": "Lahat ng Propesyon",
+    "professional_classification": "Propesyonal na Klasipikasyon",
+    "not_classified": "Hindi pa naiuri",
+    "documents": "Mga Dokumento",
+    "no_documents": "Walang karagdagang dokumento",
+    "document_uploaded": "Na-upload ang dokumento",
+    "portfolio": "Portfolio",
+    "certification": "Sertipikasyon",
+    "license": "Lisensya",
+    "other_document": "Ibang Dokumento",
+    "confirm_delete_user": "Burahin ang user na ito?",
+    "user": "User",
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode"
   },
   "theme": {
     "light": "Light Mode",
     "dark": "Dark Mode",
     "system": "System"
+  },
+  "categories": {
+    "ai_hint": "I-click ang Generate Recommendations para sa komprehensibong AI analysis at rekomendasyon para sa CEO",
+    "ai_prompt": "Magbigay ng komprehensibong pagsusuri at rekomendasyon para sa CEO"
   }
 }

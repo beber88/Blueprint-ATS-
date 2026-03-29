@@ -287,7 +287,9 @@
     "language": "שפה",
     "gmail": "Gmail",
     "whatsapp": "WhatsApp",
-    "integrations_subtitle": "הגדרת חיבורים לשירותים חיצוניים"
+    "integrations_subtitle": "הגדרת חיבורים לשירותים חיצוניים",
+    "variables_placeholder": "השתמשו ב-{{variable}} למשתנים",
+    "body_placeholder": "השתמשו ב-{{שם_מועמד}}, {{תפקיד}} וכו׳"
   },
   "auth": {
     "login_title": "ברוך הבא ל-Blueprint ATS",
@@ -297,7 +299,8 @@
     "login_btn": "התחבר",
     "google_btn": "המשך עם Google",
     "or": "או",
-    "logging_in": "מתחבר..."
+    "logging_in": "מתחבר...",
+    "password_placeholder": "הזינו סיסמה"
   },
   "common": {
     "loading": "טוען...",
@@ -340,11 +343,31 @@
     "ai_reasoning": "נימוק AI",
     "job_details": "פרטי משרה",
     "job_not_found": "משרה לא נמצאה",
-    "minutes": "דקות"
+    "minutes": "דקות",
+    "thinking": "חושב...",
+    "bulk_upload": "העלאה מרובה",
+    "all_professions": "כל המקצועות",
+    "professional_classification": "סיווג מקצועי",
+    "not_classified": "לא סווג עדיין",
+    "documents": "מסמכים",
+    "no_documents": "אין מסמכים נוספים",
+    "document_uploaded": "המסמך הועלה",
+    "portfolio": "תיק עבודות",
+    "certification": "הסמכה",
+    "license": "רישיון",
+    "other_document": "מסמך אחר",
+    "confirm_delete_user": "למחוק את המשתמש?",
+    "user": "משתמש",
+    "light_mode": "מצב יום",
+    "dark_mode": "מצב לילה"
   },
   "theme": {
     "light": "מצב יום",
     "dark": "מצב לילה",
     "system": "אוטומטי"
+  },
+  "categories": {
+    "ai_hint": "לחצו על הפק המלצות לקבלת ניתוח AI מקיף והמלצות למנכ״ל",
+    "ai_prompt": "תן ניתוח מקיף והמלצות למנכ״ל"
   }
 }

@@ -180,7 +180,7 @@ export default function AIAgentPage() {
             <div className="bg-white rounded-2xl px-5 py-4 flex items-center gap-2" style={{ boxShadow: 'var(--shadow-sm)' }}>
               <Loader2 className="h-4 w-4 animate-spin" style={{ color: 'var(--blue)' }} />
               <span className="text-sm" style={{ color: 'var(--gray-400)' }}>
-                {locale === "en" ? "Thinking..." : locale === "tl" ? "Nag-iisip..." : "חושב..."}
+                {t("common.thinking")}
               </span>
             </div>
           </div>

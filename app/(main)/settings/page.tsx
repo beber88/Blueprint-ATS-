@@ -230,7 +230,7 @@ export default function SettingsPage() {
                   <Input
                     value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    placeholder="השתמשו ב-{{variable_name}} למשתנים"
+                    placeholder={t("settings.variables_placeholder")}
                     className="rounded-xl border-gray-200"
                   />
                 </div>
@@ -241,7 +241,7 @@ export default function SettingsPage() {
                   value={form.body}
                   onChange={(e) => setForm({ ...form, body: e.target.value })}
                   rows={6}
-                  placeholder="השתמשו ב-{{candidate_name}}, {{job_title}} וכו׳"
+                  placeholder={t("settings.body_placeholder")}
                   className="rounded-xl border-gray-200 resize-none"
                 />
               </div>

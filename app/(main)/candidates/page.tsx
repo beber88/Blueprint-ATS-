@@ -219,7 +219,7 @@ export default function CandidatesPage() {
               <Upload className="ml-2 h-4 w-4" /> {t("candidates.upload_cv")}
             </Button>
             <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="rounded-lg">
-              <Upload className="ml-2 h-4 w-4" /> {locale === "he" ? "העלאה מרובה" : "Bulk Upload"}
+              <Upload className="ml-2 h-4 w-4" /> {t("common.bulk_upload")}
             </Button>
           </div>
         </div>
@@ -275,7 +275,7 @@ export default function CandidatesPage() {
               <SelectValue placeholder={t("candidates.all_jobs")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{locale === "he" ? "כל המקצועות" : "All Professions"}</SelectItem>
+              <SelectItem value="all">{t("common.all_professions")}</SelectItem>
               {categories.filter(c => !c.parent_key).map(cat => (
                 <SelectItem key={cat.key} value={cat.key}>
                   {locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en}

@@ -36,7 +36,7 @@ export default function UsersPage() {
   };
 
   const removeUser = async (id: string, name: string) => {
-    if (!confirm(locale === "he" ? `למחוק את ${name}?` : `Delete ${name}?`)) return;
+    if (!confirm(`${t("common.confirm_delete_user")} ${name}?`)) return;
     try {
       await fetch(`/api/users/${id}`, { method: "DELETE" });
       setUsers(prev => prev.filter(u => u.id !== id));
@@ -75,7 +75,7 @@ export default function UsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ background: 'var(--gray-50)' }}>
-                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{locale === "he" ? "משתמש" : "User"}</th>
+                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{t("common.user")}</th>
                 <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.role}</th>
                 <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.joined}</th>
                 <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}></th>

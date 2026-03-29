@@ -287,7 +287,9 @@
     "language": "Language",
     "gmail": "Gmail",
     "whatsapp": "WhatsApp",
-    "integrations_subtitle": "Configure external service connections"
+    "integrations_subtitle": "Configure external service connections",
+    "variables_placeholder": "Use {{variable}} for variables",
+    "body_placeholder": "Use {{candidate_name}}, {{position}}, etc."
   },
   "auth": {
     "login_title": "Welcome to Blueprint ATS",
@@ -297,7 +299,8 @@
     "login_btn": "Log In",
     "google_btn": "Continue with Google",
     "or": "or",
-    "logging_in": "Logging in..."
+    "logging_in": "Logging in...",
+    "password_placeholder": "Enter password"
   },
   "common": {
     "loading": "Loading...",
@@ -340,11 +343,31 @@
     "ai_reasoning": "AI Reasoning",
     "job_details": "Job Details",
     "job_not_found": "Job not found",
-    "minutes": "min"
+    "minutes": "min",
+    "thinking": "Thinking...",
+    "bulk_upload": "Bulk Upload",
+    "all_professions": "All Professions",
+    "professional_classification": "Professional Classification",
+    "not_classified": "Not classified yet",
+    "documents": "Documents",
+    "no_documents": "No additional documents",
+    "document_uploaded": "Document uploaded",
+    "portfolio": "Portfolio",
+    "certification": "Certification",
+    "license": "License",
+    "other_document": "Other Document",
+    "confirm_delete_user": "Delete this user?",
+    "user": "User",
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode"
   },
   "theme": {
     "light": "Light Mode",
     "dark": "Dark Mode",
     "system": "System"
+  },
+  "categories": {
+    "ai_hint": "Click Generate Recommendations for comprehensive AI analysis and CEO recommendations",
+    "ai_prompt": "Provide comprehensive analysis and CEO recommendations"
   }
 }

@@ -105,9 +105,7 @@ export default function CategoriesPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: locale === "he"
-            ? `תן ניתוח מקיף והמלצות למנכ"ל החברה על קטגוריית "${getCatNameByKey(selectedCategory)}". יש ${candidates.length} מועמדים. ציון ממוצע: ${avgScore}. ניסיון ממוצע: ${avgExp} שנים. מי המועמדים הטובים ביותר? מה החוסרים? מה ההמלצה?`
-            : `Provide a comprehensive analysis and CEO recommendations for the "${getCatNameByKey(selectedCategory)}" category. ${candidates.length} candidates, avg score: ${avgScore}, avg experience: ${avgExp} years. Who are the best candidates? What gaps exist? What are your recommendations?`,
+          message: `${t("categories.ai_prompt")} "${getCatNameByKey(selectedCategory)}". ${candidates.length} candidates, avg score: ${avgScore}, avg experience: ${avgExp}.`,
         }),
       });
       const data = await res.json();
@@ -295,7 +293,7 @@ export default function CategoriesPage() {
               </div>
             ) : (
               <p className="text-sm" style={{ color: 'var(--gray-400)' }}>
-                {locale === "he" ? "לחצו על 'הפק המלצות' לקבלת ניתוח AI מקיף והמלצות למנכ״ל" : "Click 'Generate Recommendations' for comprehensive AI analysis and CEO recommendations"}
+                {t("categories.ai_hint")}
               </p>
             )}
           </div>
