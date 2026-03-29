@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail,
+  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
@@ -49,6 +49,7 @@ export default function CandidatesPage() {
   const [bulkSending, setBulkSending] = useState(false);
   const [bulkProgress, setBulkProgress] = useState("");
   const [templates, setTemplates] = useState<{id: string; name: string; type: string}[]>([]);
+  const [reclassifying, setReclassifying] = useState(false);
 
   useEffect(() => {
     fetch("/api/jobs").then(r => r.json()).then(setJobs).catch(() => {});
@@ -165,6 +166,29 @@ export default function CandidatesPage() {
     }
   };
 
+  const handleReclassify = async () => {
+    setReclassifying(true);
+    toast.info(locale === "he" ? "מסווג מועמדים..." : "Classifying candidates...");
+    try {
+      const res = await fetch("/api/candidates/reclassify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      toast.success(locale === "he"
+        ? `סווגו ${data.classified} מועמדים מתוך ${data.total}`
+        : `Classified ${data.classified} of ${data.total} candidates`
+      );
+      fetchCandidates();
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setReclassifying(false);
+    }
+  };
+
   const statuses = [
     "new", "reviewed", "shortlisted", "interview_scheduled",
     "interviewed", "approved", "rejected", "keep_for_future",
@@ -220,6 +244,10 @@ export default function CandidatesPage() {
             </Button>
             <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="rounded-lg">
               <Upload className="ml-2 h-4 w-4" /> {t("common.bulk_upload")}
+            </Button>
+            <Button onClick={handleReclassify} disabled={reclassifying} variant="outline" className="rounded-lg">
+              <RefreshCw className={`ml-2 h-4 w-4 ${reclassifying ? "animate-spin" : ""}`} />
+              {locale === "he" ? "סווג מחדש" : "Reclassify"}
             </Button>
           </div>
         </div>
