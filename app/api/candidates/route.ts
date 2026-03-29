@@ -37,6 +37,11 @@ export async function GET(request: NextRequest) {
       query = query.eq("contact_status", contactStatus);
     }
 
+    const category = searchParams.get("category");
+    if (category) {
+      query = query.contains("job_categories", [category]);
+    }
+
     query = query.order("created_at", { ascending: false }).range(offset, offset + limit - 1);
 
     const { data, error, count } = await query;

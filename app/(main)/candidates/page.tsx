@@ -38,6 +38,8 @@ export default function CandidatesPage() {
     full_name: "", email: "", phone: "", location: "", notes: "",
   });
 
+  const [categories, setCategories] = useState<{key: string; name_he: string; name_en: string; name_tl: string; parent_key: string | null}[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [jobs, setJobs] = useState<{id: string; title: string; status: string}[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("all");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -51,6 +53,7 @@ export default function CandidatesPage() {
   useEffect(() => {
     fetch("/api/jobs").then(r => r.json()).then(setJobs).catch(() => {});
     fetch("/api/templates").then(r => r.json()).then(setTemplates).catch(() => {});
+    fetch("/api/categories").then(r => r.json()).then(setCategories).catch(() => {});
   }, []);
 
   const fetchCandidates = useCallback(async () => {
@@ -59,6 +62,7 @@ export default function CandidatesPage() {
       if (search) params.set("search", search);
       if (statusFilter !== "all") params.set("status", statusFilter);
       if (selectedJob !== "all") params.set("jobId", selectedJob);
+      if (categoryFilter !== "all") params.set("category", categoryFilter);
       const res = await fetch(`/api/candidates?${params}`);
       const data = await res.json();
       setCandidates(data.candidates || []);
@@ -67,7 +71,7 @@ export default function CandidatesPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, selectedJob]);
+  }, [search, statusFilter, selectedJob, categoryFilter]);
 
   useEffect(() => {
     fetchCandidates();
@@ -264,6 +268,19 @@ export default function CandidatesPage() {
             <SelectContent>
               <SelectItem value="all">{t("candidates.all_statuses")}</SelectItem>
               {statuses.map(s => <SelectItem key={s} value={s}>{getStatusLabel(s)}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-48 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--gray-200)' }}>
+              <SelectValue placeholder={t("candidates.all_jobs")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{locale === "he" ? "כל המקצועות" : "All Professions"}</SelectItem>
+              {categories.filter(c => !c.parent_key).map(cat => (
+                <SelectItem key={cat.key} value={cat.key}>
+                  {locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {(statusFilter !== "all" || selectedJob !== "all") && (

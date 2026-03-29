@@ -203,7 +203,9 @@ export async function POST(request: NextRequest) {
         previous_roles: parsed.previous_roles,
         source: "cv_upload",
         status: "new",
-        suggested_job: parsed.suggested_job_category || null,
+        job_categories: parsed.job_categories || [],
+        custom_category: parsed.custom_category || null,
+        suggested_job: (parsed.job_categories || [])[0] || parsed.suggested_job_category || null,
         classification_confidence: parsed.suggested_job_confidence || null,
         bulk_upload_batch: batchId || null,
       })
@@ -220,17 +222,19 @@ export async function POST(request: NextRequest) {
 
     console.log(`CV Upload: Candidate saved with ID ${candidate.id}`);
 
-    // Auto-link to matching job
-    if (parsed.suggested_job_category) {
-      const { data: matchingJob } = await supabase
-        .from("jobs")
-        .select("id, title")
-        .ilike("title", `%${parsed.suggested_job_category}%`)
-        .eq("status", "active")
-        .single();
-
-      if (matchingJob) {
-        await supabase.from("candidates").update({ job_id: matchingJob.id }).eq("id", candidate.id);
+    // Auto-link to matching job by category
+    if (parsed.job_categories && parsed.job_categories.length > 0 && !jobId) {
+      for (const cat of parsed.job_categories) {
+        const { data: matchingJob } = await supabase
+          .from("jobs")
+          .select("id, title")
+          .ilike("title", `%${cat.replace(/_/g, " ")}%`)
+          .eq("status", "active")
+          .single();
+        if (matchingJob) {
+          await supabase.from("candidates").update({ job_id: matchingJob.id }).eq("id", candidate.id);
+          break;
+        }
       }
     }
 

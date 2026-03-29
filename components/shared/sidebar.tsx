@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, Settings, LogOut, FileText, Bot,
+  LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, Settings, LogOut, FileText, Bot, FolderOpen,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import { LanguageSwitcher } from "@/components/shared/language-switcher";
 const navigation = [
   { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
   { key: "nav.candidates", href: "/candidates", icon: Users },
+  { key: "nav.categories", href: "/categories", icon: FolderOpen },
   { key: "nav.jobs", href: "/jobs", icon: Briefcase },
   { key: "nav.interviews", href: "/interviews", icon: Calendar },
   { key: "nav.messages", href: "/messages", icon: MessageSquare },

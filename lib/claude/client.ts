@@ -70,9 +70,10 @@ export async function parseCV(cvText: string): Promise<CVParseResult> {
       "description": "string"
     }
   ],
-  "suggested_job_category": "string - most fitting job category",
+  "job_categories": ["array of category keys that match this candidate from: architect, architect_licensed, architect_intern, draftsman, engineer, engineer_civil, engineer_structural, engineer_mep, engineer_electrical, engineer_mechanical, project_manager, site_engineer, finance, finance_accountant, finance_controller, finance_bookkeeper, quantity_surveyor, hr, secretary, procurement, marketing, foreman, construction_worker, construction_worker_concrete, construction_worker_iron, construction_worker_formwork, construction_worker_finishing, construction_worker_general, qc_inspector, hse_officer, document_controller, other"],
+  "custom_category": "string or null - if 'other' is selected, specify what",
   "suggested_job_confidence": number between 0-100,
-  "classification_reasoning": "1 sentence why"
+  "classification_reasoning": "1 sentence explaining category choice"
 }
 
 CV Text:
@@ -102,6 +103,8 @@ ${truncated}`,
     suggested_job_category: parsed.suggested_job_category || null,
     suggested_job_confidence: parsed.suggested_job_confidence ?? 0,
     classification_reasoning: parsed.classification_reasoning || null,
+    job_categories: Array.isArray(parsed.job_categories) ? parsed.job_categories : (parsed.suggested_job_category ? [parsed.suggested_job_category] : []),
+    custom_category: parsed.custom_category || null,
   };
 }
 

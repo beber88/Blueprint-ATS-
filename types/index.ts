@@ -132,6 +132,8 @@ export interface CVParseResult {
   suggested_job_category?: string | null;
   suggested_job_confidence?: number;
   classification_reasoning?: string | null;
+  job_categories?: string[];
+  custom_category?: string | null;
 }
 
 export interface AIScoreResult {
