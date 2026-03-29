@@ -60,7 +60,8 @@
       "interviewed": "Interviewed",
       "approved": "Approved",
       "rejected": "Rejected",
-      "keep_for_future": "Keep for Future"
+      "keep_for_future": "Keep for Future",
+      "scored": "Scored"
     },
     "not_assigned": "Not Assigned",
     "years": "years",
