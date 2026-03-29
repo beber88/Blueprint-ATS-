@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { useUser } from "@/lib/auth/context";
 import { useI18n } from "@/lib/i18n/context";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, Trash2 } from "lucide-react";
+import { Shield, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface UserItem {
@@ -22,6 +25,10 @@ export default function UsersPage() {
   const { user: currentUser, isAdmin } = useUser();
   const { t, locale } = useI18n();
   const [users, setUsers] = useState<UserItem[]>([]);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteForm, setInviteForm] = useState({ email: "", full_name: "", role: "recruiter" });
+  const [inviting, setInviting] = useState(false);
+
   useEffect(() => {
     if (!isAdmin) return;
     fetch("/api/users").then(r => r.json()).then(setUsers).catch(console.error);
@@ -42,6 +49,27 @@ export default function UsersPage() {
       setUsers(prev => prev.filter(u => u.id !== id));
       toast.success(t("common.success"));
     } catch { toast.error(t("common.error")); }
+  };
+
+  const inviteUser = async () => {
+    if (!inviteForm.email) { toast.error("Email required"); return; }
+    setInviting(true);
+    try {
+      const res = await fetch("/api/users/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(inviteForm),
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      toast.success(locale === "he" ? "הזמנה נשלחה" : "Invitation sent");
+      setInviteOpen(false);
+      setInviteForm({ email: "", full_name: "", role: "recruiter" });
+      fetch("/api/users").then(r => r.json()).then(setUsers);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error");
+    } finally {
+      setInviting(false);
+    }
   };
 
   const labels = {
@@ -65,9 +93,14 @@ export default function UsersPage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
       <div className="bg-white dark:bg-slate-800 border-b" style={{ borderColor: 'var(--gray-200)' }}>
-        <div className="px-8 py-6">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+        <div className="px-8 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+          </div>
+          <Button onClick={() => setInviteOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+            {locale === "he" ? "הזמן משתמש" : "Invite User"}
+          </Button>
         </div>
       </div>
       <div className="px-8 py-6">
@@ -123,6 +156,41 @@ export default function UsersPage() {
           </table>
         </div>
       </div>
+
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent className="sm:max-w-md rounded-xl">
+          <DialogHeader>
+            <DialogTitle>{locale === "he" ? "הזמנת משתמש חדש" : "Invite New User"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>{locale === "he" ? "שם מלא" : "Full Name"}</Label>
+              <Input value={inviteForm.full_name} onChange={e => setInviteForm({...inviteForm, full_name: e.target.value})} className="rounded-lg" />
+            </div>
+            <div className="space-y-2">
+              <Label>{locale === "he" ? "אימייל" : "Email"}</Label>
+              <Input type="email" value={inviteForm.email} onChange={e => setInviteForm({...inviteForm, email: e.target.value})} className="rounded-lg" />
+            </div>
+            <div className="space-y-2">
+              <Label>{locale === "he" ? "תפקיד" : "Role"}</Label>
+              <Select value={inviteForm.role} onValueChange={v => setInviteForm({...inviteForm, role: v})}>
+                <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">{locale === "he" ? "מנהל מערכת" : "Admin"}</SelectItem>
+                  <SelectItem value="recruiter">{locale === "he" ? "מגייס" : "Recruiter"}</SelectItem>
+                  <SelectItem value="viewer">{locale === "he" ? "צופה" : "Viewer"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setInviteOpen(false)} className="rounded-lg">{locale === "he" ? "ביטול" : "Cancel"}</Button>
+            <Button onClick={inviteUser} disabled={inviting} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : (locale === "he" ? "שלח הזמנה" : "Send Invite")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

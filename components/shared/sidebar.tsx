@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, Settings, LogOut, FileText, Bot, FolderOpen,
-  Sun, Moon, UserCog, BookOpen,
+  Sun, Moon, UserCog, BookOpen, Globe,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ const navigation: { key: string; href: string; icon: LucideIcon; adminOnly?: boo
   { key: "nav.ai_agent", href: "/ai-agent", icon: Bot },
   { key: "nav.guide", href: "/guide", icon: BookOpen },
   { key: "nav.settings", href: "/settings", icon: Settings },
+  { key: "nav.job_boards", href: "/settings/job-boards", icon: Globe },
   { key: "nav.users", href: "/users", icon: UserCog, adminOnly: true },
 ];
 

@@ -10,7 +10,8 @@
     "ai_agent": "AI Assistant",
     "categories": "Mga Propesyon",
     "users": "Mga User",
-    "guide": "Gabay"
+    "guide": "Gabay",
+    "job_boards": "Mga Job Board"
   },
   "dashboard": {
     "title": "Dashboard",

@@ -10,7 +10,8 @@
     "ai_agent": "AI Assistant",
     "categories": "Professions",
     "users": "Users",
-    "guide": "Guide"
+    "guide": "Guide",
+    "job_boards": "Job Boards"
   },
   "dashboard": {
     "title": "Dashboard",
