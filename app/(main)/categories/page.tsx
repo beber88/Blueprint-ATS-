@@ -105,7 +105,7 @@ export default function CategoriesPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: `${t("categories.ai_prompt")} "${getCatNameByKey(selectedCategory)}". ${candidates.length} candidates, avg score: ${avgScore}, avg experience: ${avgExp}.`,
+          message: `${t("categories.ai_prompt")} "${getCatNameByKey(selectedCategory)}". ${candidates.length} candidates, avg score: ${avgScore}, avg experience: ${avgExp}. IMPORTANT: Respond entirely in ${locale === "he" ? "Hebrew" : locale === "tl" ? "Tagalog" : "English"}. Do not mix languages.`,
         }),
       });
       const data = await res.json();

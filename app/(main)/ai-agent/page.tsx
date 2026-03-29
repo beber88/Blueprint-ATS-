@@ -58,6 +58,7 @@ export default function AIAgentPage() {
           conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
           candidateIds: selectedCandidates.length > 0 ? selectedCandidates : undefined,
           mode: selectedCandidates.length >= 2 ? "compare" : selectedCandidates.length === 1 ? "candidate" : "general",
+          locale,
         }),
       });
 

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "AI not configured" }, { status: 500 });
     }
 
-    const { message, conversationHistory, candidateIds, mode } = await request.json();
+    const { message, conversationHistory, candidateIds, mode, locale } = await request.json();
     if (!message) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
@@ -180,8 +180,12 @@ YOUR CAPABILITIES:
 7. TREND ANALYSIS: Identify patterns across candidates - common skills, experience levels, score distributions.
 8. PROACTIVE ALERTS: Flag candidates who need attention, long-waiting candidates, missing information, etc.
 
+LANGUAGE REQUIREMENT (CRITICAL):
+You MUST respond ENTIRELY in ${locale === "he" ? "Hebrew (עברית)" : locale === "tl" ? "Tagalog" : "English"}.
+Do NOT mix languages. Every word, header, bullet point, and recommendation must be in ${locale === "he" ? "Hebrew" : locale === "tl" ? "Tagalog" : "English"}.
+This is non-negotiable — the user's interface is set to ${locale === "he" ? "Hebrew" : locale === "tl" ? "Tagalog" : "English"}.
+
 RESPONSE RULES:
-- ALWAYS respond in the SAME LANGUAGE as the user's message (Hebrew/English/Tagalog)
 - Be SPECIFIC - reference actual candidate names, scores, skills from the data
 - When comparing, use tables or structured format
 - Provide ACTIONABLE recommendations, not generic advice

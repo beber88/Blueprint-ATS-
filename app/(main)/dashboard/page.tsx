@@ -1,350 +1,352 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
-import { Header } from "@/components/shared/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { PageLoading } from "@/components/shared/loading";
+import { ScoreBadge } from "@/components/shared/score-badge";
+import { StatusBadge } from "@/components/shared/status-badge";
 import {
-  Users, UserPlus, Calendar, CheckCircle, Upload, Briefcase, Plus, Activity,
+  Users, UserPlus, Calendar, CheckCircle, Briefcase, TrendingUp, AlertTriangle, ArrowUpRight, Brain,
 } from "lucide-react";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
 } from "recharts";
 import Link from "next/link";
 import { DashboardStats } from "@/types";
-import { formatDateTime, getStatusLabel } from "@/lib/utils";
-import { ScoreBadge } from "@/components/shared/score-badge";
+import { formatDateTime } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
+import { Button } from "@/components/ui/button";
 
 const STATUS_COLORS: Record<string, string> = {
-  new: "#6b7280",
-  reviewed: "#3b82f6",
-  shortlisted: "#6366f1",
-  interview_scheduled: "#9333ea",
-  interviewed: "#8b5cf6",
-  approved: "#22c55e",
-  rejected: "#ef4444",
-  keep_for_future: "#f59e0b",
-};
-
-const STATUS_DOT_COLORS: Record<string, string> = {
-  new: "bg-gray-500",
-  reviewed: "bg-blue-500",
-  shortlisted: "bg-indigo-500",
-  interview_scheduled: "bg-purple-600",
-  interviewed: "bg-violet-500",
-  approved: "bg-green-500",
-  rejected: "bg-red-500",
-  keep_for_future: "bg-amber-500",
+  new: "#94A3B8", reviewed: "#3B82F6", shortlisted: "#8B5CF6",
+  interview_scheduled: "#F59E0B", interviewed: "#6366F1",
+  approved: "#10B981", rejected: "#EF4444", keep_for_future: "#14B8A6",
+  scored: "#06B6D4",
 };
 
 export default function DashboardPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/dashboard/stats")
-      .then((res) => res.json())
-      .then(setStats)
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch("/api/dashboard/stats").then(r => r.json()),
+      fetch("/api/candidates?limit=100").then(r => r.json()),
+      fetch("/api/jobs").then(r => r.json()),
+    ]).then(([s, c, j]) => {
+      setStats(s);
+      setCandidates(c.candidates || []);
+      setJobs(j || []);
+    }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <PageLoading />;
 
-  const kpis = [
-    {
-      title: t("dashboard.total_candidates"),
-      value: stats?.total_candidates || 0,
-      icon: Users,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-      iconBg: "bg-blue-100",
-    },
-    {
-      title: t("dashboard.new_this_week"),
-      value: stats?.new_this_week || 0,
-      icon: UserPlus,
-      color: "text-green-600",
-      bg: "bg-green-50",
-      iconBg: "bg-green-100",
-    },
-    {
-      title: t("dashboard.interviews_scheduled"),
-      value: stats?.interviews_scheduled || 0,
-      icon: Calendar,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
-      iconBg: "bg-purple-100",
-    },
-    {
-      title: t("dashboard.approved_this_month"),
-      value: stats?.approved_this_month || 0,
-      icon: CheckCircle,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-      iconBg: "bg-amber-100",
-    },
-  ];
+  // Compute real metrics
+  const totalCandidates = candidates.length;
+  const newThisWeek = candidates.filter(c => {
+    const d = new Date(c.created_at);
+    const now = new Date();
+    return (now.getTime() - d.getTime()) < 7 * 24 * 60 * 60 * 1000;
+  }).length;
+  const activeJobs = jobs.filter((j: any) => j.status === "active").length;
+  const approvedCount = candidates.filter(c => c.status === "approved").length;
+  const interviewCount = candidates.filter(c => c.status === "interview_scheduled").length;
+  const rejectedCount = candidates.filter(c => c.status === "rejected").length;
+  const unclassified = candidates.filter(c => !c.job_categories || c.job_categories.length === 0).length;
+  const noScore = candidates.filter(c => {
+    const apps = c.applications || [];
+    return apps.every((a: any) => !a.ai_score) && !c.ai_analysis;
+  }).length;
 
-  const todayDate = new Date().toLocaleDateString("he-IL", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  // Status breakdown
+  const statusData = Object.entries(
+    candidates.reduce((acc: Record<string, number>, c: any) => {
+      acc[c.status] = (acc[c.status] || 0) + 1;
+      return acc;
+    }, {})
+  ).map(([status, count]) => ({ status, count: count as number }));
+
+  // Category breakdown
+  const catCounts: Record<string, number> = {};
+  candidates.forEach((c: any) => {
+    ((c.job_categories as string[]) || []).forEach(cat => { catCounts[cat] = (catCounts[cat] || 0) + 1; });
+  });
+  const categoryData = Object.entries(catCounts)
+    .sort(([, a], [, b]) => (b as number) - (a as number))
+    .slice(0, 8)
+    .map(([name, value]) => ({ name: name.replace(/_/g, " "), value }));
+
+  // Score distribution
+  const scoreRanges = [
+    { range: "0-20", count: 0 }, { range: "21-40", count: 0 },
+    { range: "41-60", count: 0 }, { range: "61-80", count: 0 }, { range: "81-100", count: 0 },
+  ];
+  candidates.forEach((c: any) => {
+    const score = c.ai_analysis?.total_score || c.ai_analysis?.verdict?.score;
+    if (score) {
+      if (score <= 20) scoreRanges[0].count++;
+      else if (score <= 40) scoreRanges[1].count++;
+      else if (score <= 60) scoreRanges[2].count++;
+      else if (score <= 80) scoreRanges[3].count++;
+      else scoreRanges[4].count++;
+    }
   });
 
+  // Top candidates (by score)
+  const topCandidates = [...candidates]
+    .map(c => ({
+      ...c,
+      topScore: c.ai_analysis?.total_score || c.ai_analysis?.verdict?.score || (c.applications || []).reduce((max: number, a: any) => Math.max(max, a.ai_score || 0), 0) || null,
+    }))
+    .filter(c => c.topScore && c.topScore > 0)
+    .sort((a, b) => (b.topScore || 0) - (a.topScore || 0))
+    .slice(0, 5);
+
+  // Recent activity
+  const recentActivity = (stats?.recent_activity || []).slice(0, 8);
+
+  const labels = {
+    he: {
+      title: "דשבורד", subtitle: "סקירה כללית של תהליך הגיוס",
+      total: "סה״כ מועמדים", new_week: "חדשים השבוע", active_jobs: "משרות פתוחות",
+      approved: "אושרו", interviews: "ראיונות מתוכננים", rejected: "נדחו",
+      pipeline: "מצב Pipeline", categories: "חלוקה לפי מקצוע",
+      scores: "התפלגות ציונים", top5: "TOP 5 מועמדים",
+      activity: "פעילות אחרונה", attention: "דורש תשומת לב",
+      unclassified_alert: "מועמדים ללא סיווג מקצועי",
+      no_score_alert: "מועמדים ללא ניתוח AI",
+      reclassify: "סווג עכשיו", analyze: "נתח עכשיו",
+      job_overview: "סקירת משרות", candidates_label: "מועמדים",
+      top_score: "ציון מקסימלי", no_data: "אין נתונים",
+    },
+    en: {
+      title: "Dashboard", subtitle: "Recruitment pipeline overview",
+      total: "Total Candidates", new_week: "New This Week", active_jobs: "Open Jobs",
+      approved: "Approved", interviews: "Interviews Scheduled", rejected: "Rejected",
+      pipeline: "Pipeline Status", categories: "By Profession",
+      scores: "Score Distribution", top5: "TOP 5 Candidates",
+      activity: "Recent Activity", attention: "Needs Attention",
+      unclassified_alert: "Candidates without profession classification",
+      no_score_alert: "Candidates without AI analysis",
+      reclassify: "Classify Now", analyze: "Analyze Now",
+      job_overview: "Jobs Overview", candidates_label: "Candidates",
+      top_score: "Top Score", no_data: "No data",
+    },
+    tl: {
+      title: "Dashboard", subtitle: "Pangkalahatang-ideya ng recruitment",
+      total: "Kabuuang Kandidato", new_week: "Bago Ngayong Linggo", active_jobs: "Bukas na Trabaho",
+      approved: "Naaprubahan", interviews: "Nakatakdang Panayam", rejected: "Tinanggihan",
+      pipeline: "Status ng Pipeline", categories: "Ayon sa Propesyon",
+      scores: "Distribusyon ng Score", top5: "TOP 5 Kandidato",
+      activity: "Kamakailang Aktibidad", attention: "Nangangailangan ng Atensyon",
+      unclassified_alert: "Mga kandidato na walang klasipikasyon",
+      no_score_alert: "Mga kandidato na walang AI analysis",
+      reclassify: "I-classify Ngayon", analyze: "I-analyze Ngayon",
+      job_overview: "Pangkalahatang-ideya ng Trabaho", candidates_label: "Kandidato",
+      top_score: "Pinakamataas na Score", no_data: "Walang data",
+    },
+  };
+  const l = labels[locale] || labels.he;
+
+  const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#14B8A6", "#EC4899", "#6366F1"];
+
   return (
-    <div>
-      <Header title={t("dashboard.title")} subtitle={todayDate} />
-      <div className="p-8 space-y-6">
-        {/* KPI Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {kpis.map((kpi) => (
-            <Card
-              key={kpi.title}
-              className="rounded-xl shadow-sm border-0 overflow-hidden"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {kpi.title}
-                    </p>
-                    <p className="text-4xl font-bold tracking-tight">
-                      {kpi.value}
-                    </p>
-                  </div>
-                  <div
-                    className={`rounded-2xl p-4 ${kpi.iconBg}`}
-                  >
-                    <kpi.icon className={`h-7 w-7 ${kpi.color}`} />
-                  </div>
+    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
+      {/* Header */}
+      <div className="bg-white dark:bg-slate-800 border-b px-8 py-6" style={{ borderColor: 'var(--gray-200)' }}>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+      </div>
+
+      <div className="px-8 py-6 space-y-6">
+        {/* KPI Cards Row 1 */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            { icon: Users, label: l.total, value: totalCandidates, color: "var(--blue)", bg: "var(--blue-light)" },
+            { icon: UserPlus, label: l.new_week, value: newThisWeek, color: "var(--green)", bg: "var(--green-light)" },
+            { icon: Briefcase, label: l.active_jobs, value: activeJobs, color: "var(--purple)", bg: "var(--purple-light)" },
+            { icon: Calendar, label: l.interviews, value: interviewCount, color: "var(--amber)", bg: "var(--amber-light)" },
+            { icon: CheckCircle, label: l.approved, value: approvedCount, color: "var(--green)", bg: "var(--green-light)" },
+            { icon: TrendingUp, label: l.rejected, value: rejectedCount, color: "var(--red)", bg: "var(--red-light)" },
+          ].map((kpi, i) => (
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-4" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: kpi.bg }}>
+                  <kpi.icon className="h-5 w-5" style={{ color: kpi.color }} />
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{kpi.value}</p>
+                  <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{kpi.label}</p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex gap-3">
-          <Link href="/candidates?upload=true">
-            <Button className="rounded-lg">
-              <Upload className="mr-2 h-4 w-4" />
-              {t("dashboard.upload_cv")}
-            </Button>
-          </Link>
-          <Link href="/jobs?new=true">
-            <Button variant="outline" className="rounded-lg">
-              <Briefcase className="mr-2 h-4 w-4" />
-              {t("dashboard.new_job")}
-            </Button>
-          </Link>
-          <Link href="/interviews?new=true">
-            <Button variant="outline" className="rounded-lg">
-              <Plus className="mr-2 h-4 w-4" />
-              {t("dashboard.schedule_interview")}
-            </Button>
-          </Link>
+        {/* Alerts */}
+        {(unclassified > 0 || noScore > 0) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {unclassified > 0 && (
+              <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'var(--amber-light)', border: '1px solid var(--amber)' }}>
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5" style={{ color: 'var(--amber)' }} />
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{unclassified} {l.unclassified_alert}</p>
+                  </div>
+                </div>
+                <Link href="/candidates">
+                  <Button size="sm" variant="outline" className="rounded-lg text-xs">{l.reclassify}</Button>
+                </Link>
+              </div>
+            )}
+            {noScore > 0 && (
+              <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'var(--blue-light)', border: '1px solid var(--blue)' }}>
+                <div className="flex items-center gap-3">
+                  <Brain className="h-5 w-5" style={{ color: 'var(--blue)' }} />
+                  <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{noScore} {l.no_score_alert}</p>
+                </div>
+                <Link href="/candidates">
+                  <Button size="sm" variant="outline" className="rounded-lg text-xs">{l.analyze}</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pipeline Status */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.pipeline}</h3>
+            {statusData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={statusData} layout="vertical">
+                  <XAxis type="number" allowDecimals={false} />
+                  <YAxis type="category" dataKey="status" width={100} tick={{ fontSize: 11 }} tickFormatter={(v) => t(`candidates.status.${v}`) || v} />
+                  <Tooltip formatter={(value) => [value, l.candidates_label]} />
+                  <Bar dataKey="count" radius={[0, 6, 6, 0]}>
+                    {statusData.map((entry, i) => (
+                      <Cell key={i} fill={STATUS_COLORS[entry.status] || "#94A3B8"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+          </div>
+
+          {/* Profession Distribution */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.categories}</h3>
+            {categoryData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie data={categoryData} cx="50%" cy="50%" innerRadius={50} outerRadius={90} dataKey="value" label={({ name, value }) => `${name}: ${value}`} labelLine={false}>
+                    {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+          </div>
         </div>
 
-        {/* Pipeline + Status Breakdown */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Pipeline Chart */}
-          <Card className="lg:col-span-2 rounded-xl shadow-sm border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">
-                {t("dashboard.pipeline")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {stats?.pipeline_by_status &&
-              stats.pipeline_by_status.length > 0 ? (
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart
-                    data={stats.pipeline_by_status.map((item) => ({
-                      name: getStatusLabel(item.status),
-                      count: item.count,
-                      status: item.status,
-                    }))}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-                  >
-                    <XAxis type="number" allowDecimals={false} />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      width={95}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: "12px",
-                        border: "none",
-                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                      }}
-                    />
-                    <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={24}>
-                      {stats.pipeline_by_status.map((item) => (
-                        <Cell
-                          key={item.status}
-                          fill={STATUS_COLORS[item.status] || "#6b7280"}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex items-center justify-center h-[320px]">
-                  <p className="text-sm text-muted-foreground">
-                    {t("candidates.no_candidates")}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* Score Distribution + Top 5 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Score Distribution */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.scores}</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={scoreRanges}>
+                <XAxis dataKey="range" tick={{ fontSize: 12 }} />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                  {scoreRanges.map((_, i) => <Cell key={i} fill={i < 2 ? "var(--red)" : i < 3 ? "var(--amber)" : "var(--green)"} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-          {/* Status Breakdown */}
-          <Card className="rounded-xl shadow-sm border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">
-                {t("dashboard.status_breakdown")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {stats?.pipeline_by_status &&
-              stats.pipeline_by_status.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3">
-                  {stats.pipeline_by_status.map((item) => (
-                    <div
-                      key={item.status}
-                      className="rounded-xl bg-gray-50 p-3 flex flex-col gap-1"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`h-2.5 w-2.5 rounded-full ${
-                            STATUS_DOT_COLORS[item.status] || "bg-gray-400"
-                          }`}
-                        />
-                        <span className="text-xs text-muted-foreground truncate">
-                          {getStatusLabel(item.status)}
-                        </span>
-                      </div>
-                      <span className="text-2xl font-bold pr-4">
-                        {item.count}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-40">
-                  <p className="text-sm text-muted-foreground">{t("common.no_results")}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity + Active Jobs */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Recent Activity */}
-          <Card className="rounded-xl shadow-sm border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <div className="rounded-lg bg-blue-50 p-1.5">
-                  <Activity className="h-4 w-4 text-blue-600" />
-                </div>
-                {t("dashboard.recent_activity")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                {(stats?.recent_activity || []).map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="shrink-0 rounded-full bg-blue-100 p-2">
-                      <Activity className="h-4 w-4 text-blue-600" />
-                    </div>
+          {/* Top 5 */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.top5}</h3>
+            {topCandidates.length > 0 ? (
+              <div className="space-y-3">
+                {topCandidates.map((c, i) => (
+                  <Link key={c.id} href={`/candidates/${c.id}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold" style={{ background: i === 0 ? 'var(--amber)' : i < 3 ? 'var(--gray-200)' : 'var(--gray-100)', color: i === 0 ? '#fff' : 'var(--gray-600)' }}>
+                      #{i + 1}
+                    </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {
-                          (
-                            activity as unknown as {
-                              candidate?: { full_name: string };
-                            }
-                          ).candidate?.full_name || "Unknown"
-                        }
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {getStatusLabel(activity.action)}
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--navy)' }}>{c.full_name}</p>
+                      <p className="text-xs" style={{ color: 'var(--gray-400)' }}>
+                        {(c.job_categories || []).slice(0, 2).join(", ").replace(/_/g, " ") || "—"}
                       </p>
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDateTime(activity.created_at)}
+                    <ScoreBadge score={c.topScore} size="sm" />
+                  </Link>
+                ))}
+              </div>
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+          </div>
+        </div>
+
+        {/* Jobs Overview + Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Jobs Overview */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold" style={{ color: 'var(--navy)' }}>{l.job_overview}</h3>
+              <Link href="/jobs"><Button variant="ghost" size="sm" className="text-xs rounded-lg gap-1"><ArrowUpRight className="h-3 w-3" /></Button></Link>
+            </div>
+            {jobs.length > 0 ? (
+              <div className="space-y-3">
+                {jobs.slice(0, 5).map((job: any) => (
+                  <Link key={job.id} href={`/jobs/${job.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--navy)' }}>{job.title}</p>
+                      <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{job.department || ""} {job.location ? `• ${job.location}` : ""}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-medium" style={{ color: 'var(--gray-600)' }}>
+                        {job.candidate_count || 0} {l.candidates_label}
+                      </span>
+                      <StatusBadge status={job.status} />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+          </div>
+
+          {/* Recent Activity */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.activity}</h3>
+            {recentActivity.length > 0 ? (
+              <div className="space-y-2">
+                {recentActivity.map((activity: any) => (
+                  <div key={activity.id} className="flex items-start gap-3 p-2 rounded-lg">
+                    <div className="mt-1 h-2 w-2 rounded-full shrink-0" style={{ background: 'var(--blue)' }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm" style={{ color: 'var(--navy)' }}>
+                        {(activity as any).candidate?.full_name || ""}
+                      </p>
+                      <p className="text-xs" style={{ color: 'var(--gray-400)' }}>
+                        {t(`candidates.status.${activity.action}`) || activity.action}
+                      </p>
+                    </div>
+                    <span className="text-xs whitespace-nowrap" style={{ color: 'var(--gray-400)' }}>
+                      {activity.created_at ? formatDateTime(activity.created_at) : ""}
                     </span>
                   </div>
                 ))}
-                {(!stats?.recent_activity ||
-                  stats.recent_activity.length === 0) && (
-                  <div className="flex items-center justify-center h-40">
-                    <p className="text-sm text-muted-foreground">
-                      {t("common.no_results")}
-                    </p>
-                  </div>
-                )}
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Active Jobs */}
-          <Card className="rounded-xl shadow-sm border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <div className="rounded-lg bg-purple-50 p-1.5">
-                  <Briefcase className="h-4 w-4 text-purple-600" />
-                </div>
-                {t("dashboard.top_jobs")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {stats?.top_jobs && stats.top_jobs.length > 0 ? (
-                <div className="space-y-2">
-                  {stats.top_jobs.map((job) => (
-                    <Link
-                      key={job.id}
-                      href={`/jobs/${job.id}`}
-                      className="flex items-center justify-between rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition-colors group"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm group-hover:text-blue-600 transition-colors truncate">
-                          {job.title}
-                        </p>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
-                            {job.candidate_count} {t("jobs.candidates_count")}
-                          </span>
-                        </div>
-                      </div>
-                      {job.top_score != null && job.top_score > 0 && (
-                        <ScoreBadge score={job.top_score} size="sm" />
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-40">
-                  <p className="text-sm text-muted-foreground">
-                    {t("common.no_results")}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+          </div>
         </div>
       </div>
     </div>
