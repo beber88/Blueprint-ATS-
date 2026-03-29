@@ -314,7 +314,7 @@ export default function CandidatesPage() {
                     }} />
                   </th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.candidate")}</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.job")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("common.professional_classification")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.status")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.ai_score")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.experience")}</th>
@@ -323,9 +323,11 @@ export default function CandidatesPage() {
               </thead>
               <tbody>
                 {candidates.map((candidate) => {
-                  const topScore = getTopScore(candidate as Candidate & { applications?: { ai_score: number | null }[] });
-                  const jobApp = (candidate as Candidate & { applications?: { job?: { title: string } }[] }).applications?.[0];
-                  const jobTitle = jobApp?.job?.title;
+                  const cand = candidate as Candidate & { applications?: { ai_score: number | null }[]; ai_analysis?: { total_score?: number; verdict?: { score?: number } } };
+                  const topScore = getTopScore(cand);
+                  const analysisScore = cand.ai_analysis?.total_score || cand.ai_analysis?.verdict?.score || null;
+                  const displayScore = topScore ?? analysisScore;
+                  const candCategories = (cand as unknown as { job_categories?: string[] }).job_categories || [];
                   return (
                     <tr key={candidate.id} className="hover:bg-slate-50/50 transition-colors" style={{ borderBottom: '1px solid var(--gray-100)' }}>
                       <td className="px-4 py-3">
@@ -350,15 +352,22 @@ export default function CandidatesPage() {
                         </Link>
                       </td>
                       <td className="px-4 py-3">
-                        {jobTitle ? (
-                          <span className="text-xs font-medium px-2.5 py-1 rounded-md" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>{jobTitle}</span>
+                        {candCategories.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {candCategories.slice(0, 2).map((catKey: string) => {
+                              const cat = categories.find(c => c.key === catKey);
+                              const name = cat ? (locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en) : catKey;
+                              return <span key={catKey} className="text-xs font-medium px-2 py-0.5 rounded-md" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>{name}</span>;
+                            })}
+                            {candCategories.length > 2 && <span className="text-xs" style={{ color: 'var(--gray-400)' }}>+{candCategories.length - 2}</span>}
+                          </div>
                         ) : (
-                          <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{t("candidates.not_assigned")}</span>
+                          <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{t("common.not_classified")}</span>
                         )}
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={candidate.status} /></td>
                       <td className="px-4 py-3">
-                        {topScore !== null ? <ScoreBadge score={topScore} size="sm" /> : <span className="text-xs" style={{ color: 'var(--gray-400)' }}>--</span>}
+                        {displayScore !== null && displayScore !== undefined ? <ScoreBadge score={displayScore} size="sm" /> : <span className="text-xs" style={{ color: 'var(--gray-400)' }}>--</span>}
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-sm" style={{ color: 'var(--gray-600)' }}>
