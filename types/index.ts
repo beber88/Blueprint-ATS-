@@ -32,6 +32,14 @@ export interface Candidate {
   status: CandidateStatus;
   created_at: string;
   updated_at: string;
+  job_categories?: string[];
+  custom_category?: string | null;
+  classification_confidence?: number;
+  suggested_job?: string;
+  ai_analysis?: Record<string, unknown>;
+  contact_status?: string;
+  job_id?: string;
+  documents?: { name: string; url: string; type: string; uploaded_at: string }[];
 }
 
 export type CandidateStatus =

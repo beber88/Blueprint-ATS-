@@ -9,7 +9,8 @@
     "settings": "Settings",
     "ai_agent": "AI Assistant",
     "categories": "Professions",
-    "users": "Users"
+    "users": "Users",
+    "guide": "Guide"
   },
   "dashboard": {
     "title": "Dashboard",

@@ -209,6 +209,29 @@ Return ONLY valid JSON with this exact structure:
 CV Text:
 ${truncated}
 
+PROFESSION-SPECIFIC EVALUATION:
+If the candidate is in construction/engineering:
+- Weight heavily: relevant certifications, safety training, project management experience, site experience
+- Check for: professional engineering license, safety certifications (OSHA, etc.), software proficiency (AutoCAD, Revit, etc.)
+
+If the candidate is in architecture:
+- Weight heavily: architectural license, design portfolio, software skills (AutoCAD, Revit, SketchUp, 3ds Max)
+- Check for: registered architect status, competition wins, notable projects
+
+If the candidate is in finance/accounting:
+- Weight heavily: CPA/accounting certifications, ERP experience, financial analysis skills
+- Check for: audit experience, regulatory knowledge, budgeting expertise
+
+If the candidate is in HR:
+- Weight heavily: HR certifications, recruitment experience, labor law knowledge
+- Check for: ATS experience, employee relations, training & development
+
+If the candidate is in construction labor:
+- Weight heavily: physical fitness, safety training, specific trade skills
+- Check for: trade certifications, years of hands-on experience, equipment operation
+
+Adjust scoring criteria based on the specific profession. Be strict for senior roles, lenient for entry-level.
+
 Important: Base analysis strictly on CV content. Flag missing info as "Not mentioned". Be direct and honest about weaknesses.`;
 
   const message = await anthropic.messages.create({

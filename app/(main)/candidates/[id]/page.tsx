@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +13,7 @@ import { PageLoading } from "@/components/shared/loading";
 import {
   Mail, Phone, MapPin, ExternalLink, FileText, Briefcase, GraduationCap,
   Calendar, MessageSquare, ArrowRight, Save, Clock, User, Award,
-  Send, Video, PhoneCall, Building2, Hash, CheckCircle, XCircle, Brain,
+  Send, Video, PhoneCall, Building2, Hash, CheckCircle, XCircle, Brain, Upload,
 } from "lucide-react";
 import Link from "next/link";
 import { Candidate, Application, Interview, MessageSent, ActivityLog } from "@/types";
@@ -75,10 +75,18 @@ function getSkillColor(skill: string) {
 export default function CandidateProfilePage() {
   const params = useParams();
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [candidate, setCandidate] = useState<CandidateDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState("");
+  const [editingCategories, setEditingCategories] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [allCategories, setAllCategories] = useState<{key: string; name_he: string; name_en: string; name_tl: string; parent_key: string | null}[]>([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/categories").then(r => r.json()).then(setAllCategories).catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch(`/api/candidates/${params.id}`)
@@ -86,6 +94,7 @@ export default function CandidateProfilePage() {
       .then((data) => {
         setCandidate(data);
         setNotes(data.notes || "");
+        setSelectedCategories(((data as unknown as Record<string, unknown>).job_categories as string[]) || []);
       })
       .catch(() => toast.error(t("common.error")))
       .finally(() => setLoading(false));
@@ -116,6 +125,36 @@ export default function CandidateProfilePage() {
     } catch {
       toast.error(t("common.error"));
     }
+  };
+
+  const saveCategories = async () => {
+    try {
+      await fetch(`/api/candidates/${params.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ job_categories: selectedCategories }),
+      });
+      setCandidate(prev => prev ? { ...prev, job_categories: selectedCategories } as CandidateDetail : null);
+      setEditingCategories(false);
+      toast.success(t("common.success"));
+    } catch { toast.error(t("common.error")); }
+  };
+
+  const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>, docType: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingDoc(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", docType);
+    try {
+      const res = await fetch(`/api/candidates/${params.id}/documents`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setCandidate(prev => prev ? { ...prev, documents: data.documents } as CandidateDetail : null);
+      toast.success(locale === "he" ? "המסמך הועלה" : "Document uploaded");
+    } catch { toast.error(t("common.error")); }
+    finally { setUploadingDoc(false); if (e.target) e.target.value = ""; }
   };
 
   if (loading) return <PageLoading />;
@@ -407,6 +446,104 @@ export default function CandidateProfilePage() {
                 </div>
               </div>
             )}
+
+            {/* Job Categories */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-semibold" style={{ color: 'var(--navy)' }}>
+                  {locale === "he" ? "סיווג מקצועי" : "Professional Classification"}
+                </h3>
+                <Button variant="outline" size="sm" className="rounded-lg text-xs" onClick={() => setEditingCategories(!editingCategories)}>
+                  {editingCategories ? t("common.cancel") : t("common.edit")}
+                </Button>
+              </div>
+              {editingCategories ? (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {allCategories.filter(c => !c.parent_key).map(cat => {
+                      const isSelected = selectedCategories.includes(cat.key);
+                      return (
+                        <button
+                          key={cat.key}
+                          onClick={() => setSelectedCategories(prev => isSelected ? prev.filter(k => k !== cat.key) : [...prev, cat.key])}
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                          style={{
+                            background: isSelected ? 'var(--blue)' : 'var(--gray-100)',
+                            color: isSelected ? '#fff' : 'var(--gray-600)',
+                          }}
+                        >
+                          {locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <Button onClick={saveCategories} size="sm" className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+                    {t("common.save")}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {(selectedCategories.length > 0 ? selectedCategories : (((candidate as unknown as Record<string, unknown>)?.job_categories as string[]) || [])).map((key: string) => {
+                    const cat = allCategories.find(c => c.key === key);
+                    return (
+                      <span key={key} className="px-3 py-1 rounded-lg text-xs font-medium" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
+                        {cat ? (locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en) : key}
+                      </span>
+                    );
+                  })}
+                  {selectedCategories.length === 0 && !(((candidate as unknown as Record<string, unknown>)?.job_categories as string[] | undefined)?.length) && (
+                    <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{locale === "he" ? "לא סווג עדיין" : "Not classified yet"}</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Documents */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-semibold" style={{ color: 'var(--navy)' }}>
+                  {locale === "he" ? "מסמכים" : "Documents"}
+                </h3>
+              </div>
+
+              {/* Upload buttons */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {[
+                  { type: "portfolio", label_he: "תיק עבודות", label_en: "Portfolio" },
+                  { type: "certification", label_he: "הסמכה", label_en: "Certification" },
+                  { type: "license", label_he: "רישיון", label_en: "License" },
+                  { type: "other", label_he: "מסמך אחר", label_en: "Other Document" },
+                ].map(dt => (
+                  <label key={dt.type} className="cursor-pointer">
+                    <input type="file" className="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={e => handleDocUpload(e, dt.type)} disabled={uploadingDoc} />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" style={{ borderColor: 'var(--gray-200)', color: 'var(--gray-600)' }}>
+                      <Upload className="h-3 w-3" />
+                      {locale === "he" ? dt.label_he : dt.label_en}
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              {/* Documents list */}
+              {(((candidate as unknown as Record<string, unknown>)?.documents as { name: string; url: string; type: string; uploaded_at: string }[]) || []).length > 0 ? (
+                <div className="space-y-2">
+                  {((candidate as unknown as Record<string, unknown>).documents as { name: string; url: string; type: string; uploaded_at: string }[]).map((doc, i) => (
+                    <a key={i} href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" style={{ background: 'var(--gray-50)' }}>
+                      <FileText className="h-5 w-5 shrink-0" style={{ color: 'var(--blue)' }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: 'var(--navy)' }}>{doc.name}</p>
+                        <p className="text-xs" style={{ color: 'var(--gray-400)' }}>
+                          {doc.type} • {new Date(doc.uploaded_at).toLocaleDateString(locale === "he" ? "he-IL" : "en-US")}
+                        </p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 shrink-0" style={{ color: 'var(--gray-400)' }} />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{locale === "he" ? "אין מסמכים נוספים" : "No additional documents"}</p>
+              )}
+            </div>
 
             {/* Notes Card */}
             <div className="bg-white rounded-xl shadow-sm p-6">
