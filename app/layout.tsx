@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { I18nProvider } from "@/lib/i18n/context";
+import { ThemeProvider } from "@/lib/theme/context";
+import { UserProvider } from "@/lib/auth/context";
 
 export const metadata: Metadata = {
   title: "Blueprint ATS",
@@ -14,12 +16,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl">
+    <html lang="he" dir="rtl" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('blueprint-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})();` }} />
+      </head>
       <body className="antialiased">
-        <I18nProvider>
-          {children}
-          <Toaster position="top-left" richColors closeButton />
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            <UserProvider>
+              {children}
+              <Toaster position="top-left" richColors closeButton />
+            </UserProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

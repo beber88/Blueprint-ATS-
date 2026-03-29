@@ -8,7 +8,8 @@
     "templates": "Templates",
     "settings": "Settings",
     "ai_agent": "AI Assistant",
-    "categories": "Professions"
+    "categories": "Professions",
+    "users": "Users"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -339,5 +340,10 @@
     "job_details": "Job Details",
     "job_not_found": "Job not found",
     "minutes": "min"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "system": "System"
   }
 }

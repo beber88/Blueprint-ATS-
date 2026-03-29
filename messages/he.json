@@ -8,7 +8,8 @@
     "templates": "תבניות",
     "settings": "הגדרות",
     "ai_agent": "עוזר AI",
-    "categories": "מקצועות"
+    "categories": "מקצועות",
+    "users": "משתמשים"
   },
   "dashboard": {
     "title": "דשבורד",
@@ -339,5 +340,10 @@
     "job_details": "פרטי משרה",
     "job_not_found": "משרה לא נמצאה",
     "minutes": "דקות"
+  },
+  "theme": {
+    "light": "מצב יום",
+    "dark": "מצב לילה",
+    "system": "אוטומטי"
   }
 }

@@ -8,7 +8,8 @@
     "templates": "Mga Template",
     "settings": "Mga Setting",
     "ai_agent": "AI Assistant",
-    "categories": "Mga Propesyon"
+    "categories": "Mga Propesyon",
+    "users": "Mga User"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -339,5 +340,10 @@
     "job_details": "Mga Detalye ng Trabaho",
     "job_not_found": "Hindi nahanap ang trabaho",
     "minutes": "min"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "system": "System"
   }
 }
