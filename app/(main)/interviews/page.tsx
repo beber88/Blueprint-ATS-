@@ -135,7 +135,7 @@ export default function InterviewsPage() {
                   <Calendar className="h-7 w-7 text-gray-300" />
                 </div>
                 <p className="text-gray-500 font-medium">{t("common.no_results")}</p>
-                <p className="text-sm text-gray-400 mt-1">קבעו ראיון חדש כדי להתחיל</p>
+                <p className="text-sm text-gray-400 mt-1">{t("interviews.schedule_first_hint")}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -165,20 +165,20 @@ export default function InterviewsPage() {
                             href={`/candidates/${app?.candidate?.id}`}
                             className="font-semibold text-gray-900 hover:text-blue-600 transition-colors truncate"
                           >
-                            {app?.candidate?.full_name || "לא ידוע"}
+                            {app?.candidate?.full_name || t("common.unknown")}
                           </Link>
                           <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-lg font-medium">
                             <TypeIcon className="h-3 w-3" />
                             {typeLabels[interview.type] || interview.type}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 truncate">{app?.job?.title || "משרה לא ידועה"}</p>
+                        <p className="text-sm text-gray-500 truncate">{app?.job?.title || t("common.unknown")}</p>
                         <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-400">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {scheduledDate ? formatDateTime(interview.scheduled_at!) : "TBD"}
                           </span>
-                          <span>{interview.duration_minutes} דקות</span>
+                          <span>{interview.duration_minutes} {t("common.minutes")}</span>
                           {interview.interviewer && (
                             <span className="flex items-center gap-1">
                               <User className="h-3 w-3" />
@@ -200,7 +200,7 @@ export default function InterviewsPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-5 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-900">{t("interviews.past")}</h2>
-              <p className="text-sm text-gray-500">{past.length} ראיונות שהתקיימו</p>
+              <p className="text-sm text-gray-500">{past.length} {t("interviews.past_count")}</p>
             </div>
             <div className="divide-y divide-gray-50">
               {past.map((interview) => {
@@ -215,7 +215,7 @@ export default function InterviewsPage() {
                         href={`/candidates/${app?.candidate?.id}`}
                         className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
                       >
-                        {app?.candidate?.full_name || "לא ידוע"}
+                        {app?.candidate?.full_name || t("common.unknown")}
                       </Link>
                       <p className="text-sm text-gray-500 mt-0.5">
                         {app?.job?.title} &middot; {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : ""}
@@ -333,7 +333,7 @@ export default function InterviewsPage() {
                     value={form.interviewer}
                     onChange={(e) => setForm({ ...form, interviewer: e.target.value })}
                     className="rounded-xl border-gray-200"
-                    placeholder="שם המראיין/ת"
+                    placeholder={t("interviews.placeholder_interviewer")}
                   />
                 </div>
               </div>

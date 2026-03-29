@@ -19,7 +19,7 @@ const getEmploymentTypeLabels = (t: (key: string) => string): Record<string, str
   "full-time": t("jobs.form.full_time"),
   "part-time": t("jobs.form.part_time"),
   contract: t("jobs.form.project"),
-  internship: "התמחות",
+  internship: t("jobs.form.internship"),
 });
 
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -91,7 +91,7 @@ export default function JobsPage() {
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("jobs.title")}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{jobs.length} משרות במערכת</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{jobs.length} {t("jobs.jobs_in_system")}</p>
           </div>
           <Button
             onClick={() => setCreateOpen(true)}
@@ -147,8 +147,8 @@ export default function JobsPage() {
               </h3>
               <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--gray-400)' }}>
                 {statusFilter !== "all"
-                  ? "נסו לסנן לפי סטטוס אחר"
-                  : "צרו את המשרה הראשונה שלכם כדי להתחיל"}
+                  ? t("common.no_results")
+                  : t("jobs.no_jobs")}
               </p>
               {statusFilter === "all" && (
                 <Button
@@ -157,7 +157,7 @@ export default function JobsPage() {
                   style={{ background: 'var(--blue)' }}
                 >
                   <Plus className="ml-2 h-4 w-4" />
-                  צור משרה ראשונה
+                  {t("jobs.new_job")}
                 </Button>
               )}
             </div>
@@ -298,7 +298,7 @@ export default function JobsPage() {
                   <Input
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    placeholder="למשל מפתח בכיר"
+                    placeholder={t("jobs.placeholder_title")}
                     className="rounded-lg"
                   />
                 </div>
@@ -307,7 +307,7 @@ export default function JobsPage() {
                   <Input
                     value={form.department}
                     onChange={(e) => setForm({ ...form, department: e.target.value })}
-                    placeholder="למשל הנדסה"
+                    placeholder={t("jobs.placeholder_department")}
                     className="rounded-lg"
                   />
                 </div>
@@ -318,7 +318,7 @@ export default function JobsPage() {
                   <Input
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    placeholder="למשל תל אביב"
+                    placeholder={t("jobs.placeholder_location")}
                     className="rounded-lg"
                   />
                 </div>
@@ -332,7 +332,7 @@ export default function JobsPage() {
                       <SelectItem value="full-time">{t("jobs.form.full_time")}</SelectItem>
                       <SelectItem value="part-time">{t("jobs.form.part_time")}</SelectItem>
                       <SelectItem value="contract">{t("jobs.form.project")}</SelectItem>
-                      <SelectItem value="internship">התמחות</SelectItem>
+                      <SelectItem value="internship">{t("jobs.form.internship")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

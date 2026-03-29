@@ -137,7 +137,11 @@
     "error_loading": "שגיאה בטעינת משרות",
     "error_title_required": "שם משרה הוא שדה חובה",
     "created_success": "המשרה נוצרה!",
-    "error_creating": "שגיאה ביצירת משרה"
+    "error_creating": "שגיאה ביצירת משרה",
+    "jobs_in_system": "משרות במערכת",
+    "placeholder_title": "למשל מפתח בכיר",
+    "placeholder_department": "למשל הנדסה",
+    "placeholder_location": "למשל תל אביב"
   },
   "interviews": {
     "title": "ראיונות",
@@ -179,7 +183,11 @@
     "created_success": "הראיון נקבע!",
     "error_creating": "שגיאה בקביעת ראיון",
     "updated_success": "הראיון עודכן",
-    "error_updating": "שגיאה בעדכון ראיון"
+    "error_updating": "שגיאה בעדכון ראיון",
+    "schedule_first_hint": "קבעו ראיון חדש כדי להתחיל",
+    "minutes_label": "דקות",
+    "past_count": "ראיונות שהתקיימו",
+    "placeholder_interviewer": "שם המראיין/ת"
   },
   "messages": {
     "title": "הודעות",
@@ -207,7 +215,24 @@
     "sending": "שולח...",
     "cancel": "ביטול",
     "sent_success": "ההודעה נשלחה!",
-    "send_error": "השליחה נכשלה"
+    "send_error": "השליחה נכשלה",
+    "no_subject": "ללא נושא",
+    "subtitle": "ניהול ושליחת הודעות למועמדים",
+    "templates_count": "תבניות זמינות",
+    "no_templates_yet": "אין תבניות עדיין",
+    "add_templates_hint": "הוסיפו תבניות בהגדרות",
+    "sent_section_title": "הודעות שנשלחו",
+    "messages_count": "הודעות",
+    "no_sent_yet": "אין הודעות שנשלחו עדיין",
+    "send_first_hint": "שלחו הודעה ראשונה למועמד/ת",
+    "table_candidate": "מועמד",
+    "table_channel": "ערוץ",
+    "table_subject": "נושא",
+    "table_date": "תאריך",
+    "search_placeholder": "חיפוש מועמד...",
+    "channel_label": "ערוץ",
+    "template_optional": "תבנית (אופציונלי)",
+    "variables_label": "משתנים"
   },
   "templates": {
     "title": "תבניות הודעות",
@@ -235,7 +260,11 @@
       "general": "כללי"
     },
     "subtitle": "ניהול תבניות הודעות",
+    "count_label": "תבניות",
+    "no_templates_title": "אין תבניות",
     "no_templates_hint": "צרו תבנית ראשונה",
+    "placeholder_body": "השתמשו ב-{{שם_מועמד}}, {{תפקיד}}, {{תאריך}}",
+    "placeholder_variables": "שם_מועמד, תפקיד, תאריך",
     "categories": {
       "general": "כללי",
       "interview_invite": "זימון ראיון",
@@ -279,6 +308,35 @@
     "clear_filters": "נקה פילטרים",
     "no_results": "לא נמצאו תוצאות",
     "passed": "עבר",
-    "failed": "נכשל"
+    "failed": "נכשל",
+    "table": "טבלה",
+    "charts": "גרפים",
+    "compare": "השוואה",
+    "cancel_compare": "ביטול השוואה",
+    "not_available": "לא זמין",
+    "unknown": "לא זמין",
+    "not_scored": "לא דורג",
+    "scoring_progress": "מדרג",
+    "scored_candidates": "דורגו מועמדים",
+    "scored_success": "בהצלחה",
+    "scoring_failed": "נכשלו",
+    "not_found": "לא נמצא",
+    "applications": "מועמדויות",
+    "no_applications_yet": "טרם הוגשו מועמדויות",
+    "applications_will_appear": "מועמדים שיגישו מועמדות יופיעו כאן",
+    "application_date": "תאריך הגשה",
+    "score_distribution": "התפלגות ציונים",
+    "vs_ai_score": "מול ציון AI",
+    "status_breakdown": "פילוח לפי סטטוס",
+    "top_comparison_radar": "השוואת מובילים (Radar)",
+    "no_scored_for_compare": "אין מועמדים מדורגים להשוואה",
+    "no_scored_yet": "אין מועמדים מדורגים עדיין",
+    "run_ai_to_see_top": "הפעילו דירוג AI כדי לראות את המובילים",
+    "candidate_comparison": "השוואת מועמדים",
+    "selected": "נבחרו",
+    "ai_reasoning": "נימוק AI",
+    "job_details": "פרטי משרה",
+    "job_not_found": "משרה לא נמצאה",
+    "minutes": "דקות"
   }
 }

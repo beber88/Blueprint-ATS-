@@ -29,7 +29,7 @@ export default function TemplatesPage() {
 
   const handleCreate = async () => {
     if (!form.name || !form.body) {
-      toast.error("שם ותוכן הם שדות חובה");
+      toast.error(t("common.error"));
       return;
     }
     try {
@@ -42,13 +42,13 @@ export default function TemplatesPage() {
         }),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success("התבנית נוצרה!");
+      toast.success(t("common.success"));
       setCreateOpen(false);
       setForm({ name: "", type: "email", category: "general", subject: "", body: "", variables: "" });
       const updated = await fetch("/api/templates").then(r => r.json());
       setTemplates(updated);
     } catch {
-      toast.error("שגיאה ביצירת תבנית");
+      toast.error(t("common.error"));
     }
   };
 
@@ -68,7 +68,7 @@ export default function TemplatesPage() {
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("templates.title")}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{templates.length} תבניות</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{templates.length} {t("templates.count_label")}</p>
           </div>
           <Button onClick={() => setCreateOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
             <Plus className="ml-2 h-4 w-4" /> {t("templates.new_template")}
@@ -95,8 +95,8 @@ export default function TemplatesPage() {
         {filtered.length === 0 ? (
           <div className="bg-white rounded-xl p-16 text-center" style={{ boxShadow: 'var(--shadow-sm)' }}>
             <FileText className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--gray-300)' }} />
-            <p className="font-semibold text-lg" style={{ color: 'var(--navy)' }}>אין תבניות</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>צרו תבנית ראשונה</p>
+            <p className="font-semibold text-lg" style={{ color: 'var(--navy)' }}>{t("templates.no_templates_title")}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{t("templates.no_templates_hint")}</p>
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -166,11 +166,11 @@ export default function TemplatesPage() {
             )}
             <div className="space-y-2">
               <Label className="text-sm font-medium">{t("templates.form.body")} *</Label>
-              <Textarea value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} rows={6} className="rounded-lg" placeholder="השתמשו ב-{{שם_מועמד}}, {{תפקיד}}, {{תאריך}}" />
+              <Textarea value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} rows={6} className="rounded-lg" placeholder={t("templates.placeholder_body")} />
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium">{t("templates.variables_hint")}</Label>
-              <Input value={form.variables} onChange={e => setForm({ ...form, variables: e.target.value })} className="rounded-lg" placeholder="שם_מועמד, תפקיד, תאריך" />
+              <Input value={form.variables} onChange={e => setForm({ ...form, variables: e.target.value })} className="rounded-lg" placeholder={t("templates.placeholder_variables")} />
             </div>
           </div>
           <DialogFooter className="gap-2">

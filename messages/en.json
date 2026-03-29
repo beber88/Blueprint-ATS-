@@ -137,7 +137,11 @@
     "error_loading": "Error loading jobs",
     "error_title_required": "Job title is required",
     "created_success": "Job created!",
-    "error_creating": "Error creating job"
+    "error_creating": "Error creating job",
+    "jobs_in_system": "jobs in system",
+    "placeholder_title": "e.g. Senior Developer",
+    "placeholder_department": "e.g. Engineering",
+    "placeholder_location": "e.g. Tel Aviv"
   },
   "interviews": {
     "title": "Interviews",
@@ -179,7 +183,11 @@
     "created_success": "Interview scheduled!",
     "error_creating": "Error scheduling interview",
     "updated_success": "Interview updated",
-    "error_updating": "Error updating interview"
+    "error_updating": "Error updating interview",
+    "schedule_first_hint": "Schedule a new interview to get started",
+    "minutes_label": "minutes",
+    "past_count": "interviews completed",
+    "placeholder_interviewer": "Interviewer name"
   },
   "messages": {
     "title": "Messages",
@@ -207,7 +215,24 @@
     "sending": "Sending...",
     "cancel": "Cancel",
     "sent_success": "Message sent!",
-    "send_error": "Failed to send message"
+    "send_error": "Failed to send message",
+    "no_subject": "No subject",
+    "subtitle": "Manage and send messages to candidates",
+    "templates_count": "templates available",
+    "no_templates_yet": "No templates yet",
+    "add_templates_hint": "Add templates in settings",
+    "sent_section_title": "Sent Messages",
+    "messages_count": "messages",
+    "no_sent_yet": "No messages sent yet",
+    "send_first_hint": "Send your first message to a candidate",
+    "table_candidate": "Candidate",
+    "table_channel": "Channel",
+    "table_subject": "Subject",
+    "table_date": "Date",
+    "search_placeholder": "Search candidate...",
+    "channel_label": "Channel",
+    "template_optional": "Template (optional)",
+    "variables_label": "Variables"
   },
   "templates": {
     "title": "Message Templates",
@@ -235,7 +260,11 @@
       "general": "General"
     },
     "subtitle": "Manage message templates",
+    "count_label": "templates",
+    "no_templates_title": "No templates",
     "no_templates_hint": "Create your first template",
+    "placeholder_body": "Use {{candidate_name}}, {{role}}, {{date}}",
+    "placeholder_variables": "candidate_name, role, date",
     "categories": {
       "general": "General",
       "interview_invite": "Interview Invite",
@@ -279,6 +308,35 @@
     "clear_filters": "Clear Filters",
     "no_results": "No results found",
     "passed": "Passed",
-    "failed": "Failed"
+    "failed": "Failed",
+    "table": "Table",
+    "charts": "Charts",
+    "compare": "Compare",
+    "cancel_compare": "Cancel Compare",
+    "not_available": "N/A",
+    "unknown": "N/A",
+    "not_scored": "Not scored",
+    "scoring_progress": "Scoring",
+    "scored_candidates": "candidates scored",
+    "scored_success": "successfully",
+    "scoring_failed": "failed",
+    "not_found": "Not found",
+    "applications": "applications",
+    "no_applications_yet": "No applications yet",
+    "applications_will_appear": "Candidates who apply will appear here",
+    "application_date": "Application Date",
+    "score_distribution": "Score Distribution",
+    "vs_ai_score": "vs AI Score",
+    "status_breakdown": "Breakdown by Status",
+    "top_comparison_radar": "Top Comparison (Radar)",
+    "no_scored_for_compare": "No scored candidates for comparison",
+    "no_scored_yet": "No scored candidates yet",
+    "run_ai_to_see_top": "Run AI scoring to see top candidates",
+    "candidate_comparison": "Candidate Comparison",
+    "selected": "selected",
+    "ai_reasoning": "AI Reasoning",
+    "job_details": "Job Details",
+    "job_not_found": "Job not found",
+    "minutes": "min"
   }
 }

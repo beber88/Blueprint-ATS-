@@ -137,7 +137,11 @@
     "error_loading": "Error sa pag-load ng mga trabaho",
     "error_title_required": "Kinakailangan ang pamagat ng trabaho",
     "created_success": "Nagawa ang trabaho!",
-    "error_creating": "Error sa paggawa ng trabaho"
+    "error_creating": "Error sa paggawa ng trabaho",
+    "jobs_in_system": "mga trabaho sa sistema",
+    "placeholder_title": "hal. Senior Developer",
+    "placeholder_department": "hal. Engineering",
+    "placeholder_location": "hal. Tel Aviv"
   },
   "interviews": {
     "title": "Mga Panayam",
@@ -179,7 +183,11 @@
     "created_success": "Naiskedyul ang panayam!",
     "error_creating": "Error sa pag-iskedyul ng panayam",
     "updated_success": "Na-update ang panayam",
-    "error_updating": "Error sa pag-update ng panayam"
+    "error_updating": "Error sa pag-update ng panayam",
+    "schedule_first_hint": "Mag-iskedyul ng bagong panayam para magsimula",
+    "minutes_label": "minuto",
+    "past_count": "mga natapos na panayam",
+    "placeholder_interviewer": "Pangalan ng tagapanayam"
   },
   "messages": {
     "title": "Mga Mensahe",
@@ -207,7 +215,24 @@
     "sending": "Ipinapadala...",
     "cancel": "Kanselahin",
     "sent_success": "Naipadala ang mensahe!",
-    "send_error": "Nabigong ipadala ang mensahe"
+    "send_error": "Nabigong ipadala ang mensahe",
+    "no_subject": "Walang paksa",
+    "subtitle": "Pamahalaan at magpadala ng mga mensahe sa mga kandidato",
+    "templates_count": "mga available na template",
+    "no_templates_yet": "Wala pang template",
+    "add_templates_hint": "Magdagdag ng mga template sa settings",
+    "sent_section_title": "Mga Naipadala na Mensahe",
+    "messages_count": "mga mensahe",
+    "no_sent_yet": "Wala pang naipadala na mensahe",
+    "send_first_hint": "Magpadala ng unang mensahe sa isang kandidato",
+    "table_candidate": "Kandidato",
+    "table_channel": "Channel",
+    "table_subject": "Paksa",
+    "table_date": "Petsa",
+    "search_placeholder": "Maghanap ng kandidato...",
+    "channel_label": "Channel",
+    "template_optional": "Template (opsyonal)",
+    "variables_label": "Mga Variable"
   },
   "templates": {
     "title": "Mga Template ng Mensahe",
@@ -235,7 +260,11 @@
       "general": "Pangkalahatan"
     },
     "subtitle": "Pamahalaan ang mga template ng mensahe",
+    "count_label": "mga template",
+    "no_templates_title": "Walang template",
     "no_templates_hint": "Gumawa ng unang template",
+    "placeholder_body": "Gamitin ang {{candidate_name}}, {{role}}, {{date}}",
+    "placeholder_variables": "candidate_name, role, date",
     "categories": {
       "general": "Pangkalahatan",
       "interview_invite": "Imbitasyon sa Panayam",
@@ -279,6 +308,35 @@
     "clear_filters": "I-clear ang Mga Filter",
     "no_results": "Walang nahanap na resulta",
     "passed": "Pumasa",
-    "failed": "Nabigo"
+    "failed": "Nabigo",
+    "table": "Talahanayan",
+    "charts": "Mga Tsart",
+    "compare": "Ihambing",
+    "cancel_compare": "Kanselahin ang Paghahambing",
+    "not_available": "Hindi available",
+    "unknown": "Hindi available",
+    "not_scored": "Hindi na-score",
+    "scoring_progress": "Nag-i-score",
+    "scored_candidates": "mga kandidatong na-score",
+    "scored_success": "matagumpay",
+    "scoring_failed": "nabigo",
+    "not_found": "Hindi nahanap",
+    "applications": "mga aplikasyon",
+    "no_applications_yet": "Wala pang mga aplikasyon",
+    "applications_will_appear": "Ang mga kandidatong mag-apply ay lalabas dito",
+    "application_date": "Petsa ng Aplikasyon",
+    "score_distribution": "Distribusyon ng Score",
+    "vs_ai_score": "kumpara sa AI Score",
+    "status_breakdown": "Breakdown ayon sa Status",
+    "top_comparison_radar": "Nangungunang Paghahambing (Radar)",
+    "no_scored_for_compare": "Walang na-score na kandidato para sa paghahambing",
+    "no_scored_yet": "Wala pang na-score na kandidato",
+    "run_ai_to_see_top": "Patakbuhin ang AI scoring para makita ang mga nangungunang kandidato",
+    "candidate_comparison": "Paghahambing ng Kandidato",
+    "selected": "napili",
+    "ai_reasoning": "AI Reasoning",
+    "job_details": "Mga Detalye ng Trabaho",
+    "job_not_found": "Hindi nahanap ang trabaho",
+    "minutes": "min"
   }
 }

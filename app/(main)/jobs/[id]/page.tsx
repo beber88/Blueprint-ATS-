@@ -66,7 +66,7 @@ export default function JobDetailPage() {
     fetch(`/api/jobs/${params.id}`)
       .then((res) => res.json())
       .then(setJob)
-      .catch(() => toast.error("שגיאה בטעינת משרה"))
+      .catch(() => toast.error(t("common.error")))
       .finally(() => setLoading(false));
   }, [params.id]);
 
@@ -78,9 +78,9 @@ export default function JobDetailPage() {
         body: JSON.stringify({ status }),
       });
       setJob((prev) => prev ? { ...prev, status: status as Job["status"] } : null);
-      toast.success("סטטוס המשרה עודכן");
+      toast.success(t("common.success"));
     } catch {
-      toast.error("שגיאה בעדכון משרה");
+      toast.error(t("common.error"));
     }
   };
 
@@ -90,7 +90,7 @@ export default function JobDetailPage() {
     const unscored = job.applications.filter((a) => a.ai_score === null);
 
     if (unscored.length === 0) {
-      toast.info("כל המועמדים כבר דורגו");
+      toast.info(t("common.no_results"));
       setScoring(false);
       return;
     }
@@ -114,13 +114,13 @@ export default function JobDetailPage() {
       } catch {
         failed++;
       }
-      toast.info(`מדרג: ${scored + failed}/${unscored.length}`, { id: "scoring-progress" });
+      toast.info(`${t("common.scoring_progress")}: ${scored + failed}/${unscored.length}`, { id: "scoring-progress" });
     }
 
     if (failed > 0) {
-      toast.warning(`דורגו ${scored} מועמדים, ${failed} נכשלו`);
+      toast.warning(`${t("common.scored_candidates")}: ${scored}, ${t("common.scoring_failed")}: ${failed}`);
     } else {
-      toast.success(`דורגו ${scored} מועמדים בהצלחה`);
+      toast.success(`${scored} ${t("common.scored_candidates")} ${t("common.scored_success")}`);
     }
     setScoring(false);
     const res = await fetch(`/api/jobs/${params.id}`);
@@ -183,7 +183,7 @@ export default function JobDetailPage() {
   );
 
   if (loading) return <PageLoading />;
-  if (!job) return <div className="p-6 text-center text-gray-500">משרה לא נמצאה</div>;
+  if (!job) return <div className="p-6 text-center text-gray-500">{t("common.job_not_found")}</div>;
 
   const employmentTypeLabels: Record<string, string> = {
     "full-time": t("jobs.form.full_time"),
@@ -193,9 +193,9 @@ export default function JobDetailPage() {
   };
 
   const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-    { key: "table", label: "טבלה", icon: <Table className="h-4 w-4" /> },
-    { key: "charts", label: "גרפים", icon: <BarChart3 className="h-4 w-4" /> },
-    { key: "top", label: "TOP מועמדים", icon: <Trophy className="h-4 w-4" /> },
+    { key: "table", label: t("common.table"), icon: <Table className="h-4 w-4" /> },
+    { key: "charts", label: t("common.charts"), icon: <BarChart3 className="h-4 w-4" /> },
+    { key: "top", label: "TOP " + t("nav.candidates"), icon: <Trophy className="h-4 w-4" /> },
   ];
 
   const statusColors: Record<string, string> = {
@@ -214,7 +214,7 @@ export default function JobDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
-      <Header title={job.title} subtitle={job.department || "פרטי משרה"} />
+      <Header title={job.title} subtitle={job.department || t("common.job_details")} />
 
       <div className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
         {/* Top Bar */}
@@ -244,7 +244,7 @@ export default function JobDetailPage() {
               className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-sm gap-2 px-5"
             >
               <Zap className="h-4 w-4" />
-              {scoring ? "מדרג..." : "דירוג AI"}
+              {scoring ? t("common.loading") : t("profile.run_ai_analysis")}
             </Button>
           </div>
         </div>
@@ -311,7 +311,7 @@ export default function JobDetailPage() {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-gray-900">{t("candidates.title")}</h2>
-                <p className="text-sm text-gray-500">{candidates.length} מועמדויות</p>
+                <p className="text-sm text-gray-500">{candidates.length} {t("common.applications")}</p>
               </div>
             </div>
             {activeTab === "table" && (
@@ -325,7 +325,7 @@ export default function JobDetailPage() {
                 className={`rounded-xl gap-2 transition-colors ${compareMode ? "bg-blue-500 hover:bg-blue-600 text-white" : "border-gray-200"}`}
               >
                 <GitCompare className="h-4 w-4" />
-                {compareMode ? "ביטול השוואה" : "השוואה"}
+                {compareMode ? t("common.cancel_compare") : t("common.compare")}
               </Button>
             )}
           </div>
@@ -354,8 +354,8 @@ export default function JobDetailPage() {
               <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Users className="h-7 w-7 text-gray-300" />
               </div>
-              <p className="text-gray-500 font-medium">טרם הוגשו מועמדויות</p>
-              <p className="text-sm text-gray-400 mt-1">מועמדים שיגישו מועמדות יופיעו כאן</p>
+              <p className="text-gray-500 font-medium">{t("common.no_applications_yet")}</p>
+              <p className="text-sm text-gray-400 mt-1">{t("common.applications_will_appear")}</p>
             </div>
           ) : (
             <>
@@ -370,7 +370,7 @@ export default function JobDetailPage() {
                         <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("candidates.table.ai_score")}</th>
                         <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("candidates.table.status")}</th>
                         <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("candidates.table.experience")}</th>
-                        <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">תאריך הגשה</th>
+                        <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("common.application_date")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -408,7 +408,7 @@ export default function JobDetailPage() {
                             {app.ai_score !== null ? (
                               <ScoreBadge score={app.ai_score} size="sm" />
                             ) : (
-                              <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg">לא דורג</span>
+                              <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg">{t("common.not_scored")}</span>
                             )}
                           </td>
                           <td className="py-3.5 px-5">
@@ -434,7 +434,7 @@ export default function JobDetailPage() {
                 <div className="p-6 space-y-8">
                   {/* Chart 1: Score Distribution */}
                   <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4">התפלגות ציונים</h3>
+                    <h3 className="text-sm font-semibold text-gray-800 mb-4">{t("common.score_distribution")}</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart
                         data={candidates.map((app) => ({
@@ -467,7 +467,7 @@ export default function JobDetailPage() {
                   {/* Chart 2: Experience vs Score Scatter */}
                   <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
                     <h3 className="text-sm font-semibold text-gray-800 mb-4">
-                      {t("candidates.table.experience")} מול ציון AI
+                      {t("candidates.table.experience")} {t("common.vs_ai_score")}
                     </h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <ScatterChart>
@@ -489,7 +489,7 @@ export default function JobDetailPage() {
 
                   {/* Chart 3: Pipeline Status */}
                   <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4">פילוח לפי סטטוס</h3>
+                    <h3 className="text-sm font-semibold text-gray-800 mb-4">{t("common.status_breakdown")}</h3>
                     <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={statusData} layout="vertical">
                         <XAxis type="number" />
@@ -506,7 +506,7 @@ export default function JobDetailPage() {
 
                   {/* Chart 4: Radar Comparison of Top Candidates */}
                   <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4">השוואת מובילים (Radar)</h3>
+                    <h3 className="text-sm font-semibold text-gray-800 mb-4">{t("common.top_comparison_radar")}</h3>
                     {radarData.length > 0 ? (
                       <ResponsiveContainer width="100%" height={350}>
                         <RadarChart data={radarData}>
@@ -529,7 +529,7 @@ export default function JobDetailPage() {
                       </ResponsiveContainer>
                     ) : (
                       <div className="text-center py-10 text-sm text-gray-400">
-                        אין מועמדים מדורגים להשוואה
+                        {t("common.no_scored_for_compare")}
                       </div>
                     )}
                   </div>
@@ -542,8 +542,8 @@ export default function JobDetailPage() {
                   {topCandidates.length === 0 ? (
                     <div className="text-center py-12">
                       <Trophy className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 font-medium">אין מועמדים מדורגים עדיין</p>
-                      <p className="text-sm text-gray-400 mt-1">הפעילו דירוג AI כדי לראות את המובילים</p>
+                      <p className="text-gray-500 font-medium">{t("common.no_scored_yet")}</p>
+                      <p className="text-sm text-gray-400 mt-1">{t("common.run_ai_to_see_top")}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -628,8 +628,8 @@ export default function JobDetailPage() {
             <div className="p-5 border-b border-gray-100 bg-gray-50/50">
               <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <GitCompare className="h-5 w-5 text-blue-500" />
-                השוואת מועמדים
-                <span className="text-sm font-normal text-gray-500">({selectedCandidates.size} נבחרו)</span>
+                {t("common.candidate_comparison")}
+                <span className="text-sm font-normal text-gray-500">({selectedCandidates.size} {t("common.selected")})</span>
               </h2>
             </div>
             <div className="p-5">
@@ -654,19 +654,19 @@ export default function JobDetailPage() {
                         {app.ai_score !== null ? (
                           <ScoreBadge score={app.ai_score} size="sm" />
                         ) : (
-                          <span className="text-sm text-gray-400">לא דורג</span>
+                          <span className="text-sm text-gray-400">{t("common.not_scored")}</span>
                         )}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">נימוק AI</p>
-                        <p className="text-sm text-gray-700 leading-relaxed">{app.ai_reasoning || "לא זמין"}</p>
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("common.ai_reasoning")}</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{app.ai_reasoning || t("common.not_available")}</p>
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("candidates.table.experience")}</p>
                         <p className="text-sm text-gray-700">
                           {app.candidate?.experience_years != null
                             ? `${app.candidate.experience_years} ${t("candidates.years")}`
-                            : "לא זמין"}
+                            : t("common.not_available")}
                         </p>
                       </div>
                       <div>
@@ -679,13 +679,13 @@ export default function JobDetailPage() {
                               </Badge>
                             ))
                           ) : (
-                            <span className="text-sm text-gray-400">לא זמין</span>
+                            <span className="text-sm text-gray-400">{t("common.not_available")}</span>
                           )}
                         </div>
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("profile.education")}</p>
-                        <p className="text-sm text-gray-700">{app.candidate?.education || "לא זמין"}</p>
+                        <p className="text-sm text-gray-700">{app.candidate?.education || t("common.not_available")}</p>
                       </div>
                     </div>
                   ))}

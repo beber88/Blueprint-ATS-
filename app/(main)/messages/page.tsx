@@ -128,7 +128,7 @@ export default function MessagesPage() {
           id: Date.now().toString(),
           candidateName: candidate?.full_name || "",
           channel,
-          subject: subject || "(ללא נושא)",
+          subject: subject || `(${t("messages.no_subject")})`,
           status: "sent",
           created_at: new Date().toISOString(),
         },
@@ -161,7 +161,7 @@ export default function MessagesPage() {
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("messages.title")}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>ניהול ושליחת הודעות למועמדים</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{t("messages.subtitle")}</p>
           </div>
           <Button
             onClick={() => setComposeOpen(true)}
@@ -183,7 +183,7 @@ export default function MessagesPage() {
             </div>
             <div>
               <h2 className="text-lg font-bold" style={{ color: 'var(--navy)' }}>{t("templates.title")}</h2>
-              <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{templates.length} תבניות זמינות</p>
+              <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{templates.length} {t("messages.templates_count")}</p>
             </div>
           </div>
           <div className="p-5">
@@ -192,8 +192,8 @@ export default function MessagesPage() {
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--gray-100)' }}>
                   <Mail className="h-7 w-7" style={{ color: 'var(--gray-400)' }} />
                 </div>
-                <p className="font-medium" style={{ color: 'var(--gray-600)' }}>אין תבניות עדיין</p>
-                <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>הוסיפו תבניות בהגדרות</p>
+                <p className="font-medium" style={{ color: 'var(--gray-600)' }}>{t("messages.no_templates_yet")}</p>
+                <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{t("messages.add_templates_hint")}</p>
               </div>
             ) : (
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
@@ -251,8 +251,8 @@ export default function MessagesPage() {
               <Clock className="h-5 w-5" style={{ color: 'var(--blue)' }} />
             </div>
             <div>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--navy)' }}>הודעות שנשלחו</h2>
-              <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{sentMessages.length} הודעות</p>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--navy)' }}>{t("messages.sent_section_title")}</h2>
+              <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{sentMessages.length} {t("messages.messages_count")}</p>
             </div>
           </div>
           <div className="p-5">
@@ -261,17 +261,17 @@ export default function MessagesPage() {
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--gray-100)' }}>
                   <Send className="h-7 w-7" style={{ color: 'var(--gray-400)' }} />
                 </div>
-                <p className="font-medium" style={{ color: 'var(--gray-600)' }}>אין הודעות שנשלחו עדיין</p>
-                <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>שלחו הודעה ראשונה למועמד/ת</p>
+                <p className="font-medium" style={{ color: 'var(--gray-600)' }}>{t("messages.no_sent_yet")}</p>
+                <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{t("messages.send_first_hint")}</p>
               </div>
             ) : (
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--gray-200)' }}>
-                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>מועמד</th>
-                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>ערוץ</th>
-                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>נושא</th>
-                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>תאריך</th>
+                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("messages.table_candidate")}</th>
+                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("messages.table_channel")}</th>
+                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("messages.table_subject")}</th>
+                    <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("messages.table_date")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -315,7 +315,7 @@ export default function MessagesPage() {
                         <div className="relative">
                           <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: 'var(--gray-400)' }} />
                           <Input
-                            placeholder="חיפוש מועמד..."
+                            placeholder={t("messages.search_placeholder")}
                             value={candidateSearch}
                             onChange={(e) => setCandidateSearch(e.target.value)}
                             className="pr-8 h-8 text-sm rounded-lg"
@@ -336,7 +336,7 @@ export default function MessagesPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>ערוץ</Label>
+                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>{t("messages.channel_label")}</Label>
                   <Select value={channel} onValueChange={(v) => setChannel(v as "email" | "whatsapp")}>
                     <SelectTrigger className="rounded-xl" style={{ borderColor: 'var(--gray-200)' }}>
                       <SelectValue />
@@ -350,7 +350,7 @@ export default function MessagesPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>תבנית (אופציונלי)</Label>
+                <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>{t("messages.template_optional")}</Label>
                 <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
                   <SelectTrigger className="rounded-xl" style={{ borderColor: 'var(--gray-200)' }}>
                     <SelectValue placeholder={t("messages.select_template")} />
@@ -365,7 +365,7 @@ export default function MessagesPage() {
 
               {Object.keys(variables).length > 0 && (
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>משתנים</Label>
+                  <Label className="text-sm font-semibold" style={{ color: 'var(--gray-700)' }}>{t("messages.variables_label")}</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {Object.entries(variables).map(([key, value]) => (
                       <div key={key} className="space-y-1">
