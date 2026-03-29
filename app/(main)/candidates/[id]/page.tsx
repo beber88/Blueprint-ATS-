@@ -83,10 +83,30 @@ export default function CandidateProfilePage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [allCategories, setAllCategories] = useState<{key: string; name_he: string; name_en: string; name_tl: string; parent_key: string | null}[]>([]);
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [translatedAnalysis, setTranslatedAnalysis] = useState<Record<string, unknown> | null>(null);
+  const [translating, setTranslating] = useState(false);
 
   useEffect(() => {
     fetch("/api/categories").then(r => r.json()).then(setAllCategories).catch(() => {});
   }, []);
+
+  // Auto-translate AI analysis when locale is not English
+  useEffect(() => {
+    const rawAnalysis = (candidate as unknown as Record<string, unknown>)?.ai_analysis;
+    if (!rawAnalysis || !candidate) { setTranslatedAnalysis(null); return; }
+    if (locale === "en") { setTranslatedAnalysis(rawAnalysis as Record<string, unknown>); return; }
+
+    setTranslating(true);
+    fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: rawAnalysis, targetLang: locale }),
+    })
+      .then(r => r.json())
+      .then(d => setTranslatedAnalysis(d.translated || rawAnalysis))
+      .catch(() => setTranslatedAnalysis(rawAnalysis as Record<string, unknown>))
+      .finally(() => setTranslating(false));
+  }, [candidate, locale]);
 
   useEffect(() => {
     fetch(`/api/candidates/${params.id}`)
@@ -573,8 +593,14 @@ export default function CandidateProfilePage() {
 
           {/* AI Analysis Tab */}
           <TabsContent value="analysis" className="space-y-6 mt-0">
+            {translating && (
+              <div className="flex items-center justify-center gap-2 py-4">
+                <div className="h-5 w-5 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--gray-200)', borderTopColor: 'var(--blue)' }} />
+                <span className="text-sm" style={{ color: 'var(--gray-400)' }}>{locale === "he" ? "מתרגם..." : "Translating..."}</span>
+              </div>
+            )}
             {(candidate as unknown as Record<string, unknown>).ai_analysis ? (() => {
-              const analysis = (candidate as unknown as Record<string, unknown>).ai_analysis as Record<string, unknown>;
+              const analysis = translatedAnalysis || (candidate as unknown as Record<string, unknown>).ai_analysis as Record<string, unknown>;
               const verdict = analysis.verdict as Record<string, unknown> | undefined;
               const scorecard = analysis.scorecard as { criterion: string; max: number; score: number; notes: string }[] | undefined;
               const questions = analysis.interview_questions as { question: string; type: string; purpose: string }[] | undefined;
