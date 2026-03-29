@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
 import { TableLoading } from "@/components/shared/loading";
+import { BulkUpload } from "@/components/shared/bulk-upload";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -24,7 +25,7 @@ import { getStatusLabel } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 
 export default function CandidatesPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -40,6 +41,7 @@ export default function CandidatesPage() {
   const [jobs, setJobs] = useState<{id: string; title: string; status: string}[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("all");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [bulkEmailOpen, setBulkEmailOpen] = useState(false);
   const [bulkTemplate, setBulkTemplate] = useState("");
   const [bulkSending, setBulkSending] = useState(false);
@@ -211,6 +213,9 @@ export default function CandidatesPage() {
             </Button>
             <Button onClick={() => fileInputRef.current?.click()} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
               <Upload className="ml-2 h-4 w-4" /> {t("candidates.upload_cv")}
+            </Button>
+            <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="rounded-lg">
+              <Upload className="ml-2 h-4 w-4" /> {locale === "he" ? "העלאה מרובה" : "Bulk Upload"}
             </Button>
           </div>
         </div>
@@ -508,6 +513,14 @@ export default function CandidatesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Upload Modal */}
+      {bulkUploadOpen && (
+        <BulkUpload
+          onComplete={() => fetchCandidates()}
+          onClose={() => setBulkUploadOpen(false)}
+        />
+      )}
     </div>
   );
 }

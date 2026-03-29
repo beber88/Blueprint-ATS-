@@ -7,6 +7,17 @@ const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
 export const dynamic = "force-dynamic";
 
+function similarityScore(a: string, b: string): number {
+  const s1 = a.toLowerCase().trim();
+  const s2 = b.toLowerCase().trim();
+  if (s1 === s2) return 1;
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+  if (longer.length === 0) return 1;
+  const matches = shorter.split("").filter((c, i) => longer[i] === c).length;
+  return matches / longer.length;
+}
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx"];
 
@@ -37,6 +48,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const jobId = formData.get("jobId") as string | null;
+    const batchId = formData.get("batchId") as string | null;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -131,6 +143,49 @@ export async function POST(request: NextRequest) {
 
     console.log(`CV Upload: AI parsed candidate "${parsed.full_name}", ${parsed.skills?.length || 0} skills, ${parsed.experience_years || 0} yrs exp`);
 
+    // Check for duplicates by email
+    if (parsed.email) {
+      const { data: existing } = await supabase
+        .from("candidates")
+        .select("id, full_name, email")
+        .eq("email", parsed.email)
+        .single();
+
+      if (existing) {
+        return NextResponse.json({
+          duplicate: true,
+          existing_id: existing.id,
+          existing_name: existing.full_name,
+          message: `Candidate already exists: ${existing.full_name}`,
+        }, { status: 409 });
+      }
+    }
+
+    // Check by name similarity
+    if (parsed.full_name && parsed.full_name !== "Unknown") {
+      const firstName = parsed.full_name.split(" ")[0];
+      if (firstName.length >= 2) {
+        const { data: nameMatches } = await supabase
+          .from("candidates")
+          .select("id, full_name")
+          .ilike("full_name", `%${firstName}%`)
+          .limit(5);
+
+        if (nameMatches) {
+          for (const match of nameMatches) {
+            if (similarityScore(match.full_name, parsed.full_name) > 0.85) {
+              return NextResponse.json({
+                duplicate: true,
+                existing_id: match.id,
+                existing_name: match.full_name,
+                message: `Similar candidate exists: ${match.full_name}`,
+              }, { status: 409 });
+            }
+          }
+        }
+      }
+    }
+
     // Save candidate to database
     const { data: candidate, error: dbError } = await supabase
       .from("candidates")
@@ -148,6 +203,9 @@ export async function POST(request: NextRequest) {
         previous_roles: parsed.previous_roles,
         source: "cv_upload",
         status: "new",
+        suggested_job: parsed.suggested_job_category || null,
+        classification_confidence: parsed.suggested_job_confidence || null,
+        bulk_upload_batch: batchId || null,
       })
       .select()
       .single();
@@ -161,6 +219,20 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`CV Upload: Candidate saved with ID ${candidate.id}`);
+
+    // Auto-link to matching job
+    if (parsed.suggested_job_category) {
+      const { data: matchingJob } = await supabase
+        .from("jobs")
+        .select("id, title")
+        .ilike("title", `%${parsed.suggested_job_category}%`)
+        .eq("status", "active")
+        .single();
+
+      if (matchingJob) {
+        await supabase.from("candidates").update({ job_id: matchingJob.id }).eq("id", candidate.id);
+      }
+    }
 
     // Run full AI analysis
     let aiAnalysis = null;

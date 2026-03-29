@@ -69,7 +69,10 @@ export async function parseCV(cvText: string): Promise<CVParseResult> {
       "duration": "string",
       "description": "string"
     }
-  ]
+  ],
+  "suggested_job_category": "string - most fitting job category",
+  "suggested_job_confidence": number between 0-100,
+  "classification_reasoning": "1 sentence why"
 }
 
 CV Text:
@@ -96,6 +99,9 @@ ${truncated}`,
     skills: Array.isArray(parsed.skills) ? parsed.skills : [],
     certifications: Array.isArray(parsed.certifications) ? parsed.certifications : [],
     previous_roles: Array.isArray(parsed.previous_roles) ? parsed.previous_roles : [],
+    suggested_job_category: parsed.suggested_job_category || null,
+    suggested_job_confidence: parsed.suggested_job_confidence ?? 0,
+    classification_reasoning: parsed.classification_reasoning || null,
   };
 }
 

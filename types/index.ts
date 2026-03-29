@@ -129,6 +129,9 @@ export interface CVParseResult {
   skills: string[];
   certifications: string[];
   previous_roles: PreviousRole[];
+  suggested_job_category?: string | null;
+  suggested_job_confidence?: number;
+  classification_reasoning?: string | null;
 }
 
 export interface AIScoreResult {
