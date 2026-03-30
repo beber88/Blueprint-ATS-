@@ -26,9 +26,11 @@ import { Candidate } from "@/types";
 import { toast } from "sonner";
 import { getStatusLabel } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
+import { useUser } from "@/lib/auth/context";
 
 export default function CandidatesPage() {
   const { t, locale } = useI18n();
+  const { isAdmin } = useUser();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -504,10 +506,12 @@ export default function CandidatesPage() {
             <button onClick={() => setBulkEmailOpen(true)} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
               <Mail className="inline h-3 w-3 ml-1" /> {t("candidates.bulk.send_email")}
             </button>
-            <button onClick={handleBulkDelete} disabled={deleting} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--status-rejected-bg)', color: 'var(--status-rejected-text)' }}>
-              {deleting ? <Loader2 className="inline h-3 w-3 animate-spin ml-1" /> : <Trash2 className="inline h-3 w-3 ml-1" />}
-              {locale === "he" ? "מחק" : "Delete"}
-            </button>
+            {isAdmin && (
+              <button onClick={handleBulkDelete} disabled={deleting} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--status-rejected-bg)', color: 'var(--status-rejected-text)' }}>
+                {deleting ? <Loader2 className="inline h-3 w-3 animate-spin ml-1" /> : <Trash2 className="inline h-3 w-3 ml-1" />}
+                {locale === "he" ? "מחק" : "Delete"}
+              </button>
+            )}
             <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFFFFF' }}>{t("candidates.bulk.change_status")}</button>
             <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.1)', color: '#FFFFFF' }}>{t("candidates.bulk.cancel")}</button>
           </div>
