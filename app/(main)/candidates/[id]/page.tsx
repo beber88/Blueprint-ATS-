@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { translateSkill, translateJobTitle, translateEducation, translateCertification, translateExperience } from "@/lib/i18n/content-translations";
 import { SmartUpload } from "@/components/candidates/smart-upload";
 import { CandidateFiles } from "@/components/candidates/candidate-files";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -383,7 +384,7 @@ export default function CandidateProfilePage() {
                       key={skill}
                       className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium ring-1 ring-inset ${getSkillColor(skill)}`}
                     >
-                      {skill}
+                      {translateSkill(skill, locale)}
                     </span>
                   ))}
                   {(!candidate.skills || candidate.skills.length === 0) && (
@@ -405,7 +406,7 @@ export default function CandidateProfilePage() {
                     </div>
                     <div>
                       <p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t("profile.experience")}</p>
-                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{candidate.experience_years || 0} {t("candidates.years")}</p>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{translateExperience(candidate.experience_years || 0, locale)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
@@ -414,7 +415,7 @@ export default function CandidateProfilePage() {
                     </div>
                     <div>
                       <p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t("profile.education")}</p>
-                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{candidate.education || t("candidates.not_assigned")}</p>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{candidate.education ? translateEducation(candidate.education, locale) : t("candidates.not_assigned")}</p>
                     </div>
                   </div>
                   {candidate.certifications && candidate.certifications.length > 0 && (
@@ -428,7 +429,7 @@ export default function CandidateProfilePage() {
                       <div className="flex flex-wrap gap-1.5 mt-1 mr-12">
                         {candidate.certifications.map((cert) => (
                           <Badge key={cert} variant="outline" className="text-xs rounded-md">
-                            {cert}
+                            {translateCertification(cert, locale)}
                           </Badge>
                         ))}
                       </div>
@@ -457,7 +458,7 @@ export default function CandidateProfilePage() {
                         <div className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--brand-gold)' }} />
                       </div>
                       <div className="rounded-lg p-4" style={{ background: 'var(--bg-secondary)' }}>
-                        <h4 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{role.title}</h4>
+                        <h4 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{translateJobTitle(role.title || '', locale)}</h4>
                         <p className="text-sm mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                           {role.company}
                           <span className="mx-2" style={{ color: 'var(--border-primary)' }}>&middot;</span>
