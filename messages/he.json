@@ -447,6 +447,27 @@
     "unclassified_warning": "מועמדים שלא סווגו עדיין",
     "no_candidates": "אין מועמדים במקצוע זה"
   },
+  "requirements": {
+    "title": "דרישות תפקיד",
+    "setup": "הגדר דרישות",
+    "questionnaire": "שאלון AI",
+    "find_candidates": "מצא מועמדים מתאימים",
+    "matching": "מתאים מועמדים...",
+    "strong_match": "התאמה גבוהה",
+    "good_match": "התאמה טובה",
+    "partial_match": "התאמה חלקית",
+    "weak_match": "התאמה חלשה",
+    "not_recommended": "לא מומלץ",
+    "run_matching": "הפעל התאמה",
+    "edit_requirements": "ערוך דרישות",
+    "next": "הבא",
+    "back": "חזור",
+    "finish": "סיים ושמור",
+    "no_requirements": "טרם הוגדרו דרישות למשרה זו",
+    "interview_questions": "שאלות מומלצות לראיון",
+    "strengths": "חוזקות",
+    "weaknesses": "פערים"
+  },
   "guide": {
     "title": "מדריך למערכת",
     "getting_started": "תחילת עבודה",

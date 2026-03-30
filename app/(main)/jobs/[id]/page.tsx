@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -12,7 +13,7 @@ import { ScoreBadge } from "@/components/shared/score-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageLoading } from "@/components/shared/loading";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, Zap, MapPin, Clock, Building, GitCompare, Users, FileText, BarChart3, Trophy, Table } from "lucide-react";
+import { ArrowRight, Zap, MapPin, Clock, Building, GitCompare, Users, FileText, BarChart3, Trophy, Table, Loader2, ClipboardList } from "lucide-react";
 import { Job, Application, Candidate } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
@@ -40,7 +41,7 @@ interface JobDetail extends Job {
   applications: (Application & { candidate: Candidate })[];
 }
 
-type TabKey = "table" | "charts" | "top";
+type TabKey = "table" | "charts" | "top" | "requirements";
 
 export default function JobDetailPage() {
   const params = useParams();
@@ -52,6 +53,10 @@ export default function JobDetailPage() {
   const [compareMode, setCompareMode] = useState(false);
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<TabKey>("table");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [requirements, setRequirements] = useState<Record<string, unknown> | null>(null);
+  const [matches, setMatches] = useState<Record<string, unknown>[]>([]);
+  const [matching, setMatching] = useState(false);
 
   const toggleCandidate = (appId: string) => {
     setSelectedCandidates((prev) => {
@@ -69,6 +74,31 @@ export default function JobDetailPage() {
       .catch(() => toast.error(t("common.error")))
       .finally(() => setLoading(false));
   }, [params.id]);
+
+  useEffect(() => {
+    // Fetch requirements
+    fetch(`/api/jobs/${params.id}/questionnaire`).catch(() => {});
+    // Fetch existing matches
+    fetch(`/api/jobs/${params.id}/match-candidates`).then(r => r.json()).then(d => setMatches(d.matches || [])).catch(() => {});
+  }, [params.id]);
+
+  const startQuestionnaire = () => {
+    router.push(`/jobs/${params.id}/questionnaire`);
+  };
+
+  const runMatching = async () => {
+    setMatching(true);
+    toast.info(t("requirements.matching"));
+    try {
+      const res = await fetch(`/api/jobs/${params.id}/match-candidates`, { method: "POST" });
+      const data = await res.json();
+      toast.success(`Matched ${data.matched} of ${data.total}`);
+      // Refresh matches
+      const refreshed = await fetch(`/api/jobs/${params.id}/match-candidates`).then(r => r.json());
+      setMatches(refreshed.matches || []);
+    } catch { toast.error(t("common.error")); }
+    finally { setMatching(false); }
+  };
 
   const updateStatus = async (status: string) => {
     try {
@@ -196,6 +226,7 @@ export default function JobDetailPage() {
     { key: "table", label: t("common.table"), icon: <Table className="h-4 w-4" /> },
     { key: "charts", label: t("common.charts"), icon: <BarChart3 className="h-4 w-4" /> },
     { key: "top", label: "TOP " + t("nav.candidates"), icon: <Trophy className="h-4 w-4" /> },
+    { key: "requirements", label: t("requirements.title"), icon: <ClipboardList className="h-4 w-4" /> },
   ];
 
   const statusColors: Record<string, string> = {
@@ -349,7 +380,61 @@ export default function JobDetailPage() {
           </div>
 
           {/* Tab Content */}
-          {candidates.length === 0 ? (
+          {activeTab === "requirements" ? (
+              /* REQUIREMENTS TAB - renders regardless of candidates */
+              <div className="p-6 space-y-6">
+                {/* Requirements content */}
+                <div className="rounded-xl p-6" style={{ background: "var(--bg-card)", boxShadow: "var(--shadow-sm)" }}>
+                  <h3 className="font-bold text-lg mb-4" style={{ color: "var(--text-primary)" }}>{t("requirements.title")}</h3>
+
+                  {/* Show questionnaire button or requirements summary */}
+                  <div className="space-y-4">
+                    <Button onClick={startQuestionnaire} className="rounded-lg" style={{ background: "var(--brand-gold)", color: "#1A1A1A" }}>
+                      {t("requirements.questionnaire")}
+                    </Button>
+                    <Button onClick={runMatching} disabled={matching} variant="outline" className="rounded-lg mr-2">
+                      {matching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      {t("requirements.find_candidates")}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Match results */}
+                {matches.length > 0 && (
+                  <div className="rounded-xl overflow-hidden" style={{ background: "var(--bg-card)", boxShadow: "var(--shadow-sm)" }}>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr style={{ background: "var(--bg-tertiary)" }}>
+                          <th className="text-right px-4 py-3 text-xs" style={{ color: "var(--text-tertiary)" }}>#</th>
+                          <th className="text-right px-4 py-3 text-xs" style={{ color: "var(--text-tertiary)" }}>Name</th>
+                          <th className="text-right px-4 py-3 text-xs" style={{ color: "var(--text-tertiary)" }}>Score</th>
+                          <th className="text-right px-4 py-3 text-xs" style={{ color: "var(--text-tertiary)" }}>Match</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {matches.map((m: any, i: number) => (
+                          <tr key={m.id} style={{ borderBottom: "0.5px solid var(--border-light)" }}>
+                            <td className="px-4 py-3 font-bold" style={{ color: "var(--text-gold)" }}>#{i+1}</td>
+                            <td className="px-4 py-3">
+                              <Link href={`/candidates/${m.candidate?.id}`} className="font-medium" style={{ color: "var(--text-primary)" }}>
+                                {m.candidate?.full_name}
+                              </Link>
+                            </td>
+                            <td className="px-4 py-3"><ScoreBadge score={m.total_score || 0} size="sm" /></td>
+                            <td className="px-4 py-3">
+                              <span className="text-xs px-2 py-0.5 rounded-full" style={{
+                                background: m.recommendation === "strong_match" ? "var(--status-approved-bg)" : m.recommendation === "good_match" ? "var(--status-shortlisted-bg)" : "var(--status-new-bg)",
+                                color: m.recommendation === "strong_match" ? "var(--status-approved-text)" : m.recommendation === "good_match" ? "var(--status-shortlisted-text)" : "var(--status-new-text)",
+                              }}>{t(`requirements.${m.recommendation}`)}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+          ) : candidates.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-14 h-14 bg-[color:var(--bg-secondary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Users className="h-7 w-7 text-[color:var(--border-secondary)]" />

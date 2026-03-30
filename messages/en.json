@@ -447,6 +447,27 @@
     "unclassified_warning": "Candidates not yet classified",
     "no_candidates": "No candidates in this profession"
   },
+  "requirements": {
+    "title": "Job Requirements",
+    "setup": "Define Requirements",
+    "questionnaire": "AI Questionnaire",
+    "find_candidates": "Find Best Candidates",
+    "matching": "Matching candidates...",
+    "strong_match": "Strong Match",
+    "good_match": "Good Match",
+    "partial_match": "Partial Match",
+    "weak_match": "Weak Match",
+    "not_recommended": "Not Recommended",
+    "run_matching": "Run Matching",
+    "edit_requirements": "Edit Requirements",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Save & Finish",
+    "no_requirements": "No requirements defined for this job yet",
+    "interview_questions": "Suggested Interview Questions",
+    "strengths": "Strengths",
+    "weaknesses": "Gaps"
+  },
   "guide": {
     "title": "System Guide",
     "getting_started": "Getting Started",

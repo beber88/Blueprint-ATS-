@@ -447,6 +447,27 @@
     "unclassified_warning": "Hindi pa na-classify na kandidato",
     "no_candidates": "Walang kandidato sa propesyong ito"
   },
+  "requirements": {
+    "title": "Mga Kinakailangan",
+    "setup": "Itakda ang Kinakailangan",
+    "questionnaire": "AI Questionnaire",
+    "find_candidates": "Hanapin ang Pinakamahusay",
+    "matching": "Naghahanap ng kandidato...",
+    "strong_match": "Malakas na Match",
+    "good_match": "Magandang Match",
+    "partial_match": "Bahagyang Match",
+    "weak_match": "Mahinang Match",
+    "not_recommended": "Hindi Inirerekomenda",
+    "run_matching": "Patakbuhin ang Matching",
+    "edit_requirements": "I-edit",
+    "next": "Susunod",
+    "back": "Bumalik",
+    "finish": "I-save",
+    "no_requirements": "Walang kinakailangan pa para sa trabahong ito",
+    "interview_questions": "Mga Iminungkahing Tanong",
+    "strengths": "Kalakasan",
+    "weaknesses": "Kahinaan"
+  },
   "guide": {
     "title": "Gabay sa Sistema",
     "getting_started": "Pagsisimula",
