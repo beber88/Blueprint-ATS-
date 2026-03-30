@@ -11,7 +11,8 @@
     "categories": "Professions",
     "users": "Users",
     "guide": "Guide",
-    "job_boards": "Job Boards"
+    "job_boards": "Job Boards",
+    "unmatched_files": "Unmatched Files"
   },
   "dashboard": {
     "title": "Dashboard",
