@@ -233,6 +233,9 @@ ${text.substring(0, 5000)}`
       certifications: parsed.certifications || [],
       previous_roles: parsed.previous_roles || [],
       cv_raw_text: text.substring(0, 10000),
+      profession: parsed.detected_job_category || null,
+      profession_confidence: 0.85,
+      profession_source: 'auto',
       source: 'upload',
       status: 'new'
     })

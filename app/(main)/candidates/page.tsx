@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -15,7 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw, Briefcase,
+  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw, Briefcase, Trash2, Loader2, Bot, Pencil, Brain,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
@@ -52,6 +53,8 @@ export default function CandidatesPage() {
   const [bulkProgress, setBulkProgress] = useState("");
   const [templates, setTemplates] = useState<{id: string; name: string; type: string}[]>([]);
   const [reclassifying, setReclassifying] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [classifying, setClassifying] = useState(false);
 
   useEffect(() => {
     fetch("/api/jobs").then(r => r.json()).then(setJobs).catch(() => {});
@@ -192,6 +195,35 @@ export default function CandidatesPage() {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!confirm(locale === "he" ? `למחוק ${selectedRows.size} מועמדים?` : `Delete ${selectedRows.size} candidates?`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/candidates/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidate_ids: Array.from(selectedRows) }),
+      });
+      const data = await res.json();
+      toast.success(locale === "he" ? `נמחקו ${data.deleted} מועמדים` : `Deleted ${data.deleted} candidates`);
+      setSelectedRows(new Set());
+      fetchCandidates();
+    } catch { toast.error(t("common.error")); }
+    finally { setDeleting(false); }
+  };
+
+  const handleClassifyProfessions = async () => {
+    setClassifying(true);
+    toast.info(locale === "he" ? "מסווג מקצועות..." : "Classifying professions...");
+    try {
+      const res = await fetch("/api/maintenance/classify-professions", { method: "POST" });
+      const data = await res.json();
+      toast.success(locale === "he" ? `סווגו ${data.classified} מועמדים` : `Classified ${data.classified} candidates`);
+      fetchCandidates();
+    } catch { toast.error(t("common.error")); }
+    finally { setClassifying(false); }
+  };
+
   const statuses = [
     "new", "reviewed", "shortlisted", "interview_scheduled",
     "interviewed", "approved", "rejected", "keep_for_future",
@@ -248,6 +280,10 @@ export default function CandidatesPage() {
             <Button onClick={handleReclassify} disabled={reclassifying} variant="outline" className="rounded-lg" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
               <RefreshCw className={`ml-2 h-4 w-4 ${reclassifying ? "animate-spin" : ""}`} />
               {locale === "he" ? "סווג מחדש" : "Reclassify"}
+            </Button>
+            <Button onClick={handleClassifyProfessions} disabled={classifying} variant="outline" className="rounded-lg text-xs" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
+              {classifying ? <Loader2 className="ml-1 h-3 w-3 animate-spin" /> : <Brain className="ml-1 h-3 w-3" />}
+              {locale === "he" ? "סווג מקצועות" : "Classify"}
             </Button>
           </div>
         </div>
@@ -343,6 +379,9 @@ export default function CandidatesPage() {
                   </th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.candidate")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("common.professional_classification")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--text-tertiary)' }}>
+                    {locale === "he" ? "מקצוע" : "Profession"}
+                  </th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.status")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.ai_score")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.experience")}</th>
@@ -404,6 +443,22 @@ export default function CandidatesPage() {
                           <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{t("common.not_classified")}</span>
                         )}
                       </td>
+                      <td className="px-4 py-3">
+                        {(cand as any).profession ? (
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>
+                              {t(`job_categories.${(cand as any).profession}`) || (cand as any).profession}
+                            </span>
+                            {(cand as any).profession_source === "auto" ? (
+                              <Bot className="h-3 w-3" style={{ color: 'var(--text-gold)', opacity: 0.6 }} />
+                            ) : (cand as any).profession_source === "manual" ? (
+                              <Pencil className="h-3 w-3" style={{ color: 'var(--text-gold)', opacity: 0.6 }} />
+                            ) : null}
+                          </div>
+                        ) : (
+                          <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>—</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3"><StatusBadge status={candidate.status} /></td>
                       <td className="px-4 py-3">
                         {displayScore !== null && displayScore !== undefined ? <ScoreBadge score={displayScore} size="sm" /> : <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>--</span>}
@@ -447,6 +502,10 @@ export default function CandidatesPage() {
             <span style={{ color: '#FFFFFF' }}>{selectedRows.size} {t("candidates.bulk.selected")}</span>
             <button onClick={() => setBulkEmailOpen(true)} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
               <Mail className="inline h-3 w-3 ml-1" /> {t("candidates.bulk.send_email")}
+            </button>
+            <button onClick={handleBulkDelete} disabled={deleting} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--status-rejected-bg)', color: 'var(--status-rejected-text)' }}>
+              {deleting ? <Loader2 className="inline h-3 w-3 animate-spin ml-1" /> : <Trash2 className="inline h-3 w-3 ml-1" />}
+              {locale === "he" ? "מחק" : "Delete"}
             </button>
             <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFFFFF' }}>{t("candidates.bulk.change_status")}</button>
             <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.1)', color: '#FFFFFF' }}>{t("candidates.bulk.cancel")}</button>

@@ -95,19 +95,41 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { id: candidateId } = await params;
     const supabase = createAdminClient();
 
-    const { error } = await supabase.from("candidates").delete().eq("id", id);
+    // Delete from candidate_files
+    const { data: files } = await supabase
+      .from("candidate_files")
+      .select("file_url")
+      .eq("candidate_id", candidateId);
 
-    if (error) {
-      console.error("Delete error:", error);
-      return NextResponse.json({ error: "Failed to delete candidate" }, { status: 500 });
+    // Delete storage files
+    if (files && files.length > 0) {
+      const paths = files.map((f: { file_url: string }) => {
+        try {
+          const url = new URL(f.file_url);
+          const match = url.pathname.match(/\/storage\/v1\/object\/public\/cvs\/(.*)/);
+          return match ? match[1] : null;
+        } catch { return null; }
+      }).filter(Boolean) as string[];
+      if (paths.length > 0) await supabase.storage.from("cvs").remove(paths);
     }
+
+    // Delete related records
+    await supabase.from("candidate_files").delete().eq("candidate_id", candidateId);
+    await supabase.from("applications").delete().eq("candidate_id", candidateId);
+    await supabase.from("activity_log").delete().eq("candidate_id", candidateId);
+    await supabase.from("messages_sent").delete().eq("candidate_id", candidateId);
+    await supabase.from("status_changes").delete().eq("candidate_id", candidateId);
+
+    // Delete candidate
+    const { error } = await supabase.from("candidates").delete().eq("id", candidateId);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Delete candidate error:", error);
+    return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
   }
 }
