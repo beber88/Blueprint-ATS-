@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { translateSkill, translateJobTitle, translateEducation, translateCertification, translateExperience } from "@/lib/i18n/content-translations";
 import { SmartUpload } from "@/components/candidates/smart-upload";
 import { CandidateFiles } from "@/components/candidates/candidate-files";
+import { SendMessagePanel } from "@/components/candidates/send-message-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
@@ -16,7 +17,7 @@ import { PageLoading } from "@/components/shared/loading";
 import {
   Mail, Phone, MapPin, ExternalLink, FileText, Briefcase, GraduationCap,
   Calendar, MessageSquare, ArrowRight, Save, Clock, User, Award,
-  Send, Video, PhoneCall, Building2, Hash, CheckCircle, XCircle, Brain, Upload,
+  Video, PhoneCall, Building2, Hash, CheckCircle, XCircle, Brain, Upload,
 } from "lucide-react";
 import Link from "next/link";
 import { Candidate, Application, Interview, MessageSent, ActivityLog } from "@/types";
@@ -204,13 +205,6 @@ export default function CandidateProfilePage() {
     }
   };
 
-  const channelIcon = (channel: string) => {
-    switch (channel) {
-      case "email": return <Mail className="h-4 w-4" />;
-      case "whatsapp": return <MessageSquare className="h-4 w-4" />;
-      default: return <Send className="h-4 w-4" />;
-    }
-  };
 
   const handleRunAnalysis = async () => {
     if (!candidate) return;
@@ -854,53 +848,13 @@ export default function CandidateProfilePage() {
 
           {/* Messages Tab */}
           <TabsContent value="messages" className="space-y-4 mt-0">
-            {(candidate.messages || []).length === 0 ? (
-              <div className="rounded-xl" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
-                <div className="py-16 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-4" style={{ background: 'var(--bg-tertiary)' }}>
-                    <MessageSquare className="h-8 w-8" style={{ color: 'var(--text-tertiary)' }} />
-                  </div>
-                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("profile.send_message")}</p>
-                </div>
-              </div>
-            ) : (
-              candidate.messages.map((msg) => (
-                <div key={msg.id} className="rounded-xl overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
-                  <div className="p-5">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-4 flex-1 min-w-0">
-                        <div className="flex items-center justify-center h-11 w-11 rounded-xl shrink-0" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>
-                          {channelIcon(msg.channel)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge
-                              variant="outline"
-                              className="text-xs rounded-md"
-                              style={{ borderColor: 'var(--border-primary)', color: 'var(--text-secondary)', background: 'var(--bg-tertiary)' }}
-                            >
-                              {msg.channel === "email" ? t("candidates.bulk.send_email") : "WhatsApp"}
-                            </Badge>
-                            {msg.subject && (
-                              <span className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{msg.subject}</span>
-                            )}
-                          </div>
-                          <p className="text-sm line-clamp-2 leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
-                            {msg.body}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-left shrink-0">
-                        <StatusBadge status={msg.status} />
-                        <p className="text-xs mt-1.5" style={{ color: 'var(--text-tertiary)' }}>
-                          {formatDateTime(msg.sent_at)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+            <SendMessagePanel
+              candidate={{ id: candidate.id, full_name: candidate.full_name, email: candidate.email || null, phone: candidate.phone || null }}
+              lang={locale}
+              onMessageSent={() => {
+                fetch(`/api/candidates/${params.id}`).then(r => r.json()).then(setCandidate).catch(() => {});
+              }}
+            />
           </TabsContent>
 
           {/* Files Tab */}

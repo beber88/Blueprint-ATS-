@@ -135,6 +135,18 @@ export const JOB_TITLES_MAP: Record<string, Record<string, string>> = {
   'Consultant': { he: 'יועץ', tl: 'Consultant' },
   'Officer': { he: 'קצין', tl: 'Officer' },
   'Analyst': { he: 'אנליסט', tl: 'Analyst' },
+  'Architectural Designer': { he: 'מעצב אדריכלי', tl: 'Architectural Designer' },
+  'Project Architect': { he: 'אדריכל פרויקט', tl: 'Project Architect' },
+  'FreeLancer': { he: 'פרילנסר', tl: 'Freelancer' },
+  'Freelancer': { he: 'פרילנסר', tl: 'Freelancer' },
+  'Lead Designer': { he: 'מעצב מוביל', tl: 'Lead Designer' },
+  'BIM Coordinator': { he: 'רכז BIM', tl: 'BIM Coordinator' },
+  'Construction Supervisor': { he: 'מפקח בנייה', tl: 'Construction Supervisor' },
+  'Estimation Engineer': { he: 'מהנדס אומדנים', tl: 'Estimation Engineer' },
+  'Safety Engineer': { he: 'מהנדס בטיחות', tl: 'Safety Engineer' },
+  'HR Manager': { he: 'מנהל משאבי אנוש', tl: 'HR Manager' },
+  'Office Manager': { he: 'מנהל משרד', tl: 'Office Manager' },
+  'Trainee': { he: 'חניך', tl: 'Trainee' },
 };
 
 // Education degree translations
@@ -185,15 +197,18 @@ export function translateSkill(skill: string, lang: string): string {
 }
 
 export function translateJobTitle(title: string, lang: string): string {
-  if (lang === 'en') return title;
-  if (JOB_TITLES_MAP[title]?.[lang]) return JOB_TITLES_MAP[title][lang];
-  const matches = Object.keys(JOB_TITLES_MAP)
-    .filter(k => title.toLowerCase().includes(k.toLowerCase()))
-    .sort((a, b) => b.length - a.length);
-  if (matches.length > 0 && JOB_TITLES_MAP[matches[0]]?.[lang]) {
-    const regex = new RegExp(matches[0], 'i');
-    return title.replace(regex, JOB_TITLES_MAP[matches[0]][lang]);
+  if (!title || lang === 'en') return title;
+
+  // Exact match (case-insensitive)
+  const exactKey = Object.keys(JOB_TITLES_MAP).find(k => k.toLowerCase() === title.toLowerCase().trim());
+  if (exactKey && JOB_TITLES_MAP[exactKey]?.[lang]) return JOB_TITLES_MAP[exactKey][lang];
+
+  // If contains slash, translate each part
+  if (title.includes('/')) {
+    return title.split('/').map(part => translateJobTitle(part.trim(), lang)).join(' / ');
   }
+
+  // No match found — return ORIGINAL text, never partial replace
   return title;
 }
 

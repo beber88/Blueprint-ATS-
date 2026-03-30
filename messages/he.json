@@ -368,7 +368,20 @@
     "confirm_delete_user": "למחוק את המשתמש?",
     "user": "משתמש",
     "light_mode": "מצב יום",
-    "dark_mode": "מצב לילה"
+    "dark_mode": "מצב לילה",
+    "edit": "עריכה",
+    "confirm": "אישור",
+    "actions": "פעולות",
+    "view": "צפה",
+    "download": "הורד",
+    "upload": "העלה",
+    "share": "שתף",
+    "send": "שלח",
+    "yes": "כן",
+    "no": "לא",
+    "next": "הבא",
+    "search": "חיפוש",
+    "close": "סגור"
   },
   "theme": {
     "light": "מצב יום",

@@ -368,7 +368,20 @@
     "confirm_delete_user": "Delete this user?",
     "user": "User",
     "light_mode": "Light Mode",
-    "dark_mode": "Dark Mode"
+    "dark_mode": "Dark Mode",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "actions": "Actions",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "share": "Share",
+    "send": "Send",
+    "yes": "Yes",
+    "no": "No",
+    "next": "Next",
+    "search": "Search",
+    "close": "Close"
   },
   "theme": {
     "light": "Light Mode",

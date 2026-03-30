@@ -368,7 +368,20 @@
     "confirm_delete_user": "Burahin ang user na ito?",
     "user": "User",
     "light_mode": "Light Mode",
-    "dark_mode": "Dark Mode"
+    "dark_mode": "Dark Mode",
+    "edit": "I-edit",
+    "confirm": "Kumpirmahin",
+    "actions": "Mga Aksyon",
+    "view": "Tingnan",
+    "download": "I-download",
+    "upload": "I-upload",
+    "share": "I-share",
+    "send": "Ipadala",
+    "yes": "Oo",
+    "no": "Hindi",
+    "next": "Susunod",
+    "search": "Maghanap",
+    "close": "Isara"
   },
   "theme": {
     "light": "Light Mode",
