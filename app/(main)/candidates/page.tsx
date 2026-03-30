@@ -43,7 +43,7 @@ export default function CandidatesPage() {
     min_score: null as number | null, max_score: null as number | null,
     has_portfolio: null as boolean | null, has_email: null as boolean | null,
     required_skills: [] as string[], sort_by: "created_at", sort_order: "desc" as "asc" | "desc",
-    page: 1, per_page: 50, preset: null as string | null,
+    page: 1, per_page: 200, preset: null as string | null,
   });
   const [manualOpen, setManualOpen] = useState(false);
   const [uploading, setUploading] = useState(false);

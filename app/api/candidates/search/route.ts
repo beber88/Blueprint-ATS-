@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = createAdminClient();
     const body = await request.json();
+    console.log("Search API called with:", JSON.stringify({ search: body.search, statuses: body.statuses, professions: body.professions, preset: body.preset, per_page: body.per_page }));
     const {
       search = "",
       statuses = [],
