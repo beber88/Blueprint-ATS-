@@ -35,16 +35,37 @@ export default function CandidatesPage() {
   const { isAdmin } = useUser();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
-  // Legacy vars removed — all filtering via advancedFilters
-  const [totalCount, setTotalCount] = useState(0);
-  const [advancedFilters, setAdvancedFilters] = useState({
-    search: "", statuses: [] as string[], professions: [] as string[],
-    min_experience: null as number | null, max_experience: null as number | null,
-    min_score: null as number | null, max_score: null as number | null,
+  const [total, setTotal] = useState(0);
+
+  // Individual filter state — each change triggers refetch
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [professionFilter, setProfessionFilter] = useState<string[]>([]);
+  const [minExperience, setMinExperience] = useState<number | null>(null);
+  const [maxExperience, setMaxExperience] = useState<number | null>(null);
+  const [minScore, setMinScore] = useState<number | null>(null);
+  const [maxScore, setMaxScore] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [preset, setPreset] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+
+  // Wrapper for AdvancedFilters component compatibility
+  const advancedFilters = {
+    search, statuses: statusFilter, professions: professionFilter,
+    min_experience: minExperience, max_experience: maxExperience,
+    min_score: minScore, max_score: maxScore,
     has_portfolio: null as boolean | null, has_email: null as boolean | null,
-    required_skills: [] as string[], sort_by: "created_at", sort_order: "desc" as "asc" | "desc",
-    page: 1, per_page: 200, preset: null as string | null,
-  });
+    required_skills: [] as string[], sort_by: sortBy, sort_order: sortOrder,
+    page, per_page: 200, preset,
+  };
+  const setAdvancedFilters = (f: typeof advancedFilters) => {
+    setSearch(f.search); setStatusFilter(f.statuses); setProfessionFilter(f.professions);
+    setMinExperience(f.min_experience); setMaxExperience(f.max_experience);
+    setMinScore(f.min_score); setMaxScore(f.max_score);
+    setSortBy(f.sort_by); setSortOrder(f.sort_order);
+    setPreset(f.preset); setPage(f.page);
+  };
   const [manualOpen, setManualOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
@@ -76,29 +97,38 @@ export default function CandidatesPage() {
   }, []);
 
   const fetchCandidates = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const res = await fetch("/api/candidates/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(advancedFilters),
+        body: JSON.stringify({
+          search, statuses: statusFilter, professions: professionFilter,
+          min_experience: minExperience, max_experience: maxExperience,
+          min_score: minScore, max_score: maxScore,
+          sort_by: sortBy, sort_order: sortOrder, preset, page, per_page: 200,
+        }),
       });
       const data = await res.json();
-      setCandidates(data.candidates || []);
-      setTotalCount(data.total || 0);
-    } catch {
-      toast.error(t("common.error"));
+      if (res.ok) { setCandidates(data.candidates || []); setTotal(data.total || 0); }
+    } catch (err) {
+      console.error("Fetch candidates failed:", err);
     } finally {
       setLoading(false);
     }
-  }, [advancedFilters, t]);
+  }, [search, statusFilter, professionFilter, minExperience, maxExperience,
+      minScore, maxScore, sortBy, sortOrder, preset, page]);
 
+  // Re-fetch whenever ANY filter changes (debounced)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchCandidates();
-    }, 300); // debounce for search typing
+    const timer = setTimeout(() => fetchCandidates(), 300);
     return () => clearTimeout(timer);
   }, [fetchCandidates]);
+
+  // Reset page when filters change
+  useEffect(() => { setPage(1); },
+    [search, statusFilter, professionFilter, minExperience, maxExperience,
+     minScore, maxScore, sortBy, sortOrder, preset]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -331,7 +361,7 @@ export default function CandidatesPage() {
         <AdvancedFilters
           filters={advancedFilters}
           onChange={(newFilters) => setAdvancedFilters(newFilters)}
-          total={totalCount}
+          total={total}
           lang={locale}
         />
 
