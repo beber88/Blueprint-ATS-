@@ -35,8 +35,7 @@ export default function CandidatesPage() {
   const { isAdmin } = useUser();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search] = useState("");
-  const [statusFilter] = useState("all");
+  // Legacy vars removed — all filtering via advancedFilters
   const [totalCount, setTotalCount] = useState(0);
   const [advancedFilters, setAdvancedFilters] = useState({
     search: "", statuses: [] as string[], professions: [] as string[],
@@ -55,7 +54,7 @@ export default function CandidatesPage() {
   });
 
   const [categories, setCategories] = useState<{key: string; name_he: string; name_en: string; name_tl: string; parent_key: string | null}[]>([]);
-  const [categoryFilter] = useState("all");
+  // categoryFilter removed — use advancedFilters.professions
   const [jobs, setJobs] = useState<{id: string; title: string; status: string}[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("all");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -78,17 +77,11 @@ export default function CandidatesPage() {
 
   const fetchCandidates = useCallback(async () => {
     try {
-      // Use advanced search API
+      setLoading(true);
       const res = await fetch("/api/candidates/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...advancedFilters,
-          // Also include legacy filters if set
-          search: advancedFilters.search || search,
-          statuses: advancedFilters.statuses.length > 0 ? advancedFilters.statuses : (statusFilter !== "all" ? [statusFilter] : []),
-          professions: advancedFilters.professions.length > 0 ? advancedFilters.professions : (categoryFilter !== "all" ? [categoryFilter] : []),
-        }),
+        body: JSON.stringify(advancedFilters),
       });
       const data = await res.json();
       setCandidates(data.candidates || []);
@@ -98,10 +91,13 @@ export default function CandidatesPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, selectedJob, categoryFilter, advancedFilters]);
+  }, [advancedFilters, t]);
 
   useEffect(() => {
-    fetchCandidates();
+    const timer = setTimeout(() => {
+      fetchCandidates();
+    }, 300); // debounce for search typing
+    return () => clearTimeout(timer);
   }, [fetchCandidates]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
