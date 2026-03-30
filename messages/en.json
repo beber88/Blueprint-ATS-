@@ -424,5 +424,26 @@
     "hse_officer": "HSE Officer",
     "document_controller": "Document Controller",
     "other": "Other"
+  },
+  "professions": {
+    "title": "Analysis by Profession",
+    "total_professions": "Total professions",
+    "total_classified": "Classified candidates",
+    "unclassified": "Unclassified",
+    "classify_now": "Classify now",
+    "most_common": "Most common profession",
+    "avg_experience": "Average experience",
+    "years_avg": "years avg",
+    "with_portfolio": "with portfolio",
+    "candidates_in": "candidates in",
+    "top_skills": "Top skills",
+    "status_breakdown": "Status breakdown",
+    "candidates_list": "Candidates list",
+    "skills_analysis": "Skills analysis",
+    "select_to_see": "Click a profession for details",
+    "auto_classify_all": "Auto-classify all",
+    "classify_single": "Classify",
+    "unclassified_warning": "Candidates not yet classified",
+    "no_candidates": "No candidates in this profession"
   }
 }

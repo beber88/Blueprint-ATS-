@@ -424,5 +424,26 @@
     "hse_officer": "HSE Officer",
     "document_controller": "Document Controller",
     "other": "Iba pa"
+  },
+  "professions": {
+    "title": "Pagsusuri ayon sa Propesyon",
+    "total_professions": "Kabuuang propesyon",
+    "total_classified": "Na-classify na kandidato",
+    "unclassified": "Hindi pa na-classify",
+    "classify_now": "I-classify ngayon",
+    "most_common": "Pinakakaraniwang propesyon",
+    "avg_experience": "Average na karanasan",
+    "years_avg": "taon avg",
+    "with_portfolio": "may portfolio",
+    "candidates_in": "kandidato sa",
+    "top_skills": "Nangungunang kasanayan",
+    "status_breakdown": "Breakdown ng status",
+    "candidates_list": "Listahan ng kandidato",
+    "skills_analysis": "Pagsusuri ng kasanayan",
+    "select_to_see": "Mag-click ng propesyon para sa detalye",
+    "auto_classify_all": "Auto-classify lahat",
+    "classify_single": "I-classify",
+    "unclassified_warning": "Hindi pa na-classify na kandidato",
+    "no_candidates": "Walang kandidato sa propesyong ito"
   }
 }

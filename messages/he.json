@@ -424,5 +424,26 @@
     "hse_officer": "קצין בטיחות",
     "document_controller": "בקר מסמכים",
     "other": "אחר"
+  },
+  "professions": {
+    "title": "ניתוח לפי מקצוע",
+    "total_professions": "סה״כ מקצועות",
+    "total_classified": "מועמדים מסווגים",
+    "unclassified": "לא מסווגים",
+    "classify_now": "סווג עכשיו",
+    "most_common": "מקצוע נפוץ ביותר",
+    "avg_experience": "ניסיון ממוצע",
+    "years_avg": "שנים בממוצע",
+    "with_portfolio": "עם תיק עבודות",
+    "candidates_in": "מועמדים ב",
+    "top_skills": "כישורים מובילים",
+    "status_breakdown": "חלוקה לפי סטטוס",
+    "candidates_list": "רשימת מועמדים",
+    "skills_analysis": "ניתוח כישורים",
+    "select_to_see": "לחץ על מקצוע לפרטים נוספים",
+    "auto_classify_all": "סווג הכל אוטומטית",
+    "classify_single": "סווג",
+    "unclassified_warning": "מועמדים שלא סווגו עדיין",
+    "no_candidates": "אין מועמדים במקצוע זה"
   }
 }
