@@ -236,15 +236,16 @@ export default function CandidateProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       {/* Hero Section */}
-      <div className="bg-white border-b border-slate-200">
+      <div style={{ background: 'var(--bg-secondary)', borderBottom: '0.5px solid var(--border-primary)' }}>
         <div className="px-8 py-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.back()}
-            className="text-slate-500 hover:text-slate-700 -mr-2 mb-4"
+            className="-mr-2 mb-4"
+            style={{ color: 'var(--text-tertiary)' }}
           >
             <ArrowRight className="ml-1 h-4 w-4" />
             {t("common.back")}
@@ -261,7 +262,7 @@ export default function CandidateProfilePage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{candidate.full_name}</h1>
+                    <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{candidate.full_name}</h1>
                     <StatusBadge status={candidate.status} className="text-sm px-3 py-1" />
                     {topScore !== null && (
                       <ScoreBadge score={topScore} size="md" />
@@ -269,34 +270,34 @@ export default function CandidateProfilePage() {
                   </div>
 
                   {/* Contact Row */}
-                  <div className="flex items-center gap-5 text-sm text-slate-500 flex-wrap mt-1">
+                  <div className="flex items-center gap-5 text-sm flex-wrap mt-1" style={{ color: 'var(--text-tertiary)' }}>
                     {candidate.email && (
-                      <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
-                        <Mail className="h-4 w-4 text-slate-400" />
+                      <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 transition-colors" style={{ color: 'var(--text-tertiary)' }}>
+                        <Mail className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
                         {candidate.email}
                       </a>
                     )}
                     {candidate.phone && (
-                      <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
-                        <Phone className="h-4 w-4 text-slate-400" />
+                      <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 transition-colors" style={{ color: 'var(--text-tertiary)' }}>
+                        <Phone className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
                         {candidate.phone}
                       </a>
                     )}
                     {candidate.location && (
                       <span className="flex items-center gap-1.5">
-                        <MapPin className="h-4 w-4 text-slate-400" />
+                        <MapPin className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
                         {candidate.location}
                       </span>
                     )}
                     {candidate.linkedin_url && (
-                      <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
-                        <ExternalLink className="h-4 w-4 text-slate-400" />
+                      <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 transition-colors" style={{ color: 'var(--text-tertiary)' }}>
+                        <ExternalLink className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
                         LinkedIn
                       </a>
                     )}
                     {candidate.cv_file_url && (
-                      <a href={candidate.cv_file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-electric-600 transition-colors">
-                        <FileText className="h-4 w-4 text-slate-400" />
+                      <a href={candidate.cv_file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 transition-colors" style={{ color: 'var(--text-tertiary)' }}>
+                        <FileText className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
                         {t("candidates.upload_cv")}
                       </a>
                     )}
@@ -306,13 +307,13 @@ export default function CandidateProfilePage() {
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 shrink-0">
                   <Link href={`/messages?candidateId=${candidate.id}`}>
-                    <Button variant="outline" className="h-10 rounded-lg border-slate-200 shadow-sm hover:shadow-md transition-all">
+                    <Button variant="outline" className="h-10 rounded-lg shadow-sm hover:shadow-md transition-all" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
                       <MessageSquare className="ml-2 h-4 w-4" />
                       {t("profile.send_message")}
                     </Button>
                   </Link>
                   <Select value={candidate.status} onValueChange={updateStatus}>
-                    <SelectTrigger className="w-52 h-10 rounded-lg border-slate-200 shadow-sm text-sm">
+                    <SelectTrigger className="w-52 h-10 rounded-lg shadow-sm text-sm" style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -333,36 +334,36 @@ export default function CandidateProfilePage() {
       {/* Tabs */}
       <div className="px-8 py-6">
         <Tabs defaultValue="overview" dir="rtl">
-          <TabsList className="bg-white rounded-xl shadow-sm border border-slate-200 p-1 h-auto mb-6">
-            <TabsTrigger value="overview" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+          <TabsList className="rounded-xl shadow-sm p-1 h-auto mb-6" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)' }}>
+            <TabsTrigger value="overview" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:shadow-sm" style={{ color: 'var(--text-secondary)' }}>
               {t("profile.overview")}
             </TabsTrigger>
-            <TabsTrigger value="analysis" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+            <TabsTrigger value="analysis" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:shadow-sm" style={{ color: 'var(--text-secondary)' }}>
               <Brain className="h-4 w-4 ml-1.5" />
               {t("profile.ai_analysis")}
             </TabsTrigger>
-            <TabsTrigger value="applications" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+            <TabsTrigger value="applications" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:shadow-sm" style={{ color: 'var(--text-secondary)' }}>
               {t("profile.applications")}
-              <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
+              <span className="mr-1.5 text-xs rounded-full px-2 py-0.5" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>
                 {candidate.applications?.length || 0}
               </span>
             </TabsTrigger>
-            <TabsTrigger value="interviews" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+            <TabsTrigger value="interviews" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:shadow-sm" style={{ color: 'var(--text-secondary)' }}>
               {t("profile.interviews")}
-              <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
+              <span className="mr-1.5 text-xs rounded-full px-2 py-0.5" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>
                 {candidate.interviews?.length || 0}
               </span>
             </TabsTrigger>
-            <TabsTrigger value="messages" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+            <TabsTrigger value="messages" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:shadow-sm" style={{ color: 'var(--text-secondary)' }}>
               {t("profile.send_message")}
-              <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
+              <span className="mr-1.5 text-xs rounded-full px-2 py-0.5" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>
                 {candidate.messages?.length || 0}
               </span>
             </TabsTrigger>
-            <TabsTrigger value="files" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+            <TabsTrigger value="files" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:shadow-sm" style={{ color: 'var(--text-secondary)' }}>
               {t("files.title")}
             </TabsTrigger>
-            <TabsTrigger value="activity" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+            <TabsTrigger value="activity" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:shadow-sm" style={{ color: 'var(--text-secondary)' }}>
               {t("profile.history")}
             </TabsTrigger>
           </TabsList>
@@ -371,10 +372,10 @@ export default function CandidateProfilePage() {
           <TabsContent value="overview" className="space-y-6 mt-0">
             <div className="grid gap-6 md:grid-cols-2">
               {/* Skills Card */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="flex items-center gap-2 mb-4">
-                  <Hash className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-base font-semibold text-slate-900">{t("profile.skills")}</h3>
+                  <Hash className="h-5 w-5" style={{ color: 'var(--text-tertiary)' }} />
+                  <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t("profile.skills")}</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {(candidate.skills || []).map((skill) => (
@@ -386,43 +387,43 @@ export default function CandidateProfilePage() {
                     </span>
                   ))}
                   {(!candidate.skills || candidate.skills.length === 0) && (
-                    <p className="text-sm text-slate-400">{t("candidates.not_assigned")}</p>
+                    <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.not_assigned")}</p>
                   )}
                 </div>
               </div>
 
               {/* Summary Card */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="flex items-center gap-2 mb-4">
-                  <User className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-base font-semibold text-slate-900">{t("profile.overview")}</h3>
+                  <User className="h-5 w-5" style={{ color: 'var(--text-tertiary)' }} />
+                  <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t("profile.overview")}</h3>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-blue-100">
-                      <Briefcase className="h-4 w-4 text-blue-600" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
+                    <div className="flex items-center justify-center h-9 w-9 rounded-lg" style={{ background: 'var(--bg-tertiary)' }}>
+                      <Briefcase className="h-4 w-4" style={{ color: 'var(--text-gold)' }} />
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">{t("profile.experience")}</p>
-                      <p className="text-sm font-semibold text-slate-900">{candidate.experience_years || 0} {t("candidates.years")}</p>
+                      <p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t("profile.experience")}</p>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{candidate.experience_years || 0} {t("candidates.years")}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-violet-100">
-                      <GraduationCap className="h-4 w-4 text-violet-600" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
+                    <div className="flex items-center justify-center h-9 w-9 rounded-lg" style={{ background: 'var(--bg-tertiary)' }}>
+                      <GraduationCap className="h-4 w-4" style={{ color: 'var(--text-gold)' }} />
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">{t("profile.education")}</p>
-                      <p className="text-sm font-semibold text-slate-900">{candidate.education || t("candidates.not_assigned")}</p>
+                      <p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t("profile.education")}</p>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{candidate.education || t("candidates.not_assigned")}</p>
                     </div>
                   </div>
                   {candidate.certifications && candidate.certifications.length > 0 && (
-                    <div className="p-3 bg-slate-50 rounded-lg">
+                    <div className="p-3 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-amber-100">
-                          <Award className="h-4 w-4 text-amber-600" />
+                        <div className="flex items-center justify-center h-9 w-9 rounded-lg" style={{ background: 'var(--bg-tertiary)' }}>
+                          <Award className="h-4 w-4" style={{ color: 'var(--text-gold)' }} />
                         </div>
-                        <p className="text-xs text-slate-500 font-medium">{t("profile.certifications")}</p>
+                        <p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t("profile.certifications")}</p>
                       </div>
                       <div className="flex flex-wrap gap-1.5 mt-1 mr-12">
                         {candidate.certifications.map((cert) => (
@@ -439,31 +440,31 @@ export default function CandidateProfilePage() {
 
             {/* Experience Timeline */}
             {candidate.previous_roles && candidate.previous_roles.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="flex items-center gap-2 mb-5">
-                  <Briefcase className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-base font-semibold text-slate-900">{t("profile.experience")}</h3>
+                  <Briefcase className="h-5 w-5" style={{ color: 'var(--text-tertiary)' }} />
+                  <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t("profile.experience")}</h3>
                 </div>
                 <div className="space-y-0">
                   {candidate.previous_roles.map((role, i) => (
                     <div key={i} className="relative pr-8 pb-6 last:pb-0">
                       {/* Timeline line */}
                       {i < candidate.previous_roles!.length - 1 && (
-                        <div className="absolute right-[11px] top-6 bottom-0 w-0.5 bg-slate-200" />
+                        <div className="absolute right-[11px] top-6 bottom-0 w-0.5" style={{ background: 'var(--border-primary)' }} />
                       )}
                       {/* Timeline dot */}
-                      <div className="absolute right-0 top-1 h-6 w-6 rounded-full bg-electric-100 flex items-center justify-center ring-4 ring-white">
-                        <div className="h-2.5 w-2.5 rounded-full bg-electric-500" />
+                      <div className="absolute right-0 top-1 h-6 w-6 rounded-full flex items-center justify-center ring-4" style={{ background: 'var(--bg-tertiary)' }}>
+                        <div className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--brand-gold)' }} />
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-4">
-                        <h4 className="font-semibold text-slate-900">{role.title}</h4>
-                        <p className="text-sm text-slate-500 mt-0.5">
+                      <div className="rounded-lg p-4" style={{ background: 'var(--bg-secondary)' }}>
+                        <h4 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{role.title}</h4>
+                        <p className="text-sm mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                           {role.company}
-                          <span className="mx-2 text-slate-300">&middot;</span>
+                          <span className="mx-2" style={{ color: 'var(--border-primary)' }}>&middot;</span>
                           {role.duration}
                         </p>
                         {role.description && (
-                          <p className="text-sm text-slate-600 mt-2 leading-relaxed">{role.description}</p>
+                          <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{role.description}</p>
                         )}
                       </div>
                     </div>
@@ -473,9 +474,9 @@ export default function CandidateProfilePage() {
             )}
 
             {/* Job Categories */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-semibold" style={{ color: 'var(--navy)' }}>
+                <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
                   {t("common.professional_classification")}
                 </h3>
                 <Button variant="outline" size="sm" className="rounded-lg text-xs" onClick={() => setEditingCategories(!editingCategories)}>
@@ -493,8 +494,8 @@ export default function CandidateProfilePage() {
                           onClick={() => setSelectedCategories(prev => isSelected ? prev.filter(k => k !== cat.key) : [...prev, cat.key])}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                           style={{
-                            background: isSelected ? 'var(--blue)' : 'var(--gray-100)',
-                            color: isSelected ? '#fff' : 'var(--gray-600)',
+                            background: isSelected ? 'var(--brand-gold)' : 'var(--bg-tertiary)',
+                            color: isSelected ? '#1A1A1A' : 'var(--text-secondary)',
                           }}
                         >
                           {locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en}
@@ -502,7 +503,7 @@ export default function CandidateProfilePage() {
                       );
                     })}
                   </div>
-                  <Button onClick={saveCategories} size="sm" className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+                  <Button onClick={saveCategories} size="sm" className="rounded-lg text-white" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
                     {t("common.save")}
                   </Button>
                 </div>
@@ -511,22 +512,22 @@ export default function CandidateProfilePage() {
                   {(selectedCategories.length > 0 ? selectedCategories : (((candidate as unknown as Record<string, unknown>)?.job_categories as string[]) || [])).map((key: string) => {
                     const cat = allCategories.find(c => c.key === key);
                     return (
-                      <span key={key} className="px-3 py-1 rounded-lg text-xs font-medium" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
+                      <span key={key} className="px-3 py-1 rounded-lg text-xs font-medium" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>
                         {cat ? (locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en) : key}
                       </span>
                     );
                   })}
                   {selectedCategories.length === 0 && !(((candidate as unknown as Record<string, unknown>)?.job_categories as string[] | undefined)?.length) && (
-                    <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{t("common.not_classified")}</span>
+                    <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{t("common.not_classified")}</span>
                   )}
                 </div>
               )}
             </div>
 
             {/* Documents */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-semibold" style={{ color: 'var(--navy)' }}>
+                <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
                   {t("common.documents")}
                 </h3>
               </div>
@@ -541,7 +542,7 @@ export default function CandidateProfilePage() {
                 ].map(dt => (
                   <label key={dt.type} className="cursor-pointer">
                     <input type="file" className="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={e => handleDocUpload(e, dt.type)} disabled={uploadingDoc} />
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" style={{ borderColor: 'var(--gray-200)', color: 'var(--gray-600)' }}>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border cursor-pointer hover:opacity-95 transition-colors" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-secondary)' }}>
                       <Upload className="h-3 w-3" />
                       {t(dt.labelKey)}
                     </span>
@@ -553,41 +554,43 @@ export default function CandidateProfilePage() {
               {(((candidate as unknown as Record<string, unknown>)?.documents as { name: string; url: string; type: string; uploaded_at: string }[]) || []).length > 0 ? (
                 <div className="space-y-2">
                   {((candidate as unknown as Record<string, unknown>).documents as { name: string; url: string; type: string; uploaded_at: string }[]).map((doc, i) => (
-                    <a key={i} href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" style={{ background: 'var(--gray-50)' }}>
-                      <FileText className="h-5 w-5 shrink-0" style={{ color: 'var(--blue)' }} />
+                    <a key={i} href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg hover:opacity-95 transition-colors" style={{ background: 'var(--bg-secondary)' }}>
+                      <FileText className="h-5 w-5 shrink-0" style={{ color: 'var(--text-gold)' }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate" style={{ color: 'var(--navy)' }}>{doc.name}</p>
-                        <p className="text-xs" style={{ color: 'var(--gray-400)' }}>
+                        <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{doc.name}</p>
+                        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                           {doc.type} • {new Date(doc.uploaded_at).toLocaleDateString(locale === "he" ? "he-IL" : "en-US")}
                         </p>
                       </div>
-                      <ExternalLink className="h-4 w-4 shrink-0" style={{ color: 'var(--gray-400)' }} />
+                      <ExternalLink className="h-4 w-4 shrink-0" style={{ color: 'var(--text-tertiary)' }} />
                     </a>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm" style={{ color: 'var(--gray-400)' }}>{t("common.no_documents")}</p>
+                <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("common.no_documents")}</p>
               )}
             </div>
 
             {/* Notes Card */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center gap-2 mb-4">
-                <FileText className="h-5 w-5 text-slate-400" />
-                <h3 className="text-base font-semibold text-slate-900">{t("interviews.form.notes")}</h3>
+                <FileText className="h-5 w-5" style={{ color: 'var(--text-tertiary)' }} />
+                <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{t("interviews.form.notes")}</h3>
               </div>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={t("interviews.form.notes")}
                 rows={4}
-                className="resize-none rounded-lg border-slate-200 focus:ring-2 focus:ring-electric-500/20 focus:border-electric-400"
+                className="resize-none rounded-lg"
+                style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               />
               <div className="mt-3 flex justify-end">
                 <Button
                   onClick={saveNotes}
                   size="sm"
-                  className="rounded-lg bg-electric-600 hover:bg-electric-700"
+                  className="rounded-lg"
+                  style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}
                 >
                   <Save className="ml-2 h-4 w-4" />
                   {t("common.save")}
@@ -600,8 +603,8 @@ export default function CandidateProfilePage() {
           <TabsContent value="analysis" className="space-y-6 mt-0">
             {translating && (
               <div className="flex items-center justify-center gap-2 py-4">
-                <div className="h-5 w-5 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--gray-200)', borderTopColor: 'var(--blue)' }} />
-                <span className="text-sm" style={{ color: 'var(--gray-400)' }}>{locale === "he" ? "מתרגם..." : "Translating..."}</span>
+                <div className="h-5 w-5 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--border-primary)', borderTopColor: 'var(--brand-gold)' }} />
+                <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{locale === "he" ? "מתרגם..." : "Translating..."}</span>
               </div>
             )}
             {(candidate as unknown as Record<string, unknown>).ai_analysis ? (() => {
@@ -613,13 +616,13 @@ export default function CandidateProfilePage() {
                 <>
                   {/* Profile Snapshot */}
                   {analysis.profile_snapshot && (
-                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>{t("profile.overview")}</h3>
+                    <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>{t("profile.overview")}</h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {Object.entries(analysis.profile_snapshot as Record<string, string>).map(([key, val]) => (
-                          <div key={key} className="p-3 rounded-lg" style={{ background: 'var(--gray-50)' }}>
-                            <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>{key}</p>
-                            <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{val}</p>
+                          <div key={key} className="p-3 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
+                            <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>{key}</p>
+                            <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{val}</p>
                           </div>
                         ))}
                       </div>
@@ -628,24 +631,24 @@ export default function CandidateProfilePage() {
 
                   {/* Strengths & Weaknesses */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                    <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                       <h3 className="font-bold mb-3" style={{ color: 'var(--green)' }}>{t("profile.strengths")}</h3>
                       <ul className="space-y-2">
                         {((analysis.strengths as string[]) || []).map((s, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm">
                             <CheckCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: 'var(--green)' }} />
-                            <span style={{ color: 'var(--gray-600)' }}>{s}</span>
+                            <span style={{ color: 'var(--text-secondary)' }}>{s}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                    <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                       <h3 className="font-bold mb-3" style={{ color: 'var(--red)' }}>{t("profile.weaknesses")}</h3>
                       <ul className="space-y-2">
                         {((analysis.weaknesses as string[]) || []).map((w, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm">
                             <XCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: 'var(--red)' }} />
-                            <span style={{ color: 'var(--gray-600)' }}>{w}</span>
+                            <span style={{ color: 'var(--text-secondary)' }}>{w}</span>
                           </li>
                         ))}
                       </ul>
@@ -654,19 +657,19 @@ export default function CandidateProfilePage() {
 
                   {/* Scorecard */}
                   {scorecard && scorecard.length > 0 && (
-                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>{t("profile.scorecard")}</h3>
+                    <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>{t("profile.scorecard")}</h3>
                       <div className="space-y-3">
                         {scorecard.map((item, i) => (
                           <div key={i} className="flex items-center gap-4">
-                            <span className="text-sm w-44 shrink-0 font-medium" style={{ color: 'var(--gray-600)' }}>{item.criterion}</span>
-                            <div className="flex-1 h-2.5 rounded-full" style={{ background: 'var(--gray-100)' }}>
+                            <span className="text-sm w-44 shrink-0 font-medium" style={{ color: 'var(--text-secondary)' }}>{item.criterion}</span>
+                            <div className="flex-1 h-2.5 rounded-full" style={{ background: 'var(--bg-tertiary)' }}>
                               <div className="h-2.5 rounded-full transition-all" style={{
                                 width: `${(item.score / item.max) * 100}%`,
                                 background: item.score / item.max >= 0.7 ? 'var(--green)' : item.score / item.max >= 0.4 ? 'var(--amber)' : 'var(--red)',
                               }} />
                             </div>
-                            <span className="text-sm font-bold w-16 text-left" style={{ color: 'var(--navy)' }}>{item.score}/{item.max}</span>
+                            <span className="text-sm font-bold w-16 text-left" style={{ color: 'var(--text-primary)' }}>{item.score}/{item.max}</span>
                           </div>
                         ))}
                       </div>
@@ -681,7 +684,7 @@ export default function CandidateProfilePage() {
                     }}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>{t("profile.verdict")}</p>
+                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>{t("profile.verdict")}</p>
                           <p className="text-2xl font-bold" style={{
                             color: verdict.recommendation === 'HIRE' ? 'var(--green)' : verdict.recommendation === 'REJECT' ? 'var(--red)' : 'var(--amber)',
                           }}>
@@ -689,13 +692,13 @@ export default function CandidateProfilePage() {
                           </p>
                         </div>
                         <div className="text-left">
-                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.ai_score")}</p>
-                          <p className="text-4xl font-bold" style={{ color: 'var(--navy)' }}>
+                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.ai_score")}</p>
+                          <p className="text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>
                             {(analysis.total_score as number) || (verdict.score as number) || 0}
                           </p>
                         </div>
                       </div>
-                      <p className="text-sm mt-3" style={{ color: 'var(--gray-600)' }}>
+                      <p className="text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>
                         רמה: {verdict.level as string} &bull; {verdict.summary as string}
                       </p>
                     </div>
@@ -703,17 +706,17 @@ export default function CandidateProfilePage() {
 
                   {/* Interview Questions */}
                   {questions && questions.length > 0 && (
-                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--navy)' }}>{t("profile.interview_questions")}</h3>
+                    <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>{t("profile.interview_questions")}</h3>
                       <div className="space-y-3">
                         {questions.map((q, i) => (
-                          <div key={i} className="p-4 rounded-lg" style={{ background: 'var(--gray-50)' }}>
+                          <div key={i} className="p-4 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
                             <span className="text-xs px-2 py-0.5 rounded font-medium mb-1 inline-block" style={{
-                              background: q.type === 'Technical' ? 'var(--blue-light)' : q.type === 'Behavioral' ? 'var(--purple-light)' : 'var(--amber-light)',
-                              color: q.type === 'Technical' ? 'var(--blue)' : q.type === 'Behavioral' ? 'var(--purple)' : 'var(--amber)',
+                              background: q.type === 'Technical' ? 'var(--bg-tertiary)' : q.type === 'Behavioral' ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
+                              color: q.type === 'Technical' ? 'var(--text-gold)' : q.type === 'Behavioral' ? 'var(--text-secondary)' : 'var(--text-secondary)',
                             }}>{q.type}</span>
-                            <p className="text-sm font-medium mt-1" style={{ color: 'var(--navy)' }}>{q.question}</p>
-                            <p className="text-xs mt-1" style={{ color: 'var(--gray-400)' }}>{q.purpose}</p>
+                            <p className="text-sm font-medium mt-1" style={{ color: 'var(--text-primary)' }}>{q.question}</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>{q.purpose}</p>
                           </div>
                         ))}
                       </div>
@@ -722,19 +725,19 @@ export default function CandidateProfilePage() {
 
                   {/* Interviewer Notes */}
                   {analysis.interviewer_notes && (
-                    <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                      <h3 className="font-bold mb-2" style={{ color: 'var(--navy)' }}>{t("profile.interviewer_notes")}</h3>
-                      <p className="text-sm" style={{ color: 'var(--gray-600)' }}>{analysis.interviewer_notes as string}</p>
+                    <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+                      <h3 className="font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{t("profile.interviewer_notes")}</h3>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{analysis.interviewer_notes as string}</p>
                     </div>
                   )}
                 </>
               );
             })() : (
-              <div className="bg-white rounded-xl p-16 text-center" style={{ boxShadow: 'var(--shadow-sm)' }}>
-                <Brain className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--gray-300)' }} />
-                <p className="font-semibold text-lg mb-2" style={{ color: 'var(--navy)' }}>{t("profile.no_analysis")}</p>
-                <p className="text-sm mb-4" style={{ color: 'var(--gray-400)' }}>{t("profile.run_ai_analysis")}</p>
-                <Button onClick={handleRunAnalysis} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+              <div className="rounded-xl p-16 text-center" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+                <Brain className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
+                <p className="font-semibold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>{t("profile.no_analysis")}</p>
+                <p className="text-sm mb-4" style={{ color: 'var(--text-tertiary)' }}>{t("profile.run_ai_analysis")}</p>
+                <Button onClick={handleRunAnalysis} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
                   <Brain className="ml-2 h-4 w-4" /> {t("profile.run_analysis_btn")}
                 </Button>
               </div>
@@ -744,27 +747,28 @@ export default function CandidateProfilePage() {
           {/* Applications Tab */}
           <TabsContent value="applications" className="space-y-4 mt-0">
             {(candidate.applications || []).length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm">
+              <div className="rounded-xl" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="py-16 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
-                    <Briefcase className="h-8 w-8 text-slate-300" />
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-4" style={{ background: 'var(--bg-tertiary)' }}>
+                    <Briefcase className="h-8 w-8" style={{ color: 'var(--text-tertiary)' }} />
                   </div>
-                  <p className="text-sm text-slate-500">{t("candidates.no_candidates")}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.no_candidates")}</p>
                 </div>
               </div>
             ) : (
               candidate.applications.map((app) => (
-                <div key={app.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div key={app.id} className="rounded-xl overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <Link
                           href={`/jobs/${app.job_id}`}
-                          className="text-base font-semibold text-slate-900 hover:text-electric-600 transition-colors"
+                          className="text-base font-semibold transition-colors"
+                          style={{ color: 'var(--text-primary)' }}
                         >
                           {app.job?.title || t("candidates.not_assigned")}
                         </Link>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>
                           <Calendar className="inline h-3.5 w-3.5 ml-1 -mt-0.5" />
                           הוגש ב-{formatDate(app.applied_at)}
                         </p>
@@ -775,9 +779,9 @@ export default function CandidateProfilePage() {
                       </div>
                     </div>
                     {app.ai_reasoning && (
-                      <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <p className="text-xs font-medium text-slate-500 mb-1">{t("profile.ai_analysis")}</p>
-                        <p className="text-sm text-slate-600 leading-relaxed">{app.ai_reasoning}</p>
+                      <div className="mt-4 p-3 rounded-lg" style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)' }}>
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>{t("profile.ai_analysis")}</p>
+                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{app.ai_reasoning}</p>
                       </div>
                     )}
                   </div>
@@ -789,30 +793,30 @@ export default function CandidateProfilePage() {
           {/* Interviews Tab */}
           <TabsContent value="interviews" className="space-y-4 mt-0">
             {(candidate.interviews || []).length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm">
+              <div className="rounded-xl" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="py-16 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
-                    <Calendar className="h-8 w-8 text-slate-300" />
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-4" style={{ background: 'var(--bg-tertiary)' }}>
+                    <Calendar className="h-8 w-8" style={{ color: 'var(--text-tertiary)' }} />
                   </div>
-                  <p className="text-sm text-slate-500">{t("profile.interviews")}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("profile.interviews")}</p>
                 </div>
               </div>
             ) : (
               candidate.interviews.map((interview) => (
-                <div key={interview.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div key={interview.id} className="rounded-xl overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
-                        <div className="flex items-center justify-center h-11 w-11 rounded-xl bg-electric-50 text-electric-600 shrink-0">
+                        <div className="flex items-center justify-center h-11 w-11 rounded-xl shrink-0" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>
                           {interviewTypeIcon(interview.type)}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-slate-900">
+                            <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                               {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : t("candidates.not_assigned")}
                             </span>
                           </div>
-                          <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
+                          <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: 'var(--text-tertiary)' }}>
                             <span className="flex items-center gap-1">
                               <Clock className="h-3.5 w-3.5" />
                               {interview.duration_minutes} דקות
@@ -837,8 +841,8 @@ export default function CandidateProfilePage() {
                       )}
                     </div>
                     {interview.notes && (
-                      <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <p className="text-sm text-slate-600 leading-relaxed">{interview.notes}</p>
+                      <div className="mt-4 p-3 rounded-lg" style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)' }}>
+                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{interview.notes}</p>
                       </div>
                     )}
                   </div>
@@ -850,47 +854,44 @@ export default function CandidateProfilePage() {
           {/* Messages Tab */}
           <TabsContent value="messages" className="space-y-4 mt-0">
             {(candidate.messages || []).length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm">
+              <div className="rounded-xl" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="py-16 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
-                    <MessageSquare className="h-8 w-8 text-slate-300" />
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-4" style={{ background: 'var(--bg-tertiary)' }}>
+                    <MessageSquare className="h-8 w-8" style={{ color: 'var(--text-tertiary)' }} />
                   </div>
-                  <p className="text-sm text-slate-500">{t("profile.send_message")}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("profile.send_message")}</p>
                 </div>
               </div>
             ) : (
               candidate.messages.map((msg) => (
-                <div key={msg.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div key={msg.id} className="rounded-xl overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4 flex-1 min-w-0">
-                        <div className={`flex items-center justify-center h-11 w-11 rounded-xl shrink-0 ${
-                          msg.channel === "email" ? "bg-blue-50 text-blue-600" : "bg-emerald-50 text-emerald-600"
-                        }`}>
+                        <div className="flex items-center justify-center h-11 w-11 rounded-xl shrink-0" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>
                           {channelIcon(msg.channel)}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <Badge
                               variant="outline"
-                              className={`text-xs rounded-md ${
-                                msg.channel === "email" ? "border-blue-200 text-blue-700 bg-blue-50" : "border-emerald-200 text-emerald-700 bg-emerald-50"
-                              }`}
+                              className="text-xs rounded-md"
+                              style={{ borderColor: 'var(--border-primary)', color: 'var(--text-secondary)', background: 'var(--bg-tertiary)' }}
                             >
                               {msg.channel === "email" ? t("candidates.bulk.send_email") : "WhatsApp"}
                             </Badge>
                             {msg.subject && (
-                              <span className="font-semibold text-slate-900 truncate">{msg.subject}</span>
+                              <span className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{msg.subject}</span>
                             )}
                           </div>
-                          <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
+                          <p className="text-sm line-clamp-2 leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
                             {msg.body}
                           </p>
                         </div>
                       </div>
                       <div className="text-left shrink-0">
                         <StatusBadge status={msg.status} />
-                        <p className="text-xs text-slate-400 mt-1.5">
+                        <p className="text-xs mt-1.5" style={{ color: 'var(--text-tertiary)' }}>
                           {formatDateTime(msg.sent_at)}
                         </p>
                       </div>
@@ -903,8 +904,8 @@ export default function CandidateProfilePage() {
 
           {/* Files Tab */}
           <TabsContent value="files" className="space-y-6 mt-0">
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{t("files.upload_files")}</h3>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+              <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{t("files.upload_files")}</h3>
               <SmartUpload
                 onUploadComplete={() => {
                   fetch(`/api/candidates/${params.id}`).then(r => r.json()).then(setCandidate).catch(() => {});
@@ -912,21 +913,21 @@ export default function CandidateProfilePage() {
                 lang={locale as "he" | "en" | "tl"}
               />
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{t("files.title")}</h3>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+              <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{t("files.title")}</h3>
               <CandidateFiles candidateId={params.id as string} lang={locale as "he" | "en" | "tl"} />
             </div>
           </TabsContent>
 
           {/* Activity Tab */}
           <TabsContent value="activity" className="mt-0">
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               {(!candidate.activity_log || candidate.activity_log.length === 0) ? (
                 <div className="py-12 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
-                    <Clock className="h-8 w-8 text-slate-300" />
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-4" style={{ background: 'var(--bg-tertiary)' }}>
+                    <Clock className="h-8 w-8" style={{ color: 'var(--text-tertiary)' }} />
                   </div>
-                  <p className="text-sm text-slate-500">{t("profile.history")}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("profile.history")}</p>
                 </div>
               ) : (
                 <div className="space-y-0">
@@ -936,15 +937,15 @@ export default function CandidateProfilePage() {
                       <div key={activity.id} className="relative pr-8 py-4 first:pt-0 last:pb-0">
                         {/* Timeline line */}
                         {i < candidate.activity_log.length - 1 && (
-                          <div className="absolute right-[11px] top-8 bottom-0 w-0.5 bg-slate-200" />
+                          <div className="absolute right-[11px] top-8 bottom-0 w-0.5" style={{ background: 'var(--border-primary)' }} />
                         )}
                         {/* Timeline dot */}
-                        <div className="absolute right-0 top-[18px] first:top-0 h-6 w-6 rounded-full bg-electric-50 flex items-center justify-center ring-4 ring-white">
-                          <div className="h-2 w-2 rounded-full bg-electric-500" />
+                        <div className="absolute right-0 top-[18px] first:top-0 h-6 w-6 rounded-full flex items-center justify-center ring-4" style={{ background: 'var(--bg-tertiary)' }}>
+                          <div className="h-2 w-2 rounded-full" style={{ background: 'var(--brand-gold)' }} />
                         </div>
                         <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-slate-900">{getStatusLabel(activity.action)}</p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{getStatusLabel(activity.action)}</p>
+                          <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                             {formatDateTime(activity.created_at)}
                           </p>
                         </div>

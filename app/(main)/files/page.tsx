@@ -126,26 +126,26 @@ export default function UnmatchedFilesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "var(--blue)" }} />
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "var(--brand-gold)" }} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--gray-50)" }}>
-      <div className="bg-white dark:bg-slate-800 border-b" style={{ borderColor: "var(--gray-200)" }}>
+    <div className="min-h-screen" style={{ background: "var(--bg-secondary)" }}>
+      <div className="border-b" style={{ borderColor: "var(--border-primary)" }}>
         <div className="px-8 py-6">
-          <h1 className="text-2xl font-bold" style={{ color: "var(--navy)" }}>{l.title}</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--gray-400)" }}>{l.subtitle}</p>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>{l.title}</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>{l.subtitle}</p>
         </div>
       </div>
 
       <div className="px-8 py-6 max-w-5xl">
         {files.length === 0 ? (
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-16 text-center" style={{ boxShadow: "var(--shadow-sm)" }}>
+          <div className="rounded-xl p-16 text-center" style={{ boxShadow: "var(--shadow-sm)" }}>
             <PartyPopper className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--green)" }} />
-            <p className="text-lg font-semibold" style={{ color: "var(--navy)" }}>{l.all_matched}</p>
-            <p className="text-sm mt-1" style={{ color: "var(--gray-400)" }}>{l.all_matched_sub}</p>
+            <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>{l.all_matched}</p>
+            <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>{l.all_matched_sub}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -155,21 +155,21 @@ export default function UnmatchedFilesPage() {
               const confidence = file.ai_classification_confidence;
 
               return (
-                <div key={file.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "var(--shadow-sm)" }}>
+                <div key={file.id} className="rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "var(--shadow-sm)" }}>
                   {/* Icon */}
-                  <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--blue-light)" }}>
-                    <Icon className="h-5 w-5" style={{ color: "var(--blue)" }} />
+                  <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--bg-tertiary)" }}>
+                    <Icon className="h-5 w-5" style={{ color: "var(--brand-gold)" }} />
                   </div>
 
                   {/* File info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate" style={{ color: "var(--navy)" }}>{file.file_name}</p>
+                    <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{file.file_name}</p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: "var(--blue-light)", color: "var(--blue)" }}>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: "var(--bg-tertiary)", color: "var(--brand-gold)" }}>
                         {fileTypeLabel(file.file_type)}
                       </span>
                       {detectedName && (
-                        <span className="text-xs" style={{ color: "var(--gray-600)" }}>
+                        <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
                           {l.detected_name}: <strong>{detectedName}</strong>
                         </span>
                       )}
@@ -183,7 +183,7 @@ export default function UnmatchedFilesPage() {
 
                   {/* Candidate selector */}
                   <Select value={assignments[file.id] || ""} onValueChange={v => setAssignments(prev => ({ ...prev, [file.id]: v }))}>
-                    <SelectTrigger className="w-48 rounded-lg text-xs h-9" style={{ borderColor: "var(--gray-200)" }}>
+                    <SelectTrigger className="w-48 rounded-lg text-xs h-9" style={{ borderColor: "var(--border-primary)" }}>
                       <SelectValue placeholder={l.select_candidate} />
                     </SelectTrigger>
                     <SelectContent>
@@ -195,7 +195,7 @@ export default function UnmatchedFilesPage() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Button size="sm" className="rounded-lg text-xs text-white h-8" style={{ background: "var(--blue)" }}
+                    <Button size="sm" className="rounded-lg text-xs text-white h-8" style={{ background: "var(--brand-gold)" }}
                       disabled={assigning === file.id || !assignments[file.id]}
                       onClick={() => assignFile(file.id)}>
                       {assigning === file.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}

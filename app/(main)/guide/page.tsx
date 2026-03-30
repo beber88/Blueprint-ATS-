@@ -114,37 +114,37 @@ export default function GuidePage() {
   const subtitles = { he: "כל מה שצריך לדעת כדי להשתמש ב-Blueprint ATS", en: "Everything you need to know to use Blueprint ATS", tl: "Lahat ng kailangan mong malaman para gamitin ang Blueprint ATS" };
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
-      <div className="bg-white dark:bg-slate-800 border-b" style={{ borderColor: 'var(--gray-200)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="border-b" style={{ borderColor: 'var(--border-primary)' }}>
         <div className="px-8 py-6">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{titles[locale] || titles.he}</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{subtitles[locale] || subtitles.he}</p>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{titles[locale] || titles.he}</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{subtitles[locale] || subtitles.he}</p>
         </div>
       </div>
       <div className="px-8 py-6 max-w-4xl mx-auto space-y-3">
         {guide.map((section, idx) => (
-          <div key={idx} className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
+          <div key={idx} className="rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
             <button
               onClick={() => setOpenSection(openSection === idx ? -1 : idx)}
-              className="w-full flex items-center gap-4 p-5 text-right hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+              className="w-full flex items-center gap-4 p-5 text-right hover:bg-[color:var(--bg-secondary)]  transition-colors"
             >
-              <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--blue-light)' }}>
-                <span style={{ color: 'var(--blue)' }}>{section.icon}</span>
+              <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--bg-tertiary)' }}>
+                <span style={{ color: 'var(--brand-gold)' }}>{section.icon}</span>
               </div>
-              <span className="flex-1 text-base font-semibold text-right" style={{ color: 'var(--navy)' }}>
+              <span className="flex-1 text-base font-semibold text-right" style={{ color: 'var(--text-primary)' }}>
                 {section.title[locale] || section.title.he}
               </span>
-              {openSection === idx ? <ChevronDown className="h-5 w-5" style={{ color: 'var(--gray-400)' }} /> : <ChevronRight className="h-5 w-5" style={{ color: 'var(--gray-400)' }} />}
+              {openSection === idx ? <ChevronDown className="h-5 w-5" style={{ color: 'var(--text-tertiary)' }} /> : <ChevronRight className="h-5 w-5" style={{ color: 'var(--text-tertiary)' }} />}
             </button>
             {openSection === idx && (
               <div className="px-5 pb-5">
                 <ol className="space-y-3 pr-14">
                   {section.steps.map((step, i) => (
                     <li key={i} className="flex gap-3 items-start">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: 'var(--blue)', color: '#fff' }}>
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: 'var(--brand-gold)', color: '#fff' }}>
                         {i + 1}
                       </span>
-                      <span className="text-sm leading-relaxed" style={{ color: 'var(--gray-600)' }}>
+                      <span className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                         {step[locale] || step.he}
                       </span>
                     </li>

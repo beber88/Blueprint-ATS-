@@ -183,7 +183,7 @@ export default function JobDetailPage() {
   );
 
   if (loading) return <PageLoading />;
-  if (!job) return <div className="p-6 text-center text-gray-500">{t("common.job_not_found")}</div>;
+  if (!job) return <div className="p-6 text-center text-[color:var(--text-tertiary)]">{t("common.job_not_found")}</div>;
 
   const employmentTypeLabels: Record<string, string> = {
     "full-time": t("jobs.form.full_time"),
@@ -210,10 +210,10 @@ export default function JobDetailPage() {
     keep_for_future: "#A78BFA",
   };
 
-  const radarColors = ["var(--blue)", "var(--green)", "var(--amber)"];
+  const radarColors = ["var(--brand-gold)", "var(--green)", "var(--amber)"];
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <div className="min-h-screen bg-[color:var(--bg-secondary)]" dir="rtl">
       <Header title={job.title} subtitle={job.department || t("common.job_details")} />
 
       <div className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
@@ -222,14 +222,14 @@ export default function JobDetailPage() {
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="text-gray-500 hover:text-gray-900 gap-2 rounded-xl px-3"
+            className="text-[color:var(--text-tertiary)] hover:text-[color:var(--text-primary)] gap-2 rounded-xl px-3"
           >
             <ArrowRight className="h-4 w-4" />
             {t("common.back")}
           </Button>
           <div className="flex items-center gap-3">
             <Select value={job.status} onValueChange={updateStatus}>
-              <SelectTrigger className="w-36 rounded-xl bg-white shadow-sm border-gray-200">
+              <SelectTrigger className="w-36 rounded-xl shadow-sm border-[color:var(--border-primary)]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -250,29 +250,29 @@ export default function JobDetailPage() {
         </div>
 
         {/* Job Info Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="rounded-xl shadow-sm border border-[color:var(--bg-tertiary)] overflow-hidden">
           <div className="p-6">
             <div className="flex items-start justify-between mb-1">
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
+                  <h1 className="text-2xl font-bold text-[color:var(--text-primary)]">{job.title}</h1>
                   <StatusBadge status={job.status} />
                 </div>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-[color:var(--text-tertiary)]">
                   {job.department && (
                     <span className="flex items-center gap-1.5">
-                      <Building className="h-4 w-4 text-gray-400" />
+                      <Building className="h-4 w-4 text-[color:var(--text-tertiary)]" />
                       {job.department}
                     </span>
                   )}
                   {job.location && (
                     <span className="flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <MapPin className="h-4 w-4 text-[color:var(--text-tertiary)]" />
                       {job.location}
                     </span>
                   )}
                   <span className="flex items-center gap-1.5">
-                    <Clock className="h-4 w-4 text-gray-400" />
+                    <Clock className="h-4 w-4 text-[color:var(--text-tertiary)]" />
                     {employmentTypeLabels[job.employment_type] || job.employment_type}
                   </span>
                 </div>
@@ -281,20 +281,20 @@ export default function JobDetailPage() {
           </div>
 
           {(job.description || job.requirements) && (
-            <div className="border-t border-gray-100 p-6 space-y-5">
+            <div className="border-t border-[color:var(--bg-tertiary)] p-6 space-y-5">
               {job.description && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-gray-400" />
+                  <h3 className="text-sm font-semibold text-[color:var(--text-primary)] mb-2 flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-[color:var(--text-tertiary)]" />
                     {t("jobs.form.description")}
                   </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{job.description}</p>
+                  <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed whitespace-pre-wrap">{job.description}</p>
                 </div>
               )}
               {job.requirements && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-800 mb-2">{t("jobs.form.requirements")}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{job.requirements}</p>
+                  <h3 className="text-sm font-semibold text-[color:var(--text-primary)] mb-2">{t("jobs.form.requirements")}</h3>
+                  <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed whitespace-pre-wrap">{job.requirements}</p>
                 </div>
               )}
             </div>
@@ -302,16 +302,16 @@ export default function JobDetailPage() {
         </div>
 
         {/* Candidates Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="rounded-xl shadow-sm border border-[color:var(--bg-tertiary)] overflow-hidden">
           {/* Section Header */}
-          <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <div className="flex items-center justify-between p-5 border-b border-[color:var(--bg-tertiary)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                <Users className="h-5 w-5 text-blue-500" />
+              <div className="w-10 h-10 bg-[color:var(--bg-tertiary)] rounded-xl flex items-center justify-center">
+                <Users className="h-5 w-5 text-[color:var(--text-gold)]" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">{t("candidates.title")}</h2>
-                <p className="text-sm text-gray-500">{candidates.length} {t("common.applications")}</p>
+                <h2 className="text-lg font-bold text-[color:var(--text-primary)]">{t("candidates.title")}</h2>
+                <p className="text-sm text-[color:var(--text-tertiary)]">{candidates.length} {t("common.applications")}</p>
               </div>
             </div>
             {activeTab === "table" && (
@@ -322,7 +322,7 @@ export default function JobDetailPage() {
                   setCompareMode(!compareMode);
                   if (compareMode) setSelectedCandidates(new Set());
                 }}
-                className={`rounded-xl gap-2 transition-colors ${compareMode ? "bg-blue-500 hover:bg-blue-600 text-white" : "border-gray-200"}`}
+                className={`rounded-xl gap-2 transition-colors ${compareMode ? "bg-[color:var(--bg-tertiary)]0 hover:bg-[color:var(--brand-gold)] text-white" : "border-[color:var(--border-primary)]"}`}
               >
                 <GitCompare className="h-4 w-4" />
                 {compareMode ? t("common.cancel_compare") : t("common.compare")}
@@ -331,15 +331,15 @@ export default function JobDetailPage() {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-100 px-5">
+          <div className="flex border-b border-[color:var(--bg-tertiary)] px-5">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.key
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    ? "border-[color:var(--brand-gold)] text-[color:var(--text-gold)]"
+                    : "border-transparent text-[color:var(--text-tertiary)] hover:text-[color:var(--text-secondary)] hover:border-[color:var(--border-secondary)]"
                 }`}
               >
                 {tab.icon}
@@ -351,11 +351,11 @@ export default function JobDetailPage() {
           {/* Tab Content */}
           {candidates.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Users className="h-7 w-7 text-gray-300" />
+              <div className="w-14 h-14 bg-[color:var(--bg-secondary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Users className="h-7 w-7 text-[color:var(--border-secondary)]" />
               </div>
-              <p className="text-gray-500 font-medium">{t("common.no_applications_yet")}</p>
-              <p className="text-sm text-gray-400 mt-1">{t("common.applications_will_appear")}</p>
+              <p className="text-[color:var(--text-tertiary)] font-medium">{t("common.no_applications_yet")}</p>
+              <p className="text-sm text-[color:var(--text-tertiary)] mt-1">{t("common.applications_will_appear")}</p>
             </div>
           ) : (
             <>
@@ -364,21 +364,21 @@ export default function JobDetailPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-100 bg-gray-50/50 text-right">
+                      <tr className="border-b border-[color:var(--bg-tertiary)] bg-[color:var(--bg-secondary)]/50 text-right">
                         {compareMode && <th className="py-3 px-4 w-12"></th>}
-                        <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("candidates.table.candidate")}</th>
-                        <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("candidates.table.ai_score")}</th>
-                        <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("candidates.table.status")}</th>
-                        <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("candidates.table.experience")}</th>
-                        <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("common.application_date")}</th>
+                        <th className="py-3 px-5 text-xs font-semibold text-[color:var(--text-tertiary)] uppercase tracking-wider">{t("candidates.table.candidate")}</th>
+                        <th className="py-3 px-5 text-xs font-semibold text-[color:var(--text-tertiary)] uppercase tracking-wider">{t("candidates.table.ai_score")}</th>
+                        <th className="py-3 px-5 text-xs font-semibold text-[color:var(--text-tertiary)] uppercase tracking-wider">{t("candidates.table.status")}</th>
+                        <th className="py-3 px-5 text-xs font-semibold text-[color:var(--text-tertiary)] uppercase tracking-wider">{t("candidates.table.experience")}</th>
+                        <th className="py-3 px-5 text-xs font-semibold text-[color:var(--text-tertiary)] uppercase tracking-wider">{t("common.application_date")}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-[color:var(--bg-secondary)]">
                       {candidates.map((app) => (
                         <tr
                           key={app.id}
-                          className={`hover:bg-gray-50/80 transition-colors ${
-                            compareMode && selectedCandidates.has(app.id) ? "bg-blue-50/60" : ""
+                          className={`hover:bg-[color:var(--bg-secondary)]/80 transition-colors ${
+                            compareMode && selectedCandidates.has(app.id) ? "bg-[color:var(--bg-tertiary)]/60" : ""
                           }`}
                         >
                           {compareMode && (
@@ -392,13 +392,13 @@ export default function JobDetailPage() {
                           <td className="py-3.5 px-5">
                             <div className="flex items-center gap-3">
                               <Avatar className="h-9 w-9">
-                                <AvatarFallback className="bg-blue-50 text-blue-600 text-xs font-semibold">
+                                <AvatarFallback className="bg-[color:var(--bg-tertiary)] text-[color:var(--text-gold)] text-xs font-semibold">
                                   {app.candidate?.full_name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                                 </AvatarFallback>
                               </Avatar>
                               <Link
                                 href={`/candidates/${app.candidate_id}`}
-                                className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                                className="font-medium text-[color:var(--text-primary)] hover:text-[color:var(--text-gold)] transition-colors"
                               >
                                 {app.candidate?.full_name}
                               </Link>
@@ -408,18 +408,18 @@ export default function JobDetailPage() {
                             {app.ai_score !== null ? (
                               <ScoreBadge score={app.ai_score} size="sm" />
                             ) : (
-                              <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg">{t("common.not_scored")}</span>
+                              <span className="text-xs text-[color:var(--text-tertiary)] bg-[color:var(--bg-tertiary)] px-2.5 py-1 rounded-lg">{t("common.not_scored")}</span>
                             )}
                           </td>
                           <td className="py-3.5 px-5">
                             <StatusBadge status={app.status} />
                           </td>
-                          <td className="py-3.5 px-5 text-sm text-gray-600">
+                          <td className="py-3.5 px-5 text-sm text-[color:var(--text-secondary)]">
                             {app.candidate?.experience_years != null
                               ? `${app.candidate.experience_years} ${t("candidates.years")}`
                               : "-"}
                           </td>
-                          <td className="py-3.5 px-5 text-sm text-gray-500">
+                          <td className="py-3.5 px-5 text-sm text-[color:var(--text-tertiary)]">
                             {formatDate(app.applied_at)}
                           </td>
                         </tr>
@@ -433,8 +433,8 @@ export default function JobDetailPage() {
               {activeTab === "charts" && (
                 <div className="p-6 space-y-8">
                   {/* Chart 1: Score Distribution */}
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4">{t("common.score_distribution")}</h3>
+                  <div className="bg-[color:var(--bg-secondary)] rounded-xl p-5 border border-[color:var(--bg-tertiary)]">
+                    <h3 className="text-sm font-semibold text-[color:var(--text-primary)] mb-4">{t("common.score_distribution")}</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart
                         data={candidates.map((app) => ({
@@ -442,7 +442,7 @@ export default function JobDetailPage() {
                           score: app.ai_score || 0,
                         }))}
                       >
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--bg-tertiary)" />
                         <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                         <YAxis domain={[0, 100]} />
                         <Tooltip />
@@ -465,13 +465,13 @@ export default function JobDetailPage() {
                   </div>
 
                   {/* Chart 2: Experience vs Score Scatter */}
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4">
+                  <div className="bg-[color:var(--bg-secondary)] rounded-xl p-5 border border-[color:var(--bg-tertiary)]">
+                    <h3 className="text-sm font-semibold text-[color:var(--text-primary)] mb-4">
                       {t("candidates.table.experience")} {t("common.vs_ai_score")}
                     </h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <ScatterChart>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--bg-tertiary)" />
                         <XAxis dataKey="experience" name="Experience" unit="y" />
                         <YAxis dataKey="score" name="Score" domain={[0, 100]} />
                         <Tooltip cursor={{ strokeDasharray: "3 3" }} />
@@ -481,15 +481,15 @@ export default function JobDetailPage() {
                             score: app.ai_score || 0,
                             name: app.candidate?.full_name,
                           }))}
-                          fill="var(--blue)"
+                          fill="var(--brand-gold)"
                         />
                       </ScatterChart>
                     </ResponsiveContainer>
                   </div>
 
                   {/* Chart 3: Pipeline Status */}
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4">{t("common.status_breakdown")}</h3>
+                  <div className="bg-[color:var(--bg-secondary)] rounded-xl p-5 border border-[color:var(--bg-tertiary)]">
+                    <h3 className="text-sm font-semibold text-[color:var(--text-primary)] mb-4">{t("common.status_breakdown")}</h3>
                     <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={statusData} layout="vertical">
                         <XAxis type="number" />
@@ -505,12 +505,12 @@ export default function JobDetailPage() {
                   </div>
 
                   {/* Chart 4: Radar Comparison of Top Candidates */}
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4">{t("common.top_comparison_radar")}</h3>
+                  <div className="bg-[color:var(--bg-secondary)] rounded-xl p-5 border border-[color:var(--bg-tertiary)]">
+                    <h3 className="text-sm font-semibold text-[color:var(--text-primary)] mb-4">{t("common.top_comparison_radar")}</h3>
                     {radarData.length > 0 ? (
                       <ResponsiveContainer width="100%" height={350}>
                         <RadarChart data={radarData}>
-                          <PolarGrid stroke="var(--gray-100)" />
+                          <PolarGrid stroke="var(--bg-tertiary)" />
                           <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 12 }} />
                           <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
                           {radarCandidateNames.map((name, i) => (
@@ -528,7 +528,7 @@ export default function JobDetailPage() {
                         </RadarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="text-center py-10 text-sm text-gray-400">
+                      <div className="text-center py-10 text-sm text-[color:var(--text-tertiary)]">
                         {t("common.no_scored_for_compare")}
                       </div>
                     )}
@@ -541,16 +541,16 @@ export default function JobDetailPage() {
                 <div className="p-6">
                   {topCandidates.length === 0 ? (
                     <div className="text-center py-12">
-                      <Trophy className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 font-medium">{t("common.no_scored_yet")}</p>
-                      <p className="text-sm text-gray-400 mt-1">{t("common.run_ai_to_see_top")}</p>
+                      <Trophy className="h-10 w-10 text-[color:var(--border-secondary)] mx-auto mb-3" />
+                      <p className="text-[color:var(--text-tertiary)] font-medium">{t("common.no_scored_yet")}</p>
+                      <p className="text-sm text-[color:var(--text-tertiary)] mt-1">{t("common.run_ai_to_see_top")}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {topCandidates.map((app, index) => (
                         <div
                           key={app.id}
-                          className="flex items-center gap-5 bg-gray-50 rounded-xl p-5 border border-gray-100 hover:border-blue-200 transition-colors"
+                          className="flex items-center gap-5 bg-[color:var(--bg-secondary)] rounded-xl p-5 border border-[color:var(--bg-tertiary)] hover:border-[color:var(--brand-gold)] transition-colors"
                         >
                           {/* Rank */}
                           <div
@@ -558,10 +558,10 @@ export default function JobDetailPage() {
                               index === 0
                                 ? "bg-amber-100 text-amber-700"
                                 : index === 1
-                                ? "bg-gray-200 text-gray-600"
+                                ? "bg-[color:var(--border-primary)] text-[color:var(--text-secondary)]"
                                 : index === 2
                                 ? "bg-orange-100 text-orange-700"
-                                : "bg-gray-100 text-gray-500"
+                                : "bg-[color:var(--bg-tertiary)] text-[color:var(--text-tertiary)]"
                             }`}
                           >
                             {index + 1}
@@ -586,28 +586,28 @@ export default function JobDetailPage() {
                           <div className="flex-1 min-w-0">
                             <Link
                               href={`/candidates/${app.candidate_id}`}
-                              className="font-bold text-gray-900 hover:text-blue-600 transition-colors text-lg"
+                              className="font-bold text-[color:var(--text-primary)] hover:text-[color:var(--text-gold)] transition-colors text-lg"
                             >
                               {app.candidate?.full_name}
                             </Link>
-                            <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                            <div className="flex items-center gap-3 mt-1 text-sm text-[color:var(--text-tertiary)]">
                               {app.candidate?.experience_years != null && (
                                 <span>{app.candidate.experience_years} {t("candidates.years")} {t("candidates.table.experience")}</span>
                               )}
                               <StatusBadge status={app.status} />
                             </div>
                             {app.ai_reasoning && (
-                              <p className="text-sm text-gray-600 mt-2 line-clamp-2">{app.ai_reasoning}</p>
+                              <p className="text-sm text-[color:var(--text-secondary)] mt-2 line-clamp-2">{app.ai_reasoning}</p>
                             )}
                             {app.candidate?.skills && app.candidate.skills.length > 0 && (
                               <div className="flex flex-wrap gap-1.5 mt-2">
                                 {app.candidate.skills.slice(0, 6).map((skill) => (
-                                  <Badge key={skill} variant="secondary" className="text-xs bg-white shadow-sm border border-gray-100">
+                                  <Badge key={skill} variant="secondary" className="text-xs shadow-sm border border-[color:var(--bg-tertiary)]">
                                     {skill}
                                   </Badge>
                                 ))}
                                 {app.candidate.skills.length > 6 && (
-                                  <span className="text-xs text-gray-400 self-center">+{app.candidate.skills.length - 6}</span>
+                                  <span className="text-xs text-[color:var(--text-tertiary)] self-center">+{app.candidate.skills.length - 6}</span>
                                 )}
                               </div>
                             )}
@@ -624,12 +624,12 @@ export default function JobDetailPage() {
 
         {/* Comparison Panel */}
         {compareMode && selectedCandidates.size >= 2 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-5 border-b border-gray-100 bg-gray-50/50">
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <GitCompare className="h-5 w-5 text-blue-500" />
+          <div className="rounded-xl shadow-sm border border-[color:var(--bg-tertiary)] overflow-hidden">
+            <div className="p-5 border-b border-[color:var(--bg-tertiary)] bg-[color:var(--bg-secondary)]/50">
+              <h2 className="text-lg font-bold text-[color:var(--text-primary)] flex items-center gap-2">
+                <GitCompare className="h-5 w-5 text-[color:var(--text-gold)]" />
                 {t("common.candidate_comparison")}
-                <span className="text-sm font-normal text-gray-500">({selectedCandidates.size} {t("common.selected")})</span>
+                <span className="text-sm font-normal text-[color:var(--text-tertiary)]">({selectedCandidates.size} {t("common.selected")})</span>
               </h2>
             </div>
             <div className="p-5">
@@ -640,52 +640,52 @@ export default function JobDetailPage() {
                 {candidates
                   .filter((app) => selectedCandidates.has(app.id))
                   .map((app) => (
-                    <div key={app.id} className="bg-gray-50 rounded-xl p-5 space-y-4 border border-gray-100">
-                      <div className="text-center pb-4 border-b border-gray-200">
+                    <div key={app.id} className="bg-[color:var(--bg-secondary)] rounded-xl p-5 space-y-4 border border-[color:var(--bg-tertiary)]">
+                      <div className="text-center pb-4 border-b border-[color:var(--border-primary)]">
                         <Avatar className="h-14 w-14 mx-auto mb-3">
-                          <AvatarFallback className="bg-blue-100 text-blue-600 font-bold text-base">
+                          <AvatarFallback className="bg-[color:var(--bg-tertiary)] text-[color:var(--text-gold)] font-bold text-base">
                             {app.candidate?.full_name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                           </AvatarFallback>
                         </Avatar>
-                        <h4 className="font-bold text-gray-900">{app.candidate?.full_name}</h4>
+                        <h4 className="font-bold text-[color:var(--text-primary)]">{app.candidate?.full_name}</h4>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("candidates.table.ai_score")}</p>
+                        <p className="text-xs font-semibold text-[color:var(--text-tertiary)] mb-1.5">{t("candidates.table.ai_score")}</p>
                         {app.ai_score !== null ? (
                           <ScoreBadge score={app.ai_score} size="sm" />
                         ) : (
-                          <span className="text-sm text-gray-400">{t("common.not_scored")}</span>
+                          <span className="text-sm text-[color:var(--text-tertiary)]">{t("common.not_scored")}</span>
                         )}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("common.ai_reasoning")}</p>
-                        <p className="text-sm text-gray-700 leading-relaxed">{app.ai_reasoning || t("common.not_available")}</p>
+                        <p className="text-xs font-semibold text-[color:var(--text-tertiary)] mb-1.5">{t("common.ai_reasoning")}</p>
+                        <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed">{app.ai_reasoning || t("common.not_available")}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("candidates.table.experience")}</p>
-                        <p className="text-sm text-gray-700">
+                        <p className="text-xs font-semibold text-[color:var(--text-tertiary)] mb-1.5">{t("candidates.table.experience")}</p>
+                        <p className="text-sm text-[color:var(--text-secondary)]">
                           {app.candidate?.experience_years != null
                             ? `${app.candidate.experience_years} ${t("candidates.years")}`
                             : t("common.not_available")}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("profile.skills")}</p>
+                        <p className="text-xs font-semibold text-[color:var(--text-tertiary)] mb-1.5">{t("profile.skills")}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {app.candidate?.skills && app.candidate.skills.length > 0 ? (
                             app.candidate.skills.map((skill) => (
-                              <Badge key={skill} variant="secondary" className="text-xs bg-white shadow-sm border border-gray-100">
+                              <Badge key={skill} variant="secondary" className="text-xs shadow-sm border border-[color:var(--bg-tertiary)]">
                                 {skill}
                               </Badge>
                             ))
                           ) : (
-                            <span className="text-sm text-gray-400">{t("common.not_available")}</span>
+                            <span className="text-sm text-[color:var(--text-tertiary)]">{t("common.not_available")}</span>
                           )}
                         </div>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{t("profile.education")}</p>
-                        <p className="text-sm text-gray-700">{app.candidate?.education || t("common.not_available")}</p>
+                        <p className="text-xs font-semibold text-[color:var(--text-tertiary)] mb-1.5">{t("profile.education")}</p>
+                        <p className="text-sm text-[color:var(--text-secondary)]">{app.candidate?.education || t("common.not_available")}</p>
                       </div>
                     </div>
                   ))}

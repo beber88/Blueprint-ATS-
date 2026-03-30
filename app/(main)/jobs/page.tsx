@@ -85,18 +85,18 @@ export default function JobsPage() {
     : jobs.filter((j) => j.status === statusFilter);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
       {/* Page Header */}
-      <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
+      <div className="border-b" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("jobs.title")}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{jobs.length} {t("jobs.jobs_in_system")}</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t("jobs.title")}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{jobs.length} {t("jobs.jobs_in_system")}</p>
           </div>
           <Button
             onClick={() => setCreateOpen(true)}
             className="rounded-lg text-white px-6"
-            style={{ background: 'var(--blue)' }}
+            style={{ background: 'var(--brand-gold)' }}
           >
             <Plus className="ml-2 h-4 w-4" />
             {t("jobs.new_job")}
@@ -119,8 +119,8 @@ export default function JobsPage() {
               className="px-5 py-2 text-sm font-medium rounded-lg transition-colors"
               style={
                 statusFilter === opt.value
-                  ? { background: 'var(--blue)', color: '#fff' }
-                  : { background: 'var(--gray-100)', color: 'var(--gray-600)' }
+                  ? { background: 'var(--brand-gold)', color: '#fff' }
+                  : { background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }
               }
             >
               {opt.label}
@@ -130,22 +130,22 @@ export default function JobsPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="bg-white rounded-xl p-8" style={{ boxShadow: 'var(--shadow-sm)' }}>
+          <div className="rounded-xl p-8" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
             <TableLoading />
           </div>
         ) : filteredJobs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24">
-            <div className="bg-white rounded-xl p-10 text-center max-w-sm" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="rounded-xl p-10 text-center max-w-sm" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               <div
                 className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
-                style={{ background: 'var(--blue-light)' }}
+                style={{ background: 'var(--bg-tertiary)' }}
               >
-                <Briefcase className="h-8 w-8" style={{ color: 'var(--blue)' }} />
+                <Briefcase className="h-8 w-8" style={{ color: 'var(--text-gold)' }} />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--navy)' }}>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
                 {t("jobs.no_jobs")} {statusFilter !== "all" ? "" : ""}
               </h3>
-              <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--gray-400)' }}>
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
                 {statusFilter !== "all"
                   ? t("common.no_results")
                   : t("jobs.no_jobs")}
@@ -154,7 +154,7 @@ export default function JobsPage() {
                 <Button
                   onClick={() => setCreateOpen(true)}
                   className="rounded-lg text-white px-6"
-                  style={{ background: 'var(--blue)' }}
+                  style={{ background: 'var(--brand-gold)' }}
                 >
                   <Plus className="ml-2 h-4 w-4" />
                   {t("jobs.new_job")}
@@ -187,12 +187,12 @@ export default function JobsPage() {
               return (
                 <div
                   key={job.id}
-                  className="bg-white rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col"
-                  style={{ boxShadow: 'var(--shadow-sm)' }}
+                  className="rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col"
+                  style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}
                 >
                   {/* Title + Status */}
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-bold text-lg leading-tight" style={{ color: 'var(--navy)' }}>
+                    <h3 className="font-bold text-lg leading-tight" style={{ color: 'var(--text-primary)' }}>
                       {job.title}
                     </h3>
                     <StatusBadge status={job.status} />
@@ -212,7 +212,7 @@ export default function JobsPage() {
                     {job.location && (
                       <span
                         className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg"
-                        style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}
+                        style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}
                       >
                         <MapPin className="h-3 w-3" />
                         {job.location}
@@ -229,18 +229,18 @@ export default function JobsPage() {
                   </div>
 
                   {/* Stats */}
-                  <div className="flex items-center gap-3 text-sm mb-4" style={{ color: 'var(--gray-600)' }}>
+                  <div className="flex items-center gap-3 text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                     <span className="inline-flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5" style={{ color: 'var(--gray-400)' }} />
+                      <Users className="h-3.5 w-3.5" style={{ color: 'var(--text-tertiary)' }} />
                       <span className="font-semibold">{candidateCount}</span>
-                      <span style={{ color: 'var(--gray-400)' }}>{t("jobs.candidates_count")}</span>
+                      <span style={{ color: 'var(--text-tertiary)' }}>{t("jobs.candidates_count")}</span>
                     </span>
                     {topScore != null && topScore > 0 && (
                       <>
-                        <span style={{ color: 'var(--gray-200)' }}>|</span>
+                        <span style={{ color: 'var(--border-primary)' }}>|</span>
                         <span className="inline-flex items-center gap-1.5">
                           <Trophy className="h-3.5 w-3.5" style={{ color: 'var(--green)' }} />
-                          <span style={{ color: 'var(--gray-400)' }}>{t("jobs.top_score")}:</span>
+                          <span style={{ color: 'var(--text-tertiary)' }}>{t("jobs.top_score")}:</span>
                           <span className="font-semibold" style={{ color: 'var(--green)' }}>{topScore}</span>
                         </span>
                       </>
@@ -251,14 +251,14 @@ export default function JobsPage() {
                   {candidateCount > 0 && totalBreakdown > 0 && (
                     <div
                       className="flex rounded-full overflow-hidden h-2 mb-4"
-                      style={{ background: 'var(--gray-100)' }}
+                      style={{ background: 'var(--bg-tertiary)' }}
                     >
                       {statusBreakdown.filter(s => s.count > 0).map((segment) => (
                         <div
                           key={segment.status}
                           style={{
                             width: `${(segment.count / totalBreakdown) * 100}%`,
-                            background: statusColors[segment.status]?.bg || 'var(--gray-400)',
+                            background: statusColors[segment.status]?.bg || 'var(--text-tertiary)',
                           }}
                           title={`${segment.status}: ${segment.count}`}
                         />
@@ -267,11 +267,11 @@ export default function JobsPage() {
                   )}
 
                   {/* Bottom link */}
-                  <div className="mt-auto pt-3 border-t" style={{ borderColor: 'var(--gray-100)' }}>
+                  <div className="mt-auto pt-3 border-t" style={{ borderColor: 'var(--bg-tertiary)' }}>
                     <Link
                       href={`/jobs/${job.id}`}
                       className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
-                      style={{ color: 'var(--blue)' }}
+                      style={{ color: 'var(--text-gold)' }}
                     >
                       {t("jobs.view_candidates")}
                       <ArrowLeft className="h-3.5 w-3.5" />
@@ -287,7 +287,7 @@ export default function JobsPage() {
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent className="max-w-2xl rounded-xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>
+              <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {t("jobs.form.create")}
               </DialogTitle>
             </DialogHeader>
@@ -363,7 +363,7 @@ export default function JobsPage() {
               <Button
                 onClick={handleCreate}
                 className="rounded-lg text-white px-6"
-                style={{ background: 'var(--blue)' }}
+                style={{ background: 'var(--brand-gold)' }}
               >
                 {t("jobs.form.create")}
               </Button>

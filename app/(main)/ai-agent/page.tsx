@@ -170,17 +170,17 @@ export default function AIAgentPage() {
   ] : [];
 
   return (
-    <div className="flex flex-col h-full" style={{ background: 'var(--gray-50)' }}>
+    <div className="flex flex-col h-full" style={{ background: 'var(--bg-secondary)' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b px-6 py-4" style={{ borderColor: 'var(--gray-200)' }}>
+      <div className="border-b px-6 py-4" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: 'linear-gradient(135deg, var(--blue), #8B5CF6)' }}>
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: 'linear-gradient(135deg, var(--brand-gold), #8B5CF6)' }}>
               <Bot className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
-              <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+              <h1 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{l.title}</h1>
+              <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{l.subtitle}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -190,12 +190,12 @@ export default function AIAgentPage() {
               size="sm"
               className="rounded-lg text-xs gap-1.5"
               onClick={() => setShowCandidateSelector(!showCandidateSelector)}
-              style={showCandidateSelector ? { background: 'var(--blue)' } : {}}
+              style={showCandidateSelector ? { background: 'var(--brand-gold)' } : {}}
             >
               <Users className="h-3.5 w-3.5" />
               {l.select_candidates}
               {selectedCandidates.length > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-blue-600">{selectedCandidates.length}</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold text-[color:var(--text-gold)]">{selectedCandidates.length}</span>
               )}
             </Button>
             {selectedCandidates.length > 0 && (
@@ -208,14 +208,14 @@ export default function AIAgentPage() {
 
         {/* Candidate selector panel */}
         {showCandidateSelector && (
-          <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-200)' }}>
+          <div className="mt-3 p-3 rounded-xl" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}>
             <input
               type="text"
               value={candidateSearch}
               onChange={e => setCandidateSearch(e.target.value)}
               placeholder={l.search_candidates}
               className="w-full px-3 py-2 rounded-lg text-sm mb-2"
-              style={{ border: '1px solid var(--gray-200)', background: 'white' }}
+              style={{ border: '1px solid var(--border-primary)', background: 'white' }}
             />
             <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
               {filteredCandidates.slice(0, 30).map(c => {
@@ -226,9 +226,9 @@ export default function AIAgentPage() {
                     onClick={() => toggleCandidate(c.id)}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
                     style={{
-                      background: isSelected ? 'var(--blue)' : 'white',
-                      color: isSelected ? '#fff' : 'var(--gray-600)',
-                      border: `1px solid ${isSelected ? 'var(--blue)' : 'var(--gray-200)'}`,
+                      background: isSelected ? 'var(--brand-gold)' : 'white',
+                      color: isSelected ? '#fff' : 'var(--text-secondary)',
+                      border: `1px solid ${isSelected ? 'var(--brand-gold)' : 'var(--border-primary)'}`,
                     }}
                   >
                     {isSelected && <Check className="h-3 w-3" />}
@@ -238,7 +238,7 @@ export default function AIAgentPage() {
               })}
             </div>
             {selectedCandidates.length > 0 && (
-              <p className="text-xs mt-2 font-medium" style={{ color: 'var(--blue)' }}>
+              <p className="text-xs mt-2 font-medium" style={{ color: 'var(--brand-gold)' }}>
                 {selectedCandidates.length} {l.selected}
               </p>
             )}
@@ -250,19 +250,19 @@ export default function AIAgentPage() {
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl mb-5" style={{ background: 'linear-gradient(135deg, var(--blue), #8B5CF6)' }}>
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl mb-5" style={{ background: 'linear-gradient(135deg, var(--brand-gold), #8B5CF6)' }}>
               <Sparkles className="h-8 w-8 text-white" />
             </div>
-            <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--navy)' }}>{l.title}</h2>
-            <p className="text-sm text-center max-w-md mb-6" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+            <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{l.title}</h2>
+            <p className="text-sm text-center max-w-md mb-6" style={{ color: 'var(--text-tertiary)' }}>{l.subtitle}</p>
 
             {/* Context-specific actions */}
             {contextActions.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full max-w-xl mb-4">
                 {contextActions.map((action, i) => (
                   <button key={i} onClick={() => sendMessage(action.prompt)}
-                    className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-xl text-sm font-medium transition-all hover:shadow-md border"
-                    style={{ borderColor: 'var(--blue)', color: 'var(--blue)' }}
+                    className="flex items-center gap-2 p-3 rounded-xl text-sm font-medium transition-all hover:shadow-md border"
+                    style={{ borderColor: 'var(--brand-gold)', color: 'var(--brand-gold)' }}
                   >
                     <action.icon className="h-4 w-4 shrink-0" />
                     <span className="truncate">{action.label}</span>
@@ -275,10 +275,10 @@ export default function AIAgentPage() {
             <div className="grid grid-cols-2 gap-2 w-full max-w-lg">
               {quickActions.map((action, i) => (
                 <button key={i} onClick={() => sendMessage(action.prompt)}
-                  className="flex items-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl text-sm font-medium transition-all hover:shadow-md text-right"
-                  style={{ boxShadow: 'var(--shadow-sm)', color: 'var(--navy)' }}
+                  className="flex items-center gap-3 p-4 rounded-xl text-sm font-medium transition-all hover:shadow-md text-right"
+                  style={{ boxShadow: 'var(--shadow-sm)', color: 'var(--text-primary)' }}
                 >
-                  <action.icon className="h-5 w-5 shrink-0" style={{ color: 'var(--blue)' }} />
+                  <action.icon className="h-5 w-5 shrink-0" style={{ color: 'var(--brand-gold)' }} />
                   {action.label}
                 </button>
               ))}
@@ -289,11 +289,11 @@ export default function AIAgentPage() {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: msg.role === "user" ? 'var(--blue)' : 'linear-gradient(135deg, var(--blue), #8B5CF6)' }}>
+              style={{ background: msg.role === "user" ? 'var(--brand-gold)' : 'linear-gradient(135deg, var(--brand-gold), #8B5CF6)' }}>
               {msg.role === "user" ? <User className="h-4 w-4 text-white" /> : <Bot className="h-4 w-4 text-white" />}
             </div>
             <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${msg.role === "user" ? "text-white" : ""}`}
-              style={{ background: msg.role === "user" ? 'var(--blue)' : 'white', color: msg.role === "user" ? 'white' : 'var(--gray-800)', boxShadow: msg.role === "assistant" ? 'var(--shadow-sm)' : 'none', whiteSpace: 'pre-wrap' }}>
+              style={{ background: msg.role === "user" ? 'var(--brand-gold)' : 'var(--bg-card)', color: msg.role === "user" ? 'white' : 'var(--text-primary)', boxShadow: msg.role === "assistant" ? 'var(--shadow-sm)' : 'none', whiteSpace: 'pre-wrap' }}>
               {msg.content}
             </div>
           </div>
@@ -301,12 +301,12 @@ export default function AIAgentPage() {
 
         {loading && (
           <div className="flex gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl" style={{ background: 'linear-gradient(135deg, var(--blue), #8B5CF6)' }}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl" style={{ background: 'linear-gradient(135deg, var(--brand-gold), #8B5CF6)' }}>
               <Bot className="h-4 w-4 text-white" />
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl px-4 py-3 flex items-center gap-2" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <Loader2 className="h-4 w-4 animate-spin" style={{ color: 'var(--blue)' }} />
-              <span className="text-sm" style={{ color: 'var(--gray-400)' }}>{l.thinking}</span>
+            <div className="rounded-2xl px-4 py-3 flex items-center gap-2" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <Loader2 className="h-4 w-4 animate-spin" style={{ color: 'var(--brand-gold)' }} />
+              <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{l.thinking}</span>
             </div>
           </div>
         )}
@@ -315,16 +315,16 @@ export default function AIAgentPage() {
       </div>
 
       {/* Input area */}
-      <div className="bg-white dark:bg-slate-800 border-t px-6 py-3" style={{ borderColor: 'var(--gray-200)' }}>
+      <div className="border-t px-6 py-3" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
         {selectedCandidates.length > 0 && (
           <div className="flex items-center gap-1.5 mb-2 flex-wrap">
-            <span className="text-xs font-medium" style={{ color: 'var(--gray-400)' }}>
+            <span className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>
               {selectedCandidates.length >= 2 ? "🔄 " : "🔍 "}
               {selectedCandidates.length >= 2 ? l.compare_mode : l.candidate_mode}:
             </span>
             {selectedCandidates.map(id => {
               const c = candidates.find(x => x.id === id);
-              return c ? <span key={id} className="text-xs px-2 py-0.5 rounded-md font-medium" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>{c.full_name}</span> : null;
+              return c ? <span key={id} className="text-xs px-2 py-0.5 rounded-md font-medium" style={{ background: 'var(--bg-tertiary)', color: 'var(--brand-gold)' }}>{c.full_name}</span> : null;
             })}
           </div>
         )}
@@ -336,13 +336,13 @@ export default function AIAgentPage() {
             onKeyDown={handleKeyDown}
             placeholder={l.placeholder}
             className="flex-1 resize-none rounded-xl min-h-[44px] max-h-[120px] text-sm"
-            style={{ borderColor: 'var(--gray-200)' }}
+            style={{ borderColor: 'var(--border-primary)' }}
             rows={1}
             disabled={loading}
           />
           <Button onClick={() => sendMessage()} disabled={!input.trim() || loading}
             className="h-11 w-11 rounded-xl shrink-0 p-0"
-            style={{ background: input.trim() ? 'var(--blue)' : 'var(--gray-200)' }}>
+            style={{ background: input.trim() ? 'var(--brand-gold)' : 'var(--border-primary)' }}>
             <Send className="h-4 w-4 text-white" />
           </Button>
         </div>

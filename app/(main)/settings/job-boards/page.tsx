@@ -58,11 +58,11 @@ export default function JobBoardsPage() {
   const l = labels[locale] || labels.he;
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
-      <div className="bg-white dark:bg-slate-800 border-b" style={{ borderColor: 'var(--gray-200)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="border-b" style={{ borderColor: 'var(--border-primary)' }}>
         <div className="px-8 py-6">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{l.title}</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{l.subtitle}</p>
         </div>
       </div>
       <div className="px-8 py-6 max-w-4xl space-y-4">
@@ -72,19 +72,19 @@ export default function JobBoardsPage() {
           const isEditing = editingBoard === board.key;
 
           return (
-            <div key={board.key} className="bg-white dark:bg-slate-800 rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div key={board.key} className="rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
+                  <div className="h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm" style={{ background: 'var(--bg-tertiary)', color: 'var(--brand-gold)' }}>
                     {board.name[0]}
                   </div>
                   <div>
-                    <h3 className="font-bold" style={{ color: 'var(--navy)' }}>{board.name}</h3>
+                    <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>{board.name}</h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       {isConnected ? (
                         <><CheckCircle className="h-3.5 w-3.5" style={{ color: 'var(--green)' }} /><span className="text-xs font-medium" style={{ color: 'var(--green)' }}>{l.connected}</span></>
                       ) : (
-                        <><XCircle className="h-3.5 w-3.5" style={{ color: 'var(--gray-400)' }} /><span className="text-xs" style={{ color: 'var(--gray-400)' }}>{l.not_connected}</span></>
+                        <><XCircle className="h-3.5 w-3.5" style={{ color: 'var(--text-tertiary)' }} /><span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{l.not_connected}</span></>
                       )}
                     </div>
                   </div>
@@ -110,12 +110,12 @@ export default function JobBoardsPage() {
                       />
                     </div>
                   ))}
-                  <div className="p-3 rounded-lg text-xs" style={{ background: 'var(--gray-50)', color: 'var(--gray-400)' }}>
+                  <div className="p-3 rounded-lg text-xs" style={{ background: 'var(--bg-secondary)', color: 'var(--text-tertiary)' }}>
                     <strong>{l.webhook}:</strong> https://blueprint-ats.vercel.app/api/webhooks/{board.key}
                   </div>
                   <div className="flex gap-2 pt-2">
                     <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setEditingBoard(null)}>{l.cancel}</Button>
-                    <Button size="sm" className="rounded-lg text-white" style={{ background: 'var(--blue)' }} disabled={saving} onClick={() => saveCredentials(board.key)}>
+                    <Button size="sm" className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }} disabled={saving} onClick={() => saveCredentials(board.key)}>
                       {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : l.save}
                     </Button>
                   </div>

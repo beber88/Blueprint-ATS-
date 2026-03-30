@@ -226,25 +226,25 @@ export default function CandidatesPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       {/* Hidden file input */}
       <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileUpload} />
 
       {/* Page Header */}
-      <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
+      <div style={{ background: 'var(--bg-secondary)', borderBottom: '0.5px solid var(--border-primary)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("candidates.title")}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{candidates.length} {t("candidates.title")}</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t("candidates.title")}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{candidates.length} {t("candidates.title")}</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => setManualOpen(true)} className="rounded-lg">
+            <Button variant="outline" onClick={() => setManualOpen(true)} className="rounded-lg" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
               <Plus className="ml-2 h-4 w-4" /> {t("candidates.add_manual")}
             </Button>
-            <Button onClick={() => setSmartUploadOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+            <Button onClick={() => setSmartUploadOpen(true)} className="rounded-lg" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
               <Upload className="ml-2 h-4 w-4" /> {t("candidates.upload_cv")}
             </Button>
-            <Button onClick={handleReclassify} disabled={reclassifying} variant="outline" className="rounded-lg">
+            <Button onClick={handleReclassify} disabled={reclassifying} variant="outline" className="rounded-lg" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
               <RefreshCw className={`ml-2 h-4 w-4 ${reclassifying ? "animate-spin" : ""}`} />
               {locale === "he" ? "סווג מחדש" : "Reclassify"}
             </Button>
@@ -256,7 +256,7 @@ export default function CandidatesPage() {
           <button
             onClick={() => setSelectedJob("all")}
             className="px-4 py-2 text-sm font-medium rounded-t-lg whitespace-nowrap transition-colors"
-            style={selectedJob === "all" ? { background: 'var(--blue)', color: '#fff' } : { color: 'var(--gray-600)', background: 'var(--gray-100)' }}
+            style={selectedJob === "all" ? { background: 'var(--brand-gold)', color: '#1A1A1A' } : { color: 'var(--text-secondary)', background: 'var(--bg-tertiary)' }}
           >
             {t("candidates.all_jobs")}
           </button>
@@ -265,7 +265,7 @@ export default function CandidatesPage() {
               key={job.id}
               onClick={() => setSelectedJob(job.id)}
               className="px-4 py-2 text-sm font-medium rounded-t-lg whitespace-nowrap transition-colors"
-              style={selectedJob === job.id ? { background: 'var(--blue)', color: '#fff' } : { color: 'var(--gray-600)', background: 'var(--gray-100)' }}
+              style={selectedJob === job.id ? { background: 'var(--brand-gold)', color: '#1A1A1A' } : { color: 'var(--text-secondary)', background: 'var(--bg-tertiary)' }}
             >
               {job.title}
             </button>
@@ -276,11 +276,11 @@ export default function CandidatesPage() {
       <div className="px-8 py-6 space-y-4">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--gray-400)' }} />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
           <Input
             placeholder={t("candidates.search_placeholder")}
             className="pr-10 h-11 rounded-lg"
-            style={{ borderColor: 'var(--gray-200)' }}
+            style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -289,7 +289,7 @@ export default function CandidatesPage() {
         {/* Status filter pills */}
         <div className="flex gap-2 flex-wrap items-center">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-44 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--gray-200)' }}>
+            <SelectTrigger className="w-44 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
               <SelectValue placeholder={t("candidates.table.status")} />
             </SelectTrigger>
             <SelectContent>
@@ -298,7 +298,7 @@ export default function CandidatesPage() {
             </SelectContent>
           </Select>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-48 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--gray-200)' }}>
+            <SelectTrigger className="w-48 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
               <SelectValue placeholder={t("candidates.all_jobs")} />
             </SelectTrigger>
             <SelectContent>
@@ -311,7 +311,7 @@ export default function CandidatesPage() {
             </SelectContent>
           </Select>
           {(statusFilter !== "all" || selectedJob !== "all") && (
-            <button onClick={() => { setStatusFilter("all"); setSelectedJob("all"); }} className="text-sm font-medium" style={{ color: 'var(--blue)' }}>
+            <button onClick={() => { setStatusFilter("all"); setSelectedJob("all"); }} className="text-sm font-medium" style={{ color: 'var(--text-gold)' }}>
               {t("common.clear_filters")}
             </button>
           )}
@@ -319,33 +319,33 @@ export default function CandidatesPage() {
 
         {/* Candidates Table */}
         {loading ? <TableLoading rows={8} /> : candidates.length === 0 ? (
-          <div className="bg-white rounded-xl p-16 text-center" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'var(--gray-100)' }}>
-              <Users className="h-8 w-8" style={{ color: 'var(--gray-400)' }} />
+          <div className="rounded-xl p-16 text-center" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)', border: '0.5px solid var(--border-primary)' }}>
+            <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'var(--bg-tertiary)' }}>
+              <Users className="h-8 w-8" style={{ color: 'var(--text-tertiary)' }} />
             </div>
-            <p className="font-semibold text-lg" style={{ color: 'var(--navy)' }}>{t("candidates.no_candidates")}</p>
-            <p className="text-sm mt-1 mb-4" style={{ color: 'var(--gray-400)' }}>{t("candidates.upload_first")}</p>
-            <Button onClick={() => fileInputRef.current?.click()} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+            <p className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>{t("candidates.no_candidates")}</p>
+            <p className="text-sm mt-1 mb-4" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.upload_first")}</p>
+            <Button onClick={() => fileInputRef.current?.click()} className="rounded-lg" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
               <Upload className="ml-2 h-4 w-4" /> {t("candidates.upload_cv")}
             </Button>
           </div>
         ) : (
-          <div className="bg-white rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
+          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)', border: '0.5px solid var(--border-primary)' }}>
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ background: 'var(--gray-50)', borderBottom: '1px solid var(--gray-200)' }}>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>
+                <tr style={{ background: 'var(--bg-tertiary)', borderBottom: '0.5px solid var(--border-primary)' }}>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
                     <input type="checkbox" className="rounded" onChange={(e) => {
                       if (e.target.checked) setSelectedRows(new Set(candidates.map(c => c.id)));
                       else setSelectedRows(new Set());
                     }} />
                   </th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.candidate")}</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("common.professional_classification")}</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.status")}</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.ai_score")}</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.experience")}</th>
-                  <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--gray-400)' }}>{t("candidates.table.actions")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.candidate")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("common.professional_classification")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.status")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.ai_score")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.experience")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -356,7 +356,13 @@ export default function CandidatesPage() {
                   const displayScore = topScore ?? analysisScore;
                   const candCategories = (cand as unknown as { job_categories?: string[] }).job_categories || [];
                   return (
-                    <tr key={candidate.id} className="hover:bg-slate-50/50 transition-colors" style={{ borderBottom: '1px solid var(--gray-100)' }}>
+                    <tr
+                      key={candidate.id}
+                      className="transition-colors"
+                      style={{ borderBottom: '0.5px solid var(--border-light)' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-card-hover)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
                       <td className="px-4 py-3">
                         <input type="checkbox" className="rounded" checked={selectedRows.has(candidate.id)}
                           onChange={(e) => {
@@ -373,13 +379,13 @@ export default function CandidatesPage() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-semibold group-hover:text-blue-600 transition-colors flex items-center gap-1.5" style={{ color: 'var(--navy)' }}>
+                            <p className="font-semibold transition-colors flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
                               {candidate.full_name}
                               {(cand as unknown as { has_portfolio?: boolean }).has_portfolio && (
-                                <span title={t("files.has_portfolio")}><Briefcase className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--purple)' }} /></span>
+                                <span title={t("files.has_portfolio")}><Briefcase className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--brand-gold)' }} /></span>
                               )}
                             </p>
-                            {candidate.email && <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{candidate.email}</p>}
+                            {candidate.email && <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{candidate.email}</p>}
                           </div>
                         </Link>
                       </td>
@@ -389,20 +395,20 @@ export default function CandidatesPage() {
                             {candCategories.slice(0, 2).map((catKey: string) => {
                               const cat = categories.find(c => c.key === catKey);
                               const name = cat ? (locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en) : catKey;
-                              return <span key={catKey} className="text-xs font-medium px-2 py-0.5 rounded-md" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>{name}</span>;
+                              return <span key={catKey} className="text-xs font-medium px-2 py-0.5 rounded-md" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>{name}</span>;
                             })}
-                            {candCategories.length > 2 && <span className="text-xs" style={{ color: 'var(--gray-400)' }}>+{candCategories.length - 2}</span>}
+                            {candCategories.length > 2 && <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>+{candCategories.length - 2}</span>}
                           </div>
                         ) : (
-                          <span className="text-xs" style={{ color: 'var(--gray-400)' }}>{t("common.not_classified")}</span>
+                          <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{t("common.not_classified")}</span>
                         )}
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={candidate.status} /></td>
                       <td className="px-4 py-3">
-                        {displayScore !== null && displayScore !== undefined ? <ScoreBadge score={displayScore} size="sm" /> : <span className="text-xs" style={{ color: 'var(--gray-400)' }}>--</span>}
+                        {displayScore !== null && displayScore !== undefined ? <ScoreBadge score={displayScore} size="sm" /> : <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>--</span>}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-sm" style={{ color: 'var(--gray-600)' }}>
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {candidate.experience_years ? `${candidate.experience_years} ${t("candidates.years")}` : "--"}
                         </span>
                       </td>
@@ -436,13 +442,13 @@ export default function CandidatesPage() {
 
         {/* Bulk Actions Bar */}
         {selectedRows.size > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded-xl text-white text-sm font-medium" style={{ background: 'var(--navy)', boxShadow: 'var(--shadow-md)', zIndex: 50 }}>
-            <span>{selectedRows.size} {t("candidates.bulk.selected")}</span>
-            <button onClick={() => setBulkEmailOpen(true)} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--blue)' }}>
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded-xl text-sm font-medium" style={{ background: '#1A1A1A', color: 'var(--text-primary)', boxShadow: 'var(--shadow-md)', zIndex: 50, border: '0.5px solid var(--border-primary)' }}>
+            <span style={{ color: '#FFFFFF' }}>{selectedRows.size} {t("candidates.bulk.selected")}</span>
+            <button onClick={() => setBulkEmailOpen(true)} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
               <Mail className="inline h-3 w-3 ml-1" /> {t("candidates.bulk.send_email")}
             </button>
-            <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)' }}>{t("candidates.bulk.change_status")}</button>
-            <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.1)' }}>{t("candidates.bulk.cancel")}</button>
+            <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFFFFF' }}>{t("candidates.bulk.change_status")}</button>
+            <button onClick={() => setSelectedRows(new Set())} className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.1)', color: '#FFFFFF' }}>{t("candidates.bulk.cancel")}</button>
           </div>
         )}
       </div>
@@ -450,10 +456,10 @@ export default function CandidatesPage() {
       {/* Upload progress dialog */}
       {uploading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.4)' }}>
-          <div className="bg-white rounded-xl p-8 text-center" style={{ boxShadow: 'var(--shadow-md)' }}>
-            <div className="h-8 w-8 border-3 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--gray-200)', borderTopColor: 'var(--blue)' }} />
-            <p className="font-medium" style={{ color: 'var(--navy)' }}>{uploadProgress || t("common.loading")}</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--gray-400)' }}>{t("common.loading")}</p>
+          <div className="rounded-xl p-8 text-center" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-md)', border: '0.5px solid var(--border-primary)' }}>
+            <div className="h-8 w-8 border-3 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--border-light)', borderTopColor: 'var(--brand-gold)' }} />
+            <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{uploadProgress || t("common.loading")}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>{t("common.loading")}</p>
           </div>
         </div>
       )}
@@ -462,57 +468,62 @@ export default function CandidatesPage() {
       <Dialog open={manualOpen} onOpenChange={setManualOpen}>
         <DialogContent className="sm:max-w-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-slate-900">{t("candidates.add_manual")}</DialogTitle>
-            <p className="text-sm text-slate-500 mt-1">{t("candidates.add_manual_description")}</p>
+            <DialogTitle className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>{t("candidates.add_manual")}</DialogTitle>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.add_manual_description")}</p>
           </DialogHeader>
           <div className="space-y-5 py-3">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">{t("candidates.form.full_name")} <span className="text-red-500">*</span></Label>
+              <Label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t("candidates.form.full_name")} <span className="text-red-500">*</span></Label>
               <Input
                 value={manualForm.full_name}
                 onChange={(e) => setManualForm({ ...manualForm, full_name: e.target.value })}
                 placeholder="John Doe"
                 className="h-11 rounded-lg"
+                style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700">{t("candidates.form.email")}</Label>
+                <Label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t("candidates.form.email")}</Label>
                 <Input
                   type="email"
                   value={manualForm.email}
                   onChange={(e) => setManualForm({ ...manualForm, email: e.target.value })}
                   placeholder="email@example.com"
                   className="h-11 rounded-lg"
+                  style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700">{t("candidates.form.phone")}</Label>
+                <Label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t("candidates.form.phone")}</Label>
                 <Input
                   value={manualForm.phone}
                   onChange={(e) => setManualForm({ ...manualForm, phone: e.target.value })}
                   placeholder="050-0000000"
                   className="h-11 rounded-lg"
+                  style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">{t("candidates.form.location")}</Label>
+              <Label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t("candidates.form.location")}</Label>
               <Input
                 value={manualForm.location}
                 onChange={(e) => setManualForm({ ...manualForm, location: e.target.value })}
                 placeholder="Tel Aviv"
                 className="h-11 rounded-lg"
+                style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">{t("interviews.form.notes")}</Label>
+              <Label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t("interviews.form.notes")}</Label>
               <Textarea
                 value={manualForm.notes}
                 onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })}
                 placeholder={t("interviews.form.notes")}
                 rows={3}
                 className="resize-none rounded-lg"
+                style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               />
             </div>
           </div>
@@ -521,12 +532,14 @@ export default function CandidatesPage() {
               variant="outline"
               onClick={() => setManualOpen(false)}
               className="rounded-lg"
+              style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}
             >
               {t("common.cancel")}
             </Button>
             <Button
               onClick={handleManualCreate}
-              className="rounded-lg bg-electric-600 hover:bg-electric-700"
+              className="rounded-lg"
+              style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}
             >
               {t("candidates.add_manual")}
             </Button>
@@ -538,15 +551,15 @@ export default function CandidatesPage() {
       <Dialog open={bulkEmailOpen} onOpenChange={setBulkEmailOpen}>
         <DialogContent className="sm:max-w-md rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>
+            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
               {t("candidates.bulk.send_email")} ({selectedRows.size})
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-3">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">{t("candidates.bulk.select_template")}</Label>
+              <Label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t("candidates.bulk.select_template")}</Label>
               <Select value={bulkTemplate} onValueChange={setBulkTemplate}>
-                <SelectTrigger className="rounded-lg">
+                <SelectTrigger className="rounded-lg" style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                   <SelectValue placeholder={t("candidates.bulk.select_template")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -557,15 +570,15 @@ export default function CandidatesPage() {
               </Select>
             </div>
             {bulkSending && (
-              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--blue-light)' }}>
-                <div className="h-4 w-4 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--gray-200)', borderTopColor: 'var(--blue)' }} />
-                <span className="text-sm font-medium" style={{ color: 'var(--blue)' }}>{bulkProgress}</span>
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--bg-tertiary)' }}>
+                <div className="h-4 w-4 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--border-light)', borderTopColor: 'var(--brand-gold)' }} />
+                <span className="text-sm font-medium" style={{ color: 'var(--text-gold)' }}>{bulkProgress}</span>
               </div>
             )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setBulkEmailOpen(false)} className="rounded-lg">{t("common.cancel")}</Button>
-            <Button onClick={handleBulkEmail} disabled={bulkSending} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+            <Button variant="outline" onClick={() => setBulkEmailOpen(false)} className="rounded-lg" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>{t("common.cancel")}</Button>
+            <Button onClick={handleBulkEmail} disabled={bulkSending} className="rounded-lg" style={{ background: 'var(--brand-gold)', color: '#1A1A1A' }}>
               {bulkSending ? t("common.loading") : t("candidates.bulk.send_email")}
             </Button>
           </DialogFooter>
@@ -576,7 +589,7 @@ export default function CandidatesPage() {
       <Dialog open={smartUploadOpen} onOpenChange={setSmartUploadOpen}>
         <DialogContent className="sm:max-w-2xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>
+            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
               {t("candidates.upload_cv")}
             </DialogTitle>
           </DialogHeader>

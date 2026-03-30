@@ -127,14 +127,14 @@ export default function CategoriesPage() {
   const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#14B8A6", "#EC4899", "#6366F1"];
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
-      <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="border-b" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{l.title}</h1>
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-64 rounded-lg" style={{ borderColor: 'var(--gray-200)' }}>
+            <SelectTrigger className="w-64 rounded-lg" style={{ borderColor: 'var(--border-primary)' }}>
               <SelectValue placeholder={l.select} />
             </SelectTrigger>
             <SelectContent>
@@ -150,47 +150,47 @@ export default function CategoriesPage() {
 
       {!selectedCategory ? (
         <div className="px-8 py-16 text-center">
-          <Users className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--gray-300)' }} />
-          <p className="text-lg font-semibold" style={{ color: 'var(--navy)' }}>{l.select}</p>
+          <Users className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--border-secondary)' }} />
+          <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{l.select}</p>
         </div>
       ) : loading ? (
         <div className="px-8 py-16 text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" style={{ color: 'var(--blue)' }} />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" style={{ color: 'var(--brand-gold)' }} />
         </div>
       ) : (
         <div className="px-8 py-6 space-y-6">
           {/* KPI Cards */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--blue-light)' }}>
-                  <Users className="h-5 w-5" style={{ color: 'var(--blue)' }} />
+                <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--bg-tertiary)' }}>
+                  <Users className="h-5 w-5" style={{ color: 'var(--brand-gold)' }} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{candidates.length}</p>
-                  <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{l.total}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{candidates.length}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{l.total}</p>
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--green-light)' }}>
                   <Award className="h-5 w-5" style={{ color: 'var(--green)' }} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{avgScore}</p>
-                  <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{l.avg_score}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{avgScore}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{l.avg_score}</p>
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--amber-light)' }}>
                   <TrendingUp className="h-5 w-5" style={{ color: 'var(--amber)' }} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{avgExp} {l.years}</p>
-                  <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{l.avg_exp}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{avgExp} {l.years}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{l.avg_exp}</p>
                 </div>
               </div>
             </div>
@@ -199,11 +199,11 @@ export default function CategoriesPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-2 gap-6">
             {/* Score Distribution */}
-            <div className="bg-white rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.scores}</h3>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+              <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.scores}</h3>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={scoreDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--bg-tertiary)" />
                   <XAxis dataKey="range" tick={{ fontSize: 12 }} />
                   <YAxis allowDecimals={false} />
                   <Tooltip />
@@ -217,8 +217,8 @@ export default function CategoriesPage() {
             </div>
 
             {/* Status Pie */}
-            <div className="bg-white rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.status_chart}</h3>
+            <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+              <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.status_chart}</h3>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
@@ -237,34 +237,34 @@ export default function CategoriesPage() {
           </div>
 
           {/* Candidates Table */}
-          <div className="bg-white rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <div className="p-5 border-b" style={{ borderColor: 'var(--gray-200)' }}>
-              <h3 className="font-bold" style={{ color: 'var(--navy)' }}>{l.candidates_table}</h3>
+          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+            <div className="p-5 border-b" style={{ borderColor: 'var(--border-primary)' }}>
+              <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>{l.candidates_table}</h3>
             </div>
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ background: 'var(--gray-50)' }}>
-                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.name}</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.score}</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.exp}</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.skills}</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.status}</th>
+                <tr style={{ background: 'var(--bg-secondary)' }}>
+                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{l.name}</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{l.score}</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{l.exp}</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{l.skills}</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{l.status}</th>
                 </tr>
               </thead>
               <tbody>
                 {candidates.sort((a, b) => (getTopScore(b) || 0) - (getTopScore(a) || 0)).map(c => (
-                  <tr key={c.id} className="hover:bg-gray-50/50" style={{ borderBottom: '1px solid var(--gray-100)' }}>
+                  <tr key={c.id} className="hover:bg-[color:var(--bg-secondary)]" style={{ borderBottom: '1px solid var(--bg-tertiary)' }}>
                     <td className="px-4 py-3">
-                      <Link href={`/candidates/${c.id}`} className="font-medium hover:text-blue-600" style={{ color: 'var(--navy)' }}>
+                      <Link href={`/candidates/${c.id}`} className="font-medium hover:text-[color:var(--text-gold)]" style={{ color: 'var(--text-primary)' }}>
                         {c.full_name}
                       </Link>
                     </td>
                     <td className="px-4 py-3">{getTopScore(c) !== null ? <ScoreBadge score={getTopScore(c)!} size="sm" /> : "--"}</td>
-                    <td className="px-4 py-3" style={{ color: 'var(--gray-600)' }}>{c.experience_years || 0} {l.years}</td>
+                    <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>{c.experience_years || 0} {l.years}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1 flex-wrap">
                         {(c.skills || []).slice(0, 3).map((s, i) => (
-                          <span key={i} className="text-xs px-2 py-0.5 rounded" style={{ background: 'var(--gray-100)', color: 'var(--gray-600)' }}>{s}</span>
+                          <span key={i} className="text-xs px-2 py-0.5 rounded" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>{s}</span>
                         ))}
                       </div>
                     </td>
@@ -276,23 +276,23 @@ export default function CategoriesPage() {
           </div>
 
           {/* AI Recommendations */}
-          <div className="bg-white rounded-xl p-6" style={{ boxShadow: 'var(--shadow-sm)' }}>
+          <div className="rounded-xl p-6" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold flex items-center gap-2" style={{ color: 'var(--navy)' }}>
-                <Brain className="h-5 w-5" style={{ color: 'var(--blue)' }} />
+              <h3 className="font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <Brain className="h-5 w-5" style={{ color: 'var(--brand-gold)' }} />
                 {l.ai_recommendations}
               </h3>
-              <Button onClick={requestInsight} disabled={loadingInsight || candidates.length === 0} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+              <Button onClick={requestInsight} disabled={loadingInsight || candidates.length === 0} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }}>
                 {loadingInsight ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
                 {l.generate}
               </Button>
             </div>
             {aiInsight ? (
-              <div className="text-sm leading-relaxed whitespace-pre-wrap p-4 rounded-lg" style={{ background: 'var(--gray-50)', color: 'var(--gray-600)' }}>
+              <div className="text-sm leading-relaxed whitespace-pre-wrap p-4 rounded-lg" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
                 {aiInsight}
               </div>
             ) : (
-              <p className="text-sm" style={{ color: 'var(--gray-400)' }}>
+              <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
                 {t("categories.ai_hint")}
               </p>
             )}

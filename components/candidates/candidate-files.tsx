@@ -26,13 +26,13 @@ interface CandidateFilesProps {
 }
 
 const TYPE_CONFIG: Record<DocType, { icon: typeof FileText; color: string; bg: string }> = {
-  cv: { icon: FileText, color: "var(--blue)", bg: "var(--blue-light)" },
+  cv: { icon: FileText, color: "var(--brand-gold)", bg: "var(--bg-tertiary)" },
   portfolio: { icon: Briefcase, color: "var(--purple)", bg: "var(--purple-light)" },
   certificate: { icon: Award, color: "var(--green)", bg: "var(--green-light)" },
   reference_letter: { icon: FileText, color: "var(--amber)", bg: "var(--amber-light)" },
-  id_document: { icon: FileText, color: "var(--gray-600)", bg: "var(--gray-100)" },
-  cover_letter: { icon: FileText, color: "var(--teal)", bg: "var(--blue-light)" },
-  other: { icon: FileText, color: "var(--gray-400)", bg: "var(--gray-100)" },
+  id_document: { icon: FileText, color: "var(--text-secondary)", bg: "var(--bg-tertiary)" },
+  cover_letter: { icon: FileText, color: "var(--teal)", bg: "var(--bg-tertiary)" },
+  other: { icon: FileText, color: "var(--text-tertiary)", bg: "var(--bg-tertiary)" },
 };
 
 const TYPE_LABELS: Record<DocType, Record<Lang, string>> = {
@@ -76,13 +76,13 @@ export function CandidateFiles({ candidateId, lang = "he" }: CandidateFilesProps
     return (
       <div className="space-y-3">
         {[1, 2, 3].map(i => (
-          <div key={i} className="flex items-center gap-3 p-4 rounded-xl animate-pulse" style={{ background: "var(--gray-50)" }}>
-            <div className="h-10 w-10 rounded-lg" style={{ background: "var(--gray-200)" }} />
+          <div key={i} className="flex items-center gap-3 p-4 rounded-xl animate-pulse" style={{ background: "var(--bg-secondary)" }}>
+            <div className="h-10 w-10 rounded-lg" style={{ background: "var(--border-primary)" }} />
             <div className="flex-1 space-y-2">
-              <div className="h-4 w-48 rounded" style={{ background: "var(--gray-200)" }} />
-              <div className="h-3 w-32 rounded" style={{ background: "var(--gray-100)" }} />
+              <div className="h-4 w-48 rounded" style={{ background: "var(--border-primary)" }} />
+              <div className="h-3 w-32 rounded" style={{ background: "var(--bg-tertiary)" }} />
             </div>
-            <div className="h-8 w-16 rounded-lg" style={{ background: "var(--gray-200)" }} />
+            <div className="h-8 w-16 rounded-lg" style={{ background: "var(--border-primary)" }} />
           </div>
         ))}
       </div>
@@ -93,8 +93,8 @@ export function CandidateFiles({ candidateId, lang = "he" }: CandidateFilesProps
   if (files.length === 0) {
     return (
       <div className="text-center py-12">
-        <FolderOpen className="h-12 w-12 mx-auto mb-3" style={{ color: "var(--gray-300)" }} />
-        <p className="text-sm font-medium" style={{ color: "var(--gray-400)" }}>{t.empty}</p>
+        <FolderOpen className="h-12 w-12 mx-auto mb-3" style={{ color: "var(--border-secondary)" }} />
+        <p className="text-sm font-medium" style={{ color: "var(--text-tertiary)" }}>{t.empty}</p>
       </div>
     );
   }
@@ -113,8 +113,8 @@ export function CandidateFiles({ candidateId, lang = "he" }: CandidateFilesProps
         return (
           <div
             key={file.id}
-            className="flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-slate-700"
-            style={{ background: "white", boxShadow: "var(--shadow-sm)" }}
+            className="flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-[color:var(--bg-secondary)]"
+            style={{ background: "var(--bg-card)", boxShadow: "var(--shadow-sm)" }}
           >
             {/* Type icon */}
             <div
@@ -126,7 +126,7 @@ export function CandidateFiles({ candidateId, lang = "he" }: CandidateFilesProps
 
             {/* File info */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate" style={{ color: "var(--navy)" }}>
+              <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
                 {file.file_name}
               </p>
               <div className="flex items-center gap-2 mt-0.5">
@@ -137,11 +137,11 @@ export function CandidateFiles({ candidateId, lang = "he" }: CandidateFilesProps
                   {typeLabel}
                 </span>
                 {file.file_size && (
-                  <span className="text-xs" style={{ color: "var(--gray-400)" }}>
+                  <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>
                     {formatFileSize(file.file_size)}
                   </span>
                 )}
-                <span className="text-xs" style={{ color: "var(--gray-400)" }}>
+                <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>
                   {dateStr}
                 </span>
                 {file.ai_classification_confidence != null && (

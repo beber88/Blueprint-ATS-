@@ -98,19 +98,19 @@ export default function InterviewsPage() {
   if (loading) return <PageLoading />;
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <div className="min-h-screen bg-[color:var(--bg-secondary)]" dir="rtl">
       <Header title={t("interviews.title")} subtitle={`${upcoming.length} ${t("interviews.upcoming")}`} />
 
       <div className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t("interviews.title")}</h1>
-            <p className="text-sm text-gray-500 mt-1">{upcoming.length} {t("interviews.upcoming")}</p>
+            <h1 className="text-2xl font-bold text-[color:var(--text-primary)]">{t("interviews.title")}</h1>
+            <p className="text-sm text-[color:var(--text-tertiary)] mt-1">{upcoming.length} {t("interviews.upcoming")}</p>
           </div>
           <Button
             onClick={() => setCreateOpen(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6 py-2.5 shadow-sm transition-colors"
+            className="bg-[color:var(--bg-tertiary)]0 hover:bg-[color:var(--brand-gold)] text-white rounded-xl px-6 py-2.5 shadow-sm transition-colors"
           >
             <Plus className="ml-2 h-4 w-4" />
             {t("interviews.schedule")}
@@ -118,24 +118,24 @@ export default function InterviewsPage() {
         </div>
 
         {/* Upcoming Interviews */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-5 border-b border-gray-100 flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-blue-500" />
+        <div className="rounded-xl shadow-sm border border-[color:var(--bg-tertiary)] overflow-hidden">
+          <div className="p-5 border-b border-[color:var(--bg-tertiary)] flex items-center gap-3">
+            <div className="w-10 h-10 bg-[color:var(--bg-tertiary)] rounded-xl flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-[color:var(--text-gold)]" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">{t("interviews.upcoming")}</h2>
-              <p className="text-sm text-gray-500">{upcoming.length} {t("interviews.upcoming")}</p>
+              <h2 className="text-lg font-bold text-[color:var(--text-primary)]">{t("interviews.upcoming")}</h2>
+              <p className="text-sm text-[color:var(--text-tertiary)]">{upcoming.length} {t("interviews.upcoming")}</p>
             </div>
           </div>
           <div className="p-5">
             {upcoming.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="h-7 w-7 text-gray-300" />
+                <div className="w-14 h-14 bg-[color:var(--bg-secondary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="h-7 w-7 text-[color:var(--border-secondary)]" />
                 </div>
-                <p className="text-gray-500 font-medium">{t("common.no_results")}</p>
-                <p className="text-sm text-gray-400 mt-1">{t("interviews.schedule_first_hint")}</p>
+                <p className="text-[color:var(--text-tertiary)] font-medium">{t("common.no_results")}</p>
+                <p className="text-sm text-[color:var(--text-tertiary)] mt-1">{t("interviews.schedule_first_hint")}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -146,14 +146,14 @@ export default function InterviewsPage() {
                   return (
                     <div
                       key={interview.id}
-                      className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:shadow-sm transition-shadow bg-white"
+                      className="flex items-center gap-4 p-4 rounded-xl border border-[color:var(--bg-tertiary)] hover:shadow-sm transition-shadow"
                     >
                       {/* Date Badge */}
-                      <div className="flex flex-col items-center justify-center bg-blue-50 rounded-xl p-3 min-w-[64px]">
-                        <span className="text-xl font-bold text-blue-600">
+                      <div className="flex flex-col items-center justify-center bg-[color:var(--bg-tertiary)] rounded-xl p-3 min-w-[64px]">
+                        <span className="text-xl font-bold text-[color:var(--text-gold)]">
                           {scheduledDate ? scheduledDate.getDate() : "?"}
                         </span>
-                        <span className="text-xs font-medium text-blue-500">
+                        <span className="text-xs font-medium text-[color:var(--text-gold)]">
                           {scheduledDate ? scheduledDate.toLocaleString("he-IL", { month: "short" }) : ""}
                         </span>
                       </div>
@@ -163,17 +163,17 @@ export default function InterviewsPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <Link
                             href={`/candidates/${app?.candidate?.id}`}
-                            className="font-semibold text-gray-900 hover:text-blue-600 transition-colors truncate"
+                            className="font-semibold text-[color:var(--text-primary)] hover:text-[color:var(--text-gold)] transition-colors truncate"
                           >
                             {app?.candidate?.full_name || t("common.unknown")}
                           </Link>
-                          <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-lg font-medium">
+                          <span className="inline-flex items-center gap-1 text-xs bg-[color:var(--bg-tertiary)] text-[color:var(--text-secondary)] px-2.5 py-0.5 rounded-lg font-medium">
                             <TypeIcon className="h-3 w-3" />
                             {typeLabels[interview.type] || interview.type}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 truncate">{app?.job?.title || t("common.unknown")}</p>
-                        <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-400">
+                        <p className="text-sm text-[color:var(--text-tertiary)] truncate">{app?.job?.title || t("common.unknown")}</p>
+                        <div className="flex items-center gap-4 mt-1.5 text-xs text-[color:var(--text-tertiary)]">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {scheduledDate ? formatDateTime(interview.scheduled_at!) : "TBD"}
@@ -197,27 +197,27 @@ export default function InterviewsPage() {
 
         {/* Past Interviews */}
         {past.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">{t("interviews.past")}</h2>
-              <p className="text-sm text-gray-500">{past.length} {t("interviews.past_count")}</p>
+          <div className="rounded-xl shadow-sm border border-[color:var(--bg-tertiary)] overflow-hidden">
+            <div className="p-5 border-b border-[color:var(--bg-tertiary)]">
+              <h2 className="text-lg font-bold text-[color:var(--text-primary)]">{t("interviews.past")}</h2>
+              <p className="text-sm text-[color:var(--text-tertiary)]">{past.length} {t("interviews.past_count")}</p>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-[color:var(--bg-secondary)]">
               {past.map((interview) => {
                 const app = interview.application as Interview["application"];
                 return (
                   <div
                     key={interview.id}
-                    className="flex items-center justify-between p-4 px-5 hover:bg-gray-50/50 transition-colors"
+                    className="flex items-center justify-between p-4 px-5 hover:bg-[color:var(--bg-secondary)]/50 transition-colors"
                   >
                     <div className="min-w-0">
                       <Link
                         href={`/candidates/${app?.candidate?.id}`}
-                        className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                        className="font-medium text-[color:var(--text-primary)] hover:text-[color:var(--text-gold)] transition-colors"
                       >
                         {app?.candidate?.full_name || t("common.unknown")}
                       </Link>
-                      <p className="text-sm text-gray-500 mt-0.5">
+                      <p className="text-sm text-[color:var(--text-tertiary)] mt-0.5">
                         {app?.job?.title} &middot; {interview.scheduled_at ? formatDateTime(interview.scheduled_at) : ""}
                       </p>
                     </div>
@@ -263,14 +263,14 @@ export default function InterviewsPage() {
         {/* Schedule Dialog */}
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent className="max-w-lg rounded-2xl p-0 overflow-hidden">
-            <DialogHeader className="p-6 pb-4 border-b border-gray-100">
-              <DialogTitle className="text-xl font-bold text-gray-900">{t("interviews.schedule")}</DialogTitle>
+            <DialogHeader className="p-6 pb-4 border-b border-[color:var(--bg-tertiary)]">
+              <DialogTitle className="text-xl font-bold text-[color:var(--text-primary)]">{t("interviews.schedule")}</DialogTitle>
             </DialogHeader>
             <div className="p-6 space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.candidate")}</Label>
+                <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.candidate")}</Label>
                 <Select value={form.candidate_id} onValueChange={(v) => setForm({ ...form, candidate_id: v })}>
-                  <SelectTrigger className="rounded-xl border-gray-200">
+                  <SelectTrigger className="rounded-xl border-[color:var(--border-primary)]">
                     <SelectValue placeholder={t("messages.select_candidate")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -281,9 +281,9 @@ export default function InterviewsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-gray-700">{t("nav.jobs")}</Label>
+                <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("nav.jobs")}</Label>
                 <Select value={form.job_id} onValueChange={(v) => setForm({ ...form, job_id: v })}>
-                  <SelectTrigger className="rounded-xl border-gray-200">
+                  <SelectTrigger className="rounded-xl border-[color:var(--border-primary)]">
                     <SelectValue placeholder={t("messages.select_template")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -295,29 +295,29 @@ export default function InterviewsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.date")}</Label>
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.date")}</Label>
                   <Input
                     type="datetime-local"
                     value={form.scheduled_at}
                     onChange={(e) => setForm({ ...form, scheduled_at: e.target.value })}
-                    className="rounded-xl border-gray-200"
+                    className="rounded-xl border-[color:var(--border-primary)]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.duration")}</Label>
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.duration")}</Label>
                   <Input
                     type="number"
                     value={form.duration_minutes}
                     onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
-                    className="rounded-xl border-gray-200"
+                    className="rounded-xl border-[color:var(--border-primary)]"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.type")}</Label>
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.type")}</Label>
                   <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
-                    <SelectTrigger className="rounded-xl border-gray-200">
+                    <SelectTrigger className="rounded-xl border-[color:var(--border-primary)]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -328,30 +328,30 @@ export default function InterviewsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.interviewer")}</Label>
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.interviewer")}</Label>
                   <Input
                     value={form.interviewer}
                     onChange={(e) => setForm({ ...form, interviewer: e.target.value })}
-                    className="rounded-xl border-gray-200"
+                    className="rounded-xl border-[color:var(--border-primary)]"
                     placeholder={t("interviews.placeholder_interviewer")}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-gray-700">{t("interviews.form.notes")}</Label>
+                <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.notes")}</Label>
                 <Textarea
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  className="rounded-xl border-gray-200 resize-none"
+                  className="rounded-xl border-[color:var(--border-primary)] resize-none"
                   rows={3}
                 />
               </div>
             </div>
-            <DialogFooter className="p-6 pt-4 border-t border-gray-100 gap-2">
+            <DialogFooter className="p-6 pt-4 border-t border-[color:var(--bg-tertiary)] gap-2">
               <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-xl px-5">
                 {t("common.cancel")}
               </Button>
-              <Button onClick={handleCreate} className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6">
+              <Button onClick={handleCreate} className="bg-[color:var(--bg-tertiary)]0 hover:bg-[color:var(--brand-gold)] text-white rounded-xl px-6">
                 {t("interviews.schedule")}
               </Button>
             </DialogFooter>

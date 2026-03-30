@@ -7,7 +7,7 @@ import { UserProvider } from "@/lib/auth/context";
 
 export const metadata: Metadata = {
   title: "Blueprint ATS",
-  description: "Applicant Tracking System for HR teams",
+  description: "Applicant Tracking System - Blueprint Building Group Inc.",
 };
 
 export default function RootLayout({

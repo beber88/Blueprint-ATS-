@@ -149,11 +149,11 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)" }}>
-      <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col" style={{ boxShadow: "var(--shadow-md)" }}>
+      <div className="rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col" style={{ background: "var(--bg-card)", boxShadow: "var(--shadow-md)" }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--gray-200)" }}>
-          <h2 className="text-xl font-bold" style={{ color: "var(--navy)" }}>{l.title}</h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100"><X className="h-5 w-5" /></button>
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--border-primary)" }}>
+          <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>{l.title}</h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[color:var(--bg-tertiary)]"><X className="h-5 w-5" /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -166,13 +166,13 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
                 onDrop={handleDrop}
                 className="border-2 border-dashed rounded-xl p-10 text-center transition-all"
                 style={{
-                  borderColor: isDragging ? "var(--blue)" : "var(--gray-200)",
-                  background: isDragging ? "var(--blue-light)" : "transparent",
+                  borderColor: isDragging ? "var(--brand-gold)" : "var(--border-primary)",
+                  background: isDragging ? "var(--bg-tertiary)" : "transparent",
                 }}
               >
-                <Upload className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--gray-400)" }} />
-                <p className="font-medium" style={{ color: "var(--navy)" }}>{l.drop}</p>
-                <p className="text-xs mt-1" style={{ color: "var(--gray-400)" }}>PDF, DOC, DOCX (max 50)</p>
+                <Upload className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--text-tertiary)" }} />
+                <p className="font-medium" style={{ color: "var(--text-primary)" }}>{l.drop}</p>
+                <p className="text-xs mt-1" style={{ color: "var(--text-tertiary)" }}>PDF, DOC, DOCX (max 50)</p>
                 <div className="flex gap-3 justify-center mt-4">
                   <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" multiple className="hidden" onChange={e => { if (e.target.files) handleFiles(e.target.files); e.target.value = ""; }} />
                   <input ref={folderInputRef} type="file" accept=".pdf,.doc,.docx" multiple className="hidden" onChange={e => { if (e.target.files) handleFiles(e.target.files); e.target.value = ""; }} {...{ webkitdirectory: "", directory: "" } as React.InputHTMLAttributes<HTMLInputElement>} />
@@ -184,16 +184,16 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
               {/* File list */}
               {files.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium mb-2" style={{ color: "var(--navy)" }}>{files.length} {l.selected}</p>
+                  <p className="text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>{files.length} {l.selected}</p>
                   <div className="space-y-1 max-h-48 overflow-y-auto">
                     {files.map((f, i) => (
-                      <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg text-sm" style={{ background: "var(--gray-50)" }}>
+                      <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg text-sm" style={{ background: "var(--bg-secondary)" }}>
                         <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" style={{ color: "var(--gray-400)" }} />
-                          <span style={{ color: "var(--navy)" }}>{f.name}</span>
-                          <span className="text-xs" style={{ color: "var(--gray-400)" }}>{(f.size / 1024).toFixed(0)}KB</span>
+                          <FileText className="h-4 w-4" style={{ color: "var(--text-tertiary)" }} />
+                          <span style={{ color: "var(--text-primary)" }}>{f.name}</span>
+                          <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>{(f.size / 1024).toFixed(0)}KB</span>
                         </div>
-                        {!uploading && <button onClick={() => removeFile(i)} className="text-gray-400 hover:text-red-500"><X className="h-4 w-4" /></button>}
+                        {!uploading && <button onClick={() => removeFile(i)} className="text-[color:var(--text-tertiary)] hover:text-red-500"><X className="h-4 w-4" /></button>}
                       </div>
                     ))}
                   </div>
@@ -204,21 +204,21 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
               {uploading && results.length > 0 && (
                 <div className="space-y-1">
                   {results.map((r, i) => (
-                    <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style={{ background: "var(--gray-50)" }}>
-                      {r.status === "uploading" && <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--blue)" }} />}
+                    <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style={{ background: "var(--bg-secondary)" }}>
+                      {r.status === "uploading" && <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--brand-gold)" }} />}
                       {r.status === "success" && <CheckCircle className="h-4 w-4" style={{ color: "var(--green)" }} />}
-                      {r.status === "attached" && <CheckCircle className="h-4 w-4" style={{ color: "var(--blue)" }} />}
+                      {r.status === "attached" && <CheckCircle className="h-4 w-4" style={{ color: "var(--brand-gold)" }} />}
                       {r.status === "duplicate" && <AlertTriangle className="h-4 w-4" style={{ color: "var(--amber)" }} />}
                       {r.status === "error" && <XCircle className="h-4 w-4" style={{ color: "var(--red)" }} />}
-                      {r.status === "pending" && <div className="h-4 w-4 rounded-full" style={{ background: "var(--gray-200)" }} />}
-                      <span className="flex-1 truncate" style={{ color: "var(--navy)" }}>{r.fileName}</span>
+                      {r.status === "pending" && <div className="h-4 w-4 rounded-full" style={{ background: "var(--border-primary)" }} />}
+                      <span className="flex-1 truncate" style={{ color: "var(--text-primary)" }}>{r.fileName}</span>
                       {r.candidateName && <span className="text-xs" style={{ color: "var(--green)" }}>{r.candidateName}</span>}
                       {r.existingName && <span className="text-xs" style={{ color: "var(--amber)" }}>{l.already_exists}: {r.existingName}</span>}
                       {r.error && <span className="text-xs" style={{ color: "var(--red)" }}>{r.error}</span>}
                     </div>
                   ))}
-                  <div className="mt-2 h-2 rounded-full overflow-hidden" style={{ background: "var(--gray-100)" }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${(results.filter(r => r.status !== "pending" && r.status !== "uploading").length / results.length) * 100}%`, background: "var(--blue)" }} />
+                  <div className="mt-2 h-2 rounded-full overflow-hidden" style={{ background: "var(--bg-tertiary)" }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${(results.filter(r => r.status !== "pending" && r.status !== "uploading").length / results.length) * 100}%`, background: "var(--brand-gold)" }} />
                   </div>
                 </div>
               )}
@@ -231,9 +231,9 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
                   <p className="text-2xl font-bold" style={{ color: "var(--green)" }}>{successCount}</p>
                   <p className="text-xs font-medium" style={{ color: "var(--green)" }}>{l.success}</p>
                 </div>
-                <div className="p-4 rounded-xl text-center" style={{ background: "var(--blue-light)" }}>
-                  <p className="text-2xl font-bold" style={{ color: "var(--blue)" }}>{attachedCount}</p>
-                  <p className="text-xs font-medium" style={{ color: "var(--blue)" }}>{locale === "he" ? "צורפו לתיק" : "Attached"}</p>
+                <div className="p-4 rounded-xl text-center" style={{ background: "var(--bg-tertiary)" }}>
+                  <p className="text-2xl font-bold" style={{ color: "var(--brand-gold)" }}>{attachedCount}</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--brand-gold)" }}>{locale === "he" ? "צורפו לתיק" : "Attached"}</p>
                 </div>
                 <div className="p-4 rounded-xl text-center" style={{ background: "var(--amber-light)" }}>
                   <p className="text-2xl font-bold" style={{ color: "var(--amber)" }}>{dupCount}</p>
@@ -247,16 +247,16 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
 
               <table className="w-full text-sm">
                 <thead>
-                  <tr style={{ background: "var(--gray-50)" }}>
-                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--gray-400)" }}>{l.file}</th>
-                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--gray-400)" }}>{l.name}</th>
-                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--gray-400)" }}>{l.category}</th>
-                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--gray-400)" }}>{l.status}</th>
+                  <tr style={{ background: "var(--bg-secondary)" }}>
+                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--text-tertiary)" }}>{l.file}</th>
+                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--text-tertiary)" }}>{l.name}</th>
+                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--text-tertiary)" }}>{l.category}</th>
+                    <th className="text-right px-3 py-2 text-xs font-medium" style={{ color: "var(--text-tertiary)" }}>{l.status}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {results.map((r, i) => (
-                    <tr key={i} style={{ borderBottom: "1px solid var(--gray-100)" }}>
+                    <tr key={i} style={{ borderBottom: "1px solid var(--bg-tertiary)" }}>
                       <td className="px-3 py-2 truncate max-w-[150px]">{r.fileName}</td>
                       <td className="px-3 py-2">{r.candidateName || r.existingName || "-"}</td>
                       <td className="px-3 py-2">{r.suggestedJob ? `${r.suggestedJob} (${r.confidence}%)` : "-"}</td>
@@ -277,13 +277,13 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t" style={{ borderColor: "var(--gray-200)" }}>
+        <div className="flex items-center justify-between px-6 py-4 border-t" style={{ borderColor: "var(--border-primary)" }}>
           {!showResults ? (
             <>
-              <span className="text-sm" style={{ color: "var(--gray-400)" }}>{files.length} {l.selected}</span>
+              <span className="text-sm" style={{ color: "var(--text-tertiary)" }}>{files.length} {l.selected}</span>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={onClose} className="rounded-lg">{l.close}</Button>
-                <Button onClick={startUpload} disabled={files.length === 0 || uploading} className="rounded-lg text-white" style={{ background: "var(--blue)" }}>
+                <Button onClick={startUpload} disabled={files.length === 0 || uploading} className="rounded-lg text-white" style={{ background: "var(--brand-gold)" }}>
                   {uploading ? <><Loader2 className="h-4 w-4 animate-spin ml-2" />{l.uploading}</> : l.start}
                 </Button>
               </div>

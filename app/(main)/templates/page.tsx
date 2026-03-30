@@ -63,14 +63,14 @@ export default function TemplatesPage() {
   const filtered = templates.filter(t => channelFilter === "all" || t.type === channelFilter);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
-      <div className="bg-white border-b" style={{ borderColor: 'var(--gray-200)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="border-b" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{t("templates.title")}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{templates.length} {t("templates.count_label")}</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t("templates.title")}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{templates.length} {t("templates.count_label")}</p>
           </div>
-          <Button onClick={() => setCreateOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+          <Button onClick={() => setCreateOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }}>
             <Plus className="ml-2 h-4 w-4" /> {t("templates.new_template")}
           </Button>
         </div>
@@ -84,7 +84,7 @@ export default function TemplatesPage() {
               key={ch}
               onClick={() => setChannelFilter(ch)}
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={channelFilter === ch ? { background: 'var(--blue)', color: '#fff' } : { background: 'var(--gray-100)', color: 'var(--gray-600)' }}
+              style={channelFilter === ch ? { background: 'var(--brand-gold)', color: '#fff' } : { background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
             >
               {ch === "all" ? t("templates.all_channels") : ch === "email" ? t("messages.channel.email") : "WhatsApp"}
             </button>
@@ -93,19 +93,19 @@ export default function TemplatesPage() {
 
         {/* Templates grid */}
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-xl p-16 text-center" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <FileText className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--gray-300)' }} />
-            <p className="font-semibold text-lg" style={{ color: 'var(--navy)' }}>{t("templates.no_templates_title")}</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{t("templates.no_templates_hint")}</p>
+          <div className="rounded-xl p-16 text-center" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+            <FileText className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--border-secondary)' }} />
+            <p className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>{t("templates.no_templates_title")}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{t("templates.no_templates_hint")}</p>
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map(template => (
-              <div key={template.id} className="bg-white rounded-xl p-5 hover:shadow-md transition-shadow" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <div key={template.id} className="rounded-xl p-5 hover:shadow-md transition-shadow" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-bold" style={{ color: 'var(--navy)' }}>{template.name}</h3>
+                  <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>{template.name}</h3>
                   <div className="flex gap-1.5">
-                    <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded" style={{ background: template.type === 'email' ? 'var(--blue-light)' : 'var(--green-light)', color: template.type === 'email' ? 'var(--blue)' : 'var(--green)' }}>
+                    <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded" style={{ background: template.type === 'email' ? 'var(--bg-tertiary)' : 'var(--green-light)', color: template.type === 'email' ? 'var(--brand-gold)' : 'var(--green)' }}>
                       {template.type === 'email' ? <Mail className="h-3 w-3" /> : <MessageCircle className="h-3 w-3" />}
                       {template.type === 'email' ? t("messages.channel.email") : 'WhatsApp'}
                     </span>
@@ -114,8 +114,8 @@ export default function TemplatesPage() {
                     </span>
                   </div>
                 </div>
-                {template.subject && <p className="text-sm font-medium mb-1" style={{ color: 'var(--gray-600)' }}>{template.subject}</p>}
-                <p className="text-sm line-clamp-3" style={{ color: 'var(--gray-400)' }}>{template.body}</p>
+                {template.subject && <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{template.subject}</p>}
+                <p className="text-sm line-clamp-3" style={{ color: 'var(--text-tertiary)' }}>{template.body}</p>
               </div>
             ))}
           </div>
@@ -126,7 +126,7 @@ export default function TemplatesPage() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="max-w-2xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>{t("templates.new_template")}</DialogTitle>
+            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{t("templates.new_template")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-3 gap-4">
@@ -175,7 +175,7 @@ export default function TemplatesPage() {
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setCreateOpen(false)} className="rounded-lg">{t("common.cancel")}</Button>
-            <Button onClick={handleCreate} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>{t("templates.form.save")}</Button>
+            <Button onClick={handleCreate} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }}>{t("templates.form.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

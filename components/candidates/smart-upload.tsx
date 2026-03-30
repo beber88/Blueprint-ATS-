@@ -211,27 +211,27 @@ export function SmartUpload({ onUploadComplete, lang = "he" }: SmartUploadProps)
           onClick={() => !uploading && fileInputRef.current?.click()}
           className="border-2 border-dashed rounded-xl p-10 text-center transition-all cursor-pointer"
           style={{
-            borderColor: isDragging ? "var(--blue)" : "var(--gray-200)",
-            background: isDragging ? "var(--blue-light)" : "transparent",
+            borderColor: isDragging ? "var(--brand-gold)" : "var(--border-primary)",
+            background: isDragging ? "var(--bg-tertiary)" : "transparent",
             opacity: uploading ? 0.6 : 1,
             pointerEvents: uploading ? "none" : "auto",
           }}
         >
           {uploading ? (
             <div className="space-y-3">
-              <Loader2 className="h-10 w-10 mx-auto animate-spin" style={{ color: "var(--blue)" }} />
-              <p className="font-semibold" style={{ color: "var(--navy)" }}>{t.analyzing}</p>
-              <p className="text-sm" style={{ color: "var(--gray-400)" }}>{t.analyzing_sub}</p>
-              <p className="text-xs font-medium" style={{ color: "var(--blue)" }}>
+              <Loader2 className="h-10 w-10 mx-auto animate-spin" style={{ color: "var(--brand-gold)" }} />
+              <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{t.analyzing}</p>
+              <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>{t.analyzing_sub}</p>
+              <p className="text-xs font-medium" style={{ color: "var(--brand-gold)" }}>
                 {t.processing} {progress.current} {t.of} {progress.total}
               </p>
             </div>
           ) : (
             <>
-              <Upload className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--gray-400)" }} />
-              <p className="font-semibold" style={{ color: "var(--navy)" }}>{t.dropzone}</p>
-              <p className="text-sm mt-1" style={{ color: "var(--gray-400)" }}>{t.subtitle}</p>
-              <p className="text-xs mt-2" style={{ color: "var(--gray-400)" }}>{t.formats}</p>
+              <Upload className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--text-tertiary)" }} />
+              <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{t.dropzone}</p>
+              <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>{t.subtitle}</p>
+              <p className="text-xs mt-2" style={{ color: "var(--text-tertiary)" }}>{t.formats}</p>
             </>
           )}
         </div>
@@ -241,7 +241,7 @@ export function SmartUpload({ onUploadComplete, lang = "he" }: SmartUploadProps)
       {showResults && results.length > 0 && (
         <div className="space-y-3">
           {/* Summary */}
-          <div className="flex items-center gap-4 p-3 rounded-lg" style={{ background: "var(--gray-50)" }}>
+          <div className="flex items-center gap-4 p-3 rounded-lg" style={{ background: "var(--bg-secondary)" }}>
             <div className="flex items-center gap-1.5">
               <Check className="h-4 w-4" style={{ color: "var(--green)" }} />
               <span className="text-sm font-medium" style={{ color: "var(--green)" }}>{successCount} {t.done}</span>
@@ -266,19 +266,19 @@ export function SmartUpload({ onUploadComplete, lang = "he" }: SmartUploadProps)
               <div
                 key={i}
                 className="flex items-center gap-3 p-3 rounded-xl"
-                style={{ background: "white", boxShadow: "var(--shadow-sm)" }}
+                style={{ background: "var(--bg-card)", boxShadow: "var(--shadow-sm)" }}
               >
                 {/* Icon */}
-                <div className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--blue-light)" }}>
-                  <Icon className="h-4 w-4" style={{ color: "var(--blue)" }} />
+                <div className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--bg-tertiary)" }}>
+                  <Icon className="h-4 w-4" style={{ color: "var(--brand-gold)" }} />
                 </div>
 
                 {/* File info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: "var(--navy)" }}>{result.file}</p>
+                  <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{result.file}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {/* Type badge */}
-                    <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: "var(--blue-light)", color: "var(--blue)" }}>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: "var(--bg-tertiary)", color: "var(--brand-gold)" }}>
                       {typeLabel}
                     </span>
 

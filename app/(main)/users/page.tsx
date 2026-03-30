@@ -83,51 +83,51 @@ export default function UsersPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <Shield className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--gray-300)' }} />
-          <p className="text-lg font-semibold" style={{ color: 'var(--navy)' }}>{l.access_denied}</p>
+          <Shield className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--border-secondary)' }} />
+          <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{l.access_denied}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
-      <div className="bg-white dark:bg-slate-800 border-b" style={{ borderColor: 'var(--gray-200)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="border-b" style={{ borderColor: 'var(--border-primary)' }}>
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{l.title}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{l.subtitle}</p>
           </div>
-          <Button onClick={() => setInviteOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+          <Button onClick={() => setInviteOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }}>
             {locale === "he" ? "הזמן משתמש" : "Invite User"}
           </Button>
         </div>
       </div>
       <div className="px-8 py-6">
-        <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ background: 'var(--gray-50)' }}>
-                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{t("common.user")}</th>
-                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.role}</th>
-                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}>{l.joined}</th>
-                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--gray-400)' }}></th>
+              <tr style={{ background: 'var(--bg-secondary)' }}>
+                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t("common.user")}</th>
+                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{l.role}</th>
+                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{l.joined}</th>
+                <th className="text-right px-4 py-3 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}></th>
               </tr>
             </thead>
             <tbody>
               {users.map(u => (
-                <tr key={u.id} style={{ borderBottom: '1px solid var(--gray-100)' }}>
+                <tr key={u.id} style={{ borderBottom: '1px solid var(--bg-tertiary)' }}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9">
                         {u.avatar_url && <AvatarImage src={u.avatar_url} />}
-                        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-semibold">
+                        <AvatarFallback className="bg-[color:var(--bg-tertiary)] text-[color:var(--text-gold)] text-xs font-semibold">
                           {(u.full_name || u.email)?.[0]?.toUpperCase() || "?"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium" style={{ color: 'var(--navy)' }}>{u.full_name || u.email}</p>
-                        <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{u.email}</p>
+                        <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{u.full_name || u.email}</p>
+                        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{u.email}</p>
                       </div>
                     </div>
                   </td>
@@ -140,7 +140,7 @@ export default function UsersPage() {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--gray-400)' }}>
+                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-tertiary)' }}>
                     {new Date(u.created_at).toLocaleDateString(locale === "he" ? "he-IL" : "en-US")}
                   </td>
                   <td className="px-4 py-3">
@@ -185,7 +185,7 @@ export default function UsersPage() {
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setInviteOpen(false)} className="rounded-lg">{locale === "he" ? "ביטול" : "Cancel"}</Button>
-            <Button onClick={inviteUser} disabled={inviting} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+            <Button onClick={inviteUser} disabled={inviting} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }}>
               {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : (locale === "he" ? "שלח הזמנה" : "Send Invite")}
             </Button>
           </DialogFooter>
