@@ -393,5 +393,30 @@
     "cover_letter": "Cover Letter",
     "id_document": "ID Document",
     "other": "Other"
+  },
+  "job_categories": {
+    "architect_licensed": "Licensed Architect",
+    "architect": "Architect",
+    "architect_intern": "Architect Intern",
+    "project_manager": "Project Manager",
+    "site_engineer": "Site Engineer",
+    "engineer_civil": "Civil Engineer",
+    "engineer_electrical": "Electrical Engineer",
+    "engineer_mechanical": "Mechanical Engineer",
+    "engineer_structural": "Structural Engineer",
+    "engineer_mep": "MEP Engineer",
+    "quantity_surveyor": "Quantity Surveyor",
+    "procurement": "Procurement",
+    "foreman": "Foreman",
+    "construction_worker": "Construction Worker",
+    "hr": "Human Resources",
+    "secretary": "Secretary",
+    "marketing": "Marketing",
+    "finance": "Finance",
+    "draftsman": "Draftsman",
+    "qc_inspector": "QC Inspector",
+    "hse_officer": "HSE Officer",
+    "document_controller": "Document Controller",
+    "other": "Other"
   }
 }

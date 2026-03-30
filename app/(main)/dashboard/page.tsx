@@ -9,8 +9,9 @@ import {
   Users, UserPlus, Calendar, CheckCircle, Briefcase, TrendingUp, AlertTriangle, ArrowUpRight, Brain,
 } from "lucide-react";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid,
 } from "recharts";
+import { TOOLTIP_STYLE, AXIS_STYLE, GRID_STYLE, SCORE_COLORS } from "@/lib/chart-config";
 import Link from "next/link";
 import { DashboardStats } from "@/types";
 import { formatDateTime } from "@/lib/utils";
@@ -152,7 +153,6 @@ export default function DashboardPage() {
   };
   const l = labels[locale] || labels.he;
 
-  const COLORS = ["#C9A84C", "#A38A3E", "#D4B95E", "#8B7633", "#E5CA6E", "#6B5A28", "#F0DC85", "#4D4020"];
 
   const today = new Date().toLocaleDateString(locale === "he" ? "he-IL" : locale === "tl" ? "fil-PH" : "en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -256,13 +256,14 @@ export default function DashboardPage() {
             <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.pipeline}</h3>
             {statusData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={statusData} layout="vertical">
-                  <XAxis type="number" allowDecimals={false} />
-                  <YAxis type="category" dataKey="status" width={100} tick={{ fontSize: 11 }} tickFormatter={(v) => t(`candidates.status.${v}`) || v} />
-                  <Tooltip formatter={(value) => [value, l.candidates_label]} />
-                  <Bar dataKey="count" radius={[0, 6, 6, 0]}>
+                <BarChart data={statusData.map(d => ({ ...d, status: t(`candidates.status.${d.status}`) || d.status }))} layout="vertical" margin={{ left: 10, right: 20 }}>
+                  <CartesianGrid {...GRID_STYLE} horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} {...AXIS_STYLE} />
+                  <YAxis type="category" dataKey="status" width={110} {...AXIS_STYLE} tick={{ ...AXIS_STYLE.tick, fontSize: 11 }} />
+                  <Tooltip {...TOOLTIP_STYLE} />
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
                     {statusData.map((entry, i) => (
-                      <Cell key={i} fill={STATUS_COLORS[entry.status] || "#94A3B8"} />
+                      <Cell key={i} fill={STATUS_COLORS[entry.status] || "#8A7D6B"} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -270,17 +271,22 @@ export default function DashboardPage() {
             ) : <p className="text-sm text-center py-8" style={{ color: 'var(--text-tertiary)' }}>{l.no_data}</p>}
           </div>
 
-          {/* Profession Distribution */}
+          {/* Profession Distribution - Horizontal Bar */}
           <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
             <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.categories}</h3>
             {categoryData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie data={categoryData} cx="50%" cy="50%" innerRadius={50} outerRadius={90} dataKey="value" label={({ name, value }) => `${name}: ${value}`} labelLine={false}>
-                    {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
+              <ResponsiveContainer width="100%" height={Math.max(250, categoryData.length * 36)}>
+                <BarChart data={categoryData.map(d => ({ ...d, name: t(`job_categories.${d.name.replace(/ /g, '_')}`) || d.name }))} layout="vertical" margin={{ left: 10, right: 30 }}>
+                  <CartesianGrid {...GRID_STYLE} horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} {...AXIS_STYLE} />
+                  <YAxis type="category" dataKey="name" width={130} {...AXIS_STYLE} tick={{ ...AXIS_STYLE.tick, fontSize: 11 }} />
+                  <Tooltip {...TOOLTIP_STYLE} />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                    {categoryData.map((_, i) => (
+                      <Cell key={i} fill="var(--brand-gold)" opacity={1 - (i * 0.08)} />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             ) : <p className="text-sm text-center py-8" style={{ color: 'var(--text-tertiary)' }}>{l.no_data}</p>}
           </div>
@@ -293,11 +299,12 @@ export default function DashboardPage() {
             <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.scores}</h3>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={scoreRanges}>
-                <XAxis dataKey="range" tick={{ fontSize: 12 }} />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                  {scoreRanges.map((_, i) => <Cell key={i} fill={i < 2 ? "#EF4444" : i < 3 ? "#F59E0B" : "#C9A84C"} />)}
+                <CartesianGrid {...GRID_STYLE} />
+                <XAxis dataKey="range" {...AXIS_STYLE} />
+                <YAxis allowDecimals={false} {...AXIS_STYLE} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={32}>
+                  {scoreRanges.map((_, i) => <Cell key={i} fill={[SCORE_COLORS.low, SCORE_COLORS.low, SCORE_COLORS.medium, SCORE_COLORS.high, SCORE_COLORS.top][i]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>

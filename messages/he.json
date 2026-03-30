@@ -393,5 +393,30 @@
     "cover_letter": "מכתב מקדים",
     "id_document": "תעודה מזהה",
     "other": "אחר"
+  },
+  "job_categories": {
+    "architect_licensed": "אדריכל מורשה",
+    "architect": "אדריכל",
+    "architect_intern": "אדריכל מתמחה",
+    "project_manager": "מנהל פרויקט",
+    "site_engineer": "מהנדס אתר",
+    "engineer_civil": "מהנדס אזרחי",
+    "engineer_electrical": "מהנדס חשמל",
+    "engineer_mechanical": "מהנדס מכונות",
+    "engineer_structural": "מהנדס קונסטרוקציה",
+    "engineer_mep": "מהנדס מערכות",
+    "quantity_surveyor": "מודד כמויות",
+    "procurement": "רכש",
+    "foreman": "מפקח",
+    "construction_worker": "פועל בניין",
+    "hr": "משאבי אנוש",
+    "secretary": "מזכירות",
+    "marketing": "שיווק",
+    "finance": "כספים",
+    "draftsman": "שרטט",
+    "qc_inspector": "מפקח איכות",
+    "hse_officer": "קצין בטיחות",
+    "document_controller": "בקר מסמכים",
+    "other": "אחר"
   }
 }
