@@ -179,37 +179,54 @@ export function SmartUpload({ onUploadComplete, lang = "he", candidateId }: Smar
     setShowResults(false);
 
     const allResults: UploadResult[] = [];
-    const batchSize = 3; // Process 3 files at a time to avoid timeout
 
-    for (let i = 0; i < validFiles.length; i += batchSize) {
-      const batch = validFiles.slice(i, i + batchSize);
-      const batchEnd = Math.min(i + batchSize, validFiles.length);
+    // Process ONE file at a time to avoid Vercel timeout (10s hobby / 60s pro)
+    for (let i = 0; i < validFiles.length; i++) {
+      const file = validFiles[i];
 
       setProgress({
-        current: i,
+        current: i + 1,
         total: validFiles.length,
-        status: `${t.uploading_batch} ${i + 1}-${batchEnd} ${t.of} ${validFiles.length}...`,
+        status: `${t.processing} ${i + 1} ${t.of} ${validFiles.length}: ${file.name}`,
       });
 
-      const formData = new FormData();
-      batch.forEach(f => formData.append("files", f));
-      if (candidateId) formData.append("candidateId", candidateId);
-
       try {
+        const formData = new FormData();
+        formData.append("files", file);
+        if (candidateId) formData.append("candidateId", candidateId);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 55000);
+
         const res = await fetch("/api/files/upload", {
           method: "POST",
           body: formData,
+          signal: controller.signal,
         });
 
-        const data = await res.json();
+        clearTimeout(timeoutId);
 
         if (!res.ok) {
-          batch.forEach(f => allResults.push({ file: f.name, status: "error", error: data.error || "Upload failed" }));
-        } else if (data.results) {
-          allResults.push(...data.results);
+          const errData = await res.json().catch(() => ({ error: "Server error" }));
+          allResults.push({ file: file.name, status: "error", error: errData.error || `HTTP ${res.status}` });
+        } else {
+          const data = await res.json();
+          if (data.results && data.results.length > 0) {
+            allResults.push(...data.results);
+          } else {
+            allResults.push({ file: file.name, status: "success" });
+          }
         }
-      } catch {
-        batch.forEach(f => allResults.push({ file: f.name, status: "error", error: "Network error" }));
+      } catch (err) {
+        const errorMsg = err instanceof Error && err.name === "AbortError"
+          ? "Timeout - file too large"
+          : err instanceof Error ? err.message : "Network error";
+        allResults.push({ file: file.name, status: "error", error: errorMsg });
+      }
+
+      // Small delay between files
+      if (i < validFiles.length - 1) {
+        await new Promise(r => setTimeout(r, 300));
       }
     }
 

@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
       if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         try {
-          const pdfData = await pdfParse(buffer);
+          const pdfData = await pdfParse(buffer, { max: 10 }); // Limit to 10 pages for speed
           extractedText = pdfData.text || '';
           pageCount = pdfData.numpages;
         } catch (e) {
@@ -65,10 +65,28 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // AI Classification
-      console.log(`Classifying: ${file.name} (${extractedText.length} chars, ${pageCount || '?'} pages)`);
-      const classification = await classifyDocument(extractedText, file.name, pageCount);
-      console.log(`Result:`, JSON.stringify(classification));
+      // AI Classification - with filename shortcut to avoid unnecessary API calls
+      const lowerName = file.name.toLowerCase();
+      const isObviousCV = lowerName.includes('cv') || lowerName.includes('resume') || lowerName.includes('curriculum') || lowerName.endsWith('cv.pdf') || lowerName.endsWith('cv.docx');
+      const isObviousPortfolio = lowerName.includes('portfolio') || lowerName.includes('works') || lowerName.includes('projects');
+
+      let classification;
+      if (isObviousCV) {
+        classification = { document_type: 'cv' as const, confidence: 0.9, reasoning: 'Classified by filename', detected_person_name: null, detected_role: null, is_construction_related: true, summary: 'CV by filename' };
+        console.log(`Fast classify: ${file.name} → cv (filename match)`);
+      } else if (isObviousPortfolio) {
+        classification = { document_type: 'portfolio' as const, confidence: 0.85, reasoning: 'Classified by filename', detected_person_name: null, detected_role: null, is_construction_related: true, summary: 'Portfolio by filename' };
+        console.log(`Fast classify: ${file.name} → portfolio (filename match)`);
+      } else {
+        console.log(`AI classifying: ${file.name} (${extractedText.length} chars)`);
+        try {
+          classification = await classifyDocument(extractedText, file.name, pageCount);
+        } catch (classErr) {
+          console.error(`Classification timeout/error for ${file.name}:`, classErr);
+          classification = { document_type: 'cv' as const, confidence: 0.5, reasoning: 'Fallback: classification failed', detected_person_name: null, detected_role: null, is_construction_related: true, summary: 'Fallback classification' };
+        }
+      }
+      console.log(`Result: ${file.name} → ${classification.document_type} (${classification.confidence})`);
 
       // Candidate matching
       let candidateId: string | null = null;
