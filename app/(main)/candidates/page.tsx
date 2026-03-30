@@ -13,12 +13,13 @@ import { ScoreBadge } from "@/components/shared/score-badge";
 import { TableLoading } from "@/components/shared/loading";
 import { BulkUpload } from "@/components/shared/bulk-upload";
 import { SmartUpload } from "@/components/candidates/smart-upload";
+import { AdvancedFilters } from "@/components/candidates/advanced-filters";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw, Briefcase, Trash2, Loader2, Bot, Pencil, Brain,
+  Upload, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw, Briefcase, Trash2, Loader2, Bot, Pencil, Brain,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
@@ -34,8 +35,17 @@ export default function CandidatesPage() {
   const { isAdmin } = useUser();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [search] = useState("");
+  const [statusFilter] = useState("all");
+  const [totalCount, setTotalCount] = useState(0);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    search: "", statuses: [] as string[], professions: [] as string[],
+    min_experience: null as number | null, max_experience: null as number | null,
+    min_score: null as number | null, max_score: null as number | null,
+    has_portfolio: null as boolean | null, has_email: null as boolean | null,
+    required_skills: [] as string[], sort_by: "created_at", sort_order: "desc" as "asc" | "desc",
+    page: 1, per_page: 50, preset: null as string | null,
+  });
   const [manualOpen, setManualOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
@@ -45,7 +55,7 @@ export default function CandidatesPage() {
   });
 
   const [categories, setCategories] = useState<{key: string; name_he: string; name_en: string; name_tl: string; parent_key: string | null}[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [categoryFilter] = useState("all");
   const [jobs, setJobs] = useState<{id: string; title: string; status: string}[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("all");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -68,21 +78,27 @@ export default function CandidatesPage() {
 
   const fetchCandidates = useCallback(async () => {
     try {
-      const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (statusFilter !== "all") params.set("status", statusFilter);
-      if (selectedJob !== "all") params.set("jobId", selectedJob);
-      if (categoryFilter !== "all") params.set("category", categoryFilter);
-      params.set("limit", "200");
-      const res = await fetch(`/api/candidates?${params}`);
+      // Use advanced search API
+      const res = await fetch("/api/candidates/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...advancedFilters,
+          // Also include legacy filters if set
+          search: advancedFilters.search || search,
+          statuses: advancedFilters.statuses.length > 0 ? advancedFilters.statuses : (statusFilter !== "all" ? [statusFilter] : []),
+          professions: advancedFilters.professions.length > 0 ? advancedFilters.professions : (categoryFilter !== "all" ? [categoryFilter] : []),
+        }),
+      });
       const data = await res.json();
       setCandidates(data.candidates || []);
+      setTotalCount(data.total || 0);
     } catch {
       toast.error(t("common.error"));
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, selectedJob, categoryFilter]);
+  }, [search, statusFilter, selectedJob, categoryFilter, advancedFilters]);
 
   useEffect(() => {
     fetchCandidates();
@@ -315,48 +331,13 @@ export default function CandidatesPage() {
       </div>
 
       <div className="px-8 py-6 space-y-4">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
-          <Input
-            placeholder={t("candidates.search_placeholder")}
-            className="pr-10 h-11 rounded-lg"
-            style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        {/* Status filter pills */}
-        <div className="flex gap-2 flex-wrap items-center">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-44 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
-              <SelectValue placeholder={t("candidates.table.status")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("candidates.all_statuses")}</SelectItem>
-              {statuses.map(s => <SelectItem key={s} value={s}>{getStatusLabel(s)}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-48 rounded-lg h-9 text-sm" style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
-              <SelectValue placeholder={t("candidates.all_jobs")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("common.all_professions")}</SelectItem>
-              {categories.filter(c => !c.parent_key).map(cat => (
-                <SelectItem key={cat.key} value={cat.key}>
-                  {locale === "he" ? cat.name_he : locale === "tl" ? cat.name_tl : cat.name_en}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {(statusFilter !== "all" || selectedJob !== "all") && (
-            <button onClick={() => { setStatusFilter("all"); setSelectedJob("all"); }} className="text-sm font-medium" style={{ color: 'var(--text-gold)' }}>
-              {t("common.clear_filters")}
-            </button>
-          )}
-        </div>
+        {/* Advanced Filters */}
+        <AdvancedFilters
+          filters={advancedFilters}
+          onChange={(newFilters) => setAdvancedFilters(newFilters)}
+          total={totalCount}
+          lang={locale}
+        />
 
         {/* Candidates Table */}
         {loading ? <TableLoading rows={8} /> : candidates.length === 0 ? (
