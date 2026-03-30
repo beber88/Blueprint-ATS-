@@ -9,9 +9,10 @@ interface ScoreBadgeProps {
 
 export function ScoreBadge({ score, size = "md" }: ScoreBadgeProps) {
   const getColor = () => {
-    if (score >= 71) return { bg: "bg-emerald-50", text: "text-emerald-600", ring: "ring-emerald-200", stroke: "#10B981" };
-    if (score >= 41) return { bg: "bg-amber-50", text: "text-amber-600", ring: "ring-amber-200", stroke: "#F59E0B" };
-    return { bg: "bg-red-50", text: "text-red-600", ring: "ring-red-200", stroke: "#EF4444" };
+    if (score >= 85) return { stroke: "#2D7A3E", text: "text-emerald-700", ring: "#2D7A3E" };
+    if (score >= 70) return { stroke: "#3D8A7D", text: "text-teal-700", ring: "#3D8A7D" };
+    if (score >= 40) return { stroke: "#C9A84C", text: "text-amber-700", ring: "#C9A84C" };
+    return { stroke: "#A32D2D", text: "text-red-700", ring: "#A32D2D" };
   };
 
   const colors = getColor();
@@ -28,10 +29,10 @@ export function ScoreBadge({ score, size = "md" }: ScoreBadgeProps) {
   return (
     <div className={cn("relative inline-flex items-center justify-center", s.container)}>
       <svg width={svgSize} height={svgSize} className="absolute -rotate-90">
-        <circle cx={svgSize/2} cy={svgSize/2} r={s.radius} fill="none" stroke="#e5e7eb" strokeWidth={s.strokeWidth} />
-        <circle cx={svgSize/2} cy={svgSize/2} r={s.radius} fill="none" stroke={colors.stroke} strokeWidth={s.strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
+        <circle cx={svgSize / 2} cy={svgSize / 2} r={s.radius} fill="none" stroke="var(--border-primary, #E5E0D5)" strokeWidth={s.strokeWidth} />
+        <circle cx={svgSize / 2} cy={svgSize / 2} r={s.radius} fill="none" stroke={colors.stroke} strokeWidth={s.strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
       </svg>
-      <span className={cn("font-bold relative z-10", colors.text, s.text)}>{score}</span>
+      <span className={cn("font-bold relative z-10", s.text)} style={{ color: colors.ring }}>{score}</span>
     </div>
   );
 }

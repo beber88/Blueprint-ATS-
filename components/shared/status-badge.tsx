@@ -1,21 +1,20 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 
-const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
-  new: { bg: "bg-slate-100", text: "text-slate-700", dot: "bg-slate-400" },
-  reviewed: { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-500" },
-  shortlisted: { bg: "bg-purple-50", text: "text-purple-700", dot: "bg-purple-500" },
-  interview_scheduled: { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500" },
-  interviewed: { bg: "bg-indigo-50", text: "text-indigo-700", dot: "bg-indigo-500" },
-  approved: { bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-500" },
-  rejected: { bg: "bg-red-50", text: "text-red-700", dot: "bg-red-500" },
-  keep_for_future: { bg: "bg-teal-50", text: "text-teal-700", dot: "bg-teal-500" },
-  scored: { bg: "bg-cyan-50", text: "text-cyan-700", dot: "bg-cyan-500" },
-  active: { bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-500" },
-  paused: { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500" },
-  closed: { bg: "bg-slate-100", text: "text-slate-700", dot: "bg-slate-400" },
+const statusStyles: Record<string, { bg: string; text: string }> = {
+  new: { bg: "var(--status-new-bg)", text: "var(--status-new-text)" },
+  reviewed: { bg: "var(--status-reviewed-bg)", text: "var(--status-reviewed-text)" },
+  shortlisted: { bg: "var(--status-shortlisted-bg)", text: "var(--status-shortlisted-text)" },
+  interview_scheduled: { bg: "var(--status-interview-bg)", text: "var(--status-interview-text)" },
+  interviewed: { bg: "var(--status-interview-bg)", text: "var(--status-interview-text)" },
+  approved: { bg: "var(--status-approved-bg)", text: "var(--status-approved-text)" },
+  rejected: { bg: "var(--status-rejected-bg)", text: "var(--status-rejected-text)" },
+  keep_for_future: { bg: "var(--status-future-bg)", text: "var(--status-future-text)" },
+  scored: { bg: "var(--status-shortlisted-bg)", text: "var(--status-shortlisted-text)" },
+  active: { bg: "var(--status-approved-bg)", text: "var(--status-approved-text)" },
+  paused: { bg: "var(--status-shortlisted-bg)", text: "var(--status-shortlisted-text)" },
+  closed: { bg: "var(--status-new-bg)", text: "var(--status-new-text)" },
 };
 
 const statusKeys: Record<string, string> = {
@@ -40,19 +39,15 @@ interface StatusBadgeProps {
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const { t } = useI18n();
-  const style = statusStyles[status] || { bg: "bg-slate-100", text: "text-slate-600", dot: "bg-slate-400" };
+  const style = statusStyles[status] || { bg: "var(--status-new-bg)", text: "var(--status-new-text)" };
   const label = statusKeys[status] ? t(statusKeys[status]) : status;
 
   return (
     <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
-        style.bg,
-        style.text,
-        className
-      )}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${className || ""}`}
+      style={{ background: style.bg, color: style.text }}
     >
-      <span className={cn("h-1.5 w-1.5 rounded-full", style.dot)} />
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: style.text, opacity: 0.6 }} />
       {label}
     </span>
   );

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <rect x="0" y="4" width="32" height="32" rx="6" fill="#C9A84C"/>
+  <text x="16" y="26" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="18" fill="#1A1A1A">B</text>
+  <text x="44" y="27" font-family="Inter, sans-serif" font-weight="600" font-size="18" fill="currentColor">Blueprint</text>
+</svg>
