@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { translateExperience } from "@/lib/i18n/content-translations";
+import { getProfessionLabel } from "@/lib/i18n/profession-labels";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -450,7 +451,7 @@ export default function CandidatesPage() {
                         {(cand as any).profession ? (
                           <div className="flex items-center gap-1">
                             <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>
-                              {t(`job_categories.${(cand as any).profession}`) || (cand as any).profession}
+                              {getProfessionLabel((cand as any).profession, locale)}
                             </span>
                             {(cand as any).profession_source === "auto" ? (
                               <Bot className="h-3 w-3" style={{ color: 'var(--text-gold)', opacity: 0.6 }} />

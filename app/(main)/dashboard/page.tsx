@@ -12,6 +12,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid,
 } from "recharts";
 import { TOOLTIP_STYLE, AXIS_STYLE, GRID_STYLE, SCORE_COLORS } from "@/lib/chart-config";
+import { getProfessionLabel } from "@/lib/i18n/profession-labels";
 import Link from "next/link";
 import { DashboardStats } from "@/types";
 import { formatDateTime } from "@/lib/utils";
@@ -276,7 +277,7 @@ export default function DashboardPage() {
             <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.categories}</h3>
             {categoryData.length > 0 ? (
               <ResponsiveContainer width="100%" height={Math.max(250, categoryData.length * 36)}>
-                <BarChart data={categoryData.map(d => ({ ...d, name: t(`job_categories.${d.name.replace(/ /g, '_')}`) || d.name }))} layout="vertical" margin={{ left: 10, right: 30 }}>
+                <BarChart data={categoryData.map(d => ({ ...d, name: getProfessionLabel(d.name.replace(/ /g, '_'), locale) }))} layout="vertical" margin={{ left: 10, right: 30 }}>
                   <CartesianGrid {...GRID_STYLE} horizontal={false} />
                   <XAxis type="number" allowDecimals={false} {...AXIS_STYLE} />
                   <YAxis type="category" dataKey="name" width={130} {...AXIS_STYLE} tick={{ ...AXIS_STYLE.tick, fontSize: 11 }} />

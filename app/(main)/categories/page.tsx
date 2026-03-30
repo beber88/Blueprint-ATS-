@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { translateSkill, translateExperience } from "@/lib/i18n/content-translations";
+import { getProfessionLabel } from "@/lib/i18n/profession-labels";
 import Link from "next/link";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { TOOLTIP_STYLE, AXIS_STYLE, GRID_STYLE } from "@/lib/chart-config";
@@ -59,10 +60,7 @@ export default function ProfessionsPage() {
     }
   };
 
-  const getProfName = (key: string) => {
-    if (key === "unclassified") return t("professions.unclassified");
-    return t(`job_categories.${key}`) || key.replace(/_/g, " ");
-  };
+  const getProfName = (key: string) => getProfessionLabel(key, locale);
 
   if (loading) {
     return (
