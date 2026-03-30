@@ -37,13 +37,16 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false);
   const [teamMembers, setTeamMembers] = useState<{ id: string; full_name: string; email: string }[]>([]);
   const [showNewChat, setShowNewChat] = useState(false);
+  const [showNewGroup, setShowNewGroup] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const labels = {
-    he: { title: "צ'אט צוות", new_chat: "צ'אט חדש", type_msg: "הקלד הודעה...", send: "שלח", no_conv: "אין שיחות עדיין", start: "התחל שיחה", search: "חיפוש...", select: "בחר שיחה" },
-    en: { title: "Team Chat", new_chat: "New Chat", type_msg: "Type a message...", send: "Send", no_conv: "No conversations yet", start: "Start a conversation", search: "Search...", select: "Select a conversation" },
-    tl: { title: "Team Chat", new_chat: "Bagong Chat", type_msg: "Mag-type ng mensahe...", send: "Ipadala", no_conv: "Wala pang usapan", start: "Magsimula ng usapan", search: "Maghanap...", select: "Pumili ng usapan" },
+    he: { title: "צ'אט צוות", new_chat: "צ'אט חדש", new_group: "קבוצה חדשה", group_name: "שם הקבוצה", create_group: "צור קבוצה", select_members: "בחר חברי צוות", type_msg: "הקלד הודעה...", send: "שלח", no_conv: "אין שיחות עדיין", start: "התחל שיחה", search: "חיפוש...", select: "בחר שיחה", cancel: "ביטול" },
+    en: { title: "Team Chat", new_chat: "New Chat", new_group: "New Group", group_name: "Group name", create_group: "Create Group", select_members: "Select members", type_msg: "Type a message...", send: "Send", no_conv: "No conversations yet", start: "Start a conversation", search: "Search...", select: "Select a conversation", cancel: "Cancel" },
+    tl: { title: "Team Chat", new_chat: "Bagong Chat", new_group: "Bagong Grupo", group_name: "Pangalan ng grupo", create_group: "Gumawa ng Grupo", select_members: "Pumili ng miyembro", type_msg: "Mag-type ng mensahe...", send: "Ipadala", no_conv: "Wala pang usapan", start: "Magsimula ng usapan", search: "Maghanap...", select: "Pumili ng usapan", cancel: "Kanselahin" },
   };
   const l = labels[locale] || labels.he;
 
@@ -114,6 +117,29 @@ export default function ChatPage() {
     } catch { /* ignore */ }
   };
 
+  const createGroup = async () => {
+    if (!groupName.trim() || selectedMembers.length === 0) return;
+    try {
+      const res = await fetch("/api/chat/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "group", participant_ids: selectedMembers, name: groupName.trim() }),
+      });
+      const data = await res.json();
+      if (data.conversation) {
+        setActiveConv(data.conversation.id);
+        setShowNewGroup(false);
+        setGroupName("");
+        setSelectedMembers([]);
+        loadConversations();
+      }
+    } catch { /* ignore */ }
+  };
+
+  const toggleMember = (id: string) => {
+    setSelectedMembers(prev => prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]);
+  };
+
   const getConvName = (conv: Conversation) => {
     if (conv.name) return conv.name;
     const other = conv.participants.find(p => p.id !== user?.id);
@@ -141,9 +167,14 @@ export default function ChatPage() {
         <div className="p-4" style={{ borderBottom: "1px solid var(--border-primary)" }}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>{l.title}</h2>
-            <Button size="sm" className="rounded-lg text-xs h-8" style={{ background: "var(--brand-gold)", color: "#1A1A1A" }} onClick={() => setShowNewChat(!showNewChat)}>
-              <Plus className="h-3 w-3 mr-1" /> {l.new_chat}
-            </Button>
+            <div className="flex gap-1.5">
+              <Button size="sm" className="rounded-lg text-xs h-8" style={{ background: "var(--brand-gold)", color: "#1A1A1A" }} onClick={() => { setShowNewChat(!showNewChat); setShowNewGroup(false); }}>
+                <Plus className="h-3 w-3 mr-1" /> {l.new_chat}
+              </Button>
+              <Button size="sm" variant="outline" className="rounded-lg text-xs h-8" onClick={() => { setShowNewGroup(!showNewGroup); setShowNewChat(false); }}>
+                <Users className="h-3 w-3 mr-1" /> {l.new_group}
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -161,6 +192,52 @@ export default function ChatPage() {
                 </div>
               </button>
             ))}
+          </div>
+        )}
+
+        {/* New group creator */}
+        {showNewGroup && (
+          <div className="p-3 space-y-3" style={{ borderBottom: "1px solid var(--border-primary)", background: "var(--bg-secondary)" }}>
+            <input
+              type="text"
+              value={groupName}
+              onChange={e => setGroupName(e.target.value)}
+              placeholder={l.group_name}
+              className="w-full px-3 py-2 rounded-lg text-sm"
+              style={{ border: "1px solid var(--border-primary)", background: "var(--bg-input)", color: "var(--text-primary)" }}
+            />
+            <p className="text-xs font-medium" style={{ color: "var(--text-tertiary)" }}>{l.select_members}</p>
+            <div className="space-y-1">
+              {teamMembers.filter(m => m.id !== user?.id).map(member => (
+                <button
+                  key={member.id}
+                  onClick={() => toggleMember(member.id)}
+                  className="flex items-center gap-3 w-full p-2 rounded-lg text-sm transition-colors"
+                  style={{ background: selectedMembers.includes(member.id) ? "rgba(201,168,76,0.12)" : "transparent", color: "var(--text-primary)" }}
+                >
+                  <div className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold" style={{
+                    background: selectedMembers.includes(member.id) ? "var(--brand-gold)" : "var(--bg-tertiary)",
+                    color: selectedMembers.includes(member.id) ? "#1A1A1A" : "var(--text-secondary)",
+                  }}>
+                    {(member.full_name || "?")[0].toUpperCase()}
+                  </div>
+                  <span className="font-medium">{member.full_name}</span>
+                  {selectedMembers.includes(member.id) && (
+                    <span className="mr-auto text-xs" style={{ color: "var(--brand-gold)" }}>✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="rounded-lg text-xs flex-1" onClick={() => { setShowNewGroup(false); setSelectedMembers([]); setGroupName(""); }}>
+                {l.cancel}
+              </Button>
+              <Button size="sm" className="rounded-lg text-xs flex-1" style={{ background: "var(--brand-gold)", color: "#1A1A1A" }}
+                disabled={!groupName.trim() || selectedMembers.length === 0}
+                onClick={createGroup}>
+                {l.create_group}
+              </Button>
+            </div>
           </div>
         )}
 
