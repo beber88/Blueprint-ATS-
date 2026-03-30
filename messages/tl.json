@@ -446,5 +446,18 @@
     "classify_single": "I-classify",
     "unclassified_warning": "Hindi pa na-classify na kandidato",
     "no_candidates": "Walang kandidato sa propesyong ito"
+  },
+  "guide": {
+    "title": "Gabay sa Sistema",
+    "getting_started": "Pagsisimula",
+    "uploading_files": "Pag-upload ng mga File",
+    "managing_candidates": "Pamamahala ng mga Kandidato",
+    "profession_management": "Pamamahala ng Propesyon",
+    "team_chat": "Team Chat",
+    "communication": "Komunikasyon",
+    "jobs_interviews": "Mga Trabaho at Panayam",
+    "dashboard_section": "Dashboard",
+    "settings_section": "Mga Setting",
+    "tips": "Mga Tip at Pinakamahusay na Kasanayan"
   }
 }

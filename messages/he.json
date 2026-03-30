@@ -446,5 +446,18 @@
     "classify_single": "סווג",
     "unclassified_warning": "מועמדים שלא סווגו עדיין",
     "no_candidates": "אין מועמדים במקצוע זה"
+  },
+  "guide": {
+    "title": "מדריך למערכת",
+    "getting_started": "תחילת עבודה",
+    "uploading_files": "העלאת קבצים",
+    "managing_candidates": "ניהול מועמדים",
+    "profession_management": "ניהול מקצועות",
+    "team_chat": "צ'אט צוות",
+    "communication": "תקשורת",
+    "jobs_interviews": "משרות וראיונות",
+    "dashboard_section": "דשבורד",
+    "settings_section": "הגדרות",
+    "tips": "טיפים ושיטות עבודה"
   }
 }

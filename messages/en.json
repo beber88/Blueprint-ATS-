@@ -446,5 +446,18 @@
     "classify_single": "Classify",
     "unclassified_warning": "Candidates not yet classified",
     "no_candidates": "No candidates in this profession"
+  },
+  "guide": {
+    "title": "System Guide",
+    "getting_started": "Getting Started",
+    "uploading_files": "Uploading Files",
+    "managing_candidates": "Managing Candidates",
+    "profession_management": "Profession Management",
+    "team_chat": "Team Chat",
+    "communication": "Communication",
+    "jobs_interviews": "Jobs & Interviews",
+    "dashboard_section": "Dashboard",
+    "settings_section": "Settings",
+    "tips": "Tips & Best Practices"
   }
 }
