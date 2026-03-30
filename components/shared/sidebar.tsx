@@ -14,20 +14,40 @@ import { useUser } from "@/lib/auth/context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LucideIcon } from "lucide-react";
 
-const navigation: { key: string; href: string; icon: LucideIcon; adminOnly?: boolean }[] = [
-  { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { key: "nav.candidates", href: "/candidates", icon: Users },
-  { key: "nav.categories", href: "/categories", icon: FolderOpen },
-  { key: "nav.jobs", href: "/jobs", icon: Briefcase },
-  { key: "nav.interviews", href: "/interviews", icon: Calendar },
-  { key: "nav.messages", href: "/messages", icon: MessageSquare },
-  { key: "nav.templates", href: "/templates", icon: FileText },
-  { key: "nav.ai_agent", href: "/ai-agent", icon: Bot },
-  { key: "nav.guide", href: "/guide", icon: BookOpen },
-  { key: "nav.unmatched_files", href: "/files", icon: FileQuestion },
-  { key: "nav.settings", href: "/settings", icon: Settings },
-  { key: "nav.job_boards", href: "/settings/job-boards", icon: Globe },
-  { key: "nav.users", href: "/users", icon: UserCog, adminOnly: true },
+const navGroups: { labelKey: string; items: { key: string; href: string; icon: LucideIcon; adminOnly?: boolean }[] }[] = [
+  {
+    labelKey: "nav_group.main",
+    items: [
+      { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { key: "nav.candidates", href: "/candidates", icon: Users },
+      { key: "nav.jobs", href: "/jobs", icon: Briefcase },
+      { key: "nav.interviews", href: "/interviews", icon: Calendar },
+    ],
+  },
+  {
+    labelKey: "nav_group.communication",
+    items: [
+      { key: "nav.messages", href: "/messages", icon: MessageSquare },
+      { key: "nav.templates", href: "/templates", icon: FileText },
+    ],
+  },
+  {
+    labelKey: "nav_group.tools",
+    items: [
+      { key: "nav.ai_agent", href: "/ai-agent", icon: Bot },
+      { key: "nav.categories", href: "/categories", icon: FolderOpen },
+      { key: "nav.guide", href: "/guide", icon: BookOpen },
+    ],
+  },
+  {
+    labelKey: "nav_group.management",
+    items: [
+      { key: "nav.unmatched_files", href: "/files", icon: FileQuestion },
+      { key: "nav.settings", href: "/settings", icon: Settings },
+      { key: "nav.job_boards", href: "/settings/job-boards", icon: Globe },
+      { key: "nav.users", href: "/users", icon: UserCog, adminOnly: true },
+    ],
+  },
 ];
 
 const languages: { code: Locale; label: string }[] = [
@@ -87,41 +107,49 @@ export function Sidebar() {
       {/* Navigation */}
       <nav style={{ flex: 1, padding: '12px 12px 0 12px', overflowY: 'auto' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {navigation.filter(item => !item.adminOnly || isAdmin).map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.key}
-                href={item.href}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '8px 12px',
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: isActive ? 500 : 400,
-                  textDecoration: 'none',
-                  transition: 'background 150ms, color 150ms',
-                  background: isActive ? 'rgba(201,168,76,0.12)' : 'transparent',
-                  color: isActive ? '#C9A84C' : '#8A8A8A',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = 'rgba(201,168,76,0.08)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = 'transparent';
-                  }
-                }}
-              >
-                <item.icon style={{ width: 18, height: 18, flexShrink: 0 }} />
-                {t(item.key)}
-              </Link>
-            );
-          })}
+          {navGroups.map((group, gi) => (
+            <div key={gi}>
+              {gi > 0 && <div style={{ height: 1, background: 'var(--sidebar-border, rgba(255,255,255,0.08))', margin: '8px 4px' }} />}
+              <div style={{ padding: '4px 12px 4px 12px', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#8A8A8A', opacity: 0.5 }}>
+                {t(group.labelKey)}
+              </div>
+              {group.items.filter(item => !item.adminOnly || isAdmin).map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      fontSize: 14,
+                      fontWeight: isActive ? 500 : 400,
+                      textDecoration: 'none',
+                      transition: 'background 150ms, color 150ms',
+                      background: isActive ? 'rgba(201,168,76,0.12)' : 'transparent',
+                      color: isActive ? '#C9A84C' : '#8A8A8A',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'rgba(201,168,76,0.08)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'transparent';
+                      }
+                    }}
+                  >
+                    <item.icon style={{ width: 18, height: 18, flexShrink: 0 }} />
+                    {t(item.key)}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </nav>
 

@@ -1,4 +1,10 @@
 {
+  "nav_group": {
+    "main": "Pangunahin",
+    "communication": "Komunikasyon",
+    "tools": "Mga Tool",
+    "management": "Pamamahala"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "candidates": "Mga Kandidato",

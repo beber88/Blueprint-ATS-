@@ -1,4 +1,10 @@
 {
+  "nav_group": {
+    "main": "ראשי",
+    "communication": "תקשורת",
+    "tools": "כלים",
+    "management": "ניהול"
+  },
   "nav": {
     "dashboard": "דשבורד",
     "candidates": "מועמדים",

@@ -1,4 +1,10 @@
 {
+  "nav_group": {
+    "main": "Main",
+    "communication": "Communication",
+    "tools": "Tools",
+    "management": "Management"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "candidates": "Candidates",
