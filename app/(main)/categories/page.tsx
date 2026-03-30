@@ -45,11 +45,18 @@ export default function ProfessionsPage() {
     try {
       const res = await fetch("/api/maintenance/classify-professions", { method: "POST" });
       const result = await res.json();
-      toast.success(`${result.classified || 0} classified`);
+      if (!res.ok) throw new Error(result.error || "Failed");
+      toast.success(`${result.classified || 0} / ${result.total || 0} classified`);
+      if (result.failed > 0) toast.warning(`${result.failed} failed`);
+      // Refresh data
       const refreshed = await fetch("/api/professions/analysis").then(r => r.json());
       setData(refreshed);
-    } catch { toast.error(t("common.error")); }
-    finally { setClassifying(false); }
+    } catch (err) {
+      console.error("Classify error:", err);
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setClassifying(false);
+    }
   };
 
   const getProfName = (key: string) => {
