@@ -66,6 +66,7 @@ export default function CandidatesPage() {
       if (statusFilter !== "all") params.set("status", statusFilter);
       if (selectedJob !== "all") params.set("jobId", selectedJob);
       if (categoryFilter !== "all") params.set("category", categoryFilter);
+      params.set("limit", "200");
       const res = await fetch(`/api/candidates?${params}`);
       const data = await res.json();
       setCandidates(data.candidates || []);
