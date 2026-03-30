@@ -370,5 +370,27 @@
   "categories": {
     "ai_hint": "I-click ang Generate Recommendations para sa komprehensibong AI analysis at rekomendasyon para sa CEO",
     "ai_prompt": "Magbigay ng komprehensibong pagsusuri at rekomendasyon para sa CEO"
+  },
+  "files": {
+    "title": "Mga File",
+    "upload_files": "Mag-upload ng mga File",
+    "analyzing": "Sinusuri ang mga dokumento...",
+    "ai_classifying": "Tinutukoy ng AI ang uri ng dokumento",
+    "drag_or_click": "I-drag ang mga file dito o mag-click",
+    "auto_classify": "CVs, Portfolios, Sertipiko - auto-classify ng AI",
+    "upload_results": "Resulta ng Upload:",
+    "matched_to_candidate": "Naitugma sa kandidato",
+    "no_match": "Walang nahanap na kandidato",
+    "has_portfolio": "May portfolio",
+    "no_files": "Walang mga file para sa kandidatong ito",
+    "view": "Tingnan",
+    "download": "I-download",
+    "cv": "Resume",
+    "portfolio": "Portfolio",
+    "certificate": "Sertipiko",
+    "reference_letter": "Sulat ng Rekomendasyon",
+    "cover_letter": "Cover Letter",
+    "id_document": "ID Document",
+    "other": "Iba pa"
   }
 }

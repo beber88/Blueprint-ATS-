@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { SmartUpload } from "@/components/candidates/smart-upload";
+import { CandidateFiles } from "@/components/candidates/candidate-files";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
@@ -356,6 +358,9 @@ export default function CandidateProfilePage() {
               <span className="mr-1.5 text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">
                 {candidate.messages?.length || 0}
               </span>
+            </TabsTrigger>
+            <TabsTrigger value="files" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
+              {t("files.title")}
             </TabsTrigger>
             <TabsTrigger value="activity" className="rounded-lg px-5 py-2.5 text-sm data-[state=active]:bg-electric-50 data-[state=active]:text-electric-700 data-[state=active]:shadow-sm">
               {t("profile.history")}
@@ -894,6 +899,23 @@ export default function CandidateProfilePage() {
                 </div>
               ))
             )}
+          </TabsContent>
+
+          {/* Files Tab */}
+          <TabsContent value="files" className="space-y-6 mt-0">
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{t("files.upload_files")}</h3>
+              <SmartUpload
+                onUploadComplete={() => {
+                  fetch(`/api/candidates/${params.id}`).then(r => r.json()).then(setCandidate).catch(() => {});
+                }}
+                lang={locale as "he" | "en" | "tl"}
+              />
+            </div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{t("files.title")}</h3>
+              <CandidateFiles candidateId={params.id as string} lang={locale as "he" | "en" | "tl"} />
+            </div>
           </TabsContent>
 
           {/* Activity Tab */}

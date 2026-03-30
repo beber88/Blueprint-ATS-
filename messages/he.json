@@ -370,5 +370,27 @@
   "categories": {
     "ai_hint": "לחצו על הפק המלצות לקבלת ניתוח AI מקיף והמלצות למנכ״ל",
     "ai_prompt": "תן ניתוח מקיף והמלצות למנכ״ל"
+  },
+  "files": {
+    "title": "קבצים",
+    "upload_files": "העלה קבצים",
+    "analyzing": "מנתח מסמכים...",
+    "ai_classifying": "AI מזהה סוג מסמך ומתאים למועמד",
+    "drag_or_click": "גרור קבצים לכאן או לחץ לבחירה",
+    "auto_classify": "קורות חיים, תיקי עבודות, תעודות - המערכת תזהה אוטומטית",
+    "upload_results": "תוצאות העלאה:",
+    "matched_to_candidate": "שויך למועמד",
+    "no_match": "לא נמצא מועמד תואם",
+    "has_portfolio": "יש תיק עבודות",
+    "no_files": "אין קבצים למועמד זה",
+    "view": "צפה",
+    "download": "הורד",
+    "cv": "קורות חיים",
+    "portfolio": "תיק עבודות",
+    "certificate": "תעודה",
+    "reference_letter": "מכתב המלצה",
+    "cover_letter": "מכתב מקדים",
+    "id_document": "תעודה מזהה",
+    "other": "אחר"
   }
 }

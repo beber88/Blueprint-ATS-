@@ -370,5 +370,27 @@
   "categories": {
     "ai_hint": "Click Generate Recommendations for comprehensive AI analysis and CEO recommendations",
     "ai_prompt": "Provide comprehensive analysis and CEO recommendations"
+  },
+  "files": {
+    "title": "Files",
+    "upload_files": "Upload Files",
+    "analyzing": "Analyzing documents...",
+    "ai_classifying": "AI is identifying document type and matching to candidate",
+    "drag_or_click": "Drag files here or click to select",
+    "auto_classify": "CVs, Portfolios, Certificates - AI auto-classifies",
+    "upload_results": "Upload Results:",
+    "matched_to_candidate": "Matched to candidate",
+    "no_match": "No matching candidate found",
+    "has_portfolio": "Has portfolio",
+    "no_files": "No files for this candidate",
+    "view": "View",
+    "download": "Download",
+    "cv": "CV/Resume",
+    "portfolio": "Portfolio",
+    "certificate": "Certificate",
+    "reference_letter": "Reference Letter",
+    "cover_letter": "Cover Letter",
+    "id_document": "ID Document",
+    "other": "Other"
   }
 }

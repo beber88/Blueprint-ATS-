@@ -9,12 +9,13 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
 import { TableLoading } from "@/components/shared/loading";
 import { BulkUpload } from "@/components/shared/bulk-upload";
+import { SmartUpload } from "@/components/candidates/smart-upload";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw,
+  Upload, Search, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw, Briefcase,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
@@ -44,6 +45,7 @@ export default function CandidatesPage() {
   const [selectedJob, setSelectedJob] = useState<string>("all");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
+  const [smartUploadOpen, setSmartUploadOpen] = useState(false);
   const [bulkEmailOpen, setBulkEmailOpen] = useState(false);
   const [bulkTemplate, setBulkTemplate] = useState("");
   const [bulkSending, setBulkSending] = useState(false);
@@ -239,11 +241,8 @@ export default function CandidatesPage() {
             <Button variant="outline" onClick={() => setManualOpen(true)} className="rounded-lg">
               <Plus className="ml-2 h-4 w-4" /> {t("candidates.add_manual")}
             </Button>
-            <Button onClick={() => fileInputRef.current?.click()} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
+            <Button onClick={() => setSmartUploadOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--blue)' }}>
               <Upload className="ml-2 h-4 w-4" /> {t("candidates.upload_cv")}
-            </Button>
-            <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="rounded-lg">
-              <Upload className="ml-2 h-4 w-4" /> {t("common.bulk_upload")}
             </Button>
             <Button onClick={handleReclassify} disabled={reclassifying} variant="outline" className="rounded-lg">
               <RefreshCw className={`ml-2 h-4 w-4 ${reclassifying ? "animate-spin" : ""}`} />
@@ -374,7 +373,12 @@ export default function CandidatesPage() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-semibold group-hover:text-blue-600 transition-colors" style={{ color: 'var(--navy)' }}>{candidate.full_name}</p>
+                            <p className="font-semibold group-hover:text-blue-600 transition-colors flex items-center gap-1.5" style={{ color: 'var(--navy)' }}>
+                              {candidate.full_name}
+                              {(cand as unknown as { has_portfolio?: boolean }).has_portfolio && (
+                                <span title={t("files.has_portfolio")}><Briefcase className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--purple)' }} /></span>
+                              )}
+                            </p>
                             {candidate.email && <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{candidate.email}</p>}
                           </div>
                         </Link>
@@ -565,6 +569,21 @@ export default function CandidatesPage() {
               {bulkSending ? t("common.loading") : t("candidates.bulk.send_email")}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Smart Upload Dialog */}
+      <Dialog open={smartUploadOpen} onOpenChange={setSmartUploadOpen}>
+        <DialogContent className="sm:max-w-2xl rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold" style={{ color: 'var(--navy)' }}>
+              {t("candidates.upload_cv")}
+            </DialogTitle>
+          </DialogHeader>
+          <SmartUpload
+            onUploadComplete={() => { fetchCandidates(); }}
+            lang={locale as "he" | "en" | "tl"}
+          />
         </DialogContent>
       </Dialog>
 
