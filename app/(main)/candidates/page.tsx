@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { translateExperience } from "@/lib/i18n/content-translations";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -465,7 +466,7 @@ export default function CandidatesPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {candidate.experience_years ? `${candidate.experience_years} ${t("candidates.years")}` : "--"}
+                          {candidate.experience_years ? translateExperience(candidate.experience_years, locale) : "--"}
                         </span>
                       </td>
                       <td className="px-4 py-3">
