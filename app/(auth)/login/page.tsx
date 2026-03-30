@@ -36,29 +36,77 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4" dir="rtl">
-      <div className="w-full max-w-sm">
+    <div
+      className="flex min-h-screen items-center justify-center px-4"
+      style={{ background: 'var(--bg-tertiary)' }}
+    >
+      <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div
+          className="rounded-xl p-8"
+          style={{
+            background: 'var(--bg-card)',
+            boxShadow: 'var(--shadow-lg)',
+          }}
+        >
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-[#3B82F6] rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/25">
-              <span className="text-white text-2xl font-bold">B</span>
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 12,
+                background: '#C9A84C',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 16,
+              }}
+            >
+              <span style={{ color: '#1A1A1A', fontSize: 24, fontWeight: 700 }}>B</span>
             </div>
-            <h1 className="text-xl font-bold text-gray-900">Blueprint ATS</h1>
-            <p className="text-sm text-gray-500 mt-1">{t("auth.login_subtitle")}</p>
+            <h1
+              style={{
+                fontSize: 22,
+                fontWeight: 700,
+                color: 'var(--brand-gold)',
+                margin: 0,
+              }}
+            >
+              Blueprint ATS
+            </h1>
+            <p
+              style={{
+                fontSize: 14,
+                color: 'var(--text-tertiary)',
+                marginTop: 4,
+              }}
+            >
+              Blueprint Building Group Inc.
+            </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             {error && (
-              <div className="rounded-xl bg-red-50 border border-red-100 p-3.5 text-sm text-red-600 text-center">
+              <div
+                className="rounded-lg p-3 text-sm text-center"
+                style={{
+                  background: 'rgba(220,38,38,0.08)',
+                  border: '1px solid rgba(220,38,38,0.15)',
+                  color: '#DC2626',
+                }}
+              >
                 {error}
               </div>
             )}
 
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 {t("auth.email")}
               </label>
               <input
@@ -68,12 +116,30 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                className="w-full px-4 py-3 rounded-lg text-sm transition-all"
+                style={{
+                  border: '1px solid var(--border-primary)',
+                  background: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--brand-gold)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(201,168,76,0.15)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 {t("auth.password")}
               </label>
               <input
@@ -83,14 +149,42 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                className="w-full px-4 py-3 rounded-lg text-sm transition-all"
+                style={{
+                  border: '1px solid var(--border-primary)',
+                  background: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--brand-gold)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(201,168,76,0.15)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold py-3 rounded-xl transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{
+                background: 'var(--brand-gold)',
+                color: '#1A1A1A',
+                fontWeight: 600,
+                fontSize: 14,
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) e.currentTarget.style.background = 'var(--brand-gold-light)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--brand-gold)';
+              }}
             >
               {loading ? (
                 <>
@@ -106,10 +200,18 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full" style={{ borderTop: '1px solid var(--border-primary)' }} />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-white px-4 text-sm text-gray-400">{t("auth.or")}</span>
+              <span
+                className="px-4 text-sm"
+                style={{
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-tertiary)',
+                }}
+              >
+                {t("auth.or")}
+              </span>
             </div>
           </div>
 
@@ -127,7 +229,20 @@ export default function LoginPage() {
                 },
               });
             }}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl border border-gray-200 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            style={{
+              background: 'transparent',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-primary)',
+              fontSize: 14,
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--bg-card-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path

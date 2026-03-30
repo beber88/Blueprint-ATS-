@@ -18,10 +18,10 @@ import { useI18n } from "@/lib/i18n/context";
 import { Button } from "@/components/ui/button";
 
 const STATUS_COLORS: Record<string, string> = {
-  new: "#94A3B8", reviewed: "#3B82F6", shortlisted: "#8B5CF6",
+  new: "#94A3B8", reviewed: "#C9A84C", shortlisted: "#8B5CF6",
   interview_scheduled: "#F59E0B", interviewed: "#6366F1",
   approved: "#10B981", rejected: "#EF4444", keep_for_future: "#14B8A6",
-  scored: "#06B6D4",
+  scored: "#C9A84C",
 };
 
 export default function DashboardPage() {
@@ -152,37 +152,57 @@ export default function DashboardPage() {
   };
   const l = labels[locale] || labels.he;
 
-  const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#14B8A6", "#EC4899", "#6366F1"];
+  const COLORS = ["#C9A84C", "#A38A3E", "#D4B95E", "#8B7633", "#E5CA6E", "#6B5A28", "#F0DC85", "#4D4020"];
+
+  const today = new Date().toLocaleDateString(locale === "he" ? "he-IL" : locale === "tl" ? "fil-PH" : "en-US", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
+  });
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b px-8 py-6" style={{ borderColor: 'var(--gray-200)' }}>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{l.title}</h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--gray-400)' }}>{l.subtitle}</p>
+      <div style={{ background: 'var(--bg-secondary)', borderBottom: '0.5px solid var(--border-primary)' }} className="px-8 py-6">
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{l.title}</h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{today}</p>
       </div>
 
       <div className="px-8 py-6 space-y-6">
-        {/* KPI Cards Row 1 */}
+        {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
-            { icon: Users, label: l.total, value: totalCandidates, color: "var(--blue)", bg: "var(--blue-light)" },
-            { icon: UserPlus, label: l.new_week, value: newThisWeek, color: "var(--green)", bg: "var(--green-light)" },
-            { icon: Briefcase, label: l.active_jobs, value: activeJobs, color: "var(--purple)", bg: "var(--purple-light)" },
-            { icon: Calendar, label: l.interviews, value: interviewCount, color: "var(--amber)", bg: "var(--amber-light)" },
-            { icon: CheckCircle, label: l.approved, value: approvedCount, color: "var(--green)", bg: "var(--green-light)" },
-            { icon: TrendingUp, label: l.rejected, value: rejectedCount, color: "var(--red)", bg: "var(--red-light)" },
+            { icon: Users, label: l.total, value: totalCandidates, highlight: true },
+            { icon: UserPlus, label: l.new_week, value: newThisWeek, highlight: false },
+            { icon: Briefcase, label: l.active_jobs, value: activeJobs, highlight: false },
+            { icon: Calendar, label: l.interviews, value: interviewCount, highlight: false },
+            { icon: CheckCircle, label: l.approved, value: approvedCount, highlight: false },
+            { icon: TrendingUp, label: l.rejected, value: rejectedCount, highlight: false },
           ].map((kpi, i) => (
-            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-4" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: kpi.bg }}>
-                  <kpi.icon className="h-5 w-5" style={{ color: kpi.color }} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>{kpi.value}</p>
-                  <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{kpi.label}</p>
-                </div>
+            <div
+              key={i}
+              className="rounded-xl p-5"
+              style={{
+                background: 'var(--bg-card)',
+                border: '0.5px solid var(--border-primary)',
+                boxShadow: 'var(--shadow-sm)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <kpi.icon className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
               </div>
+              <p className="text-xs uppercase tracking-wider mt-2" style={{ color: 'var(--text-tertiary)' }}>
+                {kpi.label}
+              </p>
+              <p
+                className="text-2xl font-semibold mt-1"
+                style={{ color: kpi.highlight ? 'var(--text-gold)' : 'var(--text-primary)' }}
+              >
+                {kpi.value}
+              </p>
+              {kpi.highlight && newThisWeek > 0 && (
+                <p className="text-xs mt-1" style={{ color: 'var(--text-gold)' }}>
+                  +{newThisWeek} this week
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -191,26 +211,38 @@ export default function DashboardPage() {
         {(unclassified > 0 || noScore > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {unclassified > 0 && (
-              <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'var(--amber-light)', border: '1px solid var(--amber)' }}>
+              <div
+                className="flex items-center justify-between p-4 rounded-xl"
+                style={{
+                  background: 'rgba(201, 168, 76, 0.08)',
+                  border: '0.5px solid var(--brand-gold)',
+                }}
+              >
                 <div className="flex items-center gap-3">
-                  <AlertTriangle className="h-5 w-5" style={{ color: 'var(--amber)' }} />
+                  <AlertTriangle className="h-5 w-5" style={{ color: 'var(--brand-gold)' }} />
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{unclassified} {l.unclassified_alert}</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{unclassified} {l.unclassified_alert}</p>
                   </div>
                 </div>
                 <Link href="/candidates">
-                  <Button size="sm" variant="outline" className="rounded-lg text-xs">{l.reclassify}</Button>
+                  <Button size="sm" variant="outline" className="rounded-lg text-xs" style={{ borderColor: 'var(--brand-gold)', color: 'var(--text-gold)' }}>{l.reclassify}</Button>
                 </Link>
               </div>
             )}
             {noScore > 0 && (
-              <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'var(--blue-light)', border: '1px solid var(--blue)' }}>
+              <div
+                className="flex items-center justify-between p-4 rounded-xl"
+                style={{
+                  background: 'rgba(201, 168, 76, 0.05)',
+                  border: '0.5px solid var(--border-primary)',
+                }}
+              >
                 <div className="flex items-center gap-3">
-                  <Brain className="h-5 w-5" style={{ color: 'var(--blue)' }} />
-                  <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{noScore} {l.no_score_alert}</p>
+                  <Brain className="h-5 w-5" style={{ color: 'var(--text-gold)' }} />
+                  <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{noScore} {l.no_score_alert}</p>
                 </div>
                 <Link href="/candidates">
-                  <Button size="sm" variant="outline" className="rounded-lg text-xs">{l.analyze}</Button>
+                  <Button size="sm" variant="outline" className="rounded-lg text-xs" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-gold)' }}>{l.analyze}</Button>
                 </Link>
               </div>
             )}
@@ -220,8 +252,8 @@ export default function DashboardPage() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pipeline Status */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.pipeline}</h3>
+          <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.pipeline}</h3>
             {statusData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={statusData} layout="vertical">
@@ -235,12 +267,12 @@ export default function DashboardPage() {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--text-tertiary)' }}>{l.no_data}</p>}
           </div>
 
           {/* Profession Distribution */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.categories}</h3>
+          <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.categories}</h3>
             {categoryData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -250,40 +282,53 @@ export default function DashboardPage() {
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
-            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--text-tertiary)' }}>{l.no_data}</p>}
           </div>
         </div>
 
         {/* Score Distribution + Top 5 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Score Distribution */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.scores}</h3>
+          <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.scores}</h3>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={scoreRanges}>
                 <XAxis dataKey="range" tick={{ fontSize: 12 }} />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
                 <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                  {scoreRanges.map((_, i) => <Cell key={i} fill={i < 2 ? "var(--red)" : i < 3 ? "var(--amber)" : "var(--green)"} />)}
+                  {scoreRanges.map((_, i) => <Cell key={i} fill={i < 2 ? "#EF4444" : i < 3 ? "#F59E0B" : "#C9A84C"} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           {/* Top 5 */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.top5}</h3>
+          <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.top5}</h3>
             {topCandidates.length > 0 ? (
               <div className="space-y-3">
                 {topCandidates.map((c, i) => (
-                  <Link key={c.id} href={`/candidates/${c.id}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold" style={{ background: i === 0 ? 'var(--amber)' : i < 3 ? 'var(--gray-200)' : 'var(--gray-100)', color: i === 0 ? '#fff' : 'var(--gray-600)' }}>
+                  <Link
+                    key={c.id}
+                    href={`/candidates/${c.id}`}
+                    className="flex items-center gap-3 p-3 rounded-lg transition-colors"
+                    style={{ borderBottom: '0.5px solid var(--border-light)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-card-hover)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    <span
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
+                      style={{
+                        background: i === 0 ? '#C9A84C' : i < 3 ? '#B0B0B0' : 'var(--bg-tertiary)',
+                        color: i === 0 ? '#1A1A1A' : i < 3 ? '#1A1A1A' : 'var(--text-secondary)',
+                      }}
+                    >
                       #{i + 1}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--navy)' }}>{c.full_name}</p>
-                      <p className="text-xs" style={{ color: 'var(--gray-400)' }}>
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{c.full_name}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                         {(c.job_categories || []).slice(0, 2).join(", ").replace(/_/g, " ") || "—"}
                       </p>
                     </div>
@@ -291,28 +336,38 @@ export default function DashboardPage() {
                   </Link>
                 ))}
               </div>
-            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--text-tertiary)' }}>{l.no_data}</p>}
           </div>
         </div>
 
         {/* Jobs Overview + Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Jobs Overview */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+          <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold" style={{ color: 'var(--navy)' }}>{l.job_overview}</h3>
-              <Link href="/jobs"><Button variant="ghost" size="sm" className="text-xs rounded-lg gap-1"><ArrowUpRight className="h-3 w-3" /></Button></Link>
+              <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>{l.job_overview}</h3>
+              <Link href="/jobs"><Button variant="ghost" size="sm" className="text-xs rounded-lg gap-1" style={{ color: 'var(--text-gold)' }}><ArrowUpRight className="h-3 w-3" /></Button></Link>
             </div>
             {jobs.length > 0 ? (
               <div className="space-y-3">
                 {jobs.slice(0, 5).map((job: any) => (
-                  <Link key={job.id} href={`/jobs/${job.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                  <Link
+                    key={job.id}
+                    href={`/jobs/${job.id}`}
+                    className="flex items-center justify-between p-3 rounded-lg transition-colors"
+                    style={{
+                      borderLeft: job.status === 'active' ? '3px solid var(--brand-gold)' : '3px solid transparent',
+                      borderBottom: '0.5px solid var(--border-light)',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-card-hover)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--navy)' }}>{job.title}</p>
-                      <p className="text-xs" style={{ color: 'var(--gray-400)' }}>{job.department || ""} {job.location ? `• ${job.location}` : ""}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{job.title}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{job.department || ""} {job.location ? `• ${job.location}` : ""}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs font-medium" style={{ color: 'var(--gray-600)' }}>
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                         {job.candidate_count || 0} {l.candidates_label}
                       </span>
                       <StatusBadge status={job.status} />
@@ -320,32 +375,32 @@ export default function DashboardPage() {
                   </Link>
                 ))}
               </div>
-            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--text-tertiary)' }}>{l.no_data}</p>}
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <h3 className="font-bold mb-4" style={{ color: 'var(--navy)' }}>{l.activity}</h3>
+          <div className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 className="font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{l.activity}</h3>
             {recentActivity.length > 0 ? (
               <div className="space-y-2">
                 {recentActivity.map((activity: any) => (
                   <div key={activity.id} className="flex items-start gap-3 p-2 rounded-lg">
-                    <div className="mt-1 h-2 w-2 rounded-full shrink-0" style={{ background: 'var(--blue)' }} />
+                    <div className="mt-1.5 h-2 w-2 rounded-full shrink-0" style={{ background: 'var(--brand-gold)' }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm" style={{ color: 'var(--navy)' }}>
+                      <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
                         {(activity as any).candidate?.full_name || ""}
                       </p>
-                      <p className="text-xs" style={{ color: 'var(--gray-400)' }}>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                         {t(`candidates.status.${activity.action}`) || activity.action}
                       </p>
                     </div>
-                    <span className="text-xs whitespace-nowrap" style={{ color: 'var(--gray-400)' }}>
+                    <span className="text-xs whitespace-nowrap" style={{ color: 'var(--text-tertiary)' }}>
                       {activity.created_at ? formatDateTime(activity.created_at) : ""}
                     </span>
                   </div>
                 ))}
               </div>
-            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--gray-400)' }}>{l.no_data}</p>}
+            ) : <p className="text-sm text-center py-8" style={{ color: 'var(--text-tertiary)' }}>{l.no_data}</p>}
           </div>
         </div>
       </div>
