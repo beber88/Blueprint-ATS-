@@ -1,0 +1,29 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = createAdminClient();
+
+    const { data: files, error } = await supabase
+      .from('candidate_files')
+      .select('*')
+      .eq('candidate_id', params.id)
+      .order('uploaded_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to fetch candidate files:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ files: files || [] });
+  } catch (error) {
+    console.error('Candidate files API error:', error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal error' }, { status: 500 });
+  }
+}
