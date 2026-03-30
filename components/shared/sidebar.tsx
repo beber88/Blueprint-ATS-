@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, Settings, LogOut, FileText, Bot, FolderOpen,
+  LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
   Sun, Moon, UserCog, BookOpen, Globe, FileQuestion,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -27,6 +27,7 @@ const navGroups: { labelKey: string; items: { key: string; href: string; icon: L
   {
     labelKey: "nav_group.communication",
     items: [
+      { key: "nav.chat", href: "/chat", icon: MessageCircle },
       { key: "nav.messages", href: "/messages", icon: MessageSquare },
       { key: "nav.templates", href: "/templates", icon: FileText },
     ],

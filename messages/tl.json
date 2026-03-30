@@ -18,7 +18,8 @@
     "users": "Mga User",
     "guide": "Gabay",
     "job_boards": "Mga Job Board",
-    "unmatched_files": "Hindi Naitugmang File"
+    "unmatched_files": "Hindi Naitugmang File",
+    "chat": "Chat"
   },
   "dashboard": {
     "title": "Dashboard",
