@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { translateExperience } from "@/lib/i18n/content-translations";
 import { getProfessionLabel } from "@/lib/i18n/profession-labels";
 import Link from "next/link";
@@ -96,18 +96,21 @@ export default function CandidatesPage() {
     fetch("/api/categories").then(r => r.json()).then(setCategories).catch(() => {});
   }, []);
 
-  const fetchCandidates = useCallback(async () => {
+  // Fetch candidates — called directly, no useCallback wrapper
+  const fetchCandidates = async () => {
     setLoading(true);
     try {
+      const body = {
+        search, statuses: statusFilter, professions: professionFilter,
+        min_experience: minExperience, max_experience: maxExperience,
+        min_score: minScore, max_score: maxScore,
+        sort_by: sortBy, sort_order: sortOrder, preset, page, per_page: 200,
+      };
+      console.log("[Blueprint] Fetching:", JSON.stringify(body));
       const res = await fetch("/api/candidates/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          search, statuses: statusFilter, professions: professionFilter,
-          min_experience: minExperience, max_experience: maxExperience,
-          min_score: minScore, max_score: maxScore,
-          sort_by: sortBy, sort_order: sortOrder, preset, page, per_page: 200,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (res.ok) { setCandidates(data.candidates || []); setTotal(data.total || 0); }
@@ -116,19 +119,17 @@ export default function CandidatesPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Re-fetch whenever ANY filter/sort variable changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchCandidates();
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, statusFilter, professionFilter, minExperience, maxExperience,
       minScore, maxScore, sortBy, sortOrder, preset, page]);
-
-  // Re-fetch whenever ANY filter changes (debounced)
-  useEffect(() => {
-    const timer = setTimeout(() => fetchCandidates(), 300);
-    return () => clearTimeout(timer);
-  }, [fetchCandidates]);
-
-  // Reset page when filters change
-  useEffect(() => { setPage(1); },
-    [search, statusFilter, professionFilter, minExperience, maxExperience,
-     minScore, maxScore, sortBy, sortOrder, preset]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
