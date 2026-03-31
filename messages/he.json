@@ -522,5 +522,15 @@
     "dashboard_section": "דשבורד",
     "settings_section": "הגדרות",
     "tips": "טיפים ושיטות עבודה"
+  },
+  "unmatched": {
+    "title": "קבצים לא משויכים",
+    "subtitle": "קבצים שהמערכת לא הצליחה לשייך אוטומטית למועמד קיים",
+    "suggested_matches": "מועמדים מתאימים",
+    "or_manual": "או בחר ידנית",
+    "assigned_success": "הקובץ שויך בהצלחה",
+    "all_matched": "כל הקבצים משויכים למועמדים",
+    "detected_name": "שם שזוהה",
+    "pending": "ממתינים לשיוך"
   }
 }

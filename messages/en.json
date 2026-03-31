@@ -522,5 +522,15 @@
     "dashboard_section": "Dashboard",
     "settings_section": "Settings",
     "tips": "Tips & Best Practices"
+  },
+  "unmatched": {
+    "title": "Unmatched Files",
+    "subtitle": "Files that could not be automatically assigned to a candidate",
+    "suggested_matches": "Suggested matches",
+    "or_manual": "Or select manually",
+    "assigned_success": "File assigned successfully",
+    "all_matched": "All files are matched to candidates",
+    "detected_name": "Detected name",
+    "pending": "pending assignment"
   }
 }

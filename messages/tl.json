@@ -522,5 +522,15 @@
     "dashboard_section": "Dashboard",
     "settings_section": "Mga Setting",
     "tips": "Mga Tip at Pinakamahusay na Kasanayan"
+  },
+  "unmatched": {
+    "title": "Hindi Naitugmang mga File",
+    "subtitle": "Mga file na hindi awtomatikong naitugma sa kandidato",
+    "suggested_matches": "Mga iminungkahing tugma",
+    "or_manual": "O pumili ng manu-mano",
+    "assigned_success": "Matagumpay na naitugma ang file",
+    "all_matched": "Lahat ng file ay naitugma na",
+    "detected_name": "Nakitang pangalan",
+    "pending": "naghihintay ng pagtatalaga"
   }
 }

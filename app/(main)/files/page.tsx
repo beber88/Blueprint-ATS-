@@ -16,6 +16,8 @@ interface UnmatchedFile {
   ai_classification_confidence: number | null;
   ai_classification_reasoning: string | null;
   metadata: { detected_person_name?: string; detected_role?: string; summary?: string } | null;
+  detected_name?: string | null;
+  suggestions?: { id: string; full_name: string; email: string; profession: string }[];
   uploaded_at: string;
 }
 
@@ -72,8 +74,8 @@ export default function UnmatchedFilesPage() {
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
-  const assignFile = async (fileId: string) => {
-    const candidateId = assignments[fileId];
+  const assignFile = async (fileId: string, directCandidateId?: string) => {
+    const candidateId = directCandidateId || assignments[fileId];
     if (!candidateId) { toast.error(l.select_candidate); return; }
     setAssigning(fileId);
     try {
@@ -155,33 +157,60 @@ export default function UnmatchedFilesPage() {
               const confidence = file.ai_classification_confidence;
 
               return (
-                <div key={file.id} className="rounded-xl p-4 flex items-center gap-4" style={{ boxShadow: "var(--shadow-sm)" }}>
-                  {/* Icon */}
-                  <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--bg-tertiary)" }}>
-                    <Icon className="h-5 w-5" style={{ color: "var(--brand-gold)" }} />
-                  </div>
-
-                  {/* File info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{file.file_name}</p>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: "var(--bg-tertiary)", color: "var(--brand-gold)" }}>
-                        {fileTypeLabel(file.file_type)}
-                      </span>
-                      {detectedName && (
-                        <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                          {l.detected_name}: <strong>{detectedName}</strong>
-                        </span>
-                      )}
-                      {confidence != null && (
-                        <span className="text-xs" style={{ color: confidence >= 0.85 ? "var(--green)" : confidence >= 0.65 ? "var(--amber)" : "var(--red)" }}>
-                          {Math.round(confidence * 100)}%
-                        </span>
-                      )}
+                <div key={file.id} className="rounded-xl p-5 space-y-3" style={{ boxShadow: "var(--shadow-sm)", borderLeft: `3px solid ${file.file_type === "portfolio" ? "var(--brand-gold)" : file.file_type === "cv" ? "var(--status-reviewed-text)" : "var(--border-primary)"}` }}>
+                  {/* Top row: icon + filename + type + confidence */}
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--bg-tertiary)" }}>
+                      <Icon className="h-5 w-5" style={{ color: "var(--brand-gold)" }} />
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{file.file_name}</p>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: "var(--bg-tertiary)", color: "var(--brand-gold)" }}>
+                          {fileTypeLabel(file.file_type)}
+                        </span>
+                        {(detectedName || file.detected_name) && (
+                          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                            {l.detected_name}: <strong>{detectedName || file.detected_name}</strong>
+                          </span>
+                        )}
+                        {confidence != null && (
+                          <span className="text-xs" style={{ color: confidence >= 0.85 ? "var(--status-approved-text)" : confidence >= 0.65 ? "var(--status-shortlisted-text)" : "var(--status-rejected-text)" }}>
+                            {Math.round(confidence * 100)}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <a href={file.file_url} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="ghost" className="rounded-lg text-xs h-8">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                    </a>
                   </div>
 
-                  {/* Candidate selector */}
+                  {/* Suggestions row */}
+                  {file.suggestions && file.suggestions.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium mb-1.5" style={{ color: "var(--text-tertiary)" }}>{locale === "he" ? "מועמדים מתאימים:" : "Suggested matches:"}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {file.suggestions.map(s => (
+                          <button
+                            key={s.id}
+                            onClick={() => assignFile(file.id, s.id)}
+                            disabled={assigning === file.id}
+                            className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
+                            style={{ background: "var(--bg-tertiary)", color: "var(--text-gold)", border: "1px solid var(--border-primary)" }}
+                          >
+                            {s.full_name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Manual assign + actions row */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs shrink-0" style={{ color: "var(--text-tertiary)" }}>{locale === "he" ? "או בחר ידנית:" : "Or select manually:"}</span>
                   <Select value={assignments[file.id] || ""} onValueChange={v => setAssignments(prev => ({ ...prev, [file.id]: v }))}>
                     <SelectTrigger className="w-48 rounded-lg text-xs h-9" style={{ borderColor: "var(--border-primary)" }}>
                       <SelectValue placeholder={l.select_candidate} />
@@ -213,6 +242,7 @@ export default function UnmatchedFilesPage() {
                         <Eye className="h-3 w-3" />
                       </Button>
                     </a>
+                  </div>
                   </div>
                 </div>
               );
