@@ -44,7 +44,7 @@ const navGroups: { labelKey: string; items: { key: string; href: string; icon: L
     labelKey: "nav_group.management",
     items: [
       { key: "nav.unmatched_files", href: "/files", icon: FileQuestion },
-      { key: "nav.reports", href: "/reports", icon: FileBarChart },
+      { key: "nav.reports", href: "/reports", icon: FileBarChart, adminOnly: true },
       { key: "nav.settings", href: "/settings", icon: Settings },
       { key: "nav.job_boards", href: "/settings/job-boards", icon: Globe },
       { key: "nav.users", href: "/users", icon: UserCog, adminOnly: true },

@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
+import { useUser } from "@/lib/auth/context";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
@@ -19,14 +20,29 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function ReportsPage() {
   const { t, locale } = useI18n();
+  const { isAdmin } = useUser();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [days, setDays] = useState(7);
   const [showSummary, setShowSummary] = useState(true);
 
+  // Admin only
+  if (!isAdmin) {
+    return (
+      <div className="flex items-center justify-center h-full" style={{ background: "var(--bg-primary)" }}>
+        <div className="text-center">
+          <FileBarChart className="h-16 w-16 mx-auto mb-4" style={{ color: "var(--text-tertiary)" }} />
+          <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
+            {locale === "he" ? "דף זה זמין למנהל מערכת בלבד" : "This page is available to admin only"}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const labels = {
     he: {
-      title: "דוח שבועי למנכ\"ל", period: "תקופה", last_week: "שבוע", two_weeks: "שבועיים", month: "חודש",
+      title: "דוח למנכ\"ל", period: "תקופה", last_week: "שבוע", two_weeks: "שבועיים", month: "חודש", all_time: "הכל",
       generate: "הפק דוח", regenerate: "הפק מחדש", generating: "מפיק דוח...",
       ai_summary: "סיכום מנהלים (AI)", new_candidates: "מועמדים חדשים", total: "סה״כ",
       avg_score: "ציון ממוצע", interviews: "ראיונות בתקופה", messages: "הודעות נשלחו",
@@ -38,7 +54,7 @@ export default function ReportsPage() {
       view_all: "צפה בכולם", no_data: "אין נתונים לתקופה זו",
     },
     en: {
-      title: "Weekly CEO Report", period: "Period", last_week: "Week", two_weeks: "2 Weeks", month: "Month",
+      title: "CEO Report", period: "Period", last_week: "Week", two_weeks: "2 Weeks", month: "Month", all_time: "All",
       generate: "Generate Report", regenerate: "Regenerate", generating: "Generating report...",
       ai_summary: "Executive Summary (AI)", new_candidates: "New Candidates", total: "Total",
       avg_score: "Avg Score", interviews: "Interviews", messages: "Messages Sent",
@@ -50,7 +66,7 @@ export default function ReportsPage() {
       view_all: "View all", no_data: "No data for this period",
     },
     tl: {
-      title: "Lingguhang Ulat sa CEO", period: "Panahon", last_week: "Linggo", two_weeks: "2 Linggo", month: "Buwan",
+      title: "Ulat sa CEO", period: "Panahon", last_week: "Linggo", two_weeks: "2 Linggo", month: "Buwan", all_time: "Lahat",
       generate: "Gumawa ng Ulat", regenerate: "Gumawa Muli", generating: "Gumagawa ng ulat...",
       ai_summary: "Executive Summary (AI)", new_candidates: "Bagong Kandidato", total: "Kabuuan",
       avg_score: "Average Score", interviews: "Mga Panayam", messages: "Mga Naipadala na Mensahe",
@@ -90,7 +106,7 @@ export default function ReportsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {[{ d: 7, label: l.last_week }, { d: 14, label: l.two_weeks }, { d: 30, label: l.month }].map(p => (
+            {[{ d: 7, label: l.last_week }, { d: 14, label: l.two_weeks }, { d: 30, label: l.month }, { d: 365, label: l.all_time }].map(p => (
               <button key={p.d} onClick={() => setDays(p.d)}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                 style={{ background: days === p.d ? "var(--brand-gold)" : "var(--bg-tertiary)", color: days === p.d ? "#1A1A1A" : "var(--text-secondary)" }}>

@@ -61,25 +61,46 @@ export async function POST(request: NextRequest) {
       try {
         const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
         const langName = lang === "he" ? "Hebrew" : lang === "tl" ? "Tagalog" : "English";
+        // Build top candidates detail for AI
+        const topCandidatesDetail = top10.slice(0, 5).map(c =>
+          `- ${c.full_name} (ID:${c.id}): ${c.profession || "unclassified"}, ${c.experience_years || 0}y exp, score ${c.overall_ai_score || "N/A"}, status: ${c.status}, portfolio: ${c.has_portfolio ? "Yes" : "No"}`
+        ).join("\n");
+
         const response = await client.messages.create({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 1500,
+          max_tokens: 2500,
           messages: [{
             role: "user",
-            content: `Write a professional executive summary for the CEO of Blueprint Building Group Inc. (construction company, Philippines).
+            content: `Write a professional executive report for the CEO of Blueprint Building Group Inc. (construction company, Philippines).
 
-Period: Last ${days} days.
+This report can be generated at ANY time (not just weekly). The CEO uses it to make hiring decisions.
+
+Period: Last ${days} days${days >= 365 ? " (all time)" : ""}.
 Data:
 - New candidates: ${newList.length}
 - Total candidates: ${allList.length}
 - Interviews scheduled: ${interviewCount || 0}
 - Messages sent: ${messagesCount || 0}
 - Open positions: ${jobs?.length || 0}
-- Top professions: ${Object.entries(byProfession).sort(([,a],[,b]) => b.newCount - a.newCount).slice(0,5).map(([k,v]) => `${k}: ${v.newCount} new, ${v.count} total`).join("; ")}
+- Top professions: ${Object.entries(byProfession).sort(([,a],[,b]) => b.newCount - a.newCount).slice(0,5).map(([k,v]) => `${k}: ${v.newCount} new, ${v.count} total, avg score ${v.avgScore}`).join("; ")}
 - Pipeline: ${Object.entries(pipeline).map(([k,v]) => `${k}: ${v}`).join(", ")}
-- Top candidate score: ${top10[0]?.overall_ai_score || "N/A"}
 
-Write in ${langName}. Be concise, professional, actionable. Include: key highlights, concerns, and recommended next steps. 3-5 paragraphs max.`
+Top 5 candidates to consider:
+${topCandidatesDetail || "No scored candidates yet"}
+
+STRUCTURE YOUR RESPONSE AS:
+1. Executive Summary (2-3 sentences overview)
+2. Key Highlights (bullet points)
+3. TOP CANDIDATE RECOMMENDATIONS - For each of the top 5 candidates:
+   * Name and profession
+   * Strengths (why they're good)
+   * Concerns (what to watch for)
+   * Match score and recommendation (HIRE / HOLD / PASS)
+4. Gaps & Concerns (what's missing in the talent pool)
+5. Recommended Next Steps (actionable items)
+
+Write ENTIRELY in ${langName}. Be professional, specific, data-driven.
+Reference actual candidate names. Be honest about weaknesses.`
           }]
         });
         aiSummary = response.content[0].type === "text" ? response.content[0].text : "";
