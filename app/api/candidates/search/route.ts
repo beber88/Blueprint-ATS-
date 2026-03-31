@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       "status",
     ];
     const sortField = validSorts.includes(sort_by) ? sort_by : "created_at";
-    query = query.order(sortField, { ascending: sort_order === "asc" });
+    query = query.order(sortField, { ascending: sort_order === "asc", nullsFirst: false });
 
     // Pagination
     const from = (page - 1) * per_page;
