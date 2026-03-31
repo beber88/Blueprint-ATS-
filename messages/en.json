@@ -19,7 +19,8 @@
     "guide": "Guide",
     "job_boards": "Job Boards",
     "unmatched_files": "Unmatched Files",
-    "chat": "Chat"
+    "chat": "Chat",
+    "reports": "Reports"
   },
   "dashboard": {
     "title": "Dashboard",

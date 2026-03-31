@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
-  Sun, Moon, UserCog, BookOpen, Globe, FileQuestion,
+  Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -44,6 +44,7 @@ const navGroups: { labelKey: string; items: { key: string; href: string; icon: L
     labelKey: "nav_group.management",
     items: [
       { key: "nav.unmatched_files", href: "/files", icon: FileQuestion },
+      { key: "nav.reports", href: "/reports", icon: FileBarChart },
       { key: "nav.settings", href: "/settings", icon: Settings },
       { key: "nav.job_boards", href: "/settings/job-boards", icon: Globe },
       { key: "nav.users", href: "/users", icon: UserCog, adminOnly: true },
