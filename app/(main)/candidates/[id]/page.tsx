@@ -208,25 +208,27 @@ export default function CandidateProfilePage() {
 
   const handleRunAnalysis = async () => {
     if (!candidate) return;
-    const jobApp = candidate.applications?.[0];
-    if (!jobApp?.job_id) {
-      toast.error(t("common.error"));
-      return;
-    }
-    toast.info(t("common.loading"));
+    toast.info(locale === "he" ? "מריץ ניתוח AI..." : "Running AI analysis...");
     try {
+      // Try to find a job to analyze against, but don't require one
+      const jobApp = candidate.applications?.[0];
+      const jobId = jobApp?.job_id || null;
+
       const res = await fetch("/api/cv/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ candidateId: candidate.id, jobId: jobApp.job_id }),
+        body: JSON.stringify({ candidateId: candidate.id, jobId }),
       });
-      if (!res.ok) throw new Error("Failed");
-      toast.success(t("profile.ai_analysis"));
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Failed" }));
+        throw new Error(err.error || "Failed");
+      }
+      toast.success(locale === "he" ? "ניתוח AI הושלם!" : "AI analysis complete!");
       const refreshRes = await fetch(`/api/candidates/${candidate.id}`);
       const refreshData = await refreshRes.json();
       setCandidate(refreshData);
-    } catch {
-      toast.error(t("common.error"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
     }
   };
 
