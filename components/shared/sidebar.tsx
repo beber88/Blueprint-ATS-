@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
-  Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart,
+  Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart, Search,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ const navGroups: { labelKey: string; items: { key: string; href: string; icon: L
   {
     labelKey: "nav_group.tools",
     items: [
+      { key: "nav.ai_search", href: "/ai-search", icon: Search },
       { key: "nav.ai_agent", href: "/ai-agent", icon: Bot },
       { key: "nav.categories", href: "/categories", icon: FolderOpen },
       { key: "nav.guide", href: "/guide", icon: BookOpen },
