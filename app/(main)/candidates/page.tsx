@@ -13,13 +13,14 @@ import { ScoreBadge } from "@/components/shared/score-badge";
 import { TableLoading } from "@/components/shared/loading";
 import { BulkUpload } from "@/components/shared/bulk-upload";
 import { SmartUpload } from "@/components/candidates/smart-upload";
+import { SmartSearch } from "@/components/candidates/smart-search";
 import { AdvancedFilters } from "@/components/candidates/advanced-filters";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Upload, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw, Briefcase, Trash2, Loader2, Bot, Pencil, Brain,
+  Upload, Plus, MoreHorizontal, Eye, Users, Mail, RefreshCw, Briefcase, Trash2, Loader2, Bot, Pencil, Brain, Sparkles,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
@@ -89,6 +90,7 @@ export default function CandidatesPage() {
   const [reclassifying, setReclassifying] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [classifying, setClassifying] = useState(false);
+  const [smartSearchOpen, setSmartSearchOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/jobs").then(r => r.json()).then(setJobs).catch(() => {});
@@ -337,6 +339,16 @@ export default function CandidatesPage() {
             <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{candidates.length} {t("candidates.title")}</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setSmartSearchOpen(!smartSearchOpen)}
+              className="rounded-lg"
+              style={smartSearchOpen
+                ? { background: 'var(--brand-gold)', color: '#1A1A1A' }
+                : { background: 'linear-gradient(135deg, var(--brand-gold), #F59E0B)', color: '#1A1A1A' }}
+            >
+              <Sparkles className="ml-2 h-4 w-4" />
+              {locale === "he" ? "חיפוש חכם" : "Smart Search"}
+            </Button>
             <Button variant="outline" onClick={() => setManualOpen(true)} className="rounded-lg" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
               <Plus className="ml-2 h-4 w-4" /> {t("candidates.add_manual")}
             </Button>
@@ -377,6 +389,11 @@ export default function CandidatesPage() {
       </div>
 
       <div className="px-8 py-6 space-y-4">
+        {/* Smart Search */}
+        {smartSearchOpen && (
+          <SmartSearch onClose={() => setSmartSearchOpen(false)} />
+        )}
+
         {/* Advanced Filters */}
         <AdvancedFilters
           filters={advancedFilters}
