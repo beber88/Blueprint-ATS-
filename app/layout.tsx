@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { I18nProvider } from "@/lib/i18n/context";
 import { ThemeProvider } from "@/lib/theme/context";
 import { UserProvider } from "@/lib/auth/context";
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 export const metadata: Metadata = {
   title: "Blueprint ATS",
@@ -26,14 +27,16 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('blueprint-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})();` }} />
       </head>
       <body className="antialiased">
-        <ThemeProvider>
-          <I18nProvider>
-            <UserProvider>
-              {children}
-              <Toaster position="top-left" richColors closeButton />
-            </UserProvider>
-          </I18nProvider>
-        </ThemeProvider>
+        <ConvexClientProvider>
+          <ThemeProvider>
+            <I18nProvider>
+              <UserProvider>
+                {children}
+                <Toaster position="top-left" richColors closeButton />
+              </UserProvider>
+            </I18nProvider>
+          </ThemeProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );
