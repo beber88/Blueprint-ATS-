@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import Anthropic from "@anthropic-ai/sdk";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
       { data: recentActivity },
       { data: categories },
     ] = await Promise.all([
-      supabase.from("candidates").select("*").order("created_at", { ascending: false }).limit(200),
+      supabase.from("candidates").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("jobs").select("*").order("created_at", { ascending: false }),
       supabase.from("applications").select("*, candidate:candidates(full_name), job:jobs(title)").order("applied_at", { ascending: false }).limit(500),
       supabase.from("interviews").select("*, application:applications(candidate:candidates(full_name), job:jobs(title))").order("scheduled_at", { ascending: false }).limit(100),
@@ -82,9 +83,9 @@ ${Array.isArray(c.previous_roles) && (c.previous_roles as Record<string, string>
   ? (c.previous_roles as Record<string, string>[]).map(r => `  • ${r.title || "?"} at ${r.company || "?"} (${r.duration || "?"}) - ${r.description || ""}`).join("\n")
   : "  No roles listed"}
 
-CV RAW TEXT (${((c.cv_raw_text as string) || "").length} chars):
-${c.cv_raw_text ? (c.cv_raw_text as string).slice(0, 3000) : "No CV text available"}
-${((c.cv_raw_text as string) || "").length > 3000 ? "\n  ...[truncated]" : ""}
+CV RAW TEXT (excerpt):
+${c.cv_raw_text ? (c.cv_raw_text as string).slice(0, 1500) : "No CV text available"}
+${((c.cv_raw_text as string) || "").length > 1500 ? "\n  ...[truncated]" : ""}
 
 ADDITIONAL DOCUMENTS: ${docs.length > 0 ? docs.map(d => `${d.name} (${d.type})`).join(", ") : "None"}
 

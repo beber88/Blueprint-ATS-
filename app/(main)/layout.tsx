@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from "@/components/shared/sidebar";
+import { AIChatBubble } from "@/components/shared/ai-chat-bubble";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -51,6 +52,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="h-14 md:hidden" />
         {children}
       </main>
+
+      {/* Floating AI Chat Bubble */}
+      <AIChatBubble />
     </div>
   );
 }

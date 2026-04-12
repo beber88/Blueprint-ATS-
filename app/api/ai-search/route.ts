@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import Anthropic from "@anthropic-ai/sdk";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 interface SearchParams {
   professions: string[];
