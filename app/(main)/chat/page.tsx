@@ -27,7 +27,7 @@ interface ChatMessage {
 }
 
 export default function ChatPage() {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const { user } = useUser();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConv, setActiveConv] = useState<string | null>(null);
@@ -151,7 +151,7 @@ export default function ChatPage() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return locale === "he" ? "עכשיו" : "now";
+    if (mins < 1) return t("common.now");
     if (mins < 60) return `${mins}m`;
     const hours = Math.floor(mins / 60);
     if (hours < 24) return `${hours}h`;
@@ -325,7 +325,7 @@ export default function ChatPage() {
                         <p style={{ whiteSpace: "pre-wrap" }}>{msg.content}</p>
                       </div>
                       <p className={`text-[10px] mt-0.5 px-1 ${isOwn ? "text-right" : ""}`} style={{ color: "var(--text-tertiary)" }}>
-                        {new Date(msg.created_at).toLocaleTimeString(locale === "he" ? "he-IL" : "en-US", { hour: "2-digit", minute: "2-digit" })}
+                        {new Date(msg.created_at).toLocaleTimeString(locale === "he" ? "he-IL" : locale === "tl" ? "fil-PH" : "en-US", { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>

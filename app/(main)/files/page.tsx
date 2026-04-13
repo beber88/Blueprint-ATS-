@@ -191,7 +191,7 @@ export default function UnmatchedFilesPage() {
                   {/* Suggestions row */}
                   {file.suggestions && file.suggestions.length > 0 && (
                     <div>
-                      <p className="text-xs font-medium mb-1.5" style={{ color: "var(--text-tertiary)" }}>{locale === "he" ? "מועמדים מתאימים:" : "Suggested matches:"}</p>
+                      <p className="text-xs font-medium mb-1.5" style={{ color: "var(--text-tertiary)" }}>{t("unmatched.suggested_matches")}:</p>
                       <div className="flex flex-wrap gap-1.5">
                         {file.suggestions.map(s => (
                           <button
@@ -210,7 +210,7 @@ export default function UnmatchedFilesPage() {
 
                   {/* Manual assign + actions row */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs shrink-0" style={{ color: "var(--text-tertiary)" }}>{locale === "he" ? "או בחר ידנית:" : "Or select manually:"}</span>
+                    <span className="text-xs shrink-0" style={{ color: "var(--text-tertiary)" }}>{t("unmatched.or_manual")}:</span>
                   <Select value={assignments[file.id] || ""} onValueChange={v => setAssignments(prev => ({ ...prev, [file.id]: v }))}>
                     <SelectTrigger className="w-48 rounded-lg text-xs h-9" style={{ borderColor: "var(--border-primary)" }}>
                       <SelectValue placeholder={l.select_candidate} />

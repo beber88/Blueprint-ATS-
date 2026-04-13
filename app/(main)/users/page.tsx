@@ -52,7 +52,7 @@ export default function UsersPage() {
   };
 
   const inviteUser = async () => {
-    if (!inviteForm.email) { toast.error("Email required"); return; }
+    if (!inviteForm.email) { toast.error(t("users.email_required")); return; }
     setInviting(true);
     try {
       const res = await fetch("/api/users/invite", {
@@ -61,21 +61,21 @@ export default function UsersPage() {
         body: JSON.stringify(inviteForm),
       });
       if (!res.ok) throw new Error((await res.json()).error);
-      toast.success(locale === "he" ? "הזמנה נשלחה" : "Invitation sent");
+      toast.success(t("users.invitation_sent"));
       setInviteOpen(false);
       setInviteForm({ email: "", full_name: "", role: "recruiter" });
       fetch("/api/users").then(r => r.json()).then(setUsers);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error");
+      toast.error(err instanceof Error ? err.message : t("common.error"));
     } finally {
       setInviting(false);
     }
   };
 
   const labels = {
-    he: { title: "ניהול משתמשים", subtitle: "ניהול הרשאות וגישה", access_denied: "אין לך הרשאה לדף זה", admin: "מנהל", user_role: "משתמש", role: "תפקיד", joined: "הצטרף", remove: "הסר" },
-    en: { title: "User Management", subtitle: "Manage permissions and access", access_denied: "You don't have permission to view this page", admin: "Admin", user_role: "User", role: "Role", joined: "Joined", remove: "Remove" },
-    tl: { title: "Pamamahala ng User", subtitle: "Pamahalaan ang mga permiso at access", access_denied: "Wala kang permiso na tingnan ang pahinang ito", admin: "Admin", user_role: "User", role: "Role", joined: "Sumali", remove: "Alisin" },
+    he: { title: "ניהול משתמשים", subtitle: "ניהול הרשאות וגישה", access_denied: "אין לך הרשאה לדף זה", admin: "מנהל", user_role: "משתמש", role: "תפקיד", joined: "הצטרף", remove: "הסר", invite_user: "הזמן משתמש", invite_title: "הזמנת משתמש חדש", full_name: "שם מלא", email: "אימייל", role_admin: "מנהל מערכת", role_recruiter: "מגייס", role_viewer: "צופה", send_invite: "שלח הזמנה" },
+    en: { title: "User Management", subtitle: "Manage permissions and access", access_denied: "You don't have permission to view this page", admin: "Admin", user_role: "User", role: "Role", joined: "Joined", remove: "Remove", invite_user: "Invite User", invite_title: "Invite New User", full_name: "Full Name", email: "Email", role_admin: "Admin", role_recruiter: "Recruiter", role_viewer: "Viewer", send_invite: "Send Invite" },
+    tl: { title: "Pamamahala ng User", subtitle: "Pamahalaan ang mga permiso at access", access_denied: "Wala kang permiso na tingnan ang pahinang ito", admin: "Admin", user_role: "User", role: "Role", joined: "Sumali", remove: "Alisin", invite_user: "Mag-imbita ng User", invite_title: "Mag-imbita ng Bagong User", full_name: "Buong Pangalan", email: "Email", role_admin: "Admin", role_recruiter: "Recruiter", role_viewer: "Viewer", send_invite: "Ipadala ang Imbitasyon" },
   };
   const l = labels[locale] || labels.he;
 
@@ -99,7 +99,7 @@ export default function UsersPage() {
             <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>{l.subtitle}</p>
           </div>
           <Button onClick={() => setInviteOpen(true)} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }}>
-            {locale === "he" ? "הזמן משתמש" : "Invite User"}
+            {l.invite_user}
           </Button>
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function UsersPage() {
                     </Select>
                   </td>
                   <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                    {new Date(u.created_at).toLocaleDateString(locale === "he" ? "he-IL" : "en-US")}
+                    {new Date(u.created_at).toLocaleDateString(locale === "he" ? "he-IL" : locale === "tl" ? "fil-PH" : "en-US")}
                   </td>
                   <td className="px-4 py-3">
                     {u.id !== currentUser?.id && (
@@ -160,33 +160,33 @@ export default function UsersPage() {
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
         <DialogContent className="sm:max-w-md rounded-xl">
           <DialogHeader>
-            <DialogTitle>{locale === "he" ? "הזמנת משתמש חדש" : "Invite New User"}</DialogTitle>
+            <DialogTitle>{l.invite_title}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>{locale === "he" ? "שם מלא" : "Full Name"}</Label>
+              <Label>{l.full_name}</Label>
               <Input value={inviteForm.full_name} onChange={e => setInviteForm({...inviteForm, full_name: e.target.value})} className="rounded-lg" />
             </div>
             <div className="space-y-2">
-              <Label>{locale === "he" ? "אימייל" : "Email"}</Label>
+              <Label>{l.email}</Label>
               <Input type="email" value={inviteForm.email} onChange={e => setInviteForm({...inviteForm, email: e.target.value})} className="rounded-lg" />
             </div>
             <div className="space-y-2">
-              <Label>{locale === "he" ? "תפקיד" : "Role"}</Label>
+              <Label>{l.role}</Label>
               <Select value={inviteForm.role} onValueChange={v => setInviteForm({...inviteForm, role: v})}>
                 <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">{locale === "he" ? "מנהל מערכת" : "Admin"}</SelectItem>
-                  <SelectItem value="recruiter">{locale === "he" ? "מגייס" : "Recruiter"}</SelectItem>
-                  <SelectItem value="viewer">{locale === "he" ? "צופה" : "Viewer"}</SelectItem>
+                  <SelectItem value="admin">{l.role_admin}</SelectItem>
+                  <SelectItem value="recruiter">{l.role_recruiter}</SelectItem>
+                  <SelectItem value="viewer">{l.role_viewer}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setInviteOpen(false)} className="rounded-lg">{locale === "he" ? "ביטול" : "Cancel"}</Button>
+            <Button variant="outline" onClick={() => setInviteOpen(false)} className="rounded-lg">{t("common.cancel")}</Button>
             <Button onClick={inviteUser} disabled={inviting} className="rounded-lg text-white" style={{ background: 'var(--brand-gold)' }}>
-              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : (locale === "he" ? "שלח הזמנה" : "Send Invite")}
+              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : l.send_invite}
             </Button>
           </DialogFooter>
         </DialogContent>

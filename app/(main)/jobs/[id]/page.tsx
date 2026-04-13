@@ -92,7 +92,7 @@ export default function JobDetailPage() {
     try {
       const res = await fetch(`/api/jobs/${params.id}/match-candidates`, { method: "POST" });
       const data = await res.json();
-      toast.success(`Matched ${data.matched} of ${data.total}`);
+      toast.success(`${t("candidates.toast.matched")} ${data.matched}/${data.total}`);
       // Refresh matches
       const refreshed = await fetch(`/api/jobs/${params.id}/match-candidates`).then(r => r.json());
       setMatches(refreshed.matches || []);

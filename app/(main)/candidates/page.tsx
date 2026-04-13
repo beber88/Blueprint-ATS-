@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Candidate } from "@/types";
 import { toast } from "sonner";
-import { getStatusLabel } from "@/lib/utils";
+
 import { useI18n } from "@/lib/i18n/context";
 import { useUser } from "@/lib/auth/context";
 
@@ -240,7 +240,7 @@ export default function CandidatesPage() {
 
   const handleReclassify = async () => {
     setReclassifying(true);
-    toast.info(locale === "he" ? "מסווג מועמדים..." : "Classifying candidates...");
+    toast.info(t("candidates.toast.classifying"));
     try {
       const res = await fetch("/api/candidates/reclassify", {
         method: "POST",
@@ -249,10 +249,7 @@ export default function CandidatesPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      toast.success(locale === "he"
-        ? `סווגו ${data.classified} מועמדים מתוך ${data.total}`
-        : `Classified ${data.classified} of ${data.total} candidates`
-      );
+      toast.success(`${t("candidates.toast.classified")} ${data.classified}/${data.total}`);
       fetchCandidates();
     } catch {
       toast.error(t("common.error"));
@@ -262,7 +259,7 @@ export default function CandidatesPage() {
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(locale === "he" ? `למחוק ${selectedRows.size} מועמדים?` : `Delete ${selectedRows.size} candidates?`)) return;
+    if (!confirm(`${t("candidates.toast.confirm_delete")} ${selectedRows.size}?`)) return;
     setDeleting(true);
     try {
       const res = await fetch("/api/candidates/bulk-delete", {
@@ -271,7 +268,7 @@ export default function CandidatesPage() {
         body: JSON.stringify({ candidate_ids: Array.from(selectedRows) }),
       });
       const data = await res.json();
-      toast.success(locale === "he" ? `נמחקו ${data.deleted} מועמדים` : `Deleted ${data.deleted} candidates`);
+      toast.success(`${t("candidates.toast.deleted")} ${data.deleted}`);
       setSelectedRows(new Set());
       fetchCandidates();
     } catch { toast.error(t("common.error")); }
@@ -280,11 +277,11 @@ export default function CandidatesPage() {
 
   const handleClassifyProfessions = async () => {
     setClassifying(true);
-    toast.info(locale === "he" ? "מסווג מקצועות..." : "Classifying professions...");
+    toast.info(t("candidates.toast.classifying_professions"));
     try {
       const res = await fetch("/api/maintenance/classify-professions", { method: "POST" });
       const data = await res.json();
-      toast.success(locale === "he" ? `סווגו ${data.classified} מועמדים` : `Classified ${data.classified} candidates`);
+      toast.success(`${t("candidates.toast.classified")} ${data.classified}`);
       fetchCandidates();
     } catch { toast.error(t("common.error")); }
     finally { setClassifying(false); }
@@ -345,11 +342,11 @@ export default function CandidatesPage() {
             </Button>
             <Button onClick={handleReclassify} disabled={reclassifying} variant="outline" className="rounded-lg" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
               <RefreshCw className={`ml-2 h-4 w-4 ${reclassifying ? "animate-spin" : ""}`} />
-              {locale === "he" ? "סווג מחדש" : "Reclassify"}
+              {t("candidates.toast.reclassify_btn")}
             </Button>
             <Button onClick={handleClassifyProfessions} disabled={classifying} variant="outline" className="rounded-lg text-xs" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
               {classifying ? <Loader2 className="ml-1 h-3 w-3 animate-spin" /> : <Brain className="ml-1 h-3 w-3" />}
-              {locale === "he" ? "סווג מקצועות" : "Classify"}
+              {t("candidates.toast.classify_btn")}
             </Button>
           </div>
         </div>
@@ -411,7 +408,7 @@ export default function CandidatesPage() {
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.candidate")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("common.professional_classification")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase" style={{ color: 'var(--text-tertiary)' }}>
-                    {locale === "he" ? "מקצוע" : "Profession"}
+                    {t("filters.filter_profession")}
                   </th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.status")}</th>
                   <th className="text-right px-4 py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{t("candidates.table.ai_score")}</th>
@@ -513,7 +510,7 @@ export default function CandidatesPage() {
                             <DropdownMenuSeparator />
                             {statuses.map(s => (
                               <DropdownMenuItem key={s} onClick={() => handleStatusChange(candidate.id, s)} disabled={candidate.status === s}>
-                                {getStatusLabel(s)}
+                                {t(`candidates.status.${s}`)}
                               </DropdownMenuItem>
                             ))}
                           </DropdownMenuContent>
@@ -537,7 +534,7 @@ export default function CandidatesPage() {
             {isAdmin && (
               <button onClick={handleBulkDelete} disabled={deleting} className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--status-rejected-bg)', color: 'var(--status-rejected-text)' }}>
                 {deleting ? <Loader2 className="inline h-3 w-3 animate-spin ml-1" /> : <Trash2 className="inline h-3 w-3 ml-1" />}
-                {locale === "he" ? "מחק" : "Delete"}
+                {t("common.delete")}
               </button>
             )}
             <button className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFFFFF' }}>{t("candidates.bulk.change_status")}</button>
