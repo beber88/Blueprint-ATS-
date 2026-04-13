@@ -306,7 +306,7 @@ export default function GuidePage() {
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder={locale === "he" ? "חיפוש במדריך..." : "Search guide..."}
+            placeholder={t("guide.search_placeholder")}
             className="w-full pr-10 pl-4 py-2.5 rounded-xl text-sm"
             style={{ border: "1px solid var(--border-primary)", background: "var(--bg-input)", color: "var(--text-primary)" }}
           />

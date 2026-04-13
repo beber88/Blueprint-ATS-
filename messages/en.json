@@ -91,7 +91,17 @@
       "created": "Candidate created!",
       "cv_uploaded": "CV uploaded successfully!",
       "emails_sent": "Emails sent",
-      "status_updated": "Status updated"
+      "status_updated": "Status updated",
+      "classifying": "Classifying candidates...",
+      "classifying_professions": "Classifying professions...",
+      "classified": "Classified",
+      "confirm_delete": "Delete candidates?",
+      "deleted": "Deleted candidates:",
+      "reclassify_btn": "Reclassify",
+      "classify_btn": "Classify",
+      "running_ai": "Running AI analysis...",
+      "ai_complete": "AI analysis complete!",
+      "matched": "Matched"
     }
   },
   "profile": {
@@ -383,7 +393,13 @@
     "no": "No",
     "next": "Next",
     "search": "Search",
-    "close": "Close"
+    "close": "Close",
+    "now": "now",
+    "translating": "Translating...",
+    "attached": "Attached",
+    "saved_successfully": "Saved successfully",
+    "save_error": "Save error",
+    "admin_only_page": "This page is available to admin only"
   },
   "theme": {
     "light": "Light Mode",
@@ -523,7 +539,12 @@
     "jobs_interviews": "Jobs & Interviews",
     "dashboard_section": "Dashboard",
     "settings_section": "Settings",
-    "tips": "Tips & Best Practices"
+    "tips": "Tips & Best Practices",
+    "search_placeholder": "Search guide..."
+  },
+  "users": {
+    "email_required": "Email is required",
+    "invitation_sent": "Invitation sent"
   },
   "unmatched": {
     "title": "Unmatched Files",

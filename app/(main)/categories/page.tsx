@@ -47,8 +47,8 @@ export default function ProfessionsPage() {
       const res = await fetch("/api/maintenance/classify-professions", { method: "POST" });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Failed");
-      toast.success(`${result.classified || 0} / ${result.total || 0} classified`);
-      if (result.failed > 0) toast.warning(`${result.failed} failed`);
+      toast.success(`${t("candidates.toast.classified")} ${result.classified || 0}/${result.total || 0}`);
+      if (result.failed > 0) toast.warning(`${result.failed} ${t("common.failed")}`);
       // Refresh data
       const refreshed = await fetch("/api/professions/analysis").then(r => r.json());
       setData(refreshed);
@@ -207,7 +207,7 @@ export default function ProfessionsPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-primary)" }}>
-                      {[locale === "he" ? "שם" : "Name", locale === "he" ? "ניסיון" : "Exp", locale === "he" ? "סטטוס" : "Status", locale === "he" ? "תיק עבודות" : "Portfolio", locale === "he" ? "אימייל" : "Email"].map(h => (
+                      {[t("candidates.table.candidate"), t("candidates.table.experience"), t("candidates.table.status"), t("common.portfolio"), t("candidates.form.email")].map(h => (
                         <th key={h} className="text-right px-3 py-2 text-xs uppercase" style={{ color: "var(--text-tertiary)" }}>{h}</th>
                       ))}
                     </tr>

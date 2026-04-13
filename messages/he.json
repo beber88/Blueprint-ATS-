@@ -91,7 +91,17 @@
       "created": "המועמד/ת נוצר/ה!",
       "cv_uploaded": "קו״ח הועלה בהצלחה!",
       "emails_sent": "הודעות נשלחו",
-      "status_updated": "הסטטוס עודכן"
+      "status_updated": "הסטטוס עודכן",
+      "classifying": "מסווג מועמדים...",
+      "classifying_professions": "מסווג מקצועות...",
+      "classified": "סווגו",
+      "confirm_delete": "למחוק מועמדים?",
+      "deleted": "נמחקו מועמדים:",
+      "reclassify_btn": "סווג מחדש",
+      "classify_btn": "סווג מקצועות",
+      "running_ai": "מריץ ניתוח AI...",
+      "ai_complete": "ניתוח AI הושלם!",
+      "matched": "הותאמו"
     }
   },
   "profile": {
@@ -383,7 +393,13 @@
     "no": "לא",
     "next": "הבא",
     "search": "חיפוש",
-    "close": "סגור"
+    "close": "סגור",
+    "now": "עכשיו",
+    "translating": "מתרגם...",
+    "attached": "צורפו לתיק",
+    "saved_successfully": "נשמר בהצלחה",
+    "save_error": "שגיאה בשמירה",
+    "admin_only_page": "דף זה זמין למנהל מערכת בלבד"
   },
   "theme": {
     "light": "מצב יום",
@@ -523,7 +539,12 @@
     "jobs_interviews": "משרות וראיונות",
     "dashboard_section": "דשבורד",
     "settings_section": "הגדרות",
-    "tips": "טיפים ושיטות עבודה"
+    "tips": "טיפים ושיטות עבודה",
+    "search_placeholder": "חיפוש במדריך..."
+  },
+  "users": {
+    "email_required": "אימייל נדרש",
+    "invitation_sent": "הזמנה נשלחה"
   },
   "unmatched": {
     "title": "קבצים לא משויכים",

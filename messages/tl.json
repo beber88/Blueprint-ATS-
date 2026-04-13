@@ -91,7 +91,17 @@
       "created": "Nagawa ang kandidato!",
       "cv_uploaded": "Matagumpay na na-upload ang CV!",
       "emails_sent": "Naipadala ang mga email",
-      "status_updated": "Na-update ang status"
+      "status_updated": "Na-update ang status",
+      "classifying": "Inaayos ang mga kandidato...",
+      "classifying_professions": "Inaayos ang mga propesyon...",
+      "classified": "Na-classify",
+      "confirm_delete": "Burahin ang mga kandidato?",
+      "deleted": "Nabura ang mga kandidato:",
+      "reclassify_btn": "I-reclassify",
+      "classify_btn": "I-classify",
+      "running_ai": "Pinapatakbo ang AI analysis...",
+      "ai_complete": "Tapos na ang AI analysis!",
+      "matched": "Naitugma"
     }
   },
   "profile": {
@@ -383,7 +393,13 @@
     "no": "Hindi",
     "next": "Susunod",
     "search": "Maghanap",
-    "close": "Isara"
+    "close": "Isara",
+    "now": "ngayon",
+    "translating": "Isinasalin...",
+    "attached": "Naikabit",
+    "saved_successfully": "Matagumpay na na-save",
+    "save_error": "Error sa pag-save",
+    "admin_only_page": "Ang pahinang ito ay para sa admin lamang"
   },
   "theme": {
     "light": "Light Mode",
@@ -523,7 +539,12 @@
     "jobs_interviews": "Mga Trabaho at Panayam",
     "dashboard_section": "Dashboard",
     "settings_section": "Mga Setting",
-    "tips": "Mga Tip at Pinakamahusay na Kasanayan"
+    "tips": "Mga Tip at Pinakamahusay na Kasanayan",
+    "search_placeholder": "Maghanap sa gabay..."
+  },
+  "users": {
+    "email_required": "Kinakailangan ang email",
+    "invitation_sent": "Naipadala ang imbitasyon"
   },
   "unmatched": {
     "title": "Hindi Naitugmang mga File",
