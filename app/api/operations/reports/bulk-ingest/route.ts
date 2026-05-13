@@ -6,16 +6,14 @@ import {
   matchEmployeeByName,
   matchProjectByName,
 } from "@/lib/operations/match-employee";
+import { splitReports } from "@/lib/operations/bulk-split";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 // Splits a long pasted text containing multiple daily reports into per-report
-// chunks and ingests each as its own op_reports row + items.
-//
-// Heuristic: each report begins with a header line containing "Date:" or
-// "תאריך:" or a markdown horizontal rule (---) followed by a date. We split on
-// these boundaries. Each chunk is sent to Claude for extraction.
+// chunks (via lib/operations/bulk-split) and ingests each as its own op_reports
+// row + items.
 //
 // Body: { text: string, defaultProjectId?: string }
 // Response: { reports: [{ id, report_date, items_count }], total_items: number }
@@ -23,48 +21,6 @@ export const maxDuration = 300;
 interface BulkBody {
   text: string;
   defaultProjectId?: string;
-}
-
-function parseDateFromHeader(header: string): string | null {
-  const m = header.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
-  if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
-  const m2 = header.match(/(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s+(\d{4})/i);
-  if (m2) {
-    const months: Record<string, string> = {
-      january: "01", february: "02", march: "03", april: "04", may: "05", june: "06",
-      july: "07", august: "08", september: "09", october: "10", november: "11", december: "12",
-    };
-    return `${m2[3]}-${months[m2[1].toLowerCase()]}-${m2[2].padStart(2, "0")}`;
-  }
-  return null;
-}
-
-function splitReports(text: string): Array<{ chunk: string; date: string | null }> {
-  const lines = text.split("\n");
-  const reports: Array<{ chunk: string; date: string | null }> = [];
-  let current: string[] = [];
-  let currentDate: string | null = null;
-
-  const isReportHeader = (i: number): { match: boolean; date: string | null } => {
-    const line = lines[i] || "";
-    const m = line.match(/^\s*(?:date|תאריך)\s*[:\-]\s*(.+)$/i);
-    if (m) return { match: true, date: parseDateFromHeader(m[1]) };
-    return { match: false, date: null };
-  };
-
-  for (let i = 0; i < lines.length; i++) {
-    const header = isReportHeader(i);
-    if (header.match && current.length > 0) {
-      reports.push({ chunk: current.join("\n").trim(), date: currentDate });
-      current = [];
-    }
-    if (header.match) currentDate = header.date;
-    current.push(lines[i]);
-  }
-  if (current.length > 0) {
-    reports.push({ chunk: current.join("\n").trim(), date: currentDate });
-  }
-  return reports.filter((r) => r.chunk.length > 100);
 }
 
 export async function POST(request: NextRequest) {

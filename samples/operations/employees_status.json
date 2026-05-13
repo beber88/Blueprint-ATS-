@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "generated_at": "2026-05-13",
+    "source_documents": [
+      "00000026 — Danica Gabayno resignation",
+      "00000028 — Erica Servancia resignation",
+      "00000086 — MC Millete promotion letter",
+      "00000101 — Roque Clarion termination case",
+      "00000316 — Josh Delatado resignation acceptance",
+      "00000473 — Ofir Levy separation notice",
+      "00000474 — Joey Cepeda reassignment",
+      "00000475 — Shaina Luz NTE (still active)",
+      "00000633 — Christian Mendevil NTE (5–7 day suspension, active)",
+      "00000639/640 — Christian explanation + decision (still active under final warning)",
+      "00000668 — Eric Masangkay final warning (still active)",
+      "00000676 — Mark Lee Bercasio non-regularization",
+      "Daily reports 2026-04-28 → 2026-05-12 — attendance snapshots",
+      "WhatsApp chat — Lara/Mela/Myla/Jet/Adrian/Jen/Darwin events"
+    ],
+    "note": "Used to drive seed filtering: only `active` employees go into op_employees; the rest live in op_employees_history."
+  },
+  "active": [
+    { "full_name": "Bar Gvili", "role": "CEO", "dept": "admin" },
+    { "full_name": "Nicx", "role": "HR & Office Manager", "dept": "hr", "source": "daily reports up to 2026-05-12" },
+    { "full_name": "Marie Cris Millete (MC)", "role": "Head of Finance and Budget", "dept": "finance", "promoted_from": "Accountant", "promoted_at": "2025-09-18", "source": "promotion letter 00000086" },
+    { "full_name": "Lawrence Locsin", "role": "Senior Architect / Head", "dept": "architecture", "promoted_at": "2025-11-13", "source": "daily reports" },
+    { "full_name": "Shaina Mae Luz", "role": "Architect", "dept": "architecture", "note": "NTE issued 2026-02-03 for unauthorized leave — still active", "source": "daily reports up to 2026-05-12" },
+    { "full_name": "Aliah Rose Mallari", "role": "Architect Apprentice", "dept": "architecture", "note": "Probation extended late April 2026 — active", "source": "daily reports" },
+    { "full_name": "Jerwin Angel Tapang", "role": "Draftsman / Architect Apprentice", "dept": "architecture", "started": "2025-12-01", "source": "job offer 11/13/2025 + daily reports" },
+    { "full_name": "Jester R. Molde", "role": "Senior Project Manager (Pampanga)", "dept": "projects", "is_pm": true, "started": "2026-01", "source": "interview Jan 22 + daily reports" },
+    { "full_name": "Eric (Enrique Masangkay)", "role": "Project Manager (Fixifoot)", "dept": "projects", "is_pm": true, "note": "Final warning issued 2026-04-22 — still active", "source": "warning 00000668 + daily reports" },
+    { "full_name": "Daff", "role": "Project Manager (Pearl de Flore)", "dept": "projects", "is_pm": true, "source": "daily reports up to 2026-05-12" },
+    { "full_name": "Raegan", "role": "Project Manager (Icon 18H)", "dept": "projects", "is_pm": true, "note": "Sick leave on 2026-05-12, otherwise active", "source": "daily reports" },
+    { "full_name": "Felix Bryan Ramones", "role": "Quantity Surveyor", "dept": "qs", "started": "2026-02-25", "source": "daily reports + job offer" },
+    { "full_name": "Justin", "role": "Quantity Surveyor", "dept": "qs", "source": "daily reports" },
+    { "full_name": "Jon Carlo Orencia", "role": "Head of Quantity Surveying", "dept": "qs", "started": "2026-02-20", "source": "job offer 00000526" },
+    { "full_name": "Daniel", "role": "Procurement Head", "dept": "procurement", "source": "referenced as Procurement lead throughout" },
+    { "full_name": "Kyla Panday", "role": "Procurement / Purchasing", "dept": "procurement", "started": "2025-10-21", "source": "job offer + daily reports" },
+    { "full_name": "Gee (Angela Bragancia)", "role": "Procurement Secretary", "dept": "procurement", "started": "2026-01-27", "note": "Reassigned from HR/Admin to Procurement support 2026-03-23", "source": "job offer + Mar 23 CEO directive" },
+    { "full_name": "Rose Anne Tabuzo", "role": "Office Secretary", "dept": "admin", "source": "daily reports up to 2026-05-12" },
+    { "full_name": "Christian S. Mendevil", "role": "Warehouse Manager", "dept": "site", "note": "5–7 day suspension Apr 7 2026, final warning, still active", "source": "decision 00000640" },
+    { "full_name": "Ryan Radulle", "role": "Repair Team Foreman", "dept": "maintenance", "note": "2nd NTE Nov 7 2025 — still active", "source": "NTE 00000288 + daily reports" },
+    { "full_name": "Jade (Joven Jade Elludar)", "role": "Repair Team", "dept": "maintenance" },
+    { "full_name": "Arnold Cedeno", "role": "Repair Team", "dept": "maintenance" },
+    { "full_name": "Ronnel Laure", "role": "Repair Team", "dept": "maintenance" },
+    { "full_name": "Nollie", "role": "Repair Team", "dept": "maintenance" },
+    { "full_name": "Arnel Serrano", "role": "Repair Team", "dept": "maintenance" },
+    { "full_name": "SG Albert Cruz Tumang", "role": "Security Guard (Day Shift)", "dept": "security" },
+    { "full_name": "SG Lansang (Arnel Salas)", "role": "Security Guard (Night Shift)", "dept": "security" }
+  ],
+  "history": [
+    { "full_name": "Roque Clarion",                "role": "Project Manager",        "dept": "projects",     "status": "terminated", "started": "2025-01-16", "ended": "2025-03-28", "reason": "Failed training evaluation",                       "source": "case file 00000101 / 00000109" },
+    { "full_name": "Maria Danica Gabayno",         "role": "Quantity Surveyor",      "dept": "qs",           "status": "resigned",   "started": null,         "ended": "2025-09-05", "reason": "Short-notice resignation (5 days vs required 30)", "source": "HR doc 00000026" },
+    { "full_name": "Mary Erica Servancia",         "role": "Site Engineer",          "dept": "projects",     "status": "resigned",   "started": null,         "ended": "2025-09-09", "reason": "Resignation accepted, last day Sep 9 2025",        "source": "HR doc 00000028" },
+    { "full_name": "Jennifer Villaverde",          "role": "Engineering staff",      "dept": "projects",     "status": "terminated", "started": null,         "ended": "2025-09-25", "reason": "Termination per management directive",             "source": "Daily report 09/25 + WhatsApp" },
+    { "full_name": "Adrian",                       "role": "Driver",                 "dept": "admin",        "status": "resigned",   "started": null,         "ended": "2025-09-30", "reason": "Resignation, last day end Sep 2025",                "source": "WhatsApp 09/28-09/29" },
+    { "full_name": "Lara",                         "role": "Architect",              "dept": "architecture", "status": "resigned",   "started": null,         "ended": "2025-10-15", "reason": "Personal — board exam prep + mother's cancer care", "source": "Daily report 10/15 + WhatsApp 10/16" },
+    { "full_name": "Mela",                         "role": "Maintenance Manager",    "dept": "maintenance",  "status": "terminated", "started": null,         "ended": "2025-10-20", "reason": "Inefficiency and lack of professionalism",         "source": "WhatsApp 10/20" },
+    { "full_name": "Myla Baldueza",                "role": "Maintenance",            "dept": "maintenance",  "status": "terminated", "started": null,         "ended": "2025-10-22", "reason": "End of probation",                                  "source": "Daily report 10/22 — PIP notice" },
+    { "full_name": "Joshua Brian Phil Delatado",   "role": "Architect",              "dept": "architecture", "status": "resigned",   "started": "2023-10-17", "ended": "2025-11-14", "reason": "Resignation, notice period waived",                "source": "Letter 00000316" },
+    { "full_name": "Jet Jandusay",                 "role": "Site Engineer (Pampanga)","dept": "projects",    "status": "terminated", "started": "2025-02-26", "ended": "2025-12-01", "reason": "Replaced after multiple memos + PIP",              "source": "Daily report 12/01 + CEO directive 09/16" },
+    { "full_name": "Appoch Kaye Rolloque",         "role": "Maintenance Manager",    "dept": "maintenance",  "status": "terminated", "started": "2025-10-13", "ended": "2026-02-24", "reason": "Performance — replaced by Mark Lee Bercasio",       "source": "Daily report 02/24" },
+    { "full_name": "Ofir Levy",                    "role": "Operations VP",          "dept": "projects",     "status": "terminated", "started": null,         "ended": "2026-02-06", "reason": "Separation per management — waiver of notice",      "source": "Notice 00000473" },
+    { "full_name": "Mark Lee Bercasio",            "role": "Maintenance Manager",    "dept": "maintenance",  "status": "terminated", "started": "2026-02-25", "ended": "2026-04-24", "reason": "Non-regularization — failed probationary standards","source": "Notice 00000676" },
+    { "full_name": "Darwin Constantino",           "role": "Quantity Surveyor",      "dept": "qs",           "status": "terminated", "started": "2025-10-02", "ended": "2026-04-29", "reason": "Performance — CEO directive 'I don't want to work with Darwin anymore'", "source": "WhatsApp 2026-02-17 + daily reports tapering off" }
+  ],
+  "transfers": [
+    { "full_name": "Jose (Joey) Cepeda", "role": "Driver", "from": "Personal Driver — Ofir Levy", "to": "JPL", "transferred_at": "2026-02-07", "source": "Notice 00000474" }
+  ]
+}

@@ -1,11 +1,33 @@
--- Blueprint HR — Operations Intelligence Module: Seed Data
--- This migration seeds the master tables with Blueprint Building Group's real organizational data
--- (departments, active projects, core team) so dashboards are populated on first run.
+-- Blueprint HR — Operations Intelligence Module: Real Org Seed
+-- Seeds master tables with Blueprint Building Group's current (May 2026) organizational data.
 --
--- Run AFTER 002_operations_intelligence.sql. Idempotent — safe to re-run.
+-- IDEMPOTENT — SAFE TO RE-RUN.
+-- Each block uses ON CONFLICT or DO NOTHING so re-running produces identical state.
+--
+-- Source-of-truth for which employees are active vs. historical:
+--   samples/operations/employees_status.json
+-- Resigned / terminated employees do NOT go into op_employees — they live in
+-- op_employees_history (seeded by 004_operations_employees_history.sql).
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Departments — overwrite the minimal seed in 002 with the full org structure
+-- Pre-flight: ensure the UNIQUE constraint we rely on for ON CONFLICT exists.
+-- Doing this here rather than in 002 keeps 002 unchanged for clients that have
+-- already applied it; this block is a no-op on re-run.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'op_employees_full_name_key'
+  ) THEN
+    ALTER TABLE op_employees
+      ADD CONSTRAINT op_employees_full_name_key UNIQUE (full_name);
+  END IF;
+END$$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Departments — full org structure
+-- (op_departments.code already has UNIQUE from 002)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 INSERT INTO op_departments (code, name, name_he, name_en, name_tl, color) VALUES
@@ -28,19 +50,18 @@ ON CONFLICT (code) DO UPDATE SET
   color = EXCLUDED.color;
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Projects — real active and pipeline projects (status snapshot as of May 2026)
+-- Projects — real active and pipeline projects (status snapshot May 2026)
+-- (op_projects.code already has UNIQUE from 002)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 INSERT INTO op_projects (code, name, status, department_id, notes) VALUES
-  -- Active construction
   ('PDF',         'Pearl de Flore (SM San Lazaro)',  'active',    NULL, 'Mall kiosk fit-out, ~90% complete'),
   ('FIXI',        'Fixifoot Grand Westside',          'active',    NULL, 'Hotel-mall retail fit-out, Paranaque, ~90%'),
   ('ICON18H',     'Icon 18H',                         'active',    NULL, 'BGC residential unit renovation, ~90%'),
-  ('ICON2H',     'Icon 2H',                          'active',    NULL, 'BGC residential unit renovation'),
+  ('ICON2H',      'Icon 2H',                          'active',    NULL, 'BGC residential unit renovation'),
   ('4STOREY',     '4-Storey Pampanga',                'active',    NULL, '4-storey residential building, Angeles City'),
   ('TRESOR',      'Tresor Rare (Manila Bay)',         'active',    NULL, 'Ayala Manila Bay mall fit-out, pre-construction'),
   ('BOHOL',       'Bohol — Panglao Prime Villas',     'active',    NULL, 'Blue Everest land development, Dauis Bohol'),
-  -- Maintenance / warranty / repair
   ('PULU',        'Pulu Amsic',                       'active',    NULL, 'Post-handover monitoring, electrical, pest control'),
   ('VITALITE',    'Vitalite',                         'active',    NULL, 'Repainting, restoration'),
   ('LCT',         'LCT (Kedma)',                      'active',    NULL, 'Mall renovation + signage'),
@@ -56,7 +77,6 @@ INSERT INTO op_projects (code, name, status, department_id, notes) VALUES
   ('RESHAPE',     'Reshape Circuit Makati',           'active',    NULL, 'Fit-out + mirror works'),
   ('FTV',         'FTV / Manila Bay',                 'completed', NULL, 'Completed turnover'),
   ('FILLIT',      'Fill It',                          'active',    NULL, 'Strip light + glass door work'),
-  -- Pipeline / design only
   ('BGCSPA',      'BGC Spa',                          'active',    NULL, 'Design phase, 3-floor layout'),
   ('ELLE',        'Elle Iloilo',                      'active',    NULL, 'BOQ + design'),
   ('TRINOMA',     'Trinoma Kiosk',                    'active',    NULL, 'Kiosk design'),
@@ -72,8 +92,9 @@ ON CONFLICT (code) DO UPDATE SET
   notes = EXCLUDED.notes;
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Employees — core in-house team (admin pre-registers; phones added via UI)
--- WhatsApp phones intentionally left null — populate via /hr/operations/employees
+-- Employees — ACTIVE core team only (May 2026 snapshot).
+-- Resigned/terminated employees are in op_employees_history (migration 004).
+-- WhatsApp phones intentionally null — admin populates via /hr/operations/employees.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 WITH dept_lookup AS (
@@ -83,41 +104,41 @@ INSERT INTO op_employees (full_name, role, department_id, is_pm, is_active)
 SELECT t.full_name, t.role, d.id, t.is_pm, t.is_active
 FROM (VALUES
   -- Management
-  ('Bar Gvili',                      'CEO',                                 'admin',        false, true),
-  ('Nicx',                            'HR & Office Manager',                 'hr',           false, true),
-  ('Marie Cris Millete (MC)',         'Head of Finance and Budget',          'finance',      false, true),
-  -- Architecture team
-  ('Lawrence Locsin',                 'Senior Architect / Head',             'architecture', false, true),
-  ('Shaina Mae Luz',                  'Architect',                           'architecture', false, true),
-  ('Aliah Rose Mallari',              'Architect Apprentice',                'architecture', false, true),
-  ('Jerwin Angel Tapang',             'Draftsman / Architect Apprentice',    'architecture', false, true),
+  ('Bar Gvili',                      'CEO',                                       'admin',        false, true),
+  ('Nicx',                            'HR & Office Manager',                       'hr',           false, true),
+  ('Marie Cris Millete (MC)',         'Head of Finance and Budget',                'finance',      false, true),
+  -- Architecture
+  ('Lawrence Locsin',                 'Senior Architect / Head',                   'architecture', false, true),
+  ('Shaina Mae Luz',                  'Architect',                                 'architecture', false, true),
+  ('Aliah Rose Mallari',              'Architect Apprentice',                      'architecture', false, true),
+  ('Jerwin Angel Tapang',             'Draftsman / Architect Apprentice',          'architecture', false, true),
   -- Project management
-  ('Jester R. Molde',                 'Senior Project Manager (Pampanga)',   'projects',     true,  true),
-  ('Eric (Enrique Masangkay)',        'Project Manager (Fixifoot)',          'projects',     true,  true),
-  ('Mark Lee Bercasio',               'Site Engineer (Icon 18H)',            'projects',     false, true),
-  ('Raegan',                          'Project Manager (Icon 18H)',          'projects',     true,  true),
-  ('Daff',                            'Project Manager (Pearl de Flore)',    'projects',     true,  true),
+  ('Jester R. Molde',                 'Senior Project Manager (Pampanga)',         'projects',     true,  true),
+  ('Eric (Enrique Masangkay)',        'Project Manager (Fixifoot)',                'projects',     true,  true),
+  ('Daff',                            'Project Manager (Pearl de Flore)',          'projects',     true,  true),
+  ('Raegan',                          'Project Manager (Icon 18H)',                'projects',     true,  true),
   -- QS
-  ('Darwin Constantino',              'Quantity Surveyor',                   'qs',           false, true),
-  ('Felix Bryan Ramones',             'Quantity Surveyor',                   'qs',           false, true),
-  ('Justin',                          'Quantity Surveyor',                   'qs',           false, true),
+  ('Felix Bryan Ramones',             'Quantity Surveyor',                         'qs',           false, true),
+  ('Justin',                          'Quantity Surveyor',                         'qs',           false, true),
+  ('Jon Carlo Orencia',               'Head of Quantity Surveying',                'qs',           false, true),
   -- Procurement
-  ('Daniel',                          'Procurement Head',                    'procurement',  false, true),
-  ('Kyla Panday',                     'Procurement / Purchasing',            'procurement',  false, true),
+  ('Daniel',                          'Procurement Head',                          'procurement',  false, true),
+  ('Kyla Panday',                     'Procurement / Purchasing',                  'procurement',  false, true),
+  ('Gee (Angela Bragancia)',          'Procurement Secretary',                     'procurement',  false, true),
   -- Admin / Secretary
-  ('Rose Anne Tabuzo',                'Office Secretary',                    'admin',        false, true),
-  ('Gee (Angela Bragancia)',          'Secretary / Assistant',               'admin',        false, true),
-  -- Warehouse / Maintenance
-  ('Christian S. Mendevil',           'Warehouse Manager',                   'site',         false, true),
-  ('Ryan Radulle',                    'Repair Team Foreman',                 'maintenance',  false, true),
-  ('Jade (Joven Jade Elludar)',       'Repair Team',                         'maintenance',  false, true),
-  ('Arnold Cedeno',                   'Repair Team',                         'maintenance',  false, true),
-  ('Ronnel Laure',                    'Repair Team',                         'maintenance',  false, true),
-  ('Nollie',                          'Repair Team',                         'maintenance',  false, true),
-  ('Arnel Serrano',                   'Repair Team',                         'maintenance',  false, true),
+  ('Rose Anne Tabuzo',                'Office Secretary',                          'admin',        false, true),
+  -- Warehouse
+  ('Christian S. Mendevil',           'Warehouse Manager',                         'site',         false, true),
+  -- Maintenance / Repair
+  ('Ryan Radulle',                    'Repair Team Foreman',                       'maintenance',  false, true),
+  ('Jade (Joven Jade Elludar)',       'Repair Team',                               'maintenance',  false, true),
+  ('Arnold Cedeno',                   'Repair Team',                               'maintenance',  false, true),
+  ('Ronnel Laure',                    'Repair Team',                               'maintenance',  false, true),
+  ('Nollie',                          'Repair Team',                               'maintenance',  false, true),
+  ('Arnel Serrano',                   'Repair Team',                               'maintenance',  false, true),
   -- Security
-  ('SG Albert Cruz Tumang',           'Security Guard',                      'security',     false, true),
-  ('SG Lansang (Arnel Salas)',        'Security Guard',                      'security',     false, true)
+  ('SG Albert Cruz Tumang',           'Security Guard (Day Shift)',                'security',     false, true),
+  ('SG Lansang (Arnel Salas)',        'Security Guard (Night Shift)',              'security',     false, true)
 ) AS t(full_name, role, dept_code, is_pm, is_active)
 LEFT JOIN dept_lookup d ON d.code = t.dept_code
-ON CONFLICT DO NOTHING;
+ON CONFLICT (full_name) DO NOTHING;

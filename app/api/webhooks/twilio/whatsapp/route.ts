@@ -26,7 +26,13 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get("x-twilio-signature");
   const fullUrl = request.nextUrl.toString();
   if (!verifyTwilioSignature(signature, fullUrl, params)) {
-    console.warn("twilio webhook: signature verification failed");
+    // Do NOT log the payload, headers, From, or Body. An attacker can forge a
+    // POST to this endpoint; persisting their text in our logs is a leak vector.
+    // Log only non-sensitive metadata (route + outcome).
+    console.warn("twilio webhook: signature verification failed", {
+      route: "/api/webhooks/twilio/whatsapp",
+      hasSignatureHeader: Boolean(signature),
+    });
     return new Response("forbidden", { status: 403 });
   }
 

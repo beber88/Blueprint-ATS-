@@ -1,0 +1,12 @@
+{
+  "split": {
+    "chunks": 1,
+    "dates": ["2026-05-08"]
+  },
+  "must_contain": [
+    "CEO Action Items",
+    "URGENT",
+    "Opatra Gensan",
+    "genset supplier"
+  ]
+}
