@@ -96,6 +96,7 @@ async function applyFile(c, name) {
     console.log(`  ${f}: ${r.ok ? "OK" : "FAILED — " + r.error}`);
     if (!r.ok) {
       await c.end();
+      // Exit 2 = initial apply broke. Hard CI fail.
       process.exit(2);
     }
   }
@@ -104,9 +105,11 @@ async function applyFile(c, name) {
   console.log(fmt(c1));
 
   console.log("\n=== A1: idempotency re-run of 003..007 ===");
+  let rerunFailed = false;
   for (const f of FILES.slice(2)) {
     const r = await applyFile(c, f);
     console.log(`  ${f}: ${r.ok ? "OK" : "FAILED — " + r.error.split("\n")[0]}`);
+    if (!r.ok) rerunFailed = true;
   }
   console.log("\n=== Row counts after 003..007 re-run ===");
   const c2 = await counts(c);
@@ -119,6 +122,9 @@ async function applyFile(c, name) {
   console.log("\n=== Drift (should be empty) ===");
   console.log(drift.length === 0 ? "  (none)" : drift.map((d) => "  " + d).join("\n"));
 
+  // 001+002 re-run failures are KNOWN AND EXPECTED — documented in
+  // production-readiness.md §4.2. We log them for visibility but the CI
+  // gate doesn't care.
   console.log("\n=== A1: re-run of 001 + 002 (CREATE POLICY etc. expected to fail) ===");
   for (const f of FILES.slice(0, 2)) {
     const r = await applyFile(c, f);
@@ -126,6 +132,20 @@ async function applyFile(c, name) {
   }
 
   await c.end();
+
+  // Gates the CI cares about (in order of severity):
+  if (rerunFailed) {
+    console.error("\nFAIL: at least one of migrations 003..007 broke on re-run.");
+    // Exit 4 = idempotency lost. Hard CI fail.
+    process.exit(4);
+  }
+  if (drift.length > 0) {
+    console.error("\nFAIL: row counts drifted after re-running migrations 003..007.");
+    console.error("These migrations must be re-runnable without changing row counts.");
+    // Exit 3 = silent data drift. Hard CI fail.
+    process.exit(3);
+  }
+  console.log("\nOK: migrations 001..007 apply clean; 003..007 are idempotent.");
 })().catch((e) => {
   console.error(e);
   process.exit(1);

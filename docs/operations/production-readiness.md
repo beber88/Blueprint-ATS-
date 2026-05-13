@@ -269,6 +269,33 @@ Look for repeat offenders. Each falls into one of three buckets:
 This is the explicit feedback loop for the matcher. The stopword list
 is a heuristic — staging is where it earns its final shape.
 
+## 5.6 CI gate (added cmd 8)
+
+Every PR to `main` and every push to `main` runs `.github/workflows/ci.yml`
+on GitHub Actions: lint + build + `jest --coverage --ci` (with a
+**hard-fail coverage gate** on `lib/operations/*` at 80% statements /
+80% lines / 80% functions / 70% branches) + migration idempotency sweep
++ non-blocking `npm audit`. The workflow uses a `postgres:16` service
+container; no secrets, no live Claude calls.
+
+Branch protection on `main` enforces the gate — see
+`docs/development/branch-protection.md` for the one-time setup steps.
+**All PRs to main must pass CI before merge. Branch protection enforces
+this.**
+
+In the first 48 hours, watch for:
+
+- Any CI job that lands `> 8 min` total runtime → investigate.
+- `npm audit` advisories climbing (it's currently non-blocking) → file
+  a backlog entry if a `high` advisory persists across multiple
+  dependency updates.
+- The migration sweep step failing with exit 3 (silent row-count drift)
+  on a PR that did NOT touch migrations → something else added rows
+  via a side effect; that's a real bug.
+
+For the full workflow walkthrough + debugging guide, see
+`docs/development/ci-cd.md`.
+
 ## 6. Verified at cmd 7 (paste-able evidence)
 
 | Subtask | Status | Evidence |

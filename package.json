@@ -7,7 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "ci:install": "npm ci",
+    "ci:lint": "npm run lint",
+    "ci:build": "npm run build",
+    "ci:test": "jest --coverage --ci --reporters=default --reporters=jest-junit",
+    "ci:migrate-sweep": "node scripts/a1-migration-sweep.js",
+    "ci:all": "npm run ci:install && npm run ci:lint && npm run ci:build && npm run ci:test && npm run ci:migrate-sweep"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -61,6 +67,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "jest": "^30.4.2",
+    "jest-junit": "^17.0.0",
     "pg": "^8.20.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
