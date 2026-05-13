@@ -10,14 +10,17 @@
 -- op_employees_history (seeded by 004_operations_employees_history.sql).
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Pre-flight: ensure the UNIQUE constraint we rely on for ON CONFLICT exists.
--- Doing this here rather than in 002 keeps 002 unchanged for clients that have
--- already applied it; this block is a no-op on re-run.
+-- Pre-flight: ensure SOME uniqueness guarantee exists on op_employees.full_name
+-- so the WHERE NOT EXISTS clause below is race-safe. If migration 005 has
+-- already swapped this for a partial unique index, leave it alone.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 DO $$
 BEGIN
   IF NOT EXISTS (
+    SELECT 1 FROM pg_indexes
+    WHERE schemaname = 'public' AND indexname = 'op_employees_active_full_name_uidx'
+  ) AND NOT EXISTS (
     SELECT 1 FROM pg_constraint WHERE conname = 'op_employees_full_name_key'
   ) THEN
     ALTER TABLE op_employees
@@ -141,4 +144,6 @@ FROM (VALUES
   ('SG Lansang (Arnel Salas)',        'Security Guard (Night Shift)',              'security',     false, true)
 ) AS t(full_name, role, dept_code, is_pm, is_active)
 LEFT JOIN dept_lookup d ON d.code = t.dept_code
-ON CONFLICT (full_name) DO NOTHING;
+WHERE NOT EXISTS (
+  SELECT 1 FROM op_employees e WHERE e.full_name = t.full_name
+);
