@@ -1,19 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { OpsCard, OpsPageShell } from "@/components/operations/page-shell";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
 import { Loader2, Upload, FileText, Layers } from "lucide-react";
-import { ItemsTable } from "@/components/operations/items-table";
-
-interface IngestResult {
-  report_id: string;
-  items_count: number;
-  confidence: number;
-  report_date: string;
-  notes: string | null;
-}
 
 interface BulkResult {
   jobId: string;
@@ -37,6 +29,7 @@ interface BulkPreview {
 
 export default function IntakePage() {
   const { t, locale } = useI18n();
+  const router = useRouter();
   const [mode, setMode] = useState<"single" | "bulk">("single");
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -44,12 +37,10 @@ export default function IntakePage() {
   const [projectId, setProjectId] = useState("");
   const [projects, setProjects] = useState<Array<{ id: string; name: string }>>([]);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<IngestResult | null>(null);
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const [bulkPreview, setBulkPreview] = useState<BulkPreview | null>(null);
   const [bulkConsent, setBulkConsent] = useState(false);
   const [bulkJobId, setBulkJobId] = useState<string | null>(null);
-  const [items, setItems] = useState<unknown[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,25 +56,24 @@ export default function IntakePage() {
       return;
     }
     setBusy(true);
-    setResult(null);
     setBulkResult(null);
-    setItems([]);
     try {
+      // New flow: extract → draft → preview/[draftId]. The Preview page
+      // owns Save / Save & Flag / Discard.
       const fd = new FormData();
       if (file) fd.set("file", file);
       if (text.trim()) fd.set("text", text);
       if (reportDate) fd.set("reportDate", reportDate);
       if (projectId) fd.set("projectId", projectId);
 
-      const res = await fetch("/api/operations/reports/ingest", { method: "POST", body: fd });
+      const res = await fetch("/api/operations/intake/extract", {
+        method: "POST",
+        body: fd,
+      });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Ingest failed");
-      setResult(data);
-      toast.success(t("operations.intake.success").replace("{n}", String(data.items_count)));
-
-      const itemsRes = await fetch(`/api/operations/reports/${data.report_id}`);
-      const itemsData = await itemsRes.json();
-      if (itemsRes.ok) setItems(itemsData.items || []);
+      if (!res.ok) throw new Error(data.error || "Extract failed");
+      toast.success(t("operations.intake.draft_created"));
+      router.push(`/hr/operations/intake/preview/${data.draftId}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("common.error"));
     } finally {
@@ -468,19 +458,6 @@ export default function IntakePage() {
         </OpsCard>
       )}
 
-      {result && (
-        <OpsCard title={t("operations.intake.result_title")} style={{ marginTop: 16 }}>
-          <div style={{ marginBottom: 12, fontSize: 14 }}>
-            {t("operations.intake.extracted")}: <b>{result.items_count}</b> · {t("operations.intake.confidence")}: <b>{Math.round(result.confidence * 100)}%</b>
-          </div>
-          {result.notes && (
-            <div style={{ background: "#FAF8F5", padding: 12, borderRadius: 8, marginBottom: 12, fontSize: 13, color: "var(--text-secondary)" }}>
-              {result.notes}
-            </div>
-          )}
-          <ItemsTable items={items as never} />
-        </OpsCard>
-      )}
     </OpsPageShell>
   );
 }

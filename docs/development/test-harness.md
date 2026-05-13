@@ -108,3 +108,29 @@ npm test                              # all tests
 npm test -- --testNamePattern lifecycle   # just lifecycle
 SKIP_DB_TESTS=true npm test          # skip DB tests (for CI without Postgres)
 ```
+
+## Known limitation — `maxWorkers: 1`
+
+`jest.config.js` pins `maxWorkers: 1`. The DB-integration test files share
+one Postgres database and racing `dropAndRecreate` across parallel workers
+triggers `pg_extension_name_index` conflicts (extensions live in
+`pg_extension`, not in `public`, so they survive the schema drop but can
+collide on parallel `CREATE EXTENSION` calls).
+
+This is fine today (~60 tests, ~2.5 s total) but will become a CI
+bottleneck around ~200 tests. The right medium-term fix is **schema per
+worker**:
+
+```ts
+// In tests/helpers/db.ts:
+const WORKER_SCHEMA = `test_${process.env.JEST_WORKER_ID || "1"}`;
+await client.query(`SET search_path TO ${WORKER_SCHEMA}, public`);
+```
+
+Each worker gets its own schema; migrations are rewritten to run under
+`search_path` instead of an explicit `public` reference; `dropAndRecreate`
+drops the worker's own schema and recreates it. Then `maxWorkers` can go
+back to default.
+
+Not blocking now — flagged here so the next person who notices a slow CI
+knows where to look.

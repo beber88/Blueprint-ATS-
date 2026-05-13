@@ -8,11 +8,12 @@
 | 004 | `004_operations_employees_history.sql` | **Yes** | 002 | Creates `op_employees_history`, seeds 14 historical separations + 1 transfer. Conditional UNIQUE on `full_name`, conditional RLS policies via `DO $$` blocks. |
 | 005 | `005_operations_employee_lifecycle.sql` | **Yes** | 002, 003, 004 | (A) Sets `op_employees.is_active` NOT NULL. (B) Adds partial unique index `op_employees_active_full_name_uidx` then drops global UNIQUE. (C) Adds `op_employees_history.employee_id` FK with `ON DELETE SET NULL`. See `docs/operations/employee-lifecycle.md`. |
 | 006 | `006_operations_bulk_import_jobs.sql` | **Yes** | 002 | Creates `op_bulk_import_jobs` + `op_bulk_import_items` for tracked bulk-import runs with cancel/resume/dedup. See `docs/operations/bulk-import.md`. |
+| 007 | `007_operations_drafts.sql` | **Yes** | 002, 006 | Creates `op_report_drafts` (the preview-before-save staging table). Adds `op_reports.flagged_for_review`, `op_reports.draft_source_id` (FK → drafts, ON DELETE SET NULL), `op_bulk_import_jobs.auto_promote`. See `docs/operations/preview-and-drafts.md`. |
 
 ## Apply order
 
 ```
-001 → 002 → 003 → 004 → 005 → 006
+001 → 002 → 003 → 004 → 005 → 006 → 007
 ```
 
 ## Re-runs in production
