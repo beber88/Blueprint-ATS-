@@ -16,9 +16,23 @@ interface IngestResult {
 }
 
 interface BulkResult {
-  reports: Array<{ id: string; report_date: string; items_count: number }>;
-  total_items: number;
-  chunks_detected: number;
+  jobId: string;
+  status: "done" | "failed" | "cancelled";
+  totalReports: number;
+  counts: Record<string, number>;
+}
+
+interface BulkPreview {
+  detectedReports: number;
+  dateRange: { from: string | null; to: string | null };
+  estimatedInputTokens: number;
+  estimatedOutputTokens: number;
+  estimatedCostUsd: number;
+  capExceeded: boolean;
+  cap: number;
+  sourceTextHash: string;
+  duplicateJobId?: string;
+  duplicateJobCreatedAt?: string;
 }
 
 export default function IntakePage() {
@@ -32,6 +46,9 @@ export default function IntakePage() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<IngestResult | null>(null);
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
+  const [bulkPreview, setBulkPreview] = useState<BulkPreview | null>(null);
+  const [bulkConsent, setBulkConsent] = useState(false);
+  const [bulkJobId, setBulkJobId] = useState<string | null>(null);
   const [items, setItems] = useState<unknown[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -74,29 +91,80 @@ export default function IntakePage() {
     }
   };
 
-  const submitBulk = async () => {
+  const previewBulk = async () => {
     if (!text.trim() || text.trim().length < 100) {
       toast.error(t("operations.intake.bulk_error_short"));
       return;
     }
     setBusy(true);
-    setResult(null);
+    setBulkPreview(null);
     setBulkResult(null);
-    setItems([]);
+    setBulkConsent(false);
     try {
-      const res = await fetch("/api/operations/reports/bulk-ingest", {
+      const res = await fetch("/api/operations/bulk-import/preview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, defaultProjectId: projectId || undefined }),
+        body: JSON.stringify({ text }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Bulk ingest failed");
-      setBulkResult(data);
-      toast.success(t("operations.intake.bulk_success").replace("{r}", String(data.reports.length)).replace("{i}", String(data.total_items)));
+      // 422 still returns a useful preview body (with capExceeded=true).
+      if (!res.ok && res.status !== 422) {
+        throw new Error(data.error || "Preview failed");
+      }
+      setBulkPreview(data);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("common.error"));
     } finally {
       setBusy(false);
+    }
+  };
+
+  const runBulk = async (force = false) => {
+    if (!bulkPreview || bulkPreview.capExceeded || !bulkConsent) return;
+    setBusy(true);
+    setBulkResult(null);
+    try {
+      const res = await fetch("/api/operations/bulk-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          defaultProjectId: projectId || undefined,
+          expectedReports: bulkPreview.detectedReports,
+          force,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 409 && data.duplicateJobId) {
+          // Duplicate — let the user decide to force.
+          throw new Error(data.error || "Duplicate batch detected.");
+        }
+        throw new Error(data.error || "Bulk import failed");
+      }
+      setBulkResult(data);
+      setBulkJobId(data.jobId);
+      toast.success(
+        t("operations.intake.bulk_success")
+          .replace("{r}", String(data.counts?.done || 0))
+          .replace("{i}", String(data.totalReports))
+      );
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("common.error"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const cancelBulk = async () => {
+    if (!bulkJobId) return;
+    try {
+      await fetch(`/api/operations/bulk-import/jobs/${bulkJobId}/cancel`, {
+        method: "POST",
+      });
+      toast.success(t("operations.intake.bulk_cancelled"));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("common.error"));
     }
   };
 
@@ -215,46 +283,188 @@ export default function IntakePage() {
             </select>
           </OpsCard>
 
-          <button
-            disabled={busy}
-            onClick={mode === "bulk" ? submitBulk : submit}
-            style={{
-              padding: "12px 16px",
-              background: "#C9A84C",
-              color: "#1A1A1A",
-              border: "none",
-              borderRadius: 8,
-              cursor: busy ? "not-allowed" : "pointer",
-              fontWeight: 600,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              opacity: busy ? 0.6 : 1,
-            }}
-          >
-            {busy ? <Loader2 size={16} className="animate-spin" /> : mode === "bulk" ? <Layers size={16} /> : <FileText size={16} />}
-            {busy ? t("operations.intake.processing") : mode === "bulk" ? t("operations.intake.bulk_submit") : t("operations.intake.submit")}
-          </button>
+          {mode === "single" ? (
+            <button
+              disabled={busy}
+              onClick={submit}
+              style={{
+                padding: "12px 16px",
+                background: "#C9A84C",
+                color: "#1A1A1A",
+                border: "none",
+                borderRadius: 8,
+                cursor: busy ? "not-allowed" : "pointer",
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                opacity: busy ? 0.6 : 1,
+              }}
+            >
+              {busy ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+              {busy ? t("operations.intake.processing") : t("operations.intake.submit")}
+            </button>
+          ) : (
+            <button
+              disabled={busy}
+              onClick={previewBulk}
+              style={{
+                padding: "12px 16px",
+                background: "#C9A84C",
+                color: "#1A1A1A",
+                border: "none",
+                borderRadius: 8,
+                cursor: busy ? "not-allowed" : "pointer",
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                opacity: busy ? 0.6 : 1,
+              }}
+            >
+              {busy ? <Loader2 size={16} className="animate-spin" /> : <Layers size={16} />}
+              {busy ? t("operations.intake.processing") : t("operations.intake.bulk_preview")}
+            </button>
+          )}
         </div>
       </div>
 
+      {mode === "bulk" && bulkPreview && (
+        <OpsCard title={t("operations.intake.bulk_preview_title")} style={{ marginTop: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {t("operations.intake.bulk_preview_detected")}
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: bulkPreview.capExceeded ? "#A32D2D" : "var(--text-primary)" }}>
+                {bulkPreview.detectedReports}
+                {bulkPreview.capExceeded && (
+                  <span style={{ fontSize: 12, marginLeft: 6, color: "#A32D2D" }}>
+                    / {bulkPreview.cap}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {t("operations.intake.bulk_preview_date_range")}
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>
+                {bulkPreview.dateRange.from || "—"}
+                {" → "}
+                {bulkPreview.dateRange.to || "—"}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {t("operations.intake.bulk_preview_input_tokens")}
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 600 }}>
+                {bulkPreview.estimatedInputTokens.toLocaleString()}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {t("operations.intake.bulk_preview_output_tokens")}
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 600 }}>
+                {bulkPreview.estimatedOutputTokens.toLocaleString()}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {t("operations.intake.bulk_preview_cost")}
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#C9A84C" }}>
+                ${bulkPreview.estimatedCostUsd.toFixed(4)}
+              </div>
+            </div>
+          </div>
+
+          {bulkPreview.capExceeded && (
+            <div style={{ background: "#FBEAEA", color: "#7A1F1F", padding: 10, borderRadius: 6, fontSize: 13, marginBottom: 10 }}>
+              {t("operations.intake.bulk_cap_exceeded").replace("{cap}", String(bulkPreview.cap))}
+            </div>
+          )}
+          {bulkPreview.duplicateJobId && (
+            <div style={{ background: "#FFF7E6", color: "#7A5A1F", padding: 10, borderRadius: 6, fontSize: 13, marginBottom: 10 }}>
+              {t("operations.intake.bulk_duplicate_warning").replace(
+                "{at}",
+                bulkPreview.duplicateJobCreatedAt || ""
+              )}
+            </div>
+          )}
+
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 12 }}>
+            <input
+              type="checkbox"
+              checked={bulkConsent}
+              onChange={(e) => setBulkConsent(e.target.checked)}
+              disabled={bulkPreview.capExceeded}
+            />
+            {t("operations.intake.bulk_consent")}
+          </label>
+
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              disabled={busy || !bulkConsent || bulkPreview.capExceeded}
+              onClick={() => runBulk(Boolean(bulkPreview.duplicateJobId))}
+              style={{
+                padding: "10px 14px",
+                background: "#C9A84C",
+                color: "#1A1A1A",
+                border: "none",
+                borderRadius: 8,
+                cursor: busy || !bulkConsent || bulkPreview.capExceeded ? "not-allowed" : "pointer",
+                fontWeight: 600,
+                opacity: !bulkConsent || bulkPreview.capExceeded ? 0.5 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              {busy ? <Loader2 size={14} className="animate-spin" /> : <Layers size={14} />}
+              {t("operations.intake.bulk_run")}
+            </button>
+            {busy && bulkJobId && (
+              <button
+                onClick={cancelBulk}
+                style={{
+                  padding: "10px 14px",
+                  background: "transparent",
+                  color: "#A32D2D",
+                  border: "1px solid #A32D2D",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                {t("operations.intake.bulk_cancel")}
+              </button>
+            )}
+          </div>
+        </OpsCard>
+      )}
+
       {bulkResult && (
         <OpsCard title={t("operations.intake.bulk_result_title")} style={{ marginTop: 16 }}>
-          <div style={{ marginBottom: 12, fontSize: 14 }}>
-            {t("operations.intake.bulk_summary")
-              .replace("{r}", String(bulkResult.reports.length))
-              .replace("{i}", String(bulkResult.total_items))
-              .replace("{c}", String(bulkResult.chunks_detected))}
+          <div style={{ marginBottom: 8, fontSize: 14 }}>
+            {t("operations.intake.bulk_job_summary")
+              .replace("{status}", bulkResult.status)
+              .replace("{r}", String(bulkResult.totalReports))}
           </div>
-          <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-            {bulkResult.reports.map((r) => (
-              <li key={r.id} style={{ padding: "6px 0", borderBottom: "1px solid var(--border-light)", display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                <span>{r.report_date}</span>
-                <span style={{ color: "var(--text-secondary)" }}>{r.items_count} items</span>
-              </li>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>
+            {t("operations.intake.bulk_job_id")}: <code>{bulkResult.jobId}</code>
+          </div>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            {Object.entries(bulkResult.counts).map(([k, v]) => (
+              <div key={k} style={{ padding: "6px 10px", background: "var(--bg-card)", border: "1px solid var(--border-light)", borderRadius: 6, fontSize: 13 }}>
+                <b>{v}</b> <span style={{ color: "var(--text-secondary)" }}>{k}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </OpsCard>
       )}
 

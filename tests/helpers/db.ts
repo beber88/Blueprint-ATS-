@@ -54,6 +54,7 @@ const MIGRATION_FILES = [
   "003_operations_seed_real_data.sql",
   "004_operations_employees_history.sql",
   "005_operations_employee_lifecycle.sql",
+  "006_operations_bulk_import_jobs.sql",
 ];
 
 async function dropAndRecreate(client: Client) {
