@@ -2,16 +2,20 @@
 
 Bulk import lets an operator paste months of historical daily reports at once.
 The system splits them, sends each through Claude extraction, and stores the
-structured items. This document covers the **operational contract**: how to
-read the state of a job, how to cancel one, how to resume one, and what every
-status means.
+extraction as a **draft** (`op_report_drafts`). The operator then either
+reviews each draft individually (Drafts inbox → Preview UI) or enables
+**auto-promote** so drafts with zero high-severity warnings become real
+`op_reports` rows without human review.
+
+> **See also** `docs/operations/preview-and-drafts.md` for the draft state
+> machine, warning catalog, and the auto-promote decision rule.
 
 ## API surface
 
 | Method | Path | Purpose |
 | --- | --- | --- |
 | `POST` | `/api/operations/bulk-import/preview` | Counts reports, estimates cost, checks for duplicate batches. Does **not** call Claude. Returns 422 if the report count exceeds `BULK_IMPORT_MAX_REPORTS`. |
-| `POST` | `/api/operations/bulk-import` | Creates a job + per-report items, processes them with bounded concurrency, returns the final summary. Body: `{ text, defaultProjectId?, force? }`. |
+| `POST` | `/api/operations/bulk-import` | Creates a job + per-report items, each item produces a `op_report_drafts` row, processes them with bounded concurrency, returns the final summary. Body: `{ text, defaultProjectId?, force?, autoPromote? }`. |
 | `GET` | `/api/operations/bulk-import/jobs/:id` | Returns the job row plus every item and a `{status → count}` map. |
 | `POST` | `/api/operations/bulk-import/jobs/:id/cancel` | Marks the job `cancelled` and flips pending items to `cancelled`. Items mid-flight finish naturally. |
 | `POST` | `/api/operations/bulk-import/jobs/:id/resume` | Recovery only. Marks items stuck in `processing` > 1 h as `failed` and re-queues if there's any `pending` work left. **Does not re-run extraction** — POST the original batch again with `force=true` to actually re-process. |

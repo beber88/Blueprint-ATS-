@@ -9,7 +9,10 @@ import {
   hashSourceText,
 } from "@/lib/operations/bulk-import";
 import { estimateBulkCost } from "@/lib/operations/bulk-cost";
-import { processChunk } from "@/lib/operations/process-chunk";
+import { extractReportItems } from "@/lib/claude/extract-report";
+import { computeWarnings } from "@/lib/operations/draft-warnings";
+import { loadMasterSnapshot } from "@/lib/operations/draft-master-snapshot";
+import { promoteDraft } from "@/lib/operations/draft-promote";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -17,12 +20,11 @@ export const maxDuration = 300;
 interface RunBody {
   text: string;
   defaultProjectId?: string;
-  // Set true to skip the duplicate-batch check (the preview shows this as
-  // an option to the user; the UI passes the flag through).
   force?: boolean;
-  // Echoed back from preview so the UI can warn if the server-side cap
-  // changed between the two calls.
   expectedReports?: number;
+  // Auto-promote drafts with zero high-severity warnings to op_reports
+  // without human review. Drafts WITH high warnings stay as `flagged`.
+  autoPromote?: boolean;
 }
 
 export async function POST(request: NextRequest) {
@@ -88,7 +90,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 1. Create the job row.
+    // 1. Create the job.
     const { data: job, error: jobErr } = await supabase
       .from("op_bulk_import_jobs")
       .insert({
@@ -98,6 +100,7 @@ export async function POST(request: NextRequest) {
         estimated_input_tokens: cost.inputTokens,
         estimated_output_tokens: cost.outputTokens,
         estimated_cost_usd: cost.costUsd,
+        auto_promote: !!body.autoPromote,
       })
       .select()
       .single();
@@ -130,8 +133,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Process items with bounded concurrency. Each task re-fetches the
-    //    job status before starting so a cancellation mid-flight is honored.
+    // Load master snapshot ONCE — used by every chunk's computeWarnings.
+    const snapshot = await loadMasterSnapshot(supabase);
+
+    // 3. Process items with bounded concurrency.
     const limit = pLimit(BULK_IMPORT_CONCURRENCY);
     const itemById = new Map(items.map((it) => [it.report_index, it]));
 
@@ -141,10 +146,10 @@ export async function POST(request: NextRequest) {
           const item = itemById.get(i);
           if (!item) return;
 
-          // Check the job status before doing real work.
+          // Re-check job status before doing real work.
           const { data: latest } = await supabase
             .from("op_bulk_import_jobs")
-            .select("status")
+            .select("status, auto_promote")
             .eq("id", job.id)
             .single();
           if (latest?.status === "cancelled") {
@@ -163,18 +168,63 @@ export async function POST(request: NextRequest) {
 
           try {
             const reportDate = c.date || new Date().toISOString().slice(0, 10);
-            const result = await processChunk(
-              supabase,
-              c.chunk,
-              reportDate,
-              body.defaultProjectId || null,
-              { bulk_import_job_id: job.id, bulk_import_item_id: item.id }
-            );
+            const extracted = await extractReportItems(c.chunk, { reportDate });
+            const aiOutput = {
+              report_date: reportDate,
+              project_id: body.defaultProjectId || null,
+              confidence: extracted.confidence,
+              model: extracted.model,
+              notes: extracted.notes,
+              items: extracted.items,
+              ceo_action_items: extracted.items.filter(
+                (it) => it.ceo_decision_needed
+              ),
+            };
+            const warnings = computeWarnings(aiOutput, snapshot);
+
+            // Create the draft, linked to this bulk item.
+            const { data: draft, error: dErr } = await supabase
+              .from("op_report_drafts")
+              .insert({
+                source_text: c.chunk.slice(0, 200_000),
+                ai_output_json: aiOutput,
+                warnings_json: warnings,
+                source_kind: "bulk",
+                status: "draft",
+                bulk_import_item_id: item.id,
+              })
+              .select()
+              .single();
+            if (dErr || !draft) {
+              throw new Error(`failed to create draft: ${dErr?.message}`);
+            }
+
+            // Decide whether to auto-promote.
+            const hasHigh = warnings.some((w) => w.severity === "high");
+            let outputReportId: string | null = null;
+            if (latest?.auto_promote && !hasHigh) {
+              const result = await promoteDraft(supabase, draft, {
+                extraReportMeta: {
+                  bulk_import_job_id: job.id,
+                  bulk_import_item_id: item.id,
+                  auto_promoted: true,
+                },
+              });
+              outputReportId = result.reportId;
+            } else if (latest?.auto_promote && hasHigh) {
+              // Auto-promote was requested but high warnings block it.
+              // Mark the draft flagged so the operator sees it in the inbox.
+              await supabase
+                .from("op_report_drafts")
+                .update({ status: "flagged", updated_at: new Date().toISOString() })
+                .eq("id", draft.id);
+            }
+
             await supabase
               .from("op_bulk_import_items")
               .update({
                 status: "done",
-                output_report_id: result.reportId,
+                output_report_id: outputReportId,
                 processed_at: new Date().toISOString(),
               })
               .eq("id", item.id);
@@ -192,7 +242,7 @@ export async function POST(request: NextRequest) {
       )
     );
 
-    // 4. Finalize job status based on item outcomes.
+    // 4. Finalize job status.
     const { data: counts } = await supabase
       .from("op_bulk_import_items")
       .select("status")
@@ -221,6 +271,7 @@ export async function POST(request: NextRequest) {
       status: finalStatus,
       counts: byStatus,
       totalReports: chunks.length,
+      autoPromote: !!body.autoPromote,
     });
   } catch (error) {
     console.error("bulk-import: unhandled", error);

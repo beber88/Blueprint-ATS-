@@ -16,6 +16,7 @@
     "nav": {
       "dashboard": "דשבורד",
       "intake": "קליטת דוח",
+      "drafts": "טיוטות",
       "issues": "כל הסוגיות",
       "hr_issues": "סוגיות HR דחופות",
       "ceo_items": "פריטים למנכ\"ל",
@@ -95,7 +96,10 @@
       "bulk_cancelled": "ייבוא בוטל",
       "bulk_job_summary": "סטטוס: {status} · סה\"כ דוחות: {r}",
       "bulk_job_id": "מזהה ג'וב",
-      "draft_created": "טיוטה נוצרה — עובר לתצוגת תצוגה מקדימה"
+      "draft_created": "טיוטה נוצרה — עובר לתצוגת תצוגה מקדימה",
+      "bulk_auto_promote_label": "Auto-promote",
+      "bulk_auto_promote_hint": "שמור אוטומטית טיוטות ללא אזהרות חמורות. דורש אמון בנתונים.",
+      "bulk_auto_promote_confirm": "זה ישמור עד {n} דוחות ללא בדיקה אנושית אם אין להם אזהרות חמורות. מומלץ רק לנתונים היסטוריים שאתה סומך עליהם. להמשיך?"
     },
     "preview": {
       "title": "תצוגה מקדימה — בדוק לפני שמירה",
@@ -118,6 +122,24 @@
       "saved": "הדוח נשמר",
       "discarded": "הטיוטה הושלכה",
       "not_found": "טיוטה לא נמצאה"
+    },
+    "drafts": {
+      "title": "טיוטות",
+      "subtitle": "תיבת טיוטות AI שטרם נשמרו או דורשות בדיקה",
+      "filter_status": "סטטוס",
+      "filter_source": "מקור",
+      "filter_severity": "חומרת אזהרה",
+      "status_open": "פתוחות (טיוטה + לבדיקה)",
+      "source_any": "כל מקור",
+      "col_created": "נוצר",
+      "col_source": "מקור",
+      "col_date": "תאריך דוח",
+      "col_project": "פרויקט",
+      "col_warnings": "אזהרות",
+      "col_status": "סטטוס",
+      "col_action": "פעולה",
+      "open": "פתח",
+      "empty": "אין טיוטות במצב הזה"
     },
     "issues": { "subtitle": "כל הסוגיות הפתוחות" },
     "hr_issues": { "subtitle": "סוגיות HR דחופות בלבד" },

@@ -73,6 +73,7 @@ const modules: Module[] = [
         items: [
           { key: "operations.nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
           { key: "operations.nav.intake", path: "/intake", icon: ClipboardList },
+          { key: "operations.nav.drafts", path: "/drafts", icon: FileText },
           { key: "operations.nav.issues", path: "/issues", icon: Activity },
         ],
       },

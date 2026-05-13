@@ -16,6 +16,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "intake": "Intake",
+      "drafts": "Mga Draft",
       "issues": "Lahat ng Isyu",
       "hr_issues": "Mga Mapagmadaling HR Isyu",
       "ceo_items": "Para sa CEO",
@@ -95,7 +96,10 @@
       "bulk_cancelled": "Bulk import ay kinansela",
       "bulk_job_summary": "Status: {status} · Kabuuang ulat: {r}",
       "bulk_job_id": "Job ID",
-      "draft_created": "Naka-create ang draft — bubuksan ang preview"
+      "draft_created": "Naka-create ang draft — bubuksan ang preview",
+      "bulk_auto_promote_label": "Auto-promote",
+      "bulk_auto_promote_hint": "Auto-save ng drafts na walang high-severity warnings. Para sa data na pinagkakatiwalaan.",
+      "bulk_auto_promote_confirm": "Mase-save hanggang {n} ulat na walang human review kung walang high-severity warnings. Recommended lang para sa historical data na pinagkakatiwalaan. Magpatuloy?"
     },
     "preview": {
       "title": "Preview — i-review bago i-save",
@@ -118,6 +122,24 @@
       "saved": "Naka-save ang ulat",
       "discarded": "Itinapon ang draft",
       "not_found": "Hindi natagpuan ang draft"
+    },
+    "drafts": {
+      "title": "Mga Draft",
+      "subtitle": "AI drafts na naghihintay ng review o save",
+      "filter_status": "Status",
+      "filter_source": "Pinagmulan",
+      "filter_severity": "Severity",
+      "status_open": "Bukas (draft + flagged)",
+      "source_any": "Anumang pinagmulan",
+      "col_created": "Nilikha",
+      "col_source": "Pinagmulan",
+      "col_date": "Petsa ng ulat",
+      "col_project": "Proyekto",
+      "col_warnings": "Warnings",
+      "col_status": "Status",
+      "col_action": "Aksyon",
+      "open": "Buksan",
+      "empty": "Walang draft sa state na ito"
     },
     "issues": { "subtitle": "Lahat ng nakabukas na isyu" },
     "hr_issues": { "subtitle": "Mga mapagmadaling HR isyu lamang" },

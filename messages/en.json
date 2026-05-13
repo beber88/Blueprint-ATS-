@@ -16,6 +16,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "intake": "Intake",
+      "drafts": "Drafts",
       "issues": "All Issues",
       "hr_issues": "Urgent HR Issues",
       "ceo_items": "CEO Action Items",
@@ -95,7 +96,10 @@
       "bulk_cancelled": "Import cancelled",
       "bulk_job_summary": "Status: {status} · Total reports: {r}",
       "bulk_job_id": "Job ID",
-      "draft_created": "Draft created — opening preview"
+      "draft_created": "Draft created — opening preview",
+      "bulk_auto_promote_label": "Auto-promote",
+      "bulk_auto_promote_hint": "Auto-save drafts with no high-severity warnings. Requires data you trust.",
+      "bulk_auto_promote_confirm": "This will save up to {n} reports without human review if they have no high-severity warnings. Recommended only for historical data you trust. Continue?"
     },
     "preview": {
       "title": "Preview — review before save",
@@ -118,6 +122,24 @@
       "saved": "Report saved",
       "discarded": "Draft discarded",
       "not_found": "Draft not found"
+    },
+    "drafts": {
+      "title": "Drafts",
+      "subtitle": "AI drafts awaiting review or save",
+      "filter_status": "Status",
+      "filter_source": "Source",
+      "filter_severity": "Severity",
+      "status_open": "Open (draft + flagged)",
+      "source_any": "Any source",
+      "col_created": "Created",
+      "col_source": "Source",
+      "col_date": "Report date",
+      "col_project": "Project",
+      "col_warnings": "Warnings",
+      "col_status": "Status",
+      "col_action": "Action",
+      "open": "Open",
+      "empty": "No drafts in this state"
     },
     "issues": { "subtitle": "All open issues" },
     "hr_issues": { "subtitle": "Urgent HR-only issues" },

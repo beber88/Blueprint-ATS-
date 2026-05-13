@@ -40,6 +40,7 @@ export default function IntakePage() {
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const [bulkPreview, setBulkPreview] = useState<BulkPreview | null>(null);
   const [bulkConsent, setBulkConsent] = useState(false);
+  const [bulkAutoPromote, setBulkAutoPromote] = useState(false);
   const [bulkJobId, setBulkJobId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -111,6 +112,15 @@ export default function IntakePage() {
 
   const runBulk = async (force = false) => {
     if (!bulkPreview || bulkPreview.capExceeded || !bulkConsent) return;
+    if (bulkAutoPromote) {
+      const ok = window.confirm(
+        t("operations.intake.bulk_auto_promote_confirm").replace(
+          "{n}",
+          String(bulkPreview.detectedReports)
+        )
+      );
+      if (!ok) return;
+    }
     setBusy(true);
     setBulkResult(null);
     try {
@@ -122,6 +132,7 @@ export default function IntakePage() {
           defaultProjectId: projectId || undefined,
           expectedReports: bulkPreview.detectedReports,
           force,
+          autoPromote: bulkAutoPromote,
         }),
       });
       const data = await res.json();
@@ -387,7 +398,7 @@ export default function IntakePage() {
             </div>
           )}
 
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 12 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 8 }}>
             <input
               type="checkbox"
               checked={bulkConsent}
@@ -395,6 +406,20 @@ export default function IntakePage() {
               disabled={bulkPreview.capExceeded}
             />
             {t("operations.intake.bulk_consent")}
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 12, color: "#A32D2D" }}>
+            <input
+              type="checkbox"
+              checked={bulkAutoPromote}
+              onChange={(e) => setBulkAutoPromote(e.target.checked)}
+              disabled={bulkPreview.capExceeded}
+            />
+            <span>
+              <b>{t("operations.intake.bulk_auto_promote_label")}</b>
+              <span style={{ color: "var(--text-secondary)", marginLeft: 6, fontWeight: 400 }}>
+                {t("operations.intake.bulk_auto_promote_hint")}
+              </span>
+            </span>
           </label>
 
           <div style={{ display: "flex", gap: 8 }}>
