@@ -3,7 +3,190 @@
     "system": "מערכת HR",
     "brand": "Blueprint HR",
     "modules": {
-      "recruitment": "גיוסים"
+      "recruitment": "גיוסים",
+      "operations": "תפעול"
+    }
+  },
+  "operations": {
+    "nav_group": {
+      "tracking": "מעקב",
+      "org": "ארגון",
+      "tools": "כלים"
+    },
+    "nav": {
+      "dashboard": "דשבורד",
+      "intake": "קליטת דוח",
+      "issues": "כל הסוגיות",
+      "hr_issues": "סוגיות HR דחופות",
+      "ceo_items": "פריטים למנכ\"ל",
+      "missing_info": "מידע חסר",
+      "attendance": "נוכחות",
+      "followups": "מעקב",
+      "alerts": "התראות",
+      "archive": "ארכיון",
+      "projects": "פרויקטים",
+      "departments": "מחלקות",
+      "employees": "עובדים",
+      "ai_agent": "עוזר תפעולי",
+      "inbox": "תיבת נכנסים"
+    },
+    "dashboard": {
+      "title": "דשבורד תפעול",
+      "subtitle": "תמונת מצב חיה של דוחות יומיים",
+      "top_alerts": "התראות מובילות",
+      "recurring_themes": "בעיות חוזרות (30 יום)"
+    },
+    "kpi": {
+      "open": "פתוחים",
+      "overdue": "באיחור",
+      "urgent": "דחופים",
+      "ceo_pending": "ממתין למנכ\"ל",
+      "missing_info": "מידע חסר",
+      "alerts": "התראות"
+    },
+    "chart": {
+      "daily_trend": "מגמה יומית",
+      "by_priority": "לפי דחיפות",
+      "by_department": "לפי מחלקה",
+      "by_project": "לפי פרויקט",
+      "total": "סה\"כ",
+      "overdue": "באיחור",
+      "urgent": "דחוף"
+    },
+    "intake": {
+      "title": "קליטת דוח",
+      "subtitle": "הדבקת טקסט או העלאת PDF — Claude מחלץ פריטים מובנים",
+      "text_label": "טקסט הדוח",
+      "text_placeholder": "הדבק כאן את תוכן הדוח היומי...",
+      "file_label": "קובץ (PDF/TXT)",
+      "choose_file": "בחר קובץ",
+      "options": "אפשרויות",
+      "report_date": "תאריך הדוח",
+      "project_hint": "פרויקט (רמז)",
+      "submit": "חלץ פריטים",
+      "processing": "מעבד...",
+      "result_title": "תוצאת חילוץ",
+      "extracted": "פריטים שנוספו",
+      "confidence": "ביטחון",
+      "success": "נוספו {n} פריטים",
+      "error_empty": "נדרש טקסט או קובץ"
+    },
+    "issues": { "subtitle": "כל הסוגיות הפתוחות" },
+    "hr_issues": { "subtitle": "סוגיות HR דחופות בלבד" },
+    "ceo_items": { "subtitle": "פריטים שדורשים החלטת מנכ\"ל" },
+    "missing_info": { "subtitle": "פריטים שחסר בהם מידע" },
+    "followups": { "subtitle": "פריטים פתוחים למעקב" },
+    "archive": { "subtitle": "חיפוש בארכיון כל הדוחות" },
+    "alerts": {
+      "subtitle": "התראות אקטיביות",
+      "include_resolved": "כולל סגורות",
+      "dismiss": "סגור"
+    },
+    "attendance": {
+      "subtitle": "אירועי נוכחות מתוך הדוחות היומיים (30 יום)",
+      "by_employee": "לפי עובד",
+      "incidents": "אירועים",
+      "last_seen": "תאריך אחרון",
+      "recent_events": "אירועים אחרונים"
+    },
+    "projects": {
+      "subtitle": "פרויקטים פעילים",
+      "new": "פרויקט חדש",
+      "name": "שם",
+      "code": "קוד",
+      "no_department": "ללא מחלקה",
+      "status": {
+        "active": "פעיל",
+        "paused": "מושהה",
+        "completed": "הסתיים"
+      }
+    },
+    "departments": {
+      "subtitle": "מחלקות"
+    },
+    "employees": {
+      "subtitle": "עובדים מורשים לדיווח",
+      "new": "עובד חדש",
+      "full_name": "שם מלא",
+      "phone": "טלפון",
+      "whatsapp_phone": "מספר WhatsApp",
+      "email": "אימייל",
+      "role": "תפקיד",
+      "is_pm": "PM",
+      "is_active": "פעיל",
+      "no_department": "ללא מחלקה",
+      "no_project": "ללא פרויקט"
+    },
+    "inbox": {
+      "subtitle": "הודעות WhatsApp ממספרים לא מוכרים",
+      "claim": "שייך לעובד",
+      "pick_employee": "בחר עובד",
+      "claimed_by": "שויך ל"
+    },
+    "agent": {
+      "title": "עוזר תפעולי",
+      "subtitle": "שאל כל שאלה על המצב התפעולי",
+      "ask_anything": "שאל אותי כל שאלה על הדוחות והפרויקטים",
+      "thinking": "חושב...",
+      "placeholder": "שאל את העוזר... (Enter לשליחה)",
+      "suggest": {
+        "overdue": "מה באיחור היום?",
+        "who_didnt_report": "מי לא דיווח אתמול?",
+        "top_risks": "מהם 3 הסיכונים המרכזיים השבוע?",
+        "ceo_briefing": "הכן תדריך למנכ\"ל"
+      }
+    },
+    "digest": {
+      "title": "דיגסט תפעול",
+      "generated_at": "נוצר ב"
+    },
+    "status": {
+      "open": "פתוח",
+      "in_progress": "בטיפול",
+      "blocked": "חסום",
+      "resolved": "טופל"
+    },
+    "priority": {
+      "low": "נמוך",
+      "medium": "בינוני",
+      "high": "גבוה",
+      "urgent": "דחוף"
+    },
+    "col": {
+      "issue": "סוגיה",
+      "project": "פרויקט",
+      "dept": "מחלקה",
+      "responsible": "אחראי",
+      "status": "סטטוס",
+      "priority": "דחיפות",
+      "deadline": "יעד",
+      "actions": "פעולות",
+      "employee": "עובד"
+    },
+    "actions": {
+      "refresh": "רענן",
+      "create": "צור",
+      "mark_resolved": "סמן כטופל",
+      "reopen": "פתח מחדש"
+    },
+    "flag": { "ceo": "דורש החלטת מנכ\"ל" },
+    "search_placeholder": "חיפוש בכל הפריטים...",
+    "results": "תוצאות",
+    "empty": {
+      "no_items": "אין פריטים להצגה",
+      "no_alerts": "אין התראות פתוחות",
+      "no_themes": "אין בעיות חוזרות עדיין",
+      "no_attendance": "אין אירועי נוכחות",
+      "no_projects": "אין פרויקטים — הוסף את הראשון",
+      "no_employees": "אין עובדים רשומים — הוסף PMs כדי לאפשר דיווח ב-WhatsApp",
+      "no_inbox": "אין הודעות ממתינות"
+    },
+    "toast": {
+      "item_updated": "הפריט עודכן",
+      "alert_dismissed": "ההתראה נסגרה",
+      "project_created": "פרויקט נוצר",
+      "employee_created": "עובד נוסף",
+      "claimed": "ההודעה שויכה"
     }
   },
   "nav_group": {

@@ -3,7 +3,188 @@
     "system": "HR System",
     "brand": "Blueprint HR",
     "modules": {
-      "recruitment": "Pangangalap"
+      "recruitment": "Pangangalap",
+      "operations": "Operasyon"
+    }
+  },
+  "operations": {
+    "nav_group": {
+      "tracking": "Pagsubaybay",
+      "org": "Organisasyon",
+      "tools": "Mga Tool"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "intake": "Intake",
+      "issues": "Lahat ng Isyu",
+      "hr_issues": "Mga Mapagmadaling HR Isyu",
+      "ceo_items": "Para sa CEO",
+      "missing_info": "Kulang na Impormasyon",
+      "attendance": "Attendance",
+      "followups": "Follow-ups",
+      "alerts": "Mga Alerto",
+      "archive": "Archive",
+      "projects": "Mga Proyekto",
+      "departments": "Mga Departamento",
+      "employees": "Mga Empleyado",
+      "ai_agent": "Operations AI",
+      "inbox": "Inbox"
+    },
+    "dashboard": {
+      "title": "Operations Dashboard",
+      "subtitle": "Live na larawan ng pang-araw-araw na ulat",
+      "top_alerts": "Mga Pangunahing Alerto",
+      "recurring_themes": "Mga Paulit-ulit (30 araw)"
+    },
+    "kpi": {
+      "open": "Bukas",
+      "overdue": "Overdue",
+      "urgent": "Mapagmadali",
+      "ceo_pending": "Hinihintay ng CEO",
+      "missing_info": "Kulang Info",
+      "alerts": "Alerto"
+    },
+    "chart": {
+      "daily_trend": "Pang-araw-araw",
+      "by_priority": "Ayon sa Prayoridad",
+      "by_department": "Ayon sa Departamento",
+      "by_project": "Ayon sa Proyekto",
+      "total": "Kabuuan",
+      "overdue": "Overdue",
+      "urgent": "Mapagmadali"
+    },
+    "intake": {
+      "title": "Pagpasok ng Ulat",
+      "subtitle": "I-paste ang teksto o mag-upload ng PDF",
+      "text_label": "Teksto ng Ulat",
+      "text_placeholder": "I-paste ang nilalaman ng pang-araw-araw na ulat dito...",
+      "file_label": "File (PDF/TXT)",
+      "choose_file": "Pumili ng file",
+      "options": "Mga Opsyon",
+      "report_date": "Petsa ng ulat",
+      "project_hint": "Proyekto (hint)",
+      "submit": "I-extract",
+      "processing": "Pinoproseso...",
+      "result_title": "Resulta",
+      "extracted": "Mga item na naidagdag",
+      "confidence": "Confidence",
+      "success": "Naidagdag {n} na item",
+      "error_empty": "Kailangan ng teksto o file"
+    },
+    "issues": { "subtitle": "Lahat ng nakabukas na isyu" },
+    "hr_issues": { "subtitle": "Mga mapagmadaling HR isyu lamang" },
+    "ceo_items": { "subtitle": "Mga itong nangangailangan ng desisyon ng CEO" },
+    "missing_info": { "subtitle": "Mga itong may kulang na impormasyon" },
+    "followups": { "subtitle": "Mga bukas na item para sa follow-up" },
+    "archive": { "subtitle": "Hanapin sa lahat ng ulat" },
+    "alerts": {
+      "subtitle": "Mga aktibong alerto",
+      "include_resolved": "Isama ang naayos na",
+      "dismiss": "Ibasura"
+    },
+    "attendance": {
+      "subtitle": "Mga attendance event mula sa pang-araw-araw na ulat (30 araw)",
+      "by_employee": "Ayon sa Empleyado",
+      "incidents": "Pangyayari",
+      "last_seen": "Huling petsa",
+      "recent_events": "Mga kamakailan"
+    },
+    "projects": {
+      "subtitle": "Mga aktibong proyekto",
+      "new": "Bagong proyekto",
+      "name": "Pangalan",
+      "code": "Code",
+      "no_department": "Walang departamento",
+      "status": {
+        "active": "Aktibo",
+        "paused": "Naka-pause",
+        "completed": "Tapos na"
+      }
+    },
+    "departments": { "subtitle": "Mga departamento" },
+    "employees": {
+      "subtitle": "Mga empleyadong pinahihintulutang mag-ulat",
+      "new": "Bagong empleyado",
+      "full_name": "Buong pangalan",
+      "phone": "Telepono",
+      "whatsapp_phone": "Numero ng WhatsApp",
+      "email": "Email",
+      "role": "Tungkulin",
+      "is_pm": "PM",
+      "is_active": "Aktibo",
+      "no_department": "Walang departamento",
+      "no_project": "Walang proyekto"
+    },
+    "inbox": {
+      "subtitle": "Mga WhatsApp na mensahe mula sa di-rehistradong numero",
+      "claim": "Italaga sa empleyado",
+      "pick_employee": "Pumili ng empleyado",
+      "claimed_by": "Inangkin ni"
+    },
+    "agent": {
+      "title": "Operations AI",
+      "subtitle": "Magtanong tungkol sa kalagayan ng operasyon",
+      "ask_anything": "Magtanong sa akin tungkol sa ulat at proyekto",
+      "thinking": "Iniisip...",
+      "placeholder": "Tanungin ang agent... (Enter para ipadala)",
+      "suggest": {
+        "overdue": "Ano ang overdue ngayon?",
+        "who_didnt_report": "Sino ang hindi nag-ulat kahapon?",
+        "top_risks": "Anong tatlong panganib ngayong linggo?",
+        "ceo_briefing": "Maghanda ng briefing para sa CEO"
+      }
+    },
+    "digest": {
+      "title": "Operations Digest",
+      "generated_at": "Nilikha"
+    },
+    "status": {
+      "open": "Bukas",
+      "in_progress": "Ginagawa",
+      "blocked": "Naharang",
+      "resolved": "Naayos"
+    },
+    "priority": {
+      "low": "Mababa",
+      "medium": "Katamtaman",
+      "high": "Mataas",
+      "urgent": "Mapagmadali"
+    },
+    "col": {
+      "issue": "Isyu",
+      "project": "Proyekto",
+      "dept": "Departamento",
+      "responsible": "Responsable",
+      "status": "Status",
+      "priority": "Prayoridad",
+      "deadline": "Deadline",
+      "actions": "Mga Aksyon",
+      "employee": "Empleyado"
+    },
+    "actions": {
+      "refresh": "I-refresh",
+      "create": "Lumikha",
+      "mark_resolved": "Markahang naayos",
+      "reopen": "Buksang muli"
+    },
+    "flag": { "ceo": "Nangangailangan ng desisyon ng CEO" },
+    "search_placeholder": "Hanapin sa lahat ng item...",
+    "results": "Mga resulta",
+    "empty": {
+      "no_items": "Walang item",
+      "no_alerts": "Walang bukas na alerto",
+      "no_themes": "Wala pang paulit-ulit na tema",
+      "no_attendance": "Walang attendance event",
+      "no_projects": "Walang proyekto pa",
+      "no_employees": "Walang nakarehistrong empleyado",
+      "no_inbox": "Walang laman ang inbox"
+    },
+    "toast": {
+      "item_updated": "Na-update ang item",
+      "alert_dismissed": "Naibasura ang alerto",
+      "project_created": "Nalikha ang proyekto",
+      "employee_created": "Naidagdag ang empleyado",
+      "claimed": "Naangkin ang mensahe"
     }
   },
   "nav_group": {

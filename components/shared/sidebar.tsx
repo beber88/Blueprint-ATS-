@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
-  Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart, Search,
+  Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart,
+  Activity, Inbox, AlertTriangle, Building2, HardHat, ClipboardList, ClipboardCheck, Crown, Search,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -14,46 +15,94 @@ import { useUser } from "@/lib/auth/context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LucideIcon } from "lucide-react";
 
-const RECRUITMENT_PREFIX = "/hr/recruitment";
-
 type NavItem = { key: string; path: string; icon: LucideIcon; adminOnly?: boolean };
 type NavGroup = { labelKey: string; items: NavItem[] };
+type Module = { key: string; labelKey: string; prefix: string; groups: NavGroup[] };
 
-const recruitmentGroups: NavGroup[] = [
+const modules: Module[] = [
   {
-    labelKey: "nav_group.main",
-    items: [
-      { key: "nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
-      { key: "nav.candidates", path: "/candidates", icon: Users },
-      { key: "nav.jobs", path: "/jobs", icon: Briefcase },
-      { key: "nav.interviews", path: "/interviews", icon: Calendar },
+    key: "recruitment",
+    labelKey: "hr.modules.recruitment",
+    prefix: "/hr/recruitment",
+    groups: [
+      {
+        labelKey: "nav_group.main",
+        items: [
+          { key: "nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
+          { key: "nav.candidates", path: "/candidates", icon: Users },
+          { key: "nav.jobs", path: "/jobs", icon: Briefcase },
+          { key: "nav.interviews", path: "/interviews", icon: Calendar },
+        ],
+      },
+      {
+        labelKey: "nav_group.communication",
+        items: [
+          { key: "nav.chat", path: "/chat", icon: MessageCircle },
+          { key: "nav.messages", path: "/messages", icon: MessageSquare },
+          { key: "nav.templates", path: "/templates", icon: FileText },
+        ],
+      },
+      {
+        labelKey: "nav_group.tools",
+        items: [
+          { key: "nav.ai_search", path: "/ai-search", icon: Search },
+          { key: "nav.ai_agent", path: "/ai-agent", icon: Bot },
+          { key: "nav.categories", path: "/categories", icon: FolderOpen },
+          { key: "nav.guide", path: "/guide", icon: BookOpen },
+        ],
+      },
+      {
+        labelKey: "nav_group.management",
+        items: [
+          { key: "nav.unmatched_files", path: "/files", icon: FileQuestion },
+          { key: "nav.reports", path: "/reports", icon: FileBarChart, adminOnly: true },
+          { key: "nav.settings", path: "/settings", icon: Settings },
+          { key: "nav.job_boards", path: "/settings/job-boards", icon: Globe },
+          { key: "nav.users", path: "/users", icon: UserCog, adminOnly: true },
+        ],
+      },
     ],
   },
   {
-    labelKey: "nav_group.communication",
-    items: [
-      { key: "nav.chat", path: "/chat", icon: MessageCircle },
-      { key: "nav.messages", path: "/messages", icon: MessageSquare },
-      { key: "nav.templates", path: "/templates", icon: FileText },
-    ],
-  },
-  {
-    labelKey: "nav_group.tools",
-    items: [
-      { key: "nav.ai_search", path: "/ai-search", icon: Search },
-      { key: "nav.ai_agent", path: "/ai-agent", icon: Bot },
-      { key: "nav.categories", path: "/categories", icon: FolderOpen },
-      { key: "nav.guide", path: "/guide", icon: BookOpen },
-    ],
-  },
-  {
-    labelKey: "nav_group.management",
-    items: [
-      { key: "nav.unmatched_files", path: "/files", icon: FileQuestion },
-      { key: "nav.reports", path: "/reports", icon: FileBarChart, adminOnly: true },
-      { key: "nav.settings", path: "/settings", icon: Settings },
-      { key: "nav.job_boards", path: "/settings/job-boards", icon: Globe },
-      { key: "nav.users", path: "/users", icon: UserCog, adminOnly: true },
+    key: "operations",
+    labelKey: "hr.modules.operations",
+    prefix: "/hr/operations",
+    groups: [
+      {
+        labelKey: "nav_group.main",
+        items: [
+          { key: "operations.nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
+          { key: "operations.nav.intake", path: "/intake", icon: ClipboardList },
+          { key: "operations.nav.issues", path: "/issues", icon: Activity },
+        ],
+      },
+      {
+        labelKey: "operations.nav_group.tracking",
+        items: [
+          { key: "operations.nav.hr_issues", path: "/hr-issues", icon: Users },
+          { key: "operations.nav.ceo_items", path: "/ceo-items", icon: Crown },
+          { key: "operations.nav.missing_info", path: "/missing-info", icon: AlertTriangle },
+          { key: "operations.nav.attendance", path: "/attendance", icon: ClipboardCheck },
+          { key: "operations.nav.followups", path: "/followups", icon: Calendar },
+          { key: "operations.nav.alerts", path: "/alerts", icon: AlertTriangle },
+        ],
+      },
+      {
+        labelKey: "operations.nav_group.org",
+        items: [
+          { key: "operations.nav.projects", path: "/projects", icon: HardHat },
+          { key: "operations.nav.departments", path: "/departments", icon: Building2 },
+          { key: "operations.nav.employees", path: "/employees", icon: Users, adminOnly: true },
+        ],
+      },
+      {
+        labelKey: "operations.nav_group.tools",
+        items: [
+          { key: "operations.nav.ai_agent", path: "/ai-agent", icon: Bot },
+          { key: "operations.nav.archive", path: "/archive", icon: Search },
+          { key: "operations.nav.inbox", path: "/inbox", icon: Inbox, adminOnly: true },
+        ],
+      },
     ],
   },
 ];
@@ -64,11 +113,20 @@ const languages: { code: Locale; label: string }[] = [
   { code: "tl", label: "TL" },
 ];
 
-// Strip /hr/recruitment prefix so active-state matches whether the current URL
-// uses the new HR path or a legacy direct route.
-function normalizePath(p: string): string {
-  const stripped = p.replace(/^\/hr\/recruitment/, "");
+// Strip the active module prefix so active-state matching works regardless of
+// whether the URL is the full /hr/<module>/<page> form or a legacy direct one.
+function stripPrefix(p: string, prefix: string): string {
+  const stripped = p.replace(new RegExp(`^${prefix}`), "");
   return stripped === "" ? "/" : stripped;
+}
+
+function activeModuleFor(pathname: string): string {
+  for (const m of modules) {
+    if (pathname.startsWith(m.prefix)) return m.key;
+  }
+  // Fallback heuristics for legacy paths
+  if (pathname.startsWith("/operations")) return "operations";
+  return "recruitment";
 }
 
 export function Sidebar() {
@@ -84,7 +142,7 @@ export function Sidebar() {
     router.push("/login");
   };
 
-  const normalizedCurrent = normalizePath(pathname);
+  const activeKey = activeModuleFor(pathname);
 
   return (
     <aside
@@ -126,71 +184,105 @@ export function Sidebar() {
         <div style={{ height: 1, background: 'rgba(201,168,76,0.25)', marginTop: 16 }} />
       </div>
 
-      {/* Navigation */}
-      <nav style={{ flex: 1, padding: '12px 12px 0 12px', overflowY: 'auto' }}>
-        {/* Recruitment Module Header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 12px 6px 12px',
-            color: '#C9A84C',
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '0.02em',
-          }}
-        >
-          <span style={{ width: 3, height: 14, background: '#C9A84C', borderRadius: 2 }} />
-          {t("hr.modules.recruitment")}
-        </div>
+      {/* Module switcher */}
+      <div style={{ padding: '12px 12px 4px 12px', display: 'flex', gap: 6 }}>
+        {modules.map((m) => {
+          const isActive = m.key === activeKey;
+          const firstPath = m.groups[0]?.items[0]?.path || "/dashboard";
+          return (
+            <Link
+              key={m.key}
+              href={`${m.prefix}${firstPath}`}
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                padding: '8px 6px',
+                borderRadius: 8,
+                fontSize: 12,
+                fontWeight: 600,
+                background: isActive ? 'rgba(201,168,76,0.15)' : 'transparent',
+                color: isActive ? '#C9A84C' : '#8A8A8A',
+                textDecoration: 'none',
+                border: isActive ? '1px solid rgba(201,168,76,0.35)' : '1px solid transparent',
+              }}
+            >
+              {t(m.labelKey)}
+            </Link>
+          );
+        })}
+      </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {recruitmentGroups.map((group, gi) => (
-            <div key={gi}>
-              {gi > 0 && <div style={{ height: 1, background: 'var(--sidebar-border, rgba(255,255,255,0.08))', margin: '8px 4px' }} />}
-              <div style={{ padding: '4px 12px 4px 12px', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#8A8A8A', opacity: 0.5 }}>
-                {t(group.labelKey)}
+      {/* Navigation for active module */}
+      <nav style={{ flex: 1, padding: '8px 12px 0 12px', overflowY: 'auto' }}>
+        {modules.filter((m) => m.key === activeKey).map((module) => {
+          const normalized = stripPrefix(pathname, module.prefix);
+          return (
+            <div key={module.key}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 12px 6px 12px',
+                  color: '#C9A84C',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                <span style={{ width: 3, height: 14, background: '#C9A84C', borderRadius: 2 }} />
+                {t(module.labelKey)}
               </div>
-              {group.items.filter(item => !item.adminOnly || isAdmin).map((item) => {
-                const href = `${RECRUITMENT_PREFIX}${item.path}`;
-                const isActive = normalizedCurrent === item.path || normalizedCurrent.startsWith(item.path + "/");
-                return (
-                  <Link
-                    key={item.key}
-                    href={href}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      padding: '8px 12px',
-                      borderRadius: 8,
-                      fontSize: 14,
-                      fontWeight: isActive ? 500 : 400,
-                      textDecoration: 'none',
-                      transition: 'background 150ms, color 150ms',
-                      background: isActive ? 'rgba(201,168,76,0.12)' : 'transparent',
-                      color: isActive ? '#C9A84C' : '#8A8A8A',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.background = 'rgba(201,168,76,0.08)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.background = 'transparent';
-                      }
-                    }}
-                  >
-                    <item.icon style={{ width: 18, height: 18, flexShrink: 0 }} />
-                    {t(item.key)}
-                  </Link>
-                );
-              })}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {module.groups.map((group, gi) => (
+                  <div key={gi}>
+                    {gi > 0 && <div style={{ height: 1, background: 'var(--sidebar-border, rgba(255,255,255,0.08))', margin: '8px 4px' }} />}
+                    <div style={{ padding: '4px 12px 4px 12px', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#8A8A8A', opacity: 0.5 }}>
+                      {t(group.labelKey)}
+                    </div>
+                    {group.items.filter(item => !item.adminOnly || isAdmin).map((item) => {
+                      const href = `${module.prefix}${item.path}`;
+                      const isActive = normalized === item.path || normalized.startsWith(item.path + "/");
+                      return (
+                        <Link
+                          key={item.key}
+                          href={href}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            fontSize: 14,
+                            fontWeight: isActive ? 500 : 400,
+                            textDecoration: 'none',
+                            transition: 'background 150ms, color 150ms',
+                            background: isActive ? 'rgba(201,168,76,0.12)' : 'transparent',
+                            color: isActive ? '#C9A84C' : '#8A8A8A',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background = 'rgba(201,168,76,0.08)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background = 'transparent';
+                            }
+                          }}
+                        >
+                          <item.icon style={{ width: 18, height: 18, flexShrink: 0 }} />
+                          {t(item.key)}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </nav>
 
       {/* Bottom section */}

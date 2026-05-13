@@ -1,21 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { parseCV, analyzeCV, classifyDocument } from "@/lib/claude/client";
+import { similarityScore } from "@/lib/utils";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
 export const dynamic = "force-dynamic";
-
-function similarityScore(a: string, b: string): number {
-  const s1 = a.toLowerCase().trim();
-  const s2 = b.toLowerCase().trim();
-  if (s1 === s2) return 1;
-  const longer = s1.length > s2.length ? s1 : s2;
-  const shorter = s1.length > s2.length ? s2 : s1;
-  if (longer.length === 0) return 1;
-  const matches = shorter.split("").filter((c, i) => longer[i] === c).length;
-  return matches / longer.length;
-}
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx"];

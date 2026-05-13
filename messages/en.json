@@ -3,7 +3,188 @@
     "system": "HR System",
     "brand": "Blueprint HR",
     "modules": {
-      "recruitment": "Recruitment"
+      "recruitment": "Recruitment",
+      "operations": "Operations"
+    }
+  },
+  "operations": {
+    "nav_group": {
+      "tracking": "Tracking",
+      "org": "Organization",
+      "tools": "Tools"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "intake": "Intake",
+      "issues": "All Issues",
+      "hr_issues": "Urgent HR Issues",
+      "ceo_items": "CEO Action Items",
+      "missing_info": "Missing Information",
+      "attendance": "Attendance",
+      "followups": "Follow-ups",
+      "alerts": "Alerts",
+      "archive": "Archive",
+      "projects": "Projects",
+      "departments": "Departments",
+      "employees": "Employees",
+      "ai_agent": "Operations AI",
+      "inbox": "Inbox"
+    },
+    "dashboard": {
+      "title": "Operations Dashboard",
+      "subtitle": "Live picture of daily field reports",
+      "top_alerts": "Top Alerts",
+      "recurring_themes": "Recurring Themes (30d)"
+    },
+    "kpi": {
+      "open": "Open",
+      "overdue": "Overdue",
+      "urgent": "Urgent",
+      "ceo_pending": "CEO Pending",
+      "missing_info": "Missing Info",
+      "alerts": "Alerts"
+    },
+    "chart": {
+      "daily_trend": "Daily Trend",
+      "by_priority": "By Priority",
+      "by_department": "By Department",
+      "by_project": "By Project",
+      "total": "Total",
+      "overdue": "Overdue",
+      "urgent": "Urgent"
+    },
+    "intake": {
+      "title": "Report Intake",
+      "subtitle": "Paste text or upload a PDF — Claude extracts structured items",
+      "text_label": "Report Text",
+      "text_placeholder": "Paste the daily report contents here...",
+      "file_label": "File (PDF/TXT)",
+      "choose_file": "Choose file",
+      "options": "Options",
+      "report_date": "Report date",
+      "project_hint": "Project (hint)",
+      "submit": "Extract items",
+      "processing": "Processing...",
+      "result_title": "Extraction Result",
+      "extracted": "Items added",
+      "confidence": "Confidence",
+      "success": "Added {n} items",
+      "error_empty": "Text or file required"
+    },
+    "issues": { "subtitle": "All open issues" },
+    "hr_issues": { "subtitle": "Urgent HR-only issues" },
+    "ceo_items": { "subtitle": "Items requiring a CEO decision" },
+    "missing_info": { "subtitle": "Items with missing information" },
+    "followups": { "subtitle": "Open items to follow up on" },
+    "archive": { "subtitle": "Search across all reports" },
+    "alerts": {
+      "subtitle": "Active alerts",
+      "include_resolved": "Include resolved",
+      "dismiss": "Dismiss"
+    },
+    "attendance": {
+      "subtitle": "Attendance events from daily reports (30 days)",
+      "by_employee": "By Employee",
+      "incidents": "Events",
+      "last_seen": "Latest",
+      "recent_events": "Recent Events"
+    },
+    "projects": {
+      "subtitle": "Active projects",
+      "new": "New project",
+      "name": "Name",
+      "code": "Code",
+      "no_department": "No department",
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed"
+      }
+    },
+    "departments": { "subtitle": "Departments" },
+    "employees": {
+      "subtitle": "Employees authorized to submit reports",
+      "new": "New employee",
+      "full_name": "Full name",
+      "phone": "Phone",
+      "whatsapp_phone": "WhatsApp number",
+      "email": "Email",
+      "role": "Role",
+      "is_pm": "PM",
+      "is_active": "Active",
+      "no_department": "No department",
+      "no_project": "No project"
+    },
+    "inbox": {
+      "subtitle": "WhatsApp messages from unregistered numbers",
+      "claim": "Assign to employee",
+      "pick_employee": "Pick employee",
+      "claimed_by": "Claimed by"
+    },
+    "agent": {
+      "title": "Operations AI",
+      "subtitle": "Ask anything about the operational picture",
+      "ask_anything": "Ask me anything about reports and projects",
+      "thinking": "Thinking...",
+      "placeholder": "Ask the agent... (Enter to send)",
+      "suggest": {
+        "overdue": "What is overdue today?",
+        "who_didnt_report": "Who didn't report yesterday?",
+        "top_risks": "What are the top 3 risks this week?",
+        "ceo_briefing": "Prepare a CEO briefing"
+      }
+    },
+    "digest": {
+      "title": "Operations Digest",
+      "generated_at": "Generated at"
+    },
+    "status": {
+      "open": "Open",
+      "in_progress": "In progress",
+      "blocked": "Blocked",
+      "resolved": "Resolved"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "col": {
+      "issue": "Issue",
+      "project": "Project",
+      "dept": "Department",
+      "responsible": "Responsible",
+      "status": "Status",
+      "priority": "Priority",
+      "deadline": "Deadline",
+      "actions": "Actions",
+      "employee": "Employee"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "create": "Create",
+      "mark_resolved": "Mark resolved",
+      "reopen": "Reopen"
+    },
+    "flag": { "ceo": "Requires CEO decision" },
+    "search_placeholder": "Search across items...",
+    "results": "Results",
+    "empty": {
+      "no_items": "No items to display",
+      "no_alerts": "No open alerts",
+      "no_themes": "No recurring themes yet",
+      "no_attendance": "No attendance events",
+      "no_projects": "No projects yet — add one to get started",
+      "no_employees": "No employees registered — add PMs to allow WhatsApp reporting",
+      "no_inbox": "Inbox is empty"
+    },
+    "toast": {
+      "item_updated": "Item updated",
+      "alert_dismissed": "Alert dismissed",
+      "project_created": "Project created",
+      "employee_created": "Employee added",
+      "claimed": "Message claimed"
     }
   },
   "nav_group": {
