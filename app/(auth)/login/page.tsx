@@ -31,7 +31,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push("/hr/recruitment/dashboard");
     router.refresh();
   };
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
                 margin: 0,
               }}
             >
-              Blueprint ATS
+              Blueprint HR
             </h1>
             <p
               style={{

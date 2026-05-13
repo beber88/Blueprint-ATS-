@@ -1,4 +1,4 @@
-# Blueprint ATS - Claude Code Knowledge Base (SKILL.md)
+# Blueprint HR - Claude Code Knowledge Base (SKILL.md)
 
 Place this file at the root of the project: `/SKILL.md`
 Claude Code will read it automatically on every session.
@@ -7,10 +7,11 @@ Claude Code will read it automatically on every session.
 
 ## 1. PROJECT IDENTITY
 
-- **Name:** Blueprint ATS (Applicant Tracking System)
+- **Name:** Blueprint HR (an HR System; the existing app is the **Recruitment** module)
+- **Module URL prefix:** `/hr/recruitment/*` (rewrites map to legacy `/dashboard`, `/candidates`, etc.)
 - **Company:** Blueprint Building Group Inc. (construction, Philippines)
 - **Live URL:** https://blueprint-ats.vercel.app
-- **Purpose:** Internal recruitment management for construction industry hiring
+- **Purpose:** HR platform - currently the Recruitment module is live; additional HR modules (employees, payroll, attendance, performance) to be added per upcoming spec
 - **Users:** 3 users (Beber - CEO/Admin, Nicx - HR Recruiter, Rose - Secretary/Recruiter)
 - **Languages:** Hebrew (RTL, primary), English, Tagalog
 

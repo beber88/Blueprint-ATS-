@@ -1,4 +1,11 @@
 {
+  "hr": {
+    "system": "HR System",
+    "brand": "Blueprint HR",
+    "modules": {
+      "recruitment": "Pangangalap"
+    }
+  },
   "nav_group": {
     "main": "Pangunahin",
     "communication": "Komunikasyon",
@@ -313,7 +320,7 @@
     "body_placeholder": "Gamitin ang {{pangalan}}, {{posisyon}}, atbp."
   },
   "auth": {
-    "login_title": "Maligayang pagdating sa Blueprint ATS",
+    "login_title": "Maligayang pagdating sa Blueprint HR",
     "login_subtitle": "Pamahalaan ang proseso ng recruitment nang matalino",
     "email": "Email Address",
     "password": "Password",

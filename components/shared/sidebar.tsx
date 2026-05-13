@@ -14,41 +14,46 @@ import { useUser } from "@/lib/auth/context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LucideIcon } from "lucide-react";
 
-const navGroups: { labelKey: string; items: { key: string; href: string; icon: LucideIcon; adminOnly?: boolean }[] }[] = [
+const RECRUITMENT_PREFIX = "/hr/recruitment";
+
+type NavItem = { key: string; path: string; icon: LucideIcon; adminOnly?: boolean };
+type NavGroup = { labelKey: string; items: NavItem[] };
+
+const recruitmentGroups: NavGroup[] = [
   {
     labelKey: "nav_group.main",
     items: [
-      { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { key: "nav.candidates", href: "/candidates", icon: Users },
-      { key: "nav.jobs", href: "/jobs", icon: Briefcase },
-      { key: "nav.interviews", href: "/interviews", icon: Calendar },
+      { key: "nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
+      { key: "nav.candidates", path: "/candidates", icon: Users },
+      { key: "nav.jobs", path: "/jobs", icon: Briefcase },
+      { key: "nav.interviews", path: "/interviews", icon: Calendar },
     ],
   },
   {
     labelKey: "nav_group.communication",
     items: [
-      { key: "nav.chat", href: "/chat", icon: MessageCircle },
-      { key: "nav.messages", href: "/messages", icon: MessageSquare },
-      { key: "nav.templates", href: "/templates", icon: FileText },
+      { key: "nav.chat", path: "/chat", icon: MessageCircle },
+      { key: "nav.messages", path: "/messages", icon: MessageSquare },
+      { key: "nav.templates", path: "/templates", icon: FileText },
     ],
   },
   {
     labelKey: "nav_group.tools",
     items: [
-      { key: "nav.ai_search", href: "/ai-search", icon: Search },
-      { key: "nav.ai_agent", href: "/ai-agent", icon: Bot },
-      { key: "nav.categories", href: "/categories", icon: FolderOpen },
-      { key: "nav.guide", href: "/guide", icon: BookOpen },
+      { key: "nav.ai_search", path: "/ai-search", icon: Search },
+      { key: "nav.ai_agent", path: "/ai-agent", icon: Bot },
+      { key: "nav.categories", path: "/categories", icon: FolderOpen },
+      { key: "nav.guide", path: "/guide", icon: BookOpen },
     ],
   },
   {
     labelKey: "nav_group.management",
     items: [
-      { key: "nav.unmatched_files", href: "/files", icon: FileQuestion },
-      { key: "nav.reports", href: "/reports", icon: FileBarChart, adminOnly: true },
-      { key: "nav.settings", href: "/settings", icon: Settings },
-      { key: "nav.job_boards", href: "/settings/job-boards", icon: Globe },
-      { key: "nav.users", href: "/users", icon: UserCog, adminOnly: true },
+      { key: "nav.unmatched_files", path: "/files", icon: FileQuestion },
+      { key: "nav.reports", path: "/reports", icon: FileBarChart, adminOnly: true },
+      { key: "nav.settings", path: "/settings", icon: Settings },
+      { key: "nav.job_boards", path: "/settings/job-boards", icon: Globe },
+      { key: "nav.users", path: "/users", icon: UserCog, adminOnly: true },
     ],
   },
 ];
@@ -58,6 +63,13 @@ const languages: { code: Locale; label: string }[] = [
   { code: "en", label: "EN" },
   { code: "tl", label: "TL" },
 ];
+
+// Strip /hr/recruitment prefix so active-state matches whether the current URL
+// uses the new HR path or a legacy direct route.
+function normalizePath(p: string): string {
+  const stripped = p.replace(/^\/hr\/recruitment/, "");
+  return stripped === "" ? "/" : stripped;
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -72,6 +84,8 @@ export function Sidebar() {
     router.push("/login");
   };
 
+  const normalizedCurrent = normalizePath(pathname);
+
   return (
     <aside
       style={{
@@ -83,7 +97,7 @@ export function Sidebar() {
         height: '100%',
       }}
     >
-      {/* Logo */}
+      {/* Logo + System Brand */}
       <div style={{ padding: '20px 20px 0 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div
@@ -99,9 +113,14 @@ export function Sidebar() {
           >
             <span style={{ color: '#1A1A1A', fontSize: 16, fontWeight: 700 }}>B</span>
           </div>
-          <span style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 600, letterSpacing: '-0.01em' }}>
-            Blueprint
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+            <span style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 600, letterSpacing: '-0.01em' }}>
+              {t("hr.brand")}
+            </span>
+            <span style={{ color: '#8A8A8A', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>
+              {t("hr.system")}
+            </span>
+          </div>
         </div>
         {/* Gold separator */}
         <div style={{ height: 1, background: 'rgba(201,168,76,0.25)', marginTop: 16 }} />
@@ -109,19 +128,37 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav style={{ flex: 1, padding: '12px 12px 0 12px', overflowY: 'auto' }}>
+        {/* Recruitment Module Header */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 12px 6px 12px',
+            color: '#C9A84C',
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+          }}
+        >
+          <span style={{ width: 3, height: 14, background: '#C9A84C', borderRadius: 2 }} />
+          {t("hr.modules.recruitment")}
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {navGroups.map((group, gi) => (
+          {recruitmentGroups.map((group, gi) => (
             <div key={gi}>
               {gi > 0 && <div style={{ height: 1, background: 'var(--sidebar-border, rgba(255,255,255,0.08))', margin: '8px 4px' }} />}
               <div style={{ padding: '4px 12px 4px 12px', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#8A8A8A', opacity: 0.5 }}>
                 {t(group.labelKey)}
               </div>
               {group.items.filter(item => !item.adminOnly || isAdmin).map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                const href = `${RECRUITMENT_PREFIX}${item.path}`;
+                const isActive = normalizedCurrent === item.path || normalizedCurrent.startsWith(item.path + "/");
                 return (
                   <Link
                     key={item.key}
-                    href={item.href}
+                    href={href}
                     style={{
                       display: 'flex',
                       alignItems: 'center',

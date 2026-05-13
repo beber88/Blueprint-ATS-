@@ -1,4 +1,11 @@
 {
+  "hr": {
+    "system": "מערכת HR",
+    "brand": "Blueprint HR",
+    "modules": {
+      "recruitment": "גיוסים"
+    }
+  },
   "nav_group": {
     "main": "ראשי",
     "communication": "תקשורת",
@@ -313,7 +320,7 @@
     "body_placeholder": "השתמשו ב-{{שם_מועמד}}, {{תפקיד}} וכו׳"
   },
   "auth": {
-    "login_title": "ברוך הבא ל-Blueprint ATS",
+    "login_title": "ברוך הבא ל-Blueprint HR",
     "login_subtitle": "נהל את תהליך הגיוס בצורה חכמה",
     "email": "כתובת אימייל",
     "password": "סיסמה",

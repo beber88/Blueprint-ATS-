@@ -1,4 +1,11 @@
 {
+  "hr": {
+    "system": "HR System",
+    "brand": "Blueprint HR",
+    "modules": {
+      "recruitment": "Recruitment"
+    }
+  },
   "nav_group": {
     "main": "Main",
     "communication": "Communication",
@@ -313,7 +320,7 @@
     "body_placeholder": "Use {{candidate_name}}, {{position}}, etc."
   },
   "auth": {
-    "login_title": "Welcome to Blueprint ATS",
+    "login_title": "Welcome to Blueprint HR",
     "login_subtitle": "Manage your recruitment process smartly",
     "email": "Email Address",
     "password": "Password",

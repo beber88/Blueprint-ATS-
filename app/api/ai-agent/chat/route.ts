@@ -167,7 +167,7 @@ ${(recentActivity || []).slice(0, 30).map(a => `• ${(a.candidate as Record<str
 `;
     }
 
-    const systemPrompt = `You are the Blueprint ATS AI Agent - an expert HR advisor with COMPLETE access to all candidate files, CVs, analyses, and system data. You operate like NotebookLM - you know EVERYTHING about every candidate in the system.
+    const systemPrompt = `You are the Blueprint HR AI Agent for the Recruitment module - an expert HR advisor with COMPLETE access to all candidate files, CVs, analyses, and system data. You operate like NotebookLM - you know EVERYTHING about every candidate in the system.
 
 ${dataContext}
 
