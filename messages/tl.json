@@ -69,7 +69,17 @@
       "extracted": "Mga item na naidagdag",
       "confidence": "Confidence",
       "success": "Naidagdag {n} na item",
-      "error_empty": "Kailangan ng teksto o file"
+      "error_empty": "Kailangan ng teksto o file",
+      "mode_single": "Isang ulat",
+      "mode_bulk": "Bulk Import (kasaysayan)",
+      "bulk_text_label": "Maraming ulat",
+      "bulk_placeholder": "I-paste ang sunod-sunod na ulat. Bawat ulat dapat may 'Date: YYYY-MM-DD' o 'תאריך: ...'.",
+      "bulk_hint": "Awtomatikong hatiin ng sistema sa date headers.",
+      "bulk_submit": "I-import lahat",
+      "bulk_error_short": "Kailangan ng 100 character man lang",
+      "bulk_success": "Nalikha {r} ulat, {i} item",
+      "bulk_result_title": "Resulta ng Bulk Import",
+      "bulk_summary": "Natuklasan {c}, nalikha {r}, kabuuang {i}"
     },
     "issues": { "subtitle": "Lahat ng nakabukas na isyu" },
     "hr_issues": { "subtitle": "Mga mapagmadaling HR isyu lamang" },

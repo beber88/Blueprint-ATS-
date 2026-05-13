@@ -1,0 +1,45 @@
+Consolidated Company Daily Report - Blueprint
+Date: 2026-05-12
+Prepared by: Operations and Corporate Manager
+Reporting Cutoff Time: 9:30 PM
+
+1. HR - Human Resources
+- Attendance: Present: Rose, Shaina, MC, Lawrence, Nicx, SG Albert, SG Lansang, Kyla, Aliah, Jerwin, Jester, Felix Bryan, Justin, Daff. Absent: Raegan (Sick Leave).
+- HR Issues:
+  - TFT inspection conducted; assigned cleaner for 4pm tomorrow.
+  - L300 warehouse access issue in Pasig resolved.
+  - Finalized genset draft contract for 4-storey project tomorrow.
+  - Icon 18H electrical plan revision ongoing.
+
+2. Architecture
+- Project: Pearl de Flore - Material specifications file preparation ongoing for submission. 70%.
+- Project: Opatra - Re-rendered reception, rooms, and office due to lighting changes. 100%.
+
+3. Project Management and Site Updates
+- Pearl de Flore: Manpower missing. Smoke detector installation, testing, and commissioning completed. Striplight for niche installed. Punchlist completed by Renz Group. 90% progress. Awaiting textured paint curing before signage installation. Joinery delivery pending. Materials needed: Joineries delivery 2026-05-13. Tomorrow plan: continue textured paint application, prepare for signage ingress.
+- Fixifoot: Textured paint completed. Joinery items delivered. 90% progress. FMG smoke detector contractor unresponsive. ANP Builders mobilization not yet confirmed. Signage vendor pending site inspection. Risk: Delay due to unconfirmed contractor mobilization.
+- Icon 18H: Electrical plan revision ongoing. Water heater installation pending due to lavatory relocation status. Quartz inspection pending confirmation tomorrow. Risk: Delay due to pending lavatory relocation decision.
+- 4 Storey: Acquired conformed genset supplier checklist. Awaiting revised proposals from genset suppliers. Clarification pending on plumbing/electrical contract scope.
+
+4. Procurement
+- ACP for Manila Bay ordered and paid for warehouse delivery tomorrow morning.
+- GRP textured paint application scheduled for Pearl de Flore tonight.
+- Water heater for Icon 18H pending.
+- Door supplier quotation for Opatra Gensan still awaiting reply.
+- CEO decisions needed: Approval of genset supplier selection. Approval for quartz payment release after inspection confirmation. Direction regarding replacement outsourced designer for Opatra Gensan.
+
+5. Missing Information Tracker
+- Site manpower details for all active projects - From: Assigned PMs - Deadline: 2026-05-13 AM
+- Current progress percentage for ICON 18H and 4 STOREY - From: PM/QS Team - Deadline: 2026-05-13 AM
+- Delivered file names/links from Architecture Team - From: Architecture Department - Deadline: 2026-05-13 AM
+
+6. CEO Action Items
+- Approve genset supplier selection - Required for 4 STOREY project progression and permit compliance - Deadline: 2026-05-13
+- Review and approve James tile replacement contract addendum - Formalize deduction and replacement agreement - Deadline: 2026-05-13
+- Decide on Opatra Gensan replacement outsourced designer - Prevent delay in design submission - Deadline: Immediate
+- Provide direction on pending variation order negotiations - Avoid project and procurement delays - Deadline: 2026-05-13
+
+7. Company Priorities for Tomorrow
+- Priority 1: Finalize genset supplier evaluation and approvals for 4 STOREY project.
+- Priority 2: Ensure Pearl de Flore textured paint, signage ingress, and joinery deliveries proceed on schedule.
+- Priority 3: Resolve pending contractor/vendor confirmations affecting Fixifoot, Icon 18H, and Opatra Gensan projects.

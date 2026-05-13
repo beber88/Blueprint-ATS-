@@ -69,7 +69,17 @@
       "extracted": "Items added",
       "confidence": "Confidence",
       "success": "Added {n} items",
-      "error_empty": "Text or file required"
+      "error_empty": "Text or file required",
+      "mode_single": "Single Report",
+      "mode_bulk": "Bulk Import (history)",
+      "bulk_text_label": "Multiple reports text",
+      "bulk_placeholder": "Paste a sequence of daily reports. Each report must start with a 'Date: YYYY-MM-DD' or 'תאריך: ...' line.",
+      "bulk_hint": "The system auto-splits on date headers and extracts items per report.",
+      "bulk_submit": "Import all",
+      "bulk_error_short": "Text must be at least 100 characters",
+      "bulk_success": "Created {r} reports with {i} items",
+      "bulk_result_title": "Bulk Import Results",
+      "bulk_summary": "Detected {c} reports, created {r}, total {i} items"
     },
     "issues": { "subtitle": "All open issues" },
     "hr_issues": { "subtitle": "Urgent HR-only issues" },
