@@ -5,6 +5,23 @@ import {
   matchProjectByName,
 } from "@/lib/operations/match-employee";
 
+// Mirror the CHECK constraints in migration 002 so a hand-edited draft
+// (via PATCH) can't smuggle a value the schema will reject at insert.
+// extract-report.ts already filters AI output; this is the defense for
+// post-extraction edits.
+const VALID_ITEM_STATUSES = new Set(["open", "in_progress", "blocked", "resolved"]);
+const VALID_PRIORITIES = new Set(["low", "medium", "high", "urgent"]);
+const VALID_CATEGORIES = new Set([
+  "hr", "attendance", "safety", "project", "permit",
+  "procurement", "subcontractor", "site", "other",
+]);
+
+function pick<T extends string>(value: unknown, allowed: Set<T>, fallback: T): T {
+  return typeof value === "string" && (allowed as Set<string>).has(value)
+    ? (value as T)
+    : fallback;
+}
+
 interface DraftRow {
   id: string;
   source_text: string;
@@ -84,15 +101,15 @@ export async function promoteDraft(
       person_responsible_raw: person,
       person_responsible_match_confidence: empMatch.confidence || null,
       issue,
-      status: (it.status as string) || "open",
+      status: pick(it.status, VALID_ITEM_STATUSES, "open"),
       deadline: (it.deadline as string) || null,
       deadline_raw: (it.deadline_raw as string) || null,
       deadline_uncertain: !!it.deadline_uncertain,
       missing_information: (it.missing_information as string) || null,
       ceo_decision_needed: !!it.ceo_decision_needed,
-      priority: (it.priority as string) || "medium",
+      priority: pick(it.priority, VALID_PRIORITIES, "medium"),
       next_action: (it.next_action as string) || null,
-      category: (it.category as string) || "other",
+      category: pick(it.category, VALID_CATEGORIES, "other"),
     });
   }
   if (itemRows.length > 0) {
