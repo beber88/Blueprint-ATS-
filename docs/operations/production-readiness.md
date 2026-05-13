@@ -233,6 +233,42 @@ GROUP BY 1;
 `failed > 0` → likely Claude rejection of media OCR. Pull a sample row
 and look at `source_meta`.
 
+### 5.5 Name matcher noise — UNKNOWN_PROJECT / UNKNOWN_EMPLOYEE patterns
+
+The matcher uses a short construction-domain stopword list
+(`MATCHER_STOPWORDS` in `lib/operations/draft-warnings.ts`) — see
+`docs/operations/preview-and-drafts.md` for the algorithm. In the first
+48 hours, surface which raw strings keep firing the warnings:
+
+```sql
+SELECT
+  jsonb_path_query_array(warnings_json, '$[*] ? (@.code == "UNKNOWN_PROJECT" || @.code == "UNKNOWN_EMPLOYEE").message_en') AS msgs,
+  COUNT(*) AS n
+FROM op_report_drafts
+WHERE created_at > NOW() - INTERVAL '48 hours'
+  AND jsonb_path_exists(warnings_json, '$[*] ? (@.code == "UNKNOWN_PROJECT" || @.code == "UNKNOWN_EMPLOYEE")')
+GROUP BY 1
+ORDER BY n DESC
+LIMIT 30;
+```
+
+Look for repeat offenders. Each falls into one of three buckets:
+
+- **Real seed gap** — the project / person genuinely isn't in the active
+  master data. Action: add them to `op_projects` / `op_employees`.
+- **Stopword gap** — a context word (e.g. `phase`, `block`, `tower`)
+  appears in many real project mentions and is breaking the token-set
+  match. Action: add it to `MATCHER_STOPWORDS` and write a short note in
+  `preview-and-drafts.md` under "Warning catalog" explaining the
+  trigger case. **Do not add Hebrew / Tagalog words yet** — PMs write
+  reports in English. Cross that bridge if data shows otherwise.
+- **Real name variance the matcher should catch** — e.g. transliteration
+  ("Joseph" vs "Yauna Joseph"), nicknames, OCR errors. Action: file a
+  backlog entry. Don't extend the matcher reactively under fire.
+
+This is the explicit feedback loop for the matcher. The stopword list
+is a heuristic — staging is where it earns its final shape.
+
 ## 6. Verified at cmd 7 (paste-able evidence)
 
 | Subtask | Status | Evidence |

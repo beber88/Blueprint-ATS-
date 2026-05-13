@@ -70,6 +70,43 @@ Computed by `lib/operations/draft-warnings.ts` — pure, takes
 Each warning carries a `field` path that the Preview UI uses to scroll to
 the offending element (`items[N].*` matches an HTML id `field-items-N`).
 
+### Name matcher — canonicalization + token-set + stopwords
+
+`UNKNOWN_PROJECT` and `UNKNOWN_EMPLOYEE` rely on `isKnownName()` in
+`lib/operations/draft-warnings.ts`. PMs at Blueprint write the same
+project or person many different ways ("4 Storey" / "4-Storey" /
+"4-storey project" / "Mendevil/Christian" / "MC Millete") — the matcher
+canonicalizes both sides before comparing, then runs two tiers:
+
+1. **Token-set match (primary).** Strings are canonicalized
+   (lowercase + punctuation→space + collapse whitespace; apostrophes
+   and non-ASCII characters are preserved). Each side is split into
+   tokens, then tokens shorter than 2 characters AND
+   construction-domain stopwords are dropped. A match means every
+   token of the shorter side appears in the longer side — so
+   `{mendevil, christian}` matches `{christian, mendevil}` even with
+   reordered tokens or a stripped middle initial.
+2. **Substring fallback.** If token-set fails (or one side is empty
+   after filtering), the canonicalized forms are compared
+   bidirectionally with `.includes()`. Catches single-word names like
+   `"Eric"` inside `"Eric (Enrique Masangkay)"`.
+
+The stopwords list (`MATCHER_STOPWORDS` in `draft-warnings.ts`) holds
+about 15 English construction-domain words (`project`, `building`,
+`site`, `phase`, `the`, `and`, `of`, …). It exists to prevent two kinds
+of error: false negatives like `"4-storey project"` failing to match
+`"4-Storey Pampanga"`, and false positives like `"Storey Spa Project"`
+matching it via the shared word `"project"`. We've kept the list short
+on purpose — a bigger list creates more false negatives.
+
+**Feedback loop.** When the staging / production runbook surfaces a
+recurring false positive or false negative on this matcher, the fix
+is usually one word added to or removed from `MATCHER_STOPWORDS`.
+That commit should land alongside an entry under the "Monitoring"
+section of `docs/operations/production-readiness.md` describing the
+trigger case (one or two sample sentences), so future operators have
+a paper trail.
+
 ## Auto-promote (bulk only)
 
 Set `op_bulk_import_jobs.auto_promote = true` to let the worker promote

@@ -4,6 +4,12 @@
 **Priority:** medium. Not blocking go-live, but the current behavior hides
 useful information from operators.
 
+**Status (2026-05-13):** punctuation canonicalization + token-set matching
+with construction-domain stopwords landed separately (see commit
+`fix(warnings): token-set matcher with construction-domain stopwords`).
+Those changes do NOT address this backlog item — the historical / active
+distinction is still the outstanding work described below.
+
 ## Problem
 
 Today, `computeWarnings` emits `UNKNOWN_EMPLOYEE` whenever a name in the

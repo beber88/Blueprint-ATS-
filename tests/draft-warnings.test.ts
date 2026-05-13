@@ -1,4 +1,4 @@
-import { computeWarnings, type MasterDataSnapshot, type AiOutput } from "@/lib/operations/draft-warnings";
+import { computeWarnings, type MasterDataSnapshot, type AiOutput, type AiItem, type Warning } from "@/lib/operations/draft-warnings";
 
 const TODAY = new Date().toISOString().slice(0, 10);
 
@@ -233,5 +233,125 @@ describe("computeWarnings — combined / order-independence", () => {
       SNAPSHOT
     );
     expect(w[0].field).toBe("items[1].project");
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Matcher canonicalization — PMs write the same name a dozen different
+// ways. Cmd 7 verification surfaced "4 Storey" vs "4-Storey Pampanga"
+// silently mismatching because the matcher didn't normalize punctuation.
+// These cases nail down the canonicalization contract.
+// ─────────────────────────────────────────────────────────────────────────────
+describe("computeWarnings — matcher punctuation canonicalization", () => {
+  const PUNCT_SNAPSHOT: MasterDataSnapshot = {
+    activeProjects: [
+      { id: "p-storey", name: "4-Storey Pampanga" },
+      { id: "p-pearl", name: "Pearl de Flore" },
+    ],
+    activeEmployees: [
+      { id: "e-mc",       full_name: "Marie Cris Millete (MC)" },
+      { id: "e-mendevil", full_name: "Christian S. Mendevil" },
+      { id: "e-jon",      full_name: "Jon Carlo Orencia" },
+      { id: "e-dsouza",   full_name: "Aaron D'Souza" },
+    ],
+  };
+
+  function probe(itemOverrides: Partial<AiItem>): Warning[] {
+    return computeWarnings(
+      {
+        report_date: TODAY,
+        project_id: "p-pearl",
+        summary: "x",
+        items: [
+          {
+            issue: "x",
+            ...itemOverrides,
+          },
+        ],
+        ceo_action_items: [],
+      },
+      PUNCT_SNAPSHOT
+    );
+  }
+
+  it("'4 Storey' matches '4-Storey Pampanga' (the cmd-7 finding)", () => {
+    const w = probe({ project: "4 Storey", person_responsible: "Marie Cris Millete (MC)" });
+    expect(w.find((x) => x.code === "UNKNOWN_PROJECT")).toBeUndefined();
+  });
+
+  it("'4-storey project' matches '4-Storey Pampanga'", () => {
+    const w = probe({ project: "4-storey project", person_responsible: "Marie Cris Millete (MC)" });
+    expect(w.find((x) => x.code === "UNKNOWN_PROJECT")).toBeUndefined();
+  });
+
+  it("'MC Millete' matches 'Marie Cris Millete (MC)' (parens preserved by upstream substring)", () => {
+    const w = probe({ project: "Pearl de Flore", person_responsible: "MC Millete" });
+    expect(w.find((x) => x.code === "UNKNOWN_EMPLOYEE")).toBeUndefined();
+  });
+
+  it("apostrophe in 'D'Souza' is preserved (not stripped to 'd souza')", () => {
+    const w = probe({ project: "Pearl de Flore", person_responsible: "D'Souza" });
+    expect(w.find((x) => x.code === "UNKNOWN_EMPLOYEE")).toBeUndefined();
+  });
+
+  it("slash separator 'Mendevil/Christian' matches 'Christian S. Mendevil'", () => {
+    const w = probe({ project: "Pearl de Flore", person_responsible: "Mendevil/Christian" });
+    expect(w.find((x) => x.code === "UNKNOWN_EMPLOYEE")).toBeUndefined();
+  });
+
+  it("collapses runs of whitespace: 'Jon  Carlo   Orencia' matches 'Jon Carlo Orencia'", () => {
+    const w = probe({ project: "Pearl de Flore", person_responsible: "Jon  Carlo   Orencia" });
+    expect(w.find((x) => x.code === "UNKNOWN_EMPLOYEE")).toBeUndefined();
+  });
+
+  it("still raises UNKNOWN_PROJECT for a truly unknown project (canonicalize doesn't make false positives)", () => {
+    const w = probe({ project: "Made-Up Project", person_responsible: "Marie Cris Millete (MC)" });
+    expect(w.find((x) => x.code === "UNKNOWN_PROJECT")?.severity).toBe("high");
+  });
+
+  // ── Stopword false-positive guard ────────────────────────────────────
+  // Without stopword filtering "Storey Spa Project" would (via the
+  // shared token "project") collide with "4-Storey Pampanga". With
+  // "project" filtered: {storey, spa} vs {storey, pampanga} — no
+  // subset match, substring fallback also fails → UNKNOWN_PROJECT
+  // correctly fires.
+  it("'Storey Spa Project' does NOT match '4-Storey Pampanga' (stopword guard)", () => {
+    const w = probe({ project: "Storey Spa Project", person_responsible: "Marie Cris Millete (MC)" });
+    expect(w.find((x) => x.code === "UNKNOWN_PROJECT")?.severity).toBe("high");
+  });
+
+  // Single-token edge case: matcher must still handle a one-word name
+  // that exactly matches a one-word master entry. Uses the original
+  // SNAPSHOT so "Daff" matches "Daff".
+  it("single-token 'Daff' still matches 'Daff' in the master roster", () => {
+    const w = computeWarnings(
+      {
+        report_date: TODAY,
+        project_id: "p1",
+        items: [{ issue: "x", project: "Pearl de Flore", person_responsible: "Daff" }],
+        ceo_action_items: [],
+      },
+      SNAPSHOT
+    );
+    expect(w.find((x) => x.code === "UNKNOWN_EMPLOYEE")).toBeUndefined();
+  });
+
+  // Middle-initial: "S" is filtered by the length≥2 token rule, so
+  // {john, smith} matches {john, smith}. This is the same logic that
+  // makes "Christian S. Mendevil" matchable.
+  it("middle initial: 'John S Smith' matches 'John Smith' (length<2 filter)", () => {
+    const w = computeWarnings(
+      {
+        report_date: TODAY,
+        project_id: "p-pearl",
+        items: [{ issue: "x", project: "Pearl de Flore", person_responsible: "John S Smith" }],
+        ceo_action_items: [],
+      },
+      {
+        activeProjects: [{ id: "p-pearl", name: "Pearl de Flore" }],
+        activeEmployees: [{ id: "e-john", full_name: "John Smith" }],
+      }
+    );
+    expect(w.find((x) => x.code === "UNKNOWN_EMPLOYEE")).toBeUndefined();
   });
 });
