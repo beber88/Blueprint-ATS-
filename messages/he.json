@@ -4,7 +4,8 @@
     "brand": "Blueprint HR",
     "modules": {
       "recruitment": "גיוסים",
-      "operations": "תפעול"
+      "operations": "תפעול",
+      "contracts": "חוזים"
     }
   },
   "operations": {
@@ -257,6 +258,84 @@
       "project_created": "פרויקט נוצר",
       "employee_created": "עובד נוסף",
       "claimed": "ההודעה שויכה"
+    }
+  },
+  "contracts": {
+    "nav_group": {
+      "main": "ראשי",
+      "tracking": "מעקב"
+    },
+    "nav": {
+      "dashboard": "דשבורד",
+      "intake": "קליטת חוזה",
+      "drafts": "טיוטות",
+      "contracts": "חוזים",
+      "alerts": "התראות"
+    },
+    "dashboard": {
+      "title": "חוזים — דשבורד",
+      "subtitle": "תמונת מצב של חוזי לקוחות, קבלני משנה וספקים",
+      "kpi_active": "פעילים",
+      "kpi_expiring": "פג בקרוב (30 יום)",
+      "kpi_expired": "פג תוקפם",
+      "kpi_flagged": "מסומנים לבדיקה"
+    },
+    "intake": {
+      "title": "קליטת חוזה",
+      "subtitle": "הדבק טקסט או העלה PDF — Claude יחלץ מטא-דאטה לסקירה",
+      "text_label": "טקסט חוזה",
+      "upload_label": "קובץ PDF (אופציונלי)",
+      "submit": "חלץ ובדוק"
+    },
+    "preview": {
+      "title": "תצוגה מקדימה של טיוטה",
+      "save": "שמור",
+      "save_and_flag": "שמור וסמן לבדיקה",
+      "discard": "השלך",
+      "warnings_heading": "אזהרות"
+    },
+    "list": {
+      "title": "חוזים",
+      "filter_category": "קטגוריה",
+      "filter_status": "סטטוס",
+      "empty": "אין חוזים תואמים את הסינון"
+    },
+    "detail": {
+      "title": "חוזה",
+      "counterparty": "צד נגדי",
+      "project": "פרויקט",
+      "dates": "תאריכים",
+      "value": "ערך כספי",
+      "summary": "תקציר",
+      "document": "מסמך"
+    },
+    "alerts": {
+      "title": "התראות חוזים",
+      "type_expiring_soon": "פג בקרוב",
+      "type_expired": "פג תוקף",
+      "type_renewal_window_open": "חלון חידוש פתוח",
+      "resolve": "סמן כטופל"
+    },
+    "warnings": {
+      "MISSING_COUNTERPARTY": "שם הצד הנגדי חסר",
+      "MISSING_EXPIRATION": "תאריך תפוגה חסר",
+      "EFFECTIVE_AFTER_EXPIRATION": "תאריך תחילה מאוחר מתאריך תפוגה",
+      "MISSING_MONETARY_VALUE": "ערך כספי חסר",
+      "MONETARY_VALUE_UNUSUAL": "ערך כספי חריג",
+      "COUNTERPARTY_NOT_IN_ROSTER": "הצד הנגדי לא נמצא ברשימה הקיימת",
+      "PROJECT_NOT_FOUND": "פרויקט לא נמצא"
+    },
+    "category": {
+      "customer": "לקוח",
+      "subcontractor": "קבלן משנה",
+      "vendor": "ספק"
+    },
+    "status": {
+      "draft": "טיוטה",
+      "active": "פעיל",
+      "expired": "פג",
+      "terminated": "הופסק",
+      "renewed": "חודש"
     }
   },
   "nav_group": {

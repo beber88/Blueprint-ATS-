@@ -4,7 +4,8 @@
     "brand": "Blueprint HR",
     "modules": {
       "recruitment": "Recruitment",
-      "operations": "Operations"
+      "operations": "Operations",
+      "contracts": "Contracts"
     }
   },
   "operations": {
@@ -255,6 +256,84 @@
       "project_created": "Project created",
       "employee_created": "Employee added",
       "claimed": "Message claimed"
+    }
+  },
+  "contracts": {
+    "nav_group": {
+      "main": "Main",
+      "tracking": "Tracking"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "intake": "Intake",
+      "drafts": "Drafts",
+      "contracts": "Contracts",
+      "alerts": "Alerts"
+    },
+    "dashboard": {
+      "title": "Contracts — Dashboard",
+      "subtitle": "Status of customer, subcontractor and vendor contracts",
+      "kpi_active": "Active",
+      "kpi_expiring": "Expiring (30 days)",
+      "kpi_expired": "Expired",
+      "kpi_flagged": "Flagged for review"
+    },
+    "intake": {
+      "title": "Contract intake",
+      "subtitle": "Paste text or upload a PDF — Claude will extract metadata for review",
+      "text_label": "Contract text",
+      "upload_label": "PDF file (optional)",
+      "submit": "Extract and review"
+    },
+    "preview": {
+      "title": "Draft preview",
+      "save": "Save",
+      "save_and_flag": "Save & flag for review",
+      "discard": "Discard",
+      "warnings_heading": "Warnings"
+    },
+    "list": {
+      "title": "Contracts",
+      "filter_category": "Category",
+      "filter_status": "Status",
+      "empty": "No contracts match the filter"
+    },
+    "detail": {
+      "title": "Contract",
+      "counterparty": "Counterparty",
+      "project": "Project",
+      "dates": "Dates",
+      "value": "Monetary value",
+      "summary": "Summary",
+      "document": "Document"
+    },
+    "alerts": {
+      "title": "Contract alerts",
+      "type_expiring_soon": "Expiring soon",
+      "type_expired": "Expired",
+      "type_renewal_window_open": "Renewal window open",
+      "resolve": "Resolve"
+    },
+    "warnings": {
+      "MISSING_COUNTERPARTY": "Counterparty name is missing",
+      "MISSING_EXPIRATION": "Expiration date is missing",
+      "EFFECTIVE_AFTER_EXPIRATION": "Effective date is after expiration date",
+      "MISSING_MONETARY_VALUE": "Monetary value is missing",
+      "MONETARY_VALUE_UNUSUAL": "Monetary value is outside the expected range",
+      "COUNTERPARTY_NOT_IN_ROSTER": "Counterparty is not in the recent roster",
+      "PROJECT_NOT_FOUND": "Referenced project not found"
+    },
+    "category": {
+      "customer": "Customer",
+      "subcontractor": "Subcontractor",
+      "vendor": "Vendor"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "expired": "Expired",
+      "terminated": "Terminated",
+      "renewed": "Renewed"
     }
   },
   "nav_group": {

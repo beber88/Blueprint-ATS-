@@ -4,6 +4,7 @@
     { "path": "/api/operations/cron/scan-overdue",     "schedule": "0 * * * *" },
     { "path": "/api/operations/cron/missing-reports",  "schedule": "0 9 * * *" },
     { "path": "/api/operations/cron/refresh-themes",   "schedule": "0 3 * * *" },
-    { "path": "/api/operations/cron/daily-digest",     "schedule": "0 19 * * *" }
+    { "path": "/api/operations/cron/daily-digest",     "schedule": "0 19 * * *" },
+    { "path": "/api/contracts/cron/scan-deadlines",    "schedule": "0 6 * * *" }
   ]
 }
