@@ -1,4 +1,262 @@
 {
+  "hr": {
+    "system": "HR System",
+    "brand": "Blueprint HR",
+    "modules": {
+      "recruitment": "Recruitment",
+      "operations": "Operations"
+    }
+  },
+  "operations": {
+    "nav_group": {
+      "tracking": "Tracking",
+      "org": "Organization",
+      "tools": "Tools"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "intake": "Intake",
+      "drafts": "Drafts",
+      "issues": "All Issues",
+      "hr_issues": "Urgent HR Issues",
+      "ceo_items": "CEO Action Items",
+      "missing_info": "Missing Information",
+      "attendance": "Attendance",
+      "followups": "Follow-ups",
+      "alerts": "Alerts",
+      "archive": "Archive",
+      "projects": "Projects",
+      "departments": "Departments",
+      "employees": "Employees",
+      "ai_agent": "Operations AI",
+      "inbox": "Inbox"
+    },
+    "dashboard": {
+      "title": "Operations Dashboard",
+      "subtitle": "Live picture of daily field reports",
+      "top_alerts": "Top Alerts",
+      "recurring_themes": "Recurring Themes (30d)"
+    },
+    "kpi": {
+      "open": "Open",
+      "overdue": "Overdue",
+      "urgent": "Urgent",
+      "ceo_pending": "CEO Pending",
+      "missing_info": "Missing Info",
+      "alerts": "Alerts"
+    },
+    "chart": {
+      "daily_trend": "Daily Trend",
+      "by_priority": "By Priority",
+      "by_department": "By Department",
+      "by_project": "By Project",
+      "total": "Total",
+      "overdue": "Overdue",
+      "urgent": "Urgent"
+    },
+    "intake": {
+      "title": "Report Intake",
+      "subtitle": "Paste text or upload a PDF — Claude extracts structured items",
+      "text_label": "Report Text",
+      "text_placeholder": "Paste the daily report contents here...",
+      "file_label": "File (PDF/TXT)",
+      "choose_file": "Choose file",
+      "options": "Options",
+      "report_date": "Report date",
+      "project_hint": "Project (hint)",
+      "submit": "Extract items",
+      "processing": "Processing...",
+      "result_title": "Extraction Result",
+      "extracted": "Items added",
+      "confidence": "Confidence",
+      "success": "Added {n} items",
+      "error_empty": "Text or file required",
+      "mode_single": "Single Report",
+      "mode_bulk": "Bulk Import (history)",
+      "bulk_text_label": "Multiple reports text",
+      "bulk_placeholder": "Paste a sequence of daily reports. Each report must start with a 'Date: YYYY-MM-DD' or 'תאריך: ...' line.",
+      "bulk_hint": "The system auto-splits on date headers and extracts items per report.",
+      "bulk_submit": "Import all",
+      "bulk_error_short": "Text must be at least 100 characters",
+      "bulk_success": "Created {r} reports with {i} items",
+      "bulk_result_title": "Bulk Import Results",
+      "bulk_summary": "Detected {c} reports, created {r}, total {i} items",
+      "bulk_preview": "Preview + cost",
+      "bulk_preview_title": "Preview — review before running",
+      "bulk_preview_detected": "Reports detected",
+      "bulk_preview_date_range": "Date range",
+      "bulk_preview_input_tokens": "Input tokens (est.)",
+      "bulk_preview_output_tokens": "Output tokens (est.)",
+      "bulk_preview_cost": "Estimated cost",
+      "bulk_cap_exceeded": "Report count exceeds the cap ({cap}). Split the paste into smaller batches.",
+      "bulk_duplicate_warning": "An identical batch was already processed at {at}. Proceed only if this is intentional.",
+      "bulk_consent": "I understand the cost and volume; proceed",
+      "bulk_run": "Run import",
+      "bulk_cancel": "Cancel",
+      "bulk_cancelled": "Import cancelled",
+      "bulk_job_summary": "Status: {status} · Total reports: {r}",
+      "bulk_job_id": "Job ID",
+      "draft_created": "Draft created — opening preview",
+      "bulk_auto_promote_label": "Auto-promote",
+      "bulk_auto_promote_hint": "Auto-save drafts with no high-severity warnings. Requires data you trust.",
+      "bulk_auto_promote_confirm": "This will save up to {n} reports without human review if they have no high-severity warnings. Recommended only for historical data you trust. Continue?"
+    },
+    "preview": {
+      "title": "Preview — review before save",
+      "subtitle": "Source vs AI output, side by side. Edit any field inline, review warnings, then save.",
+      "source": "Source text",
+      "metadata": "Report metadata",
+      "report_date": "Report date",
+      "confidence": "AI confidence",
+      "items": "Items",
+      "issue_placeholder": "Issue description",
+      "project": "Project",
+      "person": "Person responsible",
+      "warnings": "Warnings",
+      "no_warnings": "No warnings — looks clean.",
+      "save": "Save",
+      "save_flag": "Save & Flag for Review",
+      "discard": "Discard",
+      "confirm_save_with_warnings": "{n} high-severity warning(s). Save anyway?",
+      "confirm_discard": "Discard this draft? This cannot be undone.",
+      "saved": "Report saved",
+      "discarded": "Draft discarded",
+      "not_found": "Draft not found"
+    },
+    "drafts": {
+      "title": "Drafts",
+      "subtitle": "AI drafts awaiting review or save",
+      "filter_status": "Status",
+      "filter_source": "Source",
+      "filter_severity": "Severity",
+      "status_open": "Open (draft + flagged)",
+      "source_any": "Any source",
+      "col_created": "Created",
+      "col_source": "Source",
+      "col_date": "Report date",
+      "col_project": "Project",
+      "col_warnings": "Warnings",
+      "col_status": "Status",
+      "col_action": "Action",
+      "open": "Open",
+      "empty": "No drafts in this state"
+    },
+    "issues": { "subtitle": "All open issues" },
+    "hr_issues": { "subtitle": "Urgent HR-only issues" },
+    "ceo_items": { "subtitle": "Items requiring a CEO decision" },
+    "missing_info": { "subtitle": "Items with missing information" },
+    "followups": { "subtitle": "Open items to follow up on" },
+    "archive": { "subtitle": "Search across all reports" },
+    "alerts": {
+      "subtitle": "Active alerts",
+      "include_resolved": "Include resolved",
+      "dismiss": "Dismiss"
+    },
+    "attendance": {
+      "subtitle": "Attendance events from daily reports (30 days)",
+      "by_employee": "By Employee",
+      "incidents": "Events",
+      "last_seen": "Latest",
+      "recent_events": "Recent Events"
+    },
+    "projects": {
+      "subtitle": "Active projects",
+      "new": "New project",
+      "name": "Name",
+      "code": "Code",
+      "no_department": "No department",
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed"
+      }
+    },
+    "departments": { "subtitle": "Departments" },
+    "employees": {
+      "subtitle": "Employees authorized to submit reports",
+      "new": "New employee",
+      "full_name": "Full name",
+      "phone": "Phone",
+      "whatsapp_phone": "WhatsApp number",
+      "email": "Email",
+      "role": "Role",
+      "is_pm": "PM",
+      "is_active": "Active",
+      "no_department": "No department",
+      "no_project": "No project"
+    },
+    "inbox": {
+      "subtitle": "WhatsApp messages from unregistered numbers",
+      "claim": "Assign to employee",
+      "pick_employee": "Pick employee",
+      "claimed_by": "Claimed by"
+    },
+    "agent": {
+      "title": "Operations AI",
+      "subtitle": "Ask anything about the operational picture",
+      "ask_anything": "Ask me anything about reports and projects",
+      "thinking": "Thinking...",
+      "placeholder": "Ask the agent... (Enter to send)",
+      "suggest": {
+        "overdue": "What is overdue today?",
+        "who_didnt_report": "Who didn't report yesterday?",
+        "top_risks": "What are the top 3 risks this week?",
+        "ceo_briefing": "Prepare a CEO briefing"
+      }
+    },
+    "digest": {
+      "title": "Operations Digest",
+      "generated_at": "Generated at"
+    },
+    "status": {
+      "open": "Open",
+      "in_progress": "In progress",
+      "blocked": "Blocked",
+      "resolved": "Resolved"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "col": {
+      "issue": "Issue",
+      "project": "Project",
+      "dept": "Department",
+      "responsible": "Responsible",
+      "status": "Status",
+      "priority": "Priority",
+      "deadline": "Deadline",
+      "actions": "Actions",
+      "employee": "Employee"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "create": "Create",
+      "mark_resolved": "Mark resolved",
+      "reopen": "Reopen"
+    },
+    "flag": { "ceo": "Requires CEO decision" },
+    "search_placeholder": "Search across items...",
+    "results": "Results",
+    "empty": {
+      "no_items": "No items to display",
+      "no_alerts": "No open alerts",
+      "no_themes": "No recurring themes yet",
+      "no_attendance": "No attendance events",
+      "no_projects": "No projects yet — add one to get started",
+      "no_employees": "No employees registered — add PMs to allow WhatsApp reporting",
+      "no_inbox": "Inbox is empty"
+    },
+    "toast": {
+      "item_updated": "Item updated",
+      "alert_dismissed": "Alert dismissed",
+      "project_created": "Project created",
+      "employee_created": "Employee added",
+      "claimed": "Message claimed"
+    }
+  },
   "nav_group": {
     "main": "Main",
     "communication": "Communication",
@@ -91,7 +349,17 @@
       "created": "Candidate created!",
       "cv_uploaded": "CV uploaded successfully!",
       "emails_sent": "Emails sent",
-      "status_updated": "Status updated"
+      "status_updated": "Status updated",
+      "classifying": "Classifying candidates...",
+      "classifying_professions": "Classifying professions...",
+      "classified": "Classified",
+      "confirm_delete": "Delete candidates?",
+      "deleted": "Deleted candidates:",
+      "reclassify_btn": "Reclassify",
+      "classify_btn": "Classify",
+      "running_ai": "Running AI analysis...",
+      "ai_complete": "AI analysis complete!",
+      "matched": "Matched"
     }
   },
   "profile": {
@@ -303,7 +571,7 @@
     "body_placeholder": "Use {{candidate_name}}, {{position}}, etc."
   },
   "auth": {
-    "login_title": "Welcome to Blueprint ATS",
+    "login_title": "Welcome to Blueprint HR",
     "login_subtitle": "Manage your recruitment process smartly",
     "email": "Email Address",
     "password": "Password",
@@ -383,7 +651,13 @@
     "no": "No",
     "next": "Next",
     "search": "Search",
-    "close": "Close"
+    "close": "Close",
+    "now": "now",
+    "translating": "Translating...",
+    "attached": "Attached",
+    "saved_successfully": "Saved successfully",
+    "save_error": "Save error",
+    "admin_only_page": "This page is available to admin only"
   },
   "theme": {
     "light": "Light Mode",
@@ -523,7 +797,12 @@
     "jobs_interviews": "Jobs & Interviews",
     "dashboard_section": "Dashboard",
     "settings_section": "Settings",
-    "tips": "Tips & Best Practices"
+    "tips": "Tips & Best Practices",
+    "search_placeholder": "Search guide..."
+  },
+  "users": {
+    "email_required": "Email is required",
+    "invitation_sent": "Invitation sent"
   },
   "unmatched": {
     "title": "Unmatched Files",

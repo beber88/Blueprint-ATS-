@@ -35,7 +35,7 @@ export default function DashboardPage() {
       const json = await res.json();
       if (res.ok) {
         setData(json);
-        setLastUpdated(new Date().toLocaleTimeString(locale === "he" ? "he-IL" : "en-US", { hour: "2-digit", minute: "2-digit" }));
+        setLastUpdated(new Date().toLocaleTimeString(locale === "he" ? "he-IL" : locale === "tl" ? "fil-PH" : "en-US", { hour: "2-digit", minute: "2-digit" }));
       }
     } catch { /* ignore */ }
     finally { setLoading(false); }
@@ -62,7 +62,7 @@ export default function DashboardPage() {
     const [, m] = monthKey.split("-");
     const idx = parseInt(m) - 1;
     if (locale === "he") return MONTH_NAMES_HE[idx] || monthKey;
-    return new Date(2024, idx).toLocaleString("en-US", { month: "short" });
+    return new Date(2024, idx).toLocaleString(locale === "tl" ? "fil-PH" : "en-US", { month: "short" });
   };
 
   const labels = {
@@ -158,7 +158,7 @@ export default function DashboardPage() {
               <AlertTriangle className="h-4 w-4" style={{ color: "var(--brand-gold)" }} />
               <span className="text-sm" style={{ color: "var(--text-primary)" }}>{cards.unmatched_files} {l.files}</span>
             </div>
-            <Link href="/files"><Button size="sm" variant="outline" className="rounded-lg text-xs">{locale === "he" ? "צפה" : "View"}</Button></Link>
+            <Link href="/files"><Button size="sm" variant="outline" className="rounded-lg text-xs">{t("common.view")}</Button></Link>
           </div>
         )}
 

@@ -18,7 +18,7 @@ const BOARDS = [
 ];
 
 export default function JobBoardsPage() {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   useUser(); // ensure auth context
   const [credentials, setCredentials] = useState<Record<string, Record<string, string>>>({});
   const [editingBoard, setEditingBoard] = useState<string | null>(null);
@@ -38,13 +38,13 @@ export default function JobBoardsPage() {
         body: JSON.stringify({ board: boardKey, credentials: formData }),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success(locale === "he" ? "נשמר בהצלחה" : "Saved successfully");
+      toast.success(t("common.saved_successfully"));
       setEditingBoard(null);
       // Refresh
       const updated = await fetch("/api/job-boards/credentials").then(r => r.json());
       setCredentials(updated);
     } catch {
-      toast.error(locale === "he" ? "שגיאה בשמירה" : "Save error");
+      toast.error(t("common.save_error"));
     } finally {
       setSaving(false);
     }

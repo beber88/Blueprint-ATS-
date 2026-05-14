@@ -57,6 +57,32 @@ export function getStatusColor(status: string): string {
   return colors[status] || "bg-gray-100 text-gray-800";
 }
 
+// Character-position similarity, 0..1. Used to de-duplicate candidate names
+// and to fuzzy-match operations report fields (employee/department/project)
+// against the master tables.
+export function similarityScore(a: string, b: string): number {
+  const s1 = a.toLowerCase().trim();
+  const s2 = b.toLowerCase().trim();
+  if (s1 === s2) return 1;
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+  if (longer.length === 0) return 1;
+  const matches = shorter.split("").filter((c, i) => longer[i] === c).length;
+  return matches / longer.length;
+}
+
+// Normalize a phone number to E.164 (Israel default if no country prefix).
+export function normalizePhone(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  let p = raw.replace(/[\s\-()]/g, "");
+  if (p.startsWith("whatsapp:")) p = p.slice("whatsapp:".length);
+  if (!p) return null;
+  if (p.startsWith("+")) return p;
+  if (p.startsWith("00")) return "+" + p.slice(2);
+  if (p.startsWith("0")) return "+972" + p.slice(1);
+  return "+" + p;
+}
+
 export function getStatusLabel(status: string): string {
   const labels: Record<string, string> = {
     new: "חדש",

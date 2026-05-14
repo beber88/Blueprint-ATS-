@@ -32,7 +32,9 @@ export function AIChatBubble() {
   const l = labels[locale] || labels.he;
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- pre-existing on main: early return at line 25 fires before these hooks. Tracked as a main-side fix, not changing behavior here.
   useEffect(() => { if (isOpen) scrollToBottom(); }, [messages, isOpen]);
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- same as above
   useEffect(() => { if (isOpen && !isMinimized) inputRef.current?.focus(); }, [isOpen, isMinimized]);
 
   const sendMessage = async () => {

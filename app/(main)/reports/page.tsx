@@ -33,7 +33,7 @@ export default function ReportsPage() {
         <div className="text-center">
           <FileBarChart className="h-16 w-16 mx-auto mb-4" style={{ color: "var(--text-tertiary)" }} />
           <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-            {locale === "he" ? "דף זה זמין למנהל מערכת בלבד" : "This page is available to admin only"}
+            {t("common.admin_only_page")}
           </p>
         </div>
       </div>

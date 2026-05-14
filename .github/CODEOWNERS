@@ -1,0 +1,32 @@
+# Code ownership — required reviewers per file path.
+#
+# Why these paths and not others:
+#  - supabase/migrations/  — schema changes are where 90% of future bugs
+#                            originate. Every migration must be reviewed
+#                            by the project owner before merge.
+#  - lib/operations/        — the drafts pipeline + warnings + matcher.
+#                            One bug here corrupts the entire data flow;
+#                            changes need explicit owner sign-off.
+#  - .github/workflows/     — the CI gate itself. Letting any contributor
+#                            relax thresholds undoes the protection.
+#  - .github/CODEOWNERS     — the meta: don't let CODEOWNERS itself drift.
+#  - docs/operations/       — operational runbooks. Stale runbooks are a
+#                            real outage vector.
+#
+# Format: <pattern> <space> @owner [@owner2 ...]
+# Last matching pattern wins; keep the file ordered narrow → broad.
+
+# Schema changes
+supabase/migrations/   @beber88
+
+# Core operations logic
+lib/operations/        @beber88
+
+# CI + meta
+.github/workflows/     @beber88
+.github/CODEOWNERS     @beber88
+.github/pull_request_template.md  @beber88
+
+# Operational documentation
+docs/operations/       @beber88
+docs/development/      @beber88

@@ -24,7 +24,7 @@ interface BulkUploadProps {
 }
 
 export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [results, setResults] = useState<UploadResult[]>([]);
@@ -233,7 +233,7 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
                 </div>
                 <div className="p-4 rounded-xl text-center" style={{ background: "var(--bg-tertiary)" }}>
                   <p className="text-2xl font-bold" style={{ color: "var(--brand-gold)" }}>{attachedCount}</p>
-                  <p className="text-xs font-medium" style={{ color: "var(--brand-gold)" }}>{locale === "he" ? "צורפו לתיק" : "Attached"}</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--brand-gold)" }}>{t("common.attached")}</p>
                 </div>
                 <div className="p-4 rounded-xl text-center" style={{ background: "var(--amber-light)" }}>
                   <p className="text-2xl font-bold" style={{ color: "var(--amber)" }}>{dupCount}</p>

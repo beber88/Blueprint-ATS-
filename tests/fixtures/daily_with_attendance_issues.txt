@@ -1,0 +1,37 @@
+Consolidated Company Daily Report - Blueprint
+Date: 2026-05-11
+
+1. HR - Human Resources
+- Attendance:
+  - Present: Core architecture team, all PMs except 1.
+  - Absent: 1 PM on approved sick leave.
+  - Late: 1 maintenance team member (reported, valid reason).
+  - No-Show: 1 site engineer (no notice given) — NTE to be drafted.
+- HR Issues:
+  - Reiterated attendance policy to maintenance team.
+  - NTE for unreported absence being prepared by HR.
+
+2. Project Management and Site Updates
+- Pearl de Flore: Manpower shortage today due to absences. Recovery plan in place.
+- Fixifoot: Normal operations. Joinery delivery scheduled tomorrow.
+- Icon 18H: Site engineer no-show caused delay in lavatory relocation walkthrough.
+
+3. CEO Action Items
+- Approve NTE template wording for unreported absences - Deadline: 2026-05-12
+
+4. Company Priorities for Tomorrow
+- Priority 1: Make up for today's lost manpower hours at Pearl de Flore.
+- Priority 2: Conduct lavatory relocation walkthrough at Icon 18H.
+
+Date: 2026-05-12
+
+1. HR - Human Resources
+- Attendance: Full team present. Yesterday's no-show acknowledged the NTE.
+- HR Issues: None new.
+
+2. Project Management and Site Updates
+- Pearl de Flore: Caught up on manpower hours. Back to 90% timeline.
+- Icon 18H: Walkthrough completed. Decision pending on lavatory relocation.
+
+3. CEO Action Items
+- Approve NTE final wording - Deadline: 2026-05-13

@@ -1,0 +1,10 @@
+{
+  "split": {
+    "chunks": 2,
+    "dates": ["2026-05-11", "2026-05-12"]
+  },
+  "must_contain_per_chunk": [
+    ["Attendance", "No-Show", "NTE"],
+    ["Full team present", "NTE final wording"]
+  ]
+}

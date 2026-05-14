@@ -1,0 +1,12 @@
+{
+  "split": {
+    "chunks": 1,
+    "dates": ["2026-05-12"]
+  },
+  "must_contain": [
+    "Pearl de Flore",
+    "CEO Action Items",
+    "genset supplier",
+    "Missing Information Tracker"
+  ]
+}

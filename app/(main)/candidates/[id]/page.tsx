@@ -208,7 +208,7 @@ export default function CandidateProfilePage() {
 
   const handleRunAnalysis = async () => {
     if (!candidate) return;
-    toast.info(locale === "he" ? "מריץ ניתוח AI..." : "Running AI analysis...");
+    toast.info(t("candidates.toast.running_ai"));
     try {
       // Try to find a job to analyze against, but don't require one
       const jobApp = candidate.applications?.[0];
@@ -223,7 +223,7 @@ export default function CandidateProfilePage() {
         const err = await res.json().catch(() => ({ error: "Failed" }));
         throw new Error(err.error || "Failed");
       }
-      toast.success(locale === "he" ? "ניתוח AI הושלם!" : "AI analysis complete!");
+      toast.success(t("candidates.toast.ai_complete"));
       const refreshRes = await fetch(`/api/candidates/${candidate.id}`);
       const refreshData = await refreshRes.json();
       setCandidate(refreshData);
@@ -556,7 +556,7 @@ export default function CandidateProfilePage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{doc.name}</p>
                         <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                          {doc.type} • {new Date(doc.uploaded_at).toLocaleDateString(locale === "he" ? "he-IL" : "en-US")}
+                          {doc.type} • {new Date(doc.uploaded_at).toLocaleDateString(locale === "he" ? "he-IL" : locale === "tl" ? "fil-PH" : "en-US")}
                         </p>
                       </div>
                       <ExternalLink className="h-4 w-4 shrink-0" style={{ color: 'var(--text-tertiary)' }} />
@@ -601,7 +601,7 @@ export default function CandidateProfilePage() {
             {translating && (
               <div className="flex items-center justify-center gap-2 py-4">
                 <div className="h-5 w-5 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--border-primary)', borderTopColor: 'var(--brand-gold)' }} />
-                <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{locale === "he" ? "מתרגם..." : "Translating..."}</span>
+                <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t("common.translating")}</span>
               </div>
             )}
             {(candidate as unknown as Record<string, unknown>).ai_analysis ? (() => {
