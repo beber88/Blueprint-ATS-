@@ -106,6 +106,28 @@ const modules: Module[] = [
       },
     ],
   },
+  {
+    key: "contracts",
+    labelKey: "hr.modules.contracts",
+    prefix: "/hr/contracts",
+    groups: [
+      {
+        labelKey: "nav_group.main",
+        items: [
+          { key: "contracts.nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
+          { key: "contracts.nav.intake", path: "/intake", icon: ClipboardList },
+          { key: "contracts.nav.drafts", path: "/drafts", icon: FileText },
+          { key: "contracts.nav.contracts", path: "/contracts", icon: FileBarChart },
+        ],
+      },
+      {
+        labelKey: "contracts.nav_group.tracking",
+        items: [
+          { key: "contracts.nav.alerts", path: "/alerts", icon: AlertTriangle },
+        ],
+      },
+    ],
+  },
 ];
 
 const languages: { code: Locale; label: string }[] = [
@@ -126,6 +148,7 @@ function activeModuleFor(pathname: string): string {
     if (pathname.startsWith(m.prefix)) return m.key;
   }
   // Fallback heuristics for legacy paths
+  if (pathname.startsWith("/contracts")) return "contracts";
   if (pathname.startsWith("/operations")) return "operations";
   return "recruitment";
 }

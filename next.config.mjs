@@ -40,6 +40,18 @@ const OPERATIONS_ROUTES = [
   'digest',
 ];
 
+// Contracts module top-level routes mounted under /hr/contracts. Files live in
+// app/(main)/contracts/* — this rewrite block exposes them under the
+// namespaced HR URL. Mirrors the OPERATIONS_ROUTES block above.
+const CONTRACTS_ROUTES = [
+  'dashboard',
+  'intake',
+  'drafts',
+  'preview',
+  'contracts',
+  'alerts',
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -67,6 +79,13 @@ const nextConfig = {
       ...OPERATIONS_ROUTES.flatMap((route) => [
         { source: `/hr/operations/${route}`, destination: `/operations/${route}` },
         { source: `/hr/operations/${route}/:path*`, destination: `/operations/${route}/:path*` },
+      ]),
+
+      // Bare /hr/contracts lands on the contracts dashboard.
+      { source: '/hr/contracts', destination: '/contracts/dashboard' },
+      ...CONTRACTS_ROUTES.flatMap((route) => [
+        { source: `/hr/contracts/${route}`, destination: `/contracts/${route}` },
+        { source: `/hr/contracts/${route}/:path*`, destination: `/contracts/${route}/:path*` },
       ]),
     ];
   },

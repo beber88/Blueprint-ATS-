@@ -4,7 +4,8 @@
     "brand": "Blueprint HR",
     "modules": {
       "recruitment": "Pangangalap",
-      "operations": "Operasyon"
+      "operations": "Operasyon",
+      "contracts": "Mga Kontrata"
     }
   },
   "operations": {
@@ -255,6 +256,84 @@
       "project_created": "Nalikha ang proyekto",
       "employee_created": "Naidagdag ang empleyado",
       "claimed": "Naangkin ang mensahe"
+    }
+  },
+  "contracts": {
+    "nav_group": {
+      "main": "Pangunahin",
+      "tracking": "Pagsubaybay"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "intake": "Pagtanggap",
+      "drafts": "Mga Draft",
+      "contracts": "Mga Kontrata",
+      "alerts": "Mga Alerto"
+    },
+    "dashboard": {
+      "title": "Mga Kontrata — Dashboard",
+      "subtitle": "Estado ng mga kontrata ng kostumer, subcontractor at vendor",
+      "kpi_active": "Aktibo",
+      "kpi_expiring": "Mawawalan ng bisa (30 araw)",
+      "kpi_expired": "Wala nang bisa",
+      "kpi_flagged": "Naka-flag para sa review"
+    },
+    "intake": {
+      "title": "Pagtanggap ng kontrata",
+      "subtitle": "I-paste ang text o mag-upload ng PDF — kukunin ng Claude ang metadata para sa review",
+      "text_label": "Text ng kontrata",
+      "upload_label": "PDF file (opsyonal)",
+      "submit": "I-extract at i-review"
+    },
+    "preview": {
+      "title": "Draft preview",
+      "save": "I-save",
+      "save_and_flag": "I-save at i-flag",
+      "discard": "Itapon",
+      "warnings_heading": "Mga babala"
+    },
+    "list": {
+      "title": "Mga Kontrata",
+      "filter_category": "Kategorya",
+      "filter_status": "Estado",
+      "empty": "Walang katugmang kontrata"
+    },
+    "detail": {
+      "title": "Kontrata",
+      "counterparty": "Kabilang partido",
+      "project": "Proyekto",
+      "dates": "Mga petsa",
+      "value": "Halaga ng pera",
+      "summary": "Buod",
+      "document": "Dokumento"
+    },
+    "alerts": {
+      "title": "Mga alerto ng kontrata",
+      "type_expiring_soon": "Malapit na mawalan ng bisa",
+      "type_expired": "Wala nang bisa",
+      "type_renewal_window_open": "Bukas na ang renewal window",
+      "resolve": "Resolbahin"
+    },
+    "warnings": {
+      "MISSING_COUNTERPARTY": "Wala ang pangalan ng kabilang partido",
+      "MISSING_EXPIRATION": "Wala ang petsa ng pagtigil",
+      "EFFECTIVE_AFTER_EXPIRATION": "Mas naunang ang effective date kaysa sa expiration date",
+      "MISSING_MONETARY_VALUE": "Wala ang halaga ng pera",
+      "MONETARY_VALUE_UNUSUAL": "Hindi pangkaraniwan ang halaga ng pera",
+      "COUNTERPARTY_NOT_IN_ROSTER": "Hindi nasa kasalukuyang roster ang kabilang partido",
+      "PROJECT_NOT_FOUND": "Hindi natagpuan ang nakatukoy na proyekto"
+    },
+    "category": {
+      "customer": "Kostumer",
+      "subcontractor": "Subcontractor",
+      "vendor": "Vendor"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Aktibo",
+      "expired": "Wala nang bisa",
+      "terminated": "Tinapos",
+      "renewed": "Naipanibago"
     }
   },
   "nav_group": {
