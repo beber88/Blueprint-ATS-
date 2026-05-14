@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
-import { AlertTriangle, Calendar, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, Clock, Loader2, Pencil, Trash2 } from "lucide-react";
+import { EditItemDialog } from "@/components/operations/edit-item-dialog";
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
 
 interface Item {
   id: string;
@@ -40,10 +42,39 @@ const STATUS_COLORS: Record<string, string> = {
   resolved: "#2D7A3E",
 };
 
-export function ItemsTable({ items, onChange }: { items: Item[]; onChange?: () => void }) {
+interface Emp { id: string; full_name: string }
+interface Dept { id: string; name: string; name_he: string | null }
+interface Proj { id: string; name: string }
+
+export function ItemsTable({ items, onChange, employees = [], departments = [], projects = [] }: {
+  items: Item[];
+  onChange?: () => void;
+  employees?: Emp[];
+  departments?: Dept[];
+  projects?: Proj[];
+}) {
   const { t, locale } = useI18n();
   const [busy, setBusy] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<Item | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/operations/items/${deleteTarget.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(t("common.delete"));
+      onChange?.();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setDeleteLoading(false);
+      setDeleteTarget(null);
+    }
+  };
 
   const updateItem = async (id: string, patch: Record<string, unknown>) => {
     setBusy(id);
@@ -165,31 +196,66 @@ export function ItemsTable({ items, onChange }: { items: Item[]; onChange?: () =
                   )}
                 </td>
                 <td style={{ padding: "10px 12px", verticalAlign: "top" }}>
-                  {busy === it.id ? <Loader2 size={14} className="animate-spin" /> : null}
-                  {it.status !== "resolved" && (
+                  <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                    {busy === it.id ? <Loader2 size={14} className="animate-spin" /> : null}
+                    {it.status !== "resolved" && (
+                      <button
+                        onClick={() => updateItem(it.id, { status: "resolved" })}
+                        title={t("operations.actions.mark_resolved")}
+                        style={{ background: "transparent", border: "none", cursor: "pointer", color: "#2D7A3E", padding: 4 }}
+                      >
+                        <CheckCircle2 size={16} />
+                      </button>
+                    )}
+                    {it.status === "resolved" && (
+                      <button
+                        onClick={() => updateItem(it.id, { status: "open" })}
+                        title={t("operations.actions.reopen")}
+                        style={{ background: "transparent", border: "none", cursor: "pointer", color: "#8A7D6B", padding: 4 }}
+                      >
+                        <Clock size={16} />
+                      </button>
+                    )}
                     <button
-                      onClick={() => updateItem(it.id, { status: "resolved" })}
-                      title={t("operations.actions.mark_resolved")}
-                      style={{ background: "transparent", border: "none", cursor: "pointer", color: "#2D7A3E", padding: 4 }}
+                      onClick={() => setEditTarget(it)}
+                      title={t("common.edit")}
+                      style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--text-secondary)", padding: 4 }}
                     >
-                      <CheckCircle2 size={16} />
+                      <Pencil size={14} />
                     </button>
-                  )}
-                  {it.status === "resolved" && (
                     <button
-                      onClick={() => updateItem(it.id, { status: "open" })}
-                      title={t("operations.actions.reopen")}
-                      style={{ background: "transparent", border: "none", cursor: "pointer", color: "#8A7D6B", padding: 4 }}
+                      onClick={() => setDeleteTarget(it)}
+                      title={t("common.delete")}
+                      style={{ background: "transparent", border: "none", cursor: "pointer", color: "#A32D2D", padding: 4 }}
                     >
-                      <Clock size={16} />
+                      <Trash2 size={14} />
                     </button>
-                  )}
+                  </div>
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      {editTarget && (
+        <EditItemDialog
+          open={!!editTarget}
+          item={editTarget}
+          employees={employees}
+          departments={departments}
+          projects={projects}
+          onClose={() => setEditTarget(null)}
+          onUpdated={() => { setEditTarget(null); onChange?.(); }}
+        />
+      )}
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        title={t("common.confirm_delete_title")}
+        message={t("common.confirm_delete_message")}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        loading={deleteLoading}
+      />
     </div>
   );
 }

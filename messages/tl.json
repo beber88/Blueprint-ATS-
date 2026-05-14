@@ -5,7 +5,8 @@
     "modules": {
       "recruitment": "Pangangalap",
       "operations": "Operasyon",
-      "contracts": "Mga Kontrata"
+      "contracts": "Mga Kontrata",
+      "hr_management": "HR Mgmt"
     }
   },
   "operations": {
@@ -186,13 +187,14 @@
       "name": "Pangalan",
       "code": "Code",
       "no_department": "Walang departamento",
+      "started_at": "Petsa ng simula",
       "status": {
         "active": "Aktibo",
         "paused": "Naka-pause",
         "completed": "Tapos na"
       }
     },
-    "departments": { "subtitle": "Mga departamento" },
+    "departments": { "subtitle": "Mga departamento", "new": "Bagong Departamento", "name_he": "Pangalan (Hebrew)", "name_en": "Pangalan (English)", "name_tl": "Pangalan (Tagalog)", "color": "Kulay" },
     "employees": {
       "subtitle": "Mga empleyadong pinahihintulutang mag-ulat",
       "new": "Bagong empleyado",
@@ -276,6 +278,17 @@
       "project_created": "Nalikha ang proyekto",
       "employee_created": "Naidagdag ang empleyado",
       "claimed": "Naangkin ang mensahe"
+    },
+    "edit": {
+      "employee_title": "I-edit ang Empleyado",
+      "item_title": "I-edit ang Item",
+      "project_title": "I-edit ang Proyekto",
+      "department_title": "I-edit ang Departamento",
+      "new_department": "Bagong Departamento",
+      "confirm_delete_employee": "Tanggalin ang empleyadong ito?",
+      "confirm_delete_project": "Tanggalin ang proyektong ito?",
+      "confirm_delete_department": "Tanggalin ang departamentong ito?",
+      "confirm_delete_item": "Tanggalin ang item na ito?"
     }
   },
   "contracts": {
@@ -366,6 +379,200 @@
       "expired": "Wala nang bisa",
       "terminated": "Tinapos",
       "renewed": "Naipanibago"
+    },
+    "edit": {
+      "title": "I-edit ang Kontrata",
+      "counterparty": "Katapat na Partido",
+      "contact_name": "Pangalan ng Contact",
+      "contact_email": "Email ng Contact",
+      "contact_phone": "Telepono ng Contact",
+      "signing_date": "Petsa ng Pagpirma",
+      "effective_date": "Petsa ng Epektibo",
+      "expiration_date": "Petsa ng Pagka-expire",
+      "renewal_date": "Petsa ng Pag-renew",
+      "monetary_value": "Halaga",
+      "currency": "Pera",
+      "is_renewable": "Nare-renew",
+      "flagged": "Na-flag para sa Review"
+    }
+  },
+  "hr_mgmt": {
+    "nav_group": {
+      "main": "Pangunahin",
+      "compensation": "Sahod at Benepisyo",
+      "development": "Pag-unlad",
+      "lifecycle": "Lifecycle",
+      "tools": "Mga Tool"
+    },
+    "nav": {
+      "employees": "Mga Empleyado",
+      "attendance": "Attendance",
+      "leave": "Leave at Absences",
+      "salary": "Sahod at Benepisyo",
+      "shifts": "Mga Shift",
+      "reviews": "Performance Reviews",
+      "training": "Training",
+      "onboarding": "Onboarding",
+      "offboarding": "Offboarding",
+      "assets": "Kagamitan",
+      "org_chart": "Org Chart",
+      "email_inbox": "HR Inbox"
+    },
+    "employees": {
+      "title": "Pamamahala ng Empleyado",
+      "subtitle": "File ng empleyado, dokumento, at kasaysayan ng posisyon",
+      "tab_details": "Detalye",
+      "tab_documents": "Dokumento",
+      "tab_history": "Kasaysayan",
+      "tab_leave": "Leave",
+      "tab_assets": "Kagamitan",
+      "personal_info": "Personal na Impormasyon",
+      "employment_info": "Impormasyon sa Trabaho",
+      "emergency_contact": "Emergency Contact",
+      "upload_document": "Mag-upload ng Dokumento",
+      "no_documents": "Walang mga dokumento"
+    },
+    "attendance": {
+      "title": "Attendance at Oras",
+      "subtitle": "Clock in/out, overtime, at pagsubaybay ng attendance",
+      "clock_in": "Clock In",
+      "clock_out": "Clock Out",
+      "total_hours": "Kabuuang Oras",
+      "overtime": "Overtime",
+      "present": "Narito",
+      "absent": "Absent",
+      "late": "Late",
+      "half_day": "Kalahating Araw",
+      "on_leave": "Naka-leave",
+      "holiday": "Holiday",
+      "rest_day": "Rest Day",
+      "monthly_summary": "Buod Buwanan",
+      "daily_view": "Araw-araw na View"
+    },
+    "leave": {
+      "title": "Leave at Absences",
+      "subtitle": "Mga request ng leave, pag-approve, at balanse",
+      "new_request": "Bagong Request",
+      "pending": "Naghihintay",
+      "approved": "Na-approve",
+      "rejected": "Na-reject",
+      "cancelled": "Na-cancel",
+      "balance": "Balanse",
+      "remaining": "Natitira",
+      "used": "Nagamit",
+      "total": "Kabuuan",
+      "vacation": "Vacation Leave",
+      "sick": "Sick Leave",
+      "personal": "Personal Leave",
+      "maternity": "Maternity Leave",
+      "paternity": "Paternity Leave",
+      "unpaid": "Unpaid Leave",
+      "bereavement": "Bereavement Leave",
+      "emergency": "Emergency Leave",
+      "approve": "Approve",
+      "reject": "Reject",
+      "days": "araw",
+      "reason": "Dahilan",
+      "start_date": "Simula",
+      "end_date": "Hanggang",
+      "no_requests": "Walang leave requests"
+    },
+    "salary": {
+      "title": "Sahod at Benepisyo",
+      "subtitle": "Payslip, allowance, pensyon, insurance",
+      "base_salary": "Base Salary",
+      "allowances": "Mga Allowance",
+      "deductions": "Mga Deductions",
+      "net_pay": "Net Pay",
+      "payslips": "Mga Payslip",
+      "no_records": "Walang mga rekord ng sahod"
+    },
+    "shifts": {
+      "title": "Pamamahala ng Shift",
+      "subtitle": "Mga shift definition at scheduling ng empleyado",
+      "new_shift": "Bagong Shift",
+      "assign": "I-assign",
+      "morning": "Umaga",
+      "afternoon": "Hapon",
+      "night": "Gabi",
+      "no_shifts": "Walang mga shift na naka-define"
+    },
+    "reviews": {
+      "title": "Performance Reviews",
+      "subtitle": "Mga evaluation, goals, at feedback",
+      "new_review": "Bagong Review",
+      "overall_score": "Kabuuang Score",
+      "strengths": "Mga Kalakasan",
+      "improvements": "Mga Dapat Pagbutihin",
+      "goals": "Mga Goals",
+      "draft": "Draft",
+      "submitted": "Na-submit",
+      "acknowledged": "Na-acknowledge",
+      "no_reviews": "Wala pang mga review"
+    },
+    "training": {
+      "title": "Training at Pag-unlad",
+      "subtitle": "Mga kurso, sertipikasyon, at career development",
+      "courses": "Mga Kurso",
+      "enrollments": "Mga Enrollment",
+      "new_course": "Bagong Kurso",
+      "enroll": "Mag-enroll",
+      "mandatory": "Mandatory",
+      "completed": "Natapos",
+      "in_progress": "In Progress",
+      "no_courses": "Walang available na mga kurso"
+    },
+    "onboarding": {
+      "title": "Onboarding",
+      "subtitle": "Checklist at mga gawain para sa bagong empleyado",
+      "new_checklist": "Bagong Checklist",
+      "progress": "Progress",
+      "completed": "Natapos",
+      "pending_tasks": "Mga Naghihintay na Gawain",
+      "no_active": "Walang aktibong onboarding"
+    },
+    "offboarding": {
+      "title": "Offboarding",
+      "subtitle": "Proseso ng pag-alis at exit interview",
+      "start_process": "Simulan ang Offboarding",
+      "exit_interview": "Exit Interview",
+      "asset_return": "Ibalik ang Kagamitan",
+      "no_active": "Walang aktibong offboarding"
+    },
+    "assets": {
+      "title": "Kagamitan at Assets",
+      "subtitle": "Imbentaryo ng kagamitan ng kumpanya",
+      "new_asset": "Bagong Asset",
+      "assign": "I-assign",
+      "return": "Ibalik",
+      "available": "Available",
+      "assigned": "Na-assign",
+      "maintenance": "Sa Maintenance",
+      "retired": "Retired",
+      "lost": "Nawala",
+      "no_assets": "Walang nakarehistrong assets"
+    },
+    "org_chart": {
+      "title": "Organization Chart",
+      "subtitle": "Hierarchy ng kumpanya at istruktura ng departamento"
+    },
+    "email_inbox": {
+      "title": "HR Email Inbox",
+      "subtitle": "Mga email mula sa HR na auto-classified at na-route",
+      "all": "Lahat",
+      "pending": "Naghihintay",
+      "classified": "Na-classify",
+      "routed": "Na-route",
+      "failed": "Nabigo",
+      "ignored": "Hindi pinansin",
+      "reclassify": "I-classify muli",
+      "route": "I-route",
+      "no_emails": "Wala pang mga email",
+      "from": "Mula sa",
+      "subject": "Paksa",
+      "category": "Kategorya",
+      "status": "Status",
+      "received": "Natanggap"
     }
   },
   "nav_group": {
@@ -456,6 +663,10 @@
       "location": "Lokasyon",
       "phone": "Telepono"
     },
+    "edit": {
+      "profile_title": "I-edit ang Profile",
+      "skills_hint": "Pinaghihiwalay ng kuwit"
+    },
     "toast": {
       "created": "Nagawa ang kandidato!",
       "cv_uploaded": "Matagumpay na na-upload ang CV!",
@@ -478,6 +689,9 @@
     "ai_analysis": "AI Analysis",
     "applications": "Mga Aplikasyon",
     "interviews": "Mga Panayam",
+    "email": "Email",
+    "phone": "Telepono",
+    "location": "Lokasyon",
     "history": "Kasaysayan",
     "run_ai_analysis": "Patakbuhin ang AI Analysis",
     "skills": "Mga Kasanayan",
@@ -534,7 +748,11 @@
     "jobs_in_system": "mga trabaho sa sistema",
     "placeholder_title": "hal. Senior Developer",
     "placeholder_department": "hal. Engineering",
-    "placeholder_location": "hal. Tel Aviv"
+    "placeholder_location": "hal. Tel Aviv",
+    "edit": {
+      "title": "I-edit ang Trabaho",
+      "confirm_delete": "Tanggalin ang trabahong ito?"
+    }
   },
   "interviews": {
     "title": "Mga Panayam",
@@ -580,7 +798,11 @@
     "schedule_first_hint": "Mag-iskedyul ng bagong panayam para magsimula",
     "minutes_label": "minuto",
     "past_count": "mga natapos na panayam",
-    "placeholder_interviewer": "Pangalan ng tagapanayam"
+    "placeholder_interviewer": "Pangalan ng tagapanayam",
+    "edit": {
+      "title": "I-edit ang Interview",
+      "confirm_delete": "Tanggalin ang interview na ito?"
+    }
   },
   "messages": {
     "title": "Mga Mensahe",
@@ -664,6 +886,10 @@
       "next_stage": "Susunod na Yugto",
       "offer": "Alok sa Trabaho",
       "rejection": "Pagtanggi"
+    },
+    "edit": {
+      "title": "I-edit ang Template",
+      "confirm_delete": "Tanggalin ang template na ito?"
     }
   },
   "settings": {
@@ -768,7 +994,16 @@
     "attached": "Naikabit",
     "saved_successfully": "Matagumpay na na-save",
     "save_error": "Error sa pag-save",
-    "admin_only_page": "Ang pahinang ito ay para sa admin lamang"
+    "admin_only_page": "Ang pahinang ito ay para sa admin lamang",
+    "confirm_delete_title": "Kumpirmahin ang Pagtanggal",
+    "confirm_delete_message": "Sigurado ka bang gusto mong tanggalin ito? Hindi na ito maibabalik.",
+    "save_changes": "I-save ang Pagbabago",
+    "saving": "Nagse-save...",
+    "deleting": "Tinatanggal...",
+    "updated_success": "Matagumpay na na-update",
+    "deleted_success": "Matagumpay na natanggal",
+    "error_updating": "Error sa pag-update",
+    "error_deleting": "Error sa pagtanggal"
   },
   "theme": {
     "light": "Light Mode",

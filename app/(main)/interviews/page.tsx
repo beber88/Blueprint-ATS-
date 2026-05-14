@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { PageLoading } from "@/components/shared/loading";
-import { Plus, Calendar, Clock, User, Video, Phone, MapPin } from "lucide-react";
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
+import { Plus, Calendar, Clock, User, Video, Phone, MapPin, Pencil, Trash2 } from "lucide-react";
 import { Interview, Candidate, Job } from "@/types";
 import { formatDateTime } from "@/lib/utils";
 import Link from "next/link";
@@ -27,6 +28,15 @@ export default function InterviewsPage() {
     candidate_id: "", job_id: "", scheduled_at: "", duration_minutes: "60",
     interviewer: "", type: "in-person", notes: "",
   });
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [editInterview, setEditInterview] = useState<Interview | null>(null);
+  const [editForm, setEditForm] = useState({
+    scheduled_at: "", duration_minutes: "60", type: "in-person", interviewer: "", notes: "",
+  });
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
 
   const fetchInterviews = async () => {
     try {
@@ -76,6 +86,58 @@ export default function InterviewsPage() {
       fetchInterviews();
     } catch {
       toast.error(t("interviews.error_updating"));
+    }
+  };
+
+  const openEdit = (interview: Interview) => {
+    setEditInterview(interview);
+    const dt = interview.scheduled_at ? new Date(interview.scheduled_at) : null;
+    setEditForm({
+      scheduled_at: dt ? dt.toISOString().slice(0, 16) : "",
+      duration_minutes: String(interview.duration_minutes || 60),
+      type: interview.type || "in-person",
+      interviewer: interview.interviewer || "",
+      notes: interview.notes || "",
+    });
+    setEditOpen(true);
+  };
+
+  const submitEdit = async () => {
+    if (!editInterview) return;
+    try {
+      const res = await fetch(`/api/interviews/${editInterview.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduled_at: editForm.scheduled_at || null,
+          duration_minutes: parseInt(editForm.duration_minutes),
+          type: editForm.type,
+          interviewer: editForm.interviewer,
+          notes: editForm.notes,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success(t("common.success"));
+      setEditOpen(false);
+      fetchInterviews();
+    } catch {
+      toast.error(t("common.error"));
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    setDeleteBusy(true);
+    try {
+      const res = await fetch(`/api/interviews/${deleteId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+      toast.success(t("common.success"));
+      setDeleteId(null);
+      fetchInterviews();
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setDeleteBusy(false);
     }
   };
 
@@ -187,6 +249,16 @@ export default function InterviewsPage() {
                           )}
                         </div>
                       </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button onClick={() => openEdit(interview)} style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "var(--text-secondary)" }}>
+                          <Pencil size={14} />
+                        </button>
+                        <button onClick={() => setDeleteId(interview.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "var(--red, #EF4444)" }}>
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -222,6 +294,12 @@ export default function InterviewsPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 mr-4">
+                      <button onClick={() => openEdit(interview)} style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "var(--text-secondary)" }}>
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => setDeleteId(interview.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "var(--red, #EF4444)" }}>
+                        <Trash2 size={14} />
+                      </button>
                       {interview.outcome ? (
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold ${
@@ -301,6 +379,7 @@ export default function InterviewsPage() {
                     value={form.scheduled_at}
                     onChange={(e) => setForm({ ...form, scheduled_at: e.target.value })}
                     className="rounded-xl border-[color:var(--border-primary)]"
+                    style={{ direction: "ltr" }}
                   />
                 </div>
                 <div className="space-y-2">
@@ -357,6 +436,79 @@ export default function InterviewsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Edit Interview Dialog */}
+        <Dialog open={editOpen} onOpenChange={(v) => !v && setEditOpen(false)}>
+          <DialogContent className="max-w-lg rounded-2xl p-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-4 border-b border-[color:var(--bg-tertiary)]">
+              <DialogTitle className="text-xl font-bold text-[color:var(--text-primary)]">{t("common.edit")}</DialogTitle>
+            </DialogHeader>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.date")}</Label>
+                  <Input
+                    type="datetime-local"
+                    value={editForm.scheduled_at}
+                    onChange={(e) => setEditForm({ ...editForm, scheduled_at: e.target.value })}
+                    className="rounded-xl border-[color:var(--border-primary)]"
+                    style={{ direction: "ltr" }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.duration")}</Label>
+                  <Input
+                    type="number"
+                    value={editForm.duration_minutes}
+                    onChange={(e) => setEditForm({ ...editForm, duration_minutes: e.target.value })}
+                    className="rounded-xl border-[color:var(--border-primary)]"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.type")}</Label>
+                  <Select value={editForm.type} onValueChange={(v) => setEditForm({ ...editForm, type: v })}>
+                    <SelectTrigger className="rounded-xl border-[color:var(--border-primary)]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="in-person">{t("interviews.type.in_person")}</SelectItem>
+                      <SelectItem value="video">{t("interviews.type.video")}</SelectItem>
+                      <SelectItem value="phone">{t("interviews.type.phone")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.interviewer")}</Label>
+                  <Input
+                    value={editForm.interviewer}
+                    onChange={(e) => setEditForm({ ...editForm, interviewer: e.target.value })}
+                    className="rounded-xl border-[color:var(--border-primary)]"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-[color:var(--text-secondary)]">{t("interviews.form.notes")}</Label>
+                <Textarea
+                  value={editForm.notes}
+                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                  className="rounded-xl border-[color:var(--border-primary)] resize-none"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter className="p-6 pt-4 border-t border-[color:var(--bg-tertiary)] gap-2">
+              <Button variant="outline" onClick={() => setEditOpen(false)} className="rounded-xl px-5">{t("common.cancel")}</Button>
+              <Button onClick={submitEdit} className="rounded-xl text-white px-6" style={{ background: 'var(--brand-gold)' }}>{t("common.save")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <ConfirmDeleteDialog
+          open={!!deleteId}
+          loading={deleteBusy}
+          onClose={() => setDeleteId(null)}
+          onConfirm={confirmDelete}
+        />
       </div>
     </div>
   );

@@ -30,6 +30,9 @@ export function ItemsListPage({ title, subtitle, defaultFilter, allowSearch = tr
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [employees, setEmployees] = useState<{ id: string; full_name: string }[]>([]);
+  const [departments, setDepartments] = useState<{ id: string; name: string; name_he: string | null }[]>([]);
+  const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -54,6 +57,18 @@ export function ItemsListPage({ title, subtitle, defaultFilter, allowSearch = tr
   }, [defaultFilter, search]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/operations/employees").then((r) => r.json()),
+      fetch("/api/operations/departments").then((r) => r.json()),
+      fetch("/api/operations/projects").then((r) => r.json()),
+    ]).then(([er, dr, pr]) => {
+      setEmployees(er.employees || []);
+      setDepartments(dr.departments || []);
+      setProjects(pr.projects || []);
+    });
+  }, []);
 
   return (
     <OpsPageShell
@@ -88,7 +103,7 @@ export function ItemsListPage({ title, subtitle, defaultFilter, allowSearch = tr
             <Loader2 size={20} className="animate-spin" />
           </div>
         ) : (
-          <ItemsTable items={items as never} onChange={load} />
+          <ItemsTable items={items as never} onChange={load} employees={employees} departments={departments} projects={projects} />
         )}
       </OpsCard>
     </OpsPageShell>

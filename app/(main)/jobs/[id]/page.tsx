@@ -7,13 +7,17 @@ import Link from "next/link";
 import { Header } from "@/components/shared/header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ScoreBadge } from "@/components/shared/score-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageLoading } from "@/components/shared/loading";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, Zap, MapPin, Clock, Building, GitCompare, Users, FileText, BarChart3, Trophy, Table, Loader2, ClipboardList } from "lucide-react";
+import { ArrowRight, Zap, MapPin, Clock, Building, GitCompare, Users, FileText, BarChart3, Trophy, Table, Loader2, ClipboardList, Pencil } from "lucide-react";
 import { Job, Application, Candidate } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
@@ -57,6 +61,11 @@ export default function JobDetailPage() {
   const [requirements, setRequirements] = useState<Record<string, unknown> | null>(null);
   const [matches, setMatches] = useState<Record<string, unknown>[]>([]);
   const [matching, setMatching] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: "", department: "", description: "", requirements: "",
+    location: "", employment_type: "full-time", status: "active",
+  });
 
   const toggleCandidate = (appId: string) => {
     setSelectedCandidates((prev) => {
@@ -98,6 +107,32 @@ export default function JobDetailPage() {
       setMatches(refreshed.matches || []);
     } catch { toast.error(t("common.error")); }
     finally { setMatching(false); }
+  };
+
+  const openEditDialog = () => {
+    if (!job) return;
+    setEditForm({
+      title: job.title, department: job.department || "", description: job.description || "",
+      requirements: job.requirements || "", location: job.location || "",
+      employment_type: job.employment_type || "full-time", status: job.status,
+    });
+    setEditOpen(true);
+  };
+
+  const submitEdit = async () => {
+    if (!job) return;
+    try {
+      const res = await fetch(`/api/jobs/${job.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(t("common.success"));
+      setEditOpen(false);
+      const refreshed = await fetch(`/api/jobs/${params.id}`);
+      if (refreshed.ok) setJob(await refreshed.json());
+    } catch { toast.error(t("common.error")); }
   };
 
   const updateStatus = async (status: string) => {
@@ -269,6 +304,15 @@ export default function JobDetailPage() {
                 <SelectItem value="closed">{t("jobs.status.closed")}</SelectItem>
               </SelectContent>
             </Select>
+            <Button
+              variant="outline"
+              onClick={openEditDialog}
+              className="rounded-xl shadow-sm gap-2 px-4"
+              style={{ borderColor: 'var(--border-primary)' }}
+            >
+              <Pencil className="h-4 w-4" />
+              {t("common.edit")}
+            </Button>
             <Button
               onClick={runBatchScoring}
               disabled={scoring}
@@ -778,6 +822,66 @@ export default function JobDetailPage() {
             </div>
           </div>
         )}
+        <Dialog open={editOpen} onOpenChange={(v) => !v && setEditOpen(false)}>
+          <DialogContent className="max-w-2xl rounded-xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{t("common.edit")}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.title")}</Label>
+                  <Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} className="rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.department")}</Label>
+                  <Input value={editForm.department} onChange={(e) => setEditForm({ ...editForm, department: e.target.value })} className="rounded-lg" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.location")}</Label>
+                  <Input value={editForm.location} onChange={(e) => setEditForm({ ...editForm, location: e.target.value })} className="rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.type")}</Label>
+                  <Select value={editForm.employment_type} onValueChange={(v) => setEditForm({ ...editForm, employment_type: v })}>
+                    <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full-time">{t("jobs.form.full_time")}</SelectItem>
+                      <SelectItem value="part-time">{t("jobs.form.part_time")}</SelectItem>
+                      <SelectItem value="contract">{t("jobs.form.project")}</SelectItem>
+                      <SelectItem value="freelance">{t("jobs.form.internship")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("operations.col.status")}</Label>
+                  <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
+                    <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">{t("jobs.status.active")}</SelectItem>
+                      <SelectItem value="paused">{t("jobs.status.paused")}</SelectItem>
+                      <SelectItem value="closed">{t("jobs.status.closed")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t("jobs.form.description")}</Label>
+                <Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={3} className="rounded-lg resize-none" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t("jobs.form.requirements")}</Label>
+                <Textarea value={editForm.requirements} onChange={(e) => setEditForm({ ...editForm, requirements: e.target.value })} rows={3} className="rounded-lg resize-none" />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setEditOpen(false)} className="rounded-lg px-5">{t("common.cancel")}</Button>
+              <Button onClick={submitEdit} className="rounded-lg text-white px-6" style={{ background: 'var(--brand-gold)' }}>{t("common.save")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

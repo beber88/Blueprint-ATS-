@@ -40,11 +40,28 @@ export async function PATCH(
     return NextResponse.json({ error: "invalid body" }, { status: 400 });
   }
 
-  // Whitelist editable fields. Status guarded against CHECK constraint.
+  const STRING_FIELDS = [
+    "title", "summary", "counterparty_name", "counterparty_contact_name",
+    "counterparty_contact_email", "counterparty_contact_phone", "category",
+    "signing_date", "effective_date", "expiration_date", "renewal_date",
+    "currency", "obligations_json",
+  ];
+  const NULLABLE_ID_FIELDS = ["project_id"];
+
   const patch: Record<string, unknown> = {};
-  if (typeof body.title === "string") patch.title = body.title;
-  if (typeof body.summary === "string" || body.summary === null) patch.summary = body.summary;
+  for (const f of STRING_FIELDS) {
+    if (typeof body[f] === "string" || body[f] === null) {
+      if (f in body) patch[f] = body[f];
+    }
+  }
+  for (const f of NULLABLE_ID_FIELDS) {
+    if (f in body) patch[f] = body[f] || null;
+  }
   if (typeof body.flagged_for_review === "boolean") patch.flagged_for_review = body.flagged_for_review;
+  if (typeof body.is_renewable === "boolean") patch.is_renewable = body.is_renewable;
+  if (typeof body.monetary_value === "number" || body.monetary_value === null) {
+    patch.monetary_value = body.monetary_value;
+  }
   if (typeof body.status === "string" && VALID_STATUS.has(body.status as ContractStatus)) {
     patch.status = body.status;
   }

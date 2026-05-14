@@ -4,8 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n/context";
 import { OpsPageShell, OpsCard } from "@/components/operations/page-shell";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { EditContractDialog } from "@/components/contracts/edit-contract-dialog";
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
 
 interface ContractFull {
   id: string;
@@ -38,6 +40,9 @@ export default function ContractDetailPage() {
   const id = params.id;
   const [contract, setContract] = useState<ContractFull | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -58,13 +63,18 @@ export default function ContractDetailPage() {
   }, [load]);
 
   async function remove() {
-    if (!confirm("delete contract?")) return;
-    const res = await fetch(`/api/contracts/contracts/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      toast.success("deleted");
-      router.push("/hr/contracts/contracts");
-    } else {
-      toast.error("delete failed");
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/contracts/contracts/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        toast.success(t("common.delete"));
+        router.push("/hr/contracts/contracts");
+      } else {
+        toast.error(t("common.error"));
+      }
+    } finally {
+      setDeleting(false);
+      setDeleteOpen(false);
     }
   }
 
@@ -84,23 +94,42 @@ export default function ContractDetailPage() {
       title={contract.title}
       subtitle={`${t(`contracts.category.${contract.category}`) || contract.category} · ${contract.counterparty_name}`}
       actions={
-        <button
-          onClick={remove}
-          style={{
-            background: "transparent",
-            color: "#A32D2D",
-            padding: "8px 14px",
-            borderRadius: 8,
-            border: "1px solid #A32D2D",
-            fontSize: 13,
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <Trash2 size={14} />
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => setEditOpen(true)}
+            style={{
+              background: "transparent",
+              color: "var(--text-primary)",
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid var(--border-primary)",
+              fontSize: 13,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <Pencil size={14} />
+          </button>
+          <button
+            onClick={() => setDeleteOpen(true)}
+            style={{
+              background: "transparent",
+              color: "#A32D2D",
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid #A32D2D",
+              fontSize: 13,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       }
     >
       <div
@@ -150,6 +179,22 @@ export default function ContractDetailPage() {
           </div>
         </OpsCard>
       </div>
+      {contract && (
+        <EditContractDialog
+          open={editOpen}
+          contract={contract}
+          onClose={() => setEditOpen(false)}
+          onUpdated={load}
+        />
+      )}
+      <ConfirmDeleteDialog
+        open={deleteOpen}
+        title={t("common.confirm_delete_title")}
+        message={t("common.confirm_delete_message")}
+        onCancel={() => setDeleteOpen(false)}
+        onConfirm={remove}
+        loading={deleting}
+      />
     </OpsPageShell>
   );
 }

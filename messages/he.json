@@ -5,7 +5,8 @@
     "modules": {
       "recruitment": "גיוסים",
       "operations": "תפעול",
-      "contracts": "חוזים"
+      "contracts": "חוזים",
+      "hr_management": "ניהול HR"
     }
   },
   "operations": {
@@ -186,6 +187,7 @@
       "name": "שם",
       "code": "קוד",
       "no_department": "ללא מחלקה",
+      "started_at": "תאריך התחלה",
       "status": {
         "active": "פעיל",
         "paused": "מושהה",
@@ -193,7 +195,12 @@
       }
     },
     "departments": {
-      "subtitle": "מחלקות"
+      "subtitle": "מחלקות",
+      "new": "מחלקה חדשה",
+      "name_he": "שם בעברית",
+      "name_en": "שם באנגלית",
+      "name_tl": "שם בטאגלוג",
+      "color": "צבע"
     },
     "employees": {
       "subtitle": "עובדים מורשים לדיווח",
@@ -278,6 +285,17 @@
       "project_created": "פרויקט נוצר",
       "employee_created": "עובד נוסף",
       "claimed": "ההודעה שויכה"
+    },
+    "edit": {
+      "employee_title": "עריכת עובד",
+      "item_title": "עריכת פריט",
+      "project_title": "עריכת פרויקט",
+      "department_title": "עריכת מחלקה",
+      "new_department": "מחלקה חדשה",
+      "confirm_delete_employee": "למחוק עובד זה?",
+      "confirm_delete_project": "למחוק פרויקט זה?",
+      "confirm_delete_department": "למחוק מחלקה זו?",
+      "confirm_delete_item": "למחוק פריט זה?"
     }
   },
   "contracts": {
@@ -368,6 +386,200 @@
       "expired": "פג",
       "terminated": "הופסק",
       "renewed": "חודש"
+    },
+    "edit": {
+      "title": "עריכת חוזה",
+      "counterparty": "צד שני",
+      "contact_name": "שם איש קשר",
+      "contact_email": "אימייל איש קשר",
+      "contact_phone": "טלפון איש קשר",
+      "signing_date": "תאריך חתימה",
+      "effective_date": "תאריך תחילה",
+      "expiration_date": "תאריך תפוגה",
+      "renewal_date": "תאריך חידוש",
+      "monetary_value": "ערך",
+      "currency": "מטבע",
+      "is_renewable": "ניתן לחידוש",
+      "flagged": "מסומן לבדיקה"
+    }
+  },
+  "hr_mgmt": {
+    "nav_group": {
+      "main": "ראשי",
+      "compensation": "שכר ותנאים",
+      "development": "פיתוח",
+      "lifecycle": "מחזור חיים",
+      "tools": "כלים"
+    },
+    "nav": {
+      "employees": "עובדים",
+      "attendance": "נוכחות",
+      "leave": "חופשות והיעדרויות",
+      "salary": "שכר והטבות",
+      "shifts": "משמרות",
+      "reviews": "הערכות ביצוע",
+      "training": "הכשרות",
+      "onboarding": "קליטת עובד",
+      "offboarding": "עזיבת עובד",
+      "assets": "ציוד ונכסים",
+      "org_chart": "מבנה ארגוני",
+      "email_inbox": "תיבת HR"
+    },
+    "employees": {
+      "title": "ניהול עובדים",
+      "subtitle": "תיק עובד, מסמכים, היסטוריית תפקידים",
+      "tab_details": "פרטים",
+      "tab_documents": "מסמכים",
+      "tab_history": "היסטוריה",
+      "tab_leave": "חופשות",
+      "tab_assets": "ציוד",
+      "personal_info": "פרטים אישיים",
+      "employment_info": "פרטי העסקה",
+      "emergency_contact": "איש קשר לחירום",
+      "upload_document": "העלאת מסמך",
+      "no_documents": "אין מסמכים"
+    },
+    "attendance": {
+      "title": "נוכחות ושעות",
+      "subtitle": "דיווח שעות, שעון נוכחות, שעות נוספות",
+      "clock_in": "כניסה",
+      "clock_out": "יציאה",
+      "total_hours": "סה\"כ שעות",
+      "overtime": "שעות נוספות",
+      "present": "נוכח",
+      "absent": "נעדר",
+      "late": "איחור",
+      "half_day": "חצי יום",
+      "on_leave": "בחופשה",
+      "holiday": "חג",
+      "rest_day": "יום מנוחה",
+      "monthly_summary": "סיכום חודשי",
+      "daily_view": "תצוגה יומית"
+    },
+    "leave": {
+      "title": "חופשות והיעדרויות",
+      "subtitle": "בקשות חופשה, אישורים, יתרות",
+      "new_request": "בקשה חדשה",
+      "pending": "ממתין",
+      "approved": "אושר",
+      "rejected": "נדחה",
+      "cancelled": "בוטל",
+      "balance": "יתרה",
+      "remaining": "נותרו",
+      "used": "נוצלו",
+      "total": "סה\"כ",
+      "vacation": "חופשה שנתית",
+      "sick": "מחלה",
+      "personal": "אישית",
+      "maternity": "לידה",
+      "paternity": "אבהות",
+      "unpaid": "ללא תשלום",
+      "bereavement": "אבל",
+      "emergency": "חירום",
+      "approve": "אשר",
+      "reject": "דחה",
+      "days": "ימים",
+      "reason": "סיבה",
+      "start_date": "מתאריך",
+      "end_date": "עד תאריך",
+      "no_requests": "אין בקשות חופשה"
+    },
+    "salary": {
+      "title": "שכר והטבות",
+      "subtitle": "תלושים, הטבות, פנסיה, ביטוחים",
+      "base_salary": "שכר בסיס",
+      "allowances": "תוספות",
+      "deductions": "ניכויים",
+      "net_pay": "נטו",
+      "payslips": "תלושי שכר",
+      "no_records": "אין רשומות שכר"
+    },
+    "shifts": {
+      "title": "ניהול משמרות",
+      "subtitle": "הגדרת משמרות ושיבוץ עובדים",
+      "new_shift": "משמרת חדשה",
+      "assign": "שבץ",
+      "morning": "בוקר",
+      "afternoon": "צהריים",
+      "night": "לילה",
+      "no_shifts": "אין משמרות מוגדרות"
+    },
+    "reviews": {
+      "title": "הערכות ביצוע",
+      "subtitle": "משוב, יעדים, הערכות תקופתיות",
+      "new_review": "הערכה חדשה",
+      "overall_score": "ציון כולל",
+      "strengths": "חוזקות",
+      "improvements": "תחומים לשיפור",
+      "goals": "יעדים",
+      "draft": "טיוטה",
+      "submitted": "הוגש",
+      "acknowledged": "אושר",
+      "no_reviews": "אין הערכות עדיין"
+    },
+    "training": {
+      "title": "הכשרות ופיתוח",
+      "subtitle": "קורסים, הסמכות, מסלולי קידום",
+      "courses": "קורסים",
+      "enrollments": "רישומים",
+      "new_course": "קורס חדש",
+      "enroll": "רשום",
+      "mandatory": "חובה",
+      "completed": "הושלם",
+      "in_progress": "בתהליך",
+      "no_courses": "אין קורסים זמינים"
+    },
+    "onboarding": {
+      "title": "קליטת עובד",
+      "subtitle": "תהליך קליטת עובד חדש, צ'קליסט ומשימות",
+      "new_checklist": "צ'קליסט חדש",
+      "progress": "התקדמות",
+      "completed": "הושלם",
+      "pending_tasks": "משימות ממתינות",
+      "no_active": "אין תהליכי קליטה פעילים"
+    },
+    "offboarding": {
+      "title": "עזיבת עובד",
+      "subtitle": "תהליך עזיבה, ראיון פרישה",
+      "start_process": "התחל תהליך עזיבה",
+      "exit_interview": "ראיון פרישה",
+      "asset_return": "החזרת ציוד",
+      "no_active": "אין תהליכי עזיבה פעילים"
+    },
+    "assets": {
+      "title": "ציוד ונכסים",
+      "subtitle": "מחשב, טלפון, רכב, ציוד משרדי",
+      "new_asset": "נכס חדש",
+      "assign": "שייך",
+      "return": "החזר",
+      "available": "פנוי",
+      "assigned": "משויך",
+      "maintenance": "בתחזוקה",
+      "retired": "הוצא משימוש",
+      "lost": "אבד",
+      "no_assets": "אין נכסים רשומים"
+    },
+    "org_chart": {
+      "title": "מבנה ארגוני",
+      "subtitle": "מחלקות, היררכיה, דיאגרמת ארגון"
+    },
+    "email_inbox": {
+      "title": "תיבת HR",
+      "subtitle": "מיילים מ-HR מסווגים ומנותבים אוטומטית",
+      "all": "הכל",
+      "pending": "ממתין",
+      "classified": "סווג",
+      "routed": "נותב",
+      "failed": "נכשל",
+      "ignored": "התעלם",
+      "reclassify": "סווג מחדש",
+      "route": "נתב",
+      "no_emails": "אין מיילים עדיין",
+      "from": "מאת",
+      "subject": "נושא",
+      "category": "קטגוריה",
+      "status": "סטטוס",
+      "received": "התקבל"
     }
   },
   "nav_group": {
@@ -458,6 +670,10 @@
       "location": "מיקום",
       "phone": "טלפון"
     },
+    "edit": {
+      "profile_title": "עריכת פרופיל",
+      "skills_hint": "מופרד בפסיקים"
+    },
     "toast": {
       "created": "המועמד/ת נוצר/ה!",
       "cv_uploaded": "קו״ח הועלה בהצלחה!",
@@ -480,6 +696,9 @@
     "ai_analysis": "ניתוח AI",
     "applications": "בקשות",
     "interviews": "ראיונות",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "location": "מיקום",
     "history": "היסטוריה",
     "run_ai_analysis": "הפעל ניתוח AI",
     "skills": "כישורים",
@@ -536,7 +755,11 @@
     "jobs_in_system": "משרות במערכת",
     "placeholder_title": "למשל מפתח בכיר",
     "placeholder_department": "למשל הנדסה",
-    "placeholder_location": "למשל תל אביב"
+    "placeholder_location": "למשל תל אביב",
+    "edit": {
+      "title": "עריכת משרה",
+      "confirm_delete": "למחוק משרה זו?"
+    }
   },
   "interviews": {
     "title": "ראיונות",
@@ -582,7 +805,11 @@
     "schedule_first_hint": "קבעו ראיון חדש כדי להתחיל",
     "minutes_label": "דקות",
     "past_count": "ראיונות שהתקיימו",
-    "placeholder_interviewer": "שם המראיין/ת"
+    "placeholder_interviewer": "שם המראיין/ת",
+    "edit": {
+      "title": "עריכת ראיון",
+      "confirm_delete": "למחוק ראיון זה?"
+    }
   },
   "messages": {
     "title": "הודעות",
@@ -666,6 +893,10 @@
       "next_stage": "מעבר לשלב",
       "offer": "הצעת עבודה",
       "rejection": "דחייה"
+    },
+    "edit": {
+      "title": "עריכת תבנית",
+      "confirm_delete": "למחוק תבנית זו?"
     }
   },
   "settings": {
@@ -770,7 +1001,16 @@
     "attached": "צורפו לתיק",
     "saved_successfully": "נשמר בהצלחה",
     "save_error": "שגיאה בשמירה",
-    "admin_only_page": "דף זה זמין למנהל מערכת בלבד"
+    "admin_only_page": "דף זה זמין למנהל מערכת בלבד",
+    "confirm_delete_title": "אישור מחיקה",
+    "confirm_delete_message": "בטוח שברצונך למחוק? לא ניתן לבטל פעולה זו.",
+    "save_changes": "שמור שינויים",
+    "saving": "שומר...",
+    "deleting": "מוחק...",
+    "updated_success": "עודכן בהצלחה",
+    "deleted_success": "נמחק בהצלחה",
+    "error_updating": "שגיאה בעדכון",
+    "error_deleting": "שגיאה במחיקה"
   },
   "theme": {
     "light": "מצב יום",

@@ -49,3 +49,21 @@ export async function PATCH(
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = createAdminClient();
+    const { error } = await supabase.from("interviews").delete().eq("id", id);
+    if (error) {
+      return NextResponse.json({ error: "Failed to delete interview" }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

@@ -17,9 +17,10 @@ import { PageLoading } from "@/components/shared/loading";
 import {
   Mail, Phone, MapPin, ExternalLink, FileText, Briefcase, GraduationCap,
   Calendar, MessageSquare, ArrowRight, Save, Clock, User, Award,
-  Video, PhoneCall, Building2, Hash, CheckCircle, XCircle, Brain, Upload,
+  Video, PhoneCall, Building2, Hash, CheckCircle, XCircle, Brain, Upload, Pencil,
 } from "lucide-react";
 import Link from "next/link";
+import { EditCandidateDialog } from "@/components/candidates/edit-candidate-dialog";
 import { Candidate, Application, Interview, MessageSent, ActivityLog } from "@/types";
 import { formatDate, formatDateTime, getStatusLabel } from "@/lib/utils";
 import { toast } from "sonner";
@@ -89,6 +90,7 @@ export default function CandidateProfilePage() {
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [translatedAnalysis, setTranslatedAnalysis] = useState<Record<string, unknown> | null>(null);
   const [translating, setTranslating] = useState(false);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/categories").then(r => r.json()).then(setAllCategories).catch(() => {});
@@ -303,6 +305,10 @@ export default function CandidateProfilePage() {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 shrink-0">
+                  <Button variant="outline" className="h-10 rounded-lg shadow-sm hover:shadow-md transition-all" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }} onClick={() => setEditProfileOpen(true)}>
+                    <Pencil className="ml-2 h-4 w-4" />
+                    {t("common.edit")}
+                  </Button>
                   <Link href={`/messages?candidateId=${candidate.id}`}>
                     <Button variant="outline" className="h-10 rounded-lg shadow-sm hover:shadow-md transition-all" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}>
                       <MessageSquare className="ml-2 h-4 w-4" />
@@ -914,6 +920,18 @@ export default function CandidateProfilePage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <EditCandidateDialog
+        open={editProfileOpen}
+        candidate={candidate}
+        onClose={() => setEditProfileOpen(false)}
+        onUpdated={() => {
+          fetch(`/api/candidates/${params.id}`).then(r => r.json()).then((data) => {
+            setCandidate(data);
+            setNotes(data.notes || "");
+          }).catch(() => {});
+        }}
+      />
     </div>
   );
 }

@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { TableLoading } from "@/components/shared/loading";
-import { Plus, Users, Trophy, MapPin, Briefcase, ArrowLeft } from "lucide-react";
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
+import { Plus, Users, Trophy, MapPin, Briefcase, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { Job } from "@/types";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n/context";
@@ -45,6 +46,16 @@ export default function JobsPage() {
     location: "", employment_type: "full-time",
   });
 
+  const [editOpen, setEditOpen] = useState(false);
+  const [editJob, setEditJob] = useState<Job | null>(null);
+  const [editForm, setEditForm] = useState({
+    title: "", department: "", description: "", requirements: "",
+    location: "", employment_type: "full-time", status: "active" as string,
+  });
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
   const fetchJobs = async () => {
     try {
       const res = await fetch("/api/jobs");
@@ -77,6 +88,53 @@ export default function JobsPage() {
       fetchJobs();
     } catch {
       toast.error(t("jobs.error_creating"));
+    }
+  };
+
+  const openEdit = (job: Job) => {
+    setEditJob(job);
+    setEditForm({
+      title: job.title,
+      department: job.department || "",
+      description: job.description || "",
+      requirements: job.requirements || "",
+      location: job.location || "",
+      employment_type: job.employment_type || "full-time",
+      status: job.status,
+    });
+    setEditOpen(true);
+  };
+
+  const submitEdit = async () => {
+    if (!editJob || !editForm.title) return;
+    try {
+      const res = await fetch(`/api/jobs/${editJob.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success(t("common.success"));
+      setEditOpen(false);
+      fetchJobs();
+    } catch {
+      toast.error(t("common.error"));
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    setDeleteBusy(true);
+    try {
+      const res = await fetch(`/api/jobs/${deleteId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+      toast.success(t("common.success"));
+      setDeleteId(null);
+      fetchJobs();
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setDeleteBusy(false);
     }
   };
 
@@ -168,11 +226,8 @@ export default function JobsPage() {
               const candidateCount = job.candidate_count || 0;
               const topScore = job.top_score;
 
-              // Build a mock status breakdown from available data
-              // In a real app this would come from the API
               const statusBreakdown: { status: string; count: number }[] = [];
               if (candidateCount > 0) {
-                // Simple distribution for visual effect based on available data
                 statusBreakdown.push(
                   { status: "new", count: Math.max(1, Math.round(candidateCount * 0.3)) },
                   { status: "reviewed", count: Math.max(0, Math.round(candidateCount * 0.25)) },
@@ -190,12 +245,20 @@ export default function JobsPage() {
                   className="rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col"
                   style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}
                 >
-                  {/* Title + Status */}
+                  {/* Title + Status + Actions */}
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-bold text-lg leading-tight" style={{ color: 'var(--text-primary)' }}>
                       {job.title}
                     </h3>
-                    <StatusBadge status={job.status} />
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => openEdit(job)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "var(--text-secondary)" }}>
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => setDeleteId(job.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "var(--red, #EF4444)" }}>
+                        <Trash2 size={14} />
+                      </button>
+                      <StatusBadge status={job.status} />
+                    </div>
                   </div>
 
                   {/* Department + Location chips */}
@@ -370,6 +433,77 @@ export default function JobsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Edit Job Dialog */}
+        <Dialog open={editOpen} onOpenChange={(v) => !v && setEditOpen(false)}>
+          <DialogContent className="max-w-2xl rounded-xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                {t("common.edit")}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-5 py-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.title")} *</Label>
+                  <Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} className="rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.department")}</Label>
+                  <Input value={editForm.department} onChange={(e) => setEditForm({ ...editForm, department: e.target.value })} className="rounded-lg" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.location")}</Label>
+                  <Input value={editForm.location} onChange={(e) => setEditForm({ ...editForm, location: e.target.value })} className="rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("jobs.form.type")}</Label>
+                  <Select value={editForm.employment_type} onValueChange={(v) => setEditForm({ ...editForm, employment_type: v })}>
+                    <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full-time">{t("jobs.form.full_time")}</SelectItem>
+                      <SelectItem value="part-time">{t("jobs.form.part_time")}</SelectItem>
+                      <SelectItem value="contract">{t("jobs.form.project")}</SelectItem>
+                      <SelectItem value="freelance">{t("jobs.form.internship")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t("operations.col.status")}</Label>
+                  <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
+                    <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">{t("jobs.status.active")}</SelectItem>
+                      <SelectItem value="paused">{t("jobs.status.paused")}</SelectItem>
+                      <SelectItem value="closed">{t("jobs.status.closed")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t("jobs.form.description")}</Label>
+                <Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} rows={3} className="rounded-lg resize-none" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">{t("jobs.form.requirements")}</Label>
+                <Textarea value={editForm.requirements} onChange={(e) => setEditForm({ ...editForm, requirements: e.target.value })} rows={3} className="rounded-lg resize-none" />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setEditOpen(false)} className="rounded-lg px-5">{t("common.cancel")}</Button>
+              <Button onClick={submitEdit} className="rounded-lg text-white px-6" style={{ background: 'var(--brand-gold)' }}>{t("common.save")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <ConfirmDeleteDialog
+          open={!!deleteId}
+          loading={deleteBusy}
+          onClose={() => setDeleteId(null)}
+          onConfirm={confirmDelete}
+        />
       </div>
     </div>
   );

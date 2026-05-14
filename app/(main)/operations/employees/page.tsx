@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { OpsCard, OpsPageShell } from "@/components/operations/page-shell";
 import { useI18n } from "@/lib/i18n/context";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { EditEmployeeDialog } from "@/components/operations/edit-employee-dialog";
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
 
 interface Emp {
   id: string;
@@ -32,6 +34,9 @@ export default function EmployeesPage() {
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ full_name: "", phone: "", whatsapp_phone: "", email: "", role: "", department_id: "", project_id: "", is_pm: false });
+  const [editTarget, setEditTarget] = useState<Emp | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Emp | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -80,6 +85,22 @@ export default function EmployeesPage() {
       body: JSON.stringify({ is_active: active }),
     });
     load();
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/operations/employees/${deleteTarget.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(t("common.delete"));
+      load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setDeleteLoading(false);
+      setDeleteTarget(null);
+    }
   };
 
   return (
@@ -135,6 +156,7 @@ export default function EmployeesPage() {
                 <th style={{ padding: "8px 12px", textAlign: "right" }}>{t("operations.employees.whatsapp_phone")}</th>
                 <th style={{ padding: "8px 12px", textAlign: "right" }}>{t("operations.employees.is_pm")}</th>
                 <th style={{ padding: "8px 12px", textAlign: "right" }}>{t("operations.employees.is_active")}</th>
+                <th style={{ padding: "8px 12px", textAlign: "right" }}>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -149,12 +171,40 @@ export default function EmployeesPage() {
                   <td style={{ padding: "8px 12px" }}>
                     <input type="checkbox" checked={e.is_active} onChange={(ev) => toggleActive(e, ev.target.checked)} />
                   </td>
+                  <td style={{ padding: "8px 12px" }}>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <button onClick={() => setEditTarget(e)} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--text-secondary)", padding: 4 }}>
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => setDeleteTarget(e)} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#A32D2D", padding: 4 }}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </OpsCard>
+      {editTarget && (
+        <EditEmployeeDialog
+          open={!!editTarget}
+          employee={editTarget}
+          departments={depts}
+          projects={projects}
+          onClose={() => setEditTarget(null)}
+          onUpdated={load}
+        />
+      )}
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        title={t("common.confirm_delete_title")}
+        message={t("common.confirm_delete_message")}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        loading={deleteLoading}
+      />
     </OpsPageShell>
   );
 }
