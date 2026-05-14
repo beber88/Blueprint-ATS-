@@ -5,7 +5,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function getOperationsStats() {
   const supabase = createAdminClient();
   const today = new Date().toISOString().slice(0, 10);
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const [
     { data: items },
@@ -18,9 +17,8 @@ export async function getOperationsStats() {
     supabase
       .from("op_report_items")
       .select("id, status, priority, ceo_decision_needed, missing_information, deadline, category, department_id, project_id, report_date, created_at, issue")
-      .gte("report_date", sevenDaysAgo)
       .order("report_date", { ascending: false })
-      .limit(2000),
+      .limit(5000),
     supabase.from("op_alerts").select("*").is("resolved_at", null).order("created_at", { ascending: false }).limit(200),
     supabase.from("op_reports").select("id, report_date, source_type, processing_status, created_at").order("report_date", { ascending: false }).limit(60),
     supabase.from("op_projects").select("id, name, status, department_id").order("name"),
@@ -50,18 +48,22 @@ export async function getOperationsStats() {
   const byProject: Record<string, number> = {};
   for (const r of open) if (r.project_id) byProject[r.project_id] = (byProject[r.project_id] || 0) + 1;
 
-  // Daily trend (last 14 days)
-  const dailyTrend: { date: string; total: number; overdue: number; urgent: number }[] = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    const dayItems = rows.filter((r) => r.report_date === d);
-    dailyTrend.push({
-      date: d,
+  // Daily trend — group items by report_date, show all dates that have data
+  const byDate = new Map<string, typeof rows>();
+  for (const r of rows) {
+    if (!r.report_date) continue;
+    const arr = byDate.get(r.report_date) || [];
+    arr.push(r);
+    byDate.set(r.report_date, arr);
+  }
+  const dailyTrend = Array.from(byDate.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, dayItems]) => ({
+      date,
       total: dayItems.length,
       overdue: dayItems.filter((r) => r.deadline && r.deadline < today && r.status !== "resolved").length,
       urgent: dayItems.filter((r) => r.priority === "urgent").length,
-    });
-  }
+    }));
 
   return {
     kpis: {
