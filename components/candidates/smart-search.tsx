@@ -257,7 +257,7 @@ export function SmartSearch({ onClose }: SmartSearchProps) {
                         <span className="font-medium text-sm truncate" style={{ color: "var(--text-primary)" }}>
                           {candidate.full_name}
                         </span>
-                        <StatusBadge status={candidate.status} lang={locale} />
+                        <StatusBadge status={candidate.status} />
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
                         {cats.length > 0 && (
