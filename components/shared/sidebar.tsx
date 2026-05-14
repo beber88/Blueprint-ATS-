@@ -6,6 +6,7 @@ import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
   Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart,
   Activity, Inbox, AlertTriangle, Building2, HardHat, ClipboardList, ClipboardCheck, Crown, Search,
+  Mail, Clock, DollarSign, Star, GraduationCap, UserPlus, UserMinus, Package, Network,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -124,6 +125,50 @@ const modules: Module[] = [
         labelKey: "contracts.nav_group.tracking",
         items: [
           { key: "contracts.nav.alerts", path: "/alerts", icon: AlertTriangle },
+        ],
+      },
+    ],
+  },
+  {
+    key: "hr-management",
+    labelKey: "hr.modules.hr_management",
+    prefix: "/hr/hr-management",
+    groups: [
+      {
+        labelKey: "hr_mgmt.nav_group.main",
+        items: [
+          { key: "hr_mgmt.nav.employees", path: "/employees", icon: Users },
+          { key: "hr_mgmt.nav.attendance", path: "/attendance", icon: ClipboardCheck },
+          { key: "hr_mgmt.nav.leave", path: "/leave", icon: Calendar },
+        ],
+      },
+      {
+        labelKey: "hr_mgmt.nav_group.compensation",
+        items: [
+          { key: "hr_mgmt.nav.salary", path: "/salary", icon: DollarSign },
+          { key: "hr_mgmt.nav.shifts", path: "/shifts", icon: Clock },
+        ],
+      },
+      {
+        labelKey: "hr_mgmt.nav_group.development",
+        items: [
+          { key: "hr_mgmt.nav.reviews", path: "/reviews", icon: Star },
+          { key: "hr_mgmt.nav.training", path: "/training", icon: GraduationCap },
+        ],
+      },
+      {
+        labelKey: "hr_mgmt.nav_group.lifecycle",
+        items: [
+          { key: "hr_mgmt.nav.onboarding", path: "/onboarding", icon: UserPlus },
+          { key: "hr_mgmt.nav.offboarding", path: "/offboarding", icon: UserMinus },
+          { key: "hr_mgmt.nav.assets", path: "/assets", icon: Package },
+        ],
+      },
+      {
+        labelKey: "hr_mgmt.nav_group.tools",
+        items: [
+          { key: "hr_mgmt.nav.org_chart", path: "/org-chart", icon: Network },
+          { key: "hr_mgmt.nav.email_inbox", path: "/email-inbox", icon: Mail },
         ],
       },
     ],

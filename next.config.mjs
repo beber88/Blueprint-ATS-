@@ -40,6 +40,24 @@ const OPERATIONS_ROUTES = [
   'digest',
 ];
 
+// HR Management module top-level routes mounted under /hr/hr-management.
+// Files live in app/(main)/hr-management/* — this rewrite block exposes them
+// under the namespaced HR URL.
+const HR_MANAGEMENT_ROUTES = [
+  'employees',
+  'attendance',
+  'leave',
+  'salary',
+  'shifts',
+  'reviews',
+  'training',
+  'onboarding',
+  'offboarding',
+  'assets',
+  'org-chart',
+  'email-inbox',
+];
+
 // Contracts module top-level routes mounted under /hr/contracts. Files live in
 // app/(main)/contracts/* — this rewrite block exposes them under the
 // namespaced HR URL. Mirrors the OPERATIONS_ROUTES block above.
@@ -86,6 +104,13 @@ const nextConfig = {
       ...CONTRACTS_ROUTES.flatMap((route) => [
         { source: `/hr/contracts/${route}`, destination: `/contracts/${route}` },
         { source: `/hr/contracts/${route}/:path*`, destination: `/contracts/${route}/:path*` },
+      ]),
+
+      // Bare /hr/hr-management lands on the employees page.
+      { source: '/hr/hr-management', destination: '/hr-management/employees' },
+      ...HR_MANAGEMENT_ROUTES.flatMap((route) => [
+        { source: `/hr/hr-management/${route}`, destination: `/hr-management/${route}` },
+        { source: `/hr/hr-management/${route}/:path*`, destination: `/hr-management/${route}/:path*` },
       ]),
     ];
   },
