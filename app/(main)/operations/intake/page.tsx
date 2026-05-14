@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { OpsCard, OpsPageShell } from "@/components/operations/page-shell";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
-import { Loader2, Upload, FileText, Layers } from "lucide-react";
+import { Loader2, Upload, FileText, Layers, FileUp, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
 
 interface BulkResult {
   jobId: string;
@@ -27,10 +27,37 @@ interface BulkPreview {
   duplicateJobCreatedAt?: string;
 }
 
+interface DistributionItem {
+  count: number;
+  label: string;
+  names?: string[];
+}
+
+interface PdpResult {
+  status: "saved" | "draft";
+  draftId: string;
+  reportId: string | null;
+  itemsCount: number;
+  warnings: Array<{ severity: string; message_en: string; message_he: string; code: string }>;
+  warningCount?: number;
+  highWarnings?: boolean;
+  summary: {
+    totalItems: number;
+    attendance: DistributionItem;
+    ceoDecisions: DistributionItem;
+    missingInfo: DistributionItem;
+    urgentAlerts: DistributionItem;
+    blockers: DistributionItem;
+    projects: DistributionItem;
+    departments: DistributionItem;
+  };
+  promotionError?: string;
+}
+
 export default function IntakePage() {
   const { t, locale } = useI18n();
   const router = useRouter();
-  const [mode, setMode] = useState<"single" | "bulk">("single");
+  const [mode, setMode] = useState<"single" | "bulk" | "pdp">("single");
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [reportDate, setReportDate] = useState("");
@@ -42,7 +69,11 @@ export default function IntakePage() {
   const [bulkConsent, setBulkConsent] = useState(false);
   const [bulkAutoPromote, setBulkAutoPromote] = useState(false);
   const [bulkJobId, setBulkJobId] = useState<string | null>(null);
+  const [pdpAutoSave, setPdpAutoSave] = useState(true);
+  const [pdpResult, setPdpResult] = useState<PdpResult | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pdpFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/operations/projects")
@@ -169,13 +200,83 @@ export default function IntakePage() {
     }
   };
 
+  // PDP Upload handler
+  const uploadPdp = async (uploadFile?: File) => {
+    const f = uploadFile || file;
+    if (!f) {
+      toast.error(t("operations.intake.pdp_error_no_file"));
+      return;
+    }
+    setBusy(true);
+    setPdpResult(null);
+    try {
+      const fd = new FormData();
+      fd.set("file", f);
+      fd.set("autoSave", pdpAutoSave ? "true" : "false");
+      if (reportDate) fd.set("reportDate", reportDate);
+      if (projectId) fd.set("projectId", projectId);
+
+      const res = await fetch("/api/operations/intake/pdp-upload", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      setPdpResult(data);
+      if (data.status === "saved") {
+        toast.success(
+          t("operations.intake.pdp_saved")
+            .replace("{n}", String(data.itemsCount))
+        );
+      } else {
+        toast.success(t("operations.intake.pdp_draft_created"));
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("common.error"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Drag-and-drop handlers
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(true);
+  }, []);
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+  }, []);
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+    const dropped = e.dataTransfer.files?.[0];
+    if (dropped) {
+      const n = dropped.name.toLowerCase();
+      if (n.endsWith(".pdf") || n.endsWith(".txt")) {
+        setFile(dropped);
+        if (mode === "pdp") {
+          uploadPdp(dropped);
+        }
+      } else {
+        toast.error(t("operations.intake.pdp_error_file_type"));
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, pdpAutoSave, reportDate, projectId]);
+
   return (
     <OpsPageShell title={t("operations.intake.title")} subtitle={t("operations.intake.subtitle")}>
       <div style={{ display: "inline-flex", gap: 4, padding: 4, background: "var(--bg-card)", border: "1px solid var(--border-light)", borderRadius: 10, marginBottom: 12 }}>
         {([
-          { v: "single", label: t("operations.intake.mode_single"), icon: FileText },
-          { v: "bulk", label: t("operations.intake.mode_bulk"), icon: Layers },
-        ] as const).map((m) => (
+          { v: "single" as const, label: t("operations.intake.mode_single"), icon: FileText },
+          { v: "pdp" as const, label: t("operations.intake.mode_pdp"), icon: FileUp },
+          { v: "bulk" as const, label: t("operations.intake.mode_bulk"), icon: Layers },
+        ]).map((m) => (
           <button
             key={m.v}
             onClick={() => setMode(m.v)}
@@ -198,7 +299,262 @@ export default function IntakePage() {
           </button>
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 16 }}>
+      {/* PDP Upload Mode */}
+      {mode === "pdp" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 16 }}>
+          <OpsCard title={t("operations.intake.pdp_title")}>
+            {/* Drop zone */}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => pdpFileInputRef.current?.click()}
+              style={{
+                border: `2px dashed ${dragOver ? "#C9A84C" : "var(--border-primary)"}`,
+                borderRadius: 12,
+                padding: file ? "20px 24px" : "48px 24px",
+                textAlign: "center",
+                cursor: "pointer",
+                background: dragOver ? "rgba(201, 168, 76, 0.06)" : "var(--bg-input)",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <input
+                ref={pdpFileInputRef}
+                type="file"
+                accept=".pdf,.txt"
+                onChange={(e) => {
+                  const f = e.target.files?.[0] || null;
+                  setFile(f);
+                }}
+                style={{ display: "none" }}
+              />
+              {file ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <FileUp size={24} style={{ color: "#C9A84C" }} />
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{file.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                      {(file.size / 1024).toFixed(0)} KB
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFile(null);
+                      setPdpResult(null);
+                    }}
+                    style={{
+                      marginLeft: "auto",
+                      background: "transparent",
+                      border: "1px solid var(--border-primary)",
+                      borderRadius: 6,
+                      padding: "4px 10px",
+                      fontSize: 12,
+                      cursor: "pointer",
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    {t("operations.intake.pdp_change_file")}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Upload size={32} style={{ color: "var(--text-secondary)", marginBottom: 12 }} />
+                  <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary)", marginBottom: 4 }}>
+                    {t("operations.intake.pdp_drop_title")}
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+                    {t("operations.intake.pdp_drop_hint")}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* PDP Result summary */}
+            {pdpResult && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 12,
+                  padding: "10px 14px",
+                  borderRadius: 8,
+                  background: pdpResult.status === "saved" ? "rgba(34, 139, 34, 0.08)" : "rgba(201, 168, 76, 0.08)",
+                  border: `1px solid ${pdpResult.status === "saved" ? "rgba(34, 139, 34, 0.2)" : "rgba(201, 168, 76, 0.2)"}`,
+                }}>
+                  {pdpResult.status === "saved" ? (
+                    <CheckCircle2 size={18} style={{ color: "#228B22" }} />
+                  ) : (
+                    <AlertTriangle size={18} style={{ color: "#C9A84C" }} />
+                  )}
+                  <span style={{ fontWeight: 600, fontSize: 14 }}>
+                    {pdpResult.status === "saved"
+                      ? t("operations.intake.pdp_status_saved").replace("{n}", String(pdpResult.itemsCount))
+                      : t("operations.intake.pdp_status_draft")}
+                  </span>
+                </div>
+
+                {/* Distribution summary */}
+                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 }}>
+                  {t("operations.intake.pdp_distribution")}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  {[
+                    pdpResult.summary.attendance,
+                    pdpResult.summary.ceoDecisions,
+                    pdpResult.summary.missingInfo,
+                    pdpResult.summary.urgentAlerts,
+                    pdpResult.summary.blockers,
+                    pdpResult.summary.projects,
+                    pdpResult.summary.departments,
+                  ].filter((s) => s.count > 0).map((s, i) => (
+                    <div key={i} style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "6px 10px",
+                      background: "var(--bg-card)",
+                      border: "1px solid var(--border-light)",
+                      borderRadius: 6,
+                      fontSize: 12,
+                    }}>
+                      <ArrowRight size={10} style={{ color: "#C9A84C" }} />
+                      <span style={{ fontWeight: 700 }}>{s.count}</span>
+                      <span style={{ color: "var(--text-secondary)" }}>{s.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Warnings if any */}
+                {pdpResult.warnings.length > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#A32D2D", marginBottom: 4 }}>
+                      {t("operations.intake.pdp_warnings")} ({pdpResult.warnings.length})
+                    </div>
+                    {pdpResult.warnings.slice(0, 5).map((w, i) => (
+                      <div key={i} style={{ fontSize: 11, color: "var(--text-secondary)", padding: "2px 0" }}>
+                        {locale === "he" ? w.message_he : w.message_en}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Action buttons */}
+                <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                  {pdpResult.status === "draft" && (
+                    <button
+                      onClick={() => router.push(`/hr/operations/intake/preview/${pdpResult.draftId}`)}
+                      style={{
+                        padding: "8px 14px",
+                        background: "#C9A84C",
+                        color: "#1A1A1A",
+                        border: "none",
+                        borderRadius: 8,
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        fontSize: 13,
+                      }}
+                    >
+                      {t("operations.intake.pdp_review_draft")}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setFile(null);
+                      setPdpResult(null);
+                    }}
+                    style={{
+                      padding: "8px 14px",
+                      background: "transparent",
+                      color: "var(--text-secondary)",
+                      border: "1px solid var(--border-primary)",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: 13,
+                    }}
+                  >
+                    {t("operations.intake.pdp_upload_another")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </OpsCard>
+
+          {/* Right sidebar — options + upload button */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <OpsCard title={t("operations.intake.options")}>
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 4 }}>
+                {t("operations.intake.report_date")}
+              </label>
+              <input
+                type="date"
+                value={reportDate}
+                onChange={(e) => setReportDate(e.target.value)}
+                style={{ width: "100%", padding: 8, borderRadius: 6, border: "1px solid var(--border-primary)", background: "var(--bg-input)", color: "var(--text-primary)", marginBottom: 12 }}
+              />
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 4 }}>
+                {t("operations.intake.project_hint")}
+              </label>
+              <select
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+                style={{ width: "100%", padding: 8, borderRadius: 6, border: "1px solid var(--border-primary)", background: "var(--bg-input)", color: "var(--text-primary)" }}
+              >
+                <option value="">—</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </OpsCard>
+
+            <OpsCard title={t("operations.intake.pdp_settings")}>
+              <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={pdpAutoSave}
+                  onChange={(e) => setPdpAutoSave(e.target.checked)}
+                  style={{ marginTop: 2 }}
+                />
+                <span>
+                  <b>{t("operations.intake.pdp_auto_save_label")}</b>
+                  <br />
+                  <span style={{ color: "var(--text-secondary)", fontSize: 12 }}>
+                    {t("operations.intake.pdp_auto_save_hint")}
+                  </span>
+                </span>
+              </label>
+            </OpsCard>
+
+            <button
+              disabled={busy || !file}
+              onClick={() => uploadPdp()}
+              style={{
+                padding: "12px 16px",
+                background: "#C9A84C",
+                color: "#1A1A1A",
+                border: "none",
+                borderRadius: 8,
+                cursor: busy || !file ? "not-allowed" : "pointer",
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                opacity: busy || !file ? 0.6 : 1,
+              }}
+            >
+              {busy ? <Loader2 size={16} className="animate-spin" /> : <FileUp size={16} />}
+              {busy ? t("operations.intake.pdp_processing") : t("operations.intake.pdp_upload_btn")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Single / Bulk modes */}
+      <div style={{ display: mode === "pdp" ? "none" : "grid", gridTemplateColumns: "1fr 320px", gap: 16 }}>
         <OpsCard title={mode === "bulk" ? t("operations.intake.bulk_text_label") : t("operations.intake.text_label")}>
           <textarea
             value={text}

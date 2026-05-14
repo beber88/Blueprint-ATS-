@@ -9,10 +9,12 @@ export async function GET(request: NextRequest) {
   const supabase = createAdminClient();
   const url = new URL(request.url);
   try {
+    const rawFolder = url.searchParams.get("folder_id");
     const data = await listContracts(supabase, {
       category: url.searchParams.get("category") || undefined,
       status: url.searchParams.get("status") || undefined,
       project_id: url.searchParams.get("project_id") || undefined,
+      folder_id: rawFolder === "root" ? null : rawFolder || undefined,
       expiring_within_days: url.searchParams.get("expiring_within_days")
         ? parseInt(url.searchParams.get("expiring_within_days")!, 10)
         : undefined,

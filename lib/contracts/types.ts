@@ -87,3 +87,41 @@ export interface ContractPromoteResult {
   contractId: string;
   category: ContractCategory;
 }
+
+// ── Folder types (file-manager view) ────────────────────────────────────────
+
+export interface ContractFolder {
+  id: string;
+  name: string;
+  parent_id: string | null;
+  color: string | null;
+  sort_order: number;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FolderBreadcrumb {
+  id: string;
+  name: string;
+}
+
+export interface ContractListItem {
+  id: string;
+  category: ContractCategory;
+  counterparty_name: string;
+  project_id: string | null;
+  title: string;
+  expiration_date: string | null;
+  monetary_value: number | null;
+  currency: string | null;
+  status: ContractStatus;
+  flagged_for_review: boolean;
+  created_at: string;
+}
+
+export interface FolderContents {
+  folders: ContractFolder[];
+  contracts: ContractListItem[];
+  breadcrumbs: FolderBreadcrumb[];
+}

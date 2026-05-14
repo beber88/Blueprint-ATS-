@@ -100,7 +100,27 @@
       "draft_created": "Naka-create ang draft — bubuksan ang preview",
       "bulk_auto_promote_label": "Auto-promote",
       "bulk_auto_promote_hint": "Auto-save ng drafts na walang high-severity warnings. Para sa data na pinagkakatiwalaan.",
-      "bulk_auto_promote_confirm": "Mase-save hanggang {n} ulat na walang human review kung walang high-severity warnings. Recommended lang para sa historical data na pinagkakatiwalaan. Magpatuloy?"
+      "bulk_auto_promote_confirm": "Mase-save hanggang {n} ulat na walang human review kung walang high-severity warnings. Recommended lang para sa historical data na pinagkakatiwalaan. Magpatuloy?",
+      "mode_pdp": "PDP Upload",
+      "pdp_title": "I-upload ang Daily Report (PDP)",
+      "pdp_drop_title": "I-drop ang PDF dito o mag-click para pumili",
+      "pdp_drop_hint": "PDF o TXT — awtomatikong i-extract at ipamahagi ng sistema ang data",
+      "pdp_change_file": "Palitan",
+      "pdp_error_no_file": "Pumili muna ng PDF file",
+      "pdp_error_file_type": "PDF at TXT file lang ang supported",
+      "pdp_processing": "Nag-e-extract...",
+      "pdp_upload_btn": "I-upload at I-extract",
+      "pdp_settings": "Mga Setting ng Upload",
+      "pdp_auto_save_label": "Auto-save kung malinis",
+      "pdp_auto_save_hint": "Awtomatikong i-save ang ulat kung walang mataas na antas na babala. Kung hindi, gagawa ng draft para sa review.",
+      "pdp_saved": "Ulat na-save — {n} item na ipinaimahagi",
+      "pdp_draft_created": "Draft na-create — kailangan ng review",
+      "pdp_distribution": "Pamamahagi ng data",
+      "pdp_warnings": "Mga babala",
+      "pdp_review_draft": "I-review ang draft",
+      "pdp_upload_another": "Mag-upload pa",
+      "pdp_status_saved": "Na-save — {n} item ipinaimahagi sa lahat ng module",
+      "pdp_status_draft": "Na-create ang draft — i-review ang mga babala bago i-save"
     },
     "preview": {
       "title": "Preview — i-review bago i-save",
@@ -297,6 +317,18 @@
       "filter_category": "Kategorya",
       "filter_status": "Estado",
       "empty": "Walang katugmang kontrata"
+    },
+    "folders": {
+      "new_folder": "Bagong Folder",
+      "rename": "Palitan ang pangalan",
+      "move_to": "Ilipat sa...",
+      "delete_folder": "Tanggalin ang Folder",
+      "empty_folder": "Walang laman ang folder na ito",
+      "root": "Lahat ng Kontrata",
+      "name_placeholder": "Pangalan ng folder",
+      "confirm_delete": "Tanggalin ang folder na ito at lahat ng subfolder? Ang mga kontrata sa loob ay ililipat sa root.",
+      "view_grid": "Grid",
+      "view_list": "Listahan"
     },
     "detail": {
       "title": "Kontrata",

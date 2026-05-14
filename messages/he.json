@@ -100,7 +100,27 @@
       "draft_created": "טיוטה נוצרה — עובר לתצוגת תצוגה מקדימה",
       "bulk_auto_promote_label": "Auto-promote",
       "bulk_auto_promote_hint": "שמור אוטומטית טיוטות ללא אזהרות חמורות. דורש אמון בנתונים.",
-      "bulk_auto_promote_confirm": "זה ישמור עד {n} דוחות ללא בדיקה אנושית אם אין להם אזהרות חמורות. מומלץ רק לנתונים היסטוריים שאתה סומך עליהם. להמשיך?"
+      "bulk_auto_promote_confirm": "זה ישמור עד {n} דוחות ללא בדיקה אנושית אם אין להם אזהרות חמורות. מומלץ רק לנתונים היסטוריים שאתה סומך עליהם. להמשיך?",
+      "mode_pdp": "העלאת PDP",
+      "pdp_title": "העלאת דוח יומי (PDP)",
+      "pdp_drop_title": "גרור קובץ PDF לכאן או לחץ לבחירה",
+      "pdp_drop_hint": "PDF או TXT — המערכת מחלצת ומפזרת את המידע אוטומטית",
+      "pdp_change_file": "החלף",
+      "pdp_error_no_file": "יש לבחור קובץ PDF קודם",
+      "pdp_error_file_type": "רק קבצי PDF ו-TXT נתמכים",
+      "pdp_processing": "מחלץ...",
+      "pdp_upload_btn": "העלה וחלץ",
+      "pdp_settings": "הגדרות העלאה",
+      "pdp_auto_save_label": "שמור אוטומטית אם תקין",
+      "pdp_auto_save_hint": "שמור את הדוח אוטומטית אם אין אזהרות חמורות. אחרת תיווצר טיוטה לבדיקה.",
+      "pdp_saved": "הדוח נשמר — {n} פריטים חולקו",
+      "pdp_draft_created": "טיוטה נוצרה — נדרשת בדיקה",
+      "pdp_distribution": "חלוקת מידע",
+      "pdp_warnings": "אזהרות",
+      "pdp_review_draft": "בדוק טיוטה",
+      "pdp_upload_another": "העלה עוד",
+      "pdp_status_saved": "נשמר — {n} פריטים חולקו לכל המודולים",
+      "pdp_status_draft": "טיוטה נוצרה — בדוק אזהרות לפני שמירה"
     },
     "preview": {
       "title": "תצוגה מקדימה — בדוק לפני שמירה",
@@ -299,6 +319,18 @@
       "filter_category": "קטגוריה",
       "filter_status": "סטטוס",
       "empty": "אין חוזים תואמים את הסינון"
+    },
+    "folders": {
+      "new_folder": "תיקייה חדשה",
+      "rename": "שנה שם",
+      "move_to": "העבר אל...",
+      "delete_folder": "מחק תיקייה",
+      "empty_folder": "תיקייה זו ריקה",
+      "root": "כל החוזים",
+      "name_placeholder": "שם תיקייה",
+      "confirm_delete": "למחוק תיקייה זו וכל תיקיות המשנה? חוזים בפנים יועברו לשורש.",
+      "view_grid": "רשת",
+      "view_list": "רשימה"
     },
     "detail": {
       "title": "חוזה",

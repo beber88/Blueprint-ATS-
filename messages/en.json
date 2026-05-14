@@ -100,7 +100,27 @@
       "draft_created": "Draft created — opening preview",
       "bulk_auto_promote_label": "Auto-promote",
       "bulk_auto_promote_hint": "Auto-save drafts with no high-severity warnings. Requires data you trust.",
-      "bulk_auto_promote_confirm": "This will save up to {n} reports without human review if they have no high-severity warnings. Recommended only for historical data you trust. Continue?"
+      "bulk_auto_promote_confirm": "This will save up to {n} reports without human review if they have no high-severity warnings. Recommended only for historical data you trust. Continue?",
+      "mode_pdp": "PDP Upload",
+      "pdp_title": "Upload Daily Report (PDP)",
+      "pdp_drop_title": "Drop a PDF here or click to browse",
+      "pdp_drop_hint": "PDF or TXT — the system extracts and distributes data automatically",
+      "pdp_change_file": "Change",
+      "pdp_error_no_file": "Please select a PDF file first",
+      "pdp_error_file_type": "Only PDF and TXT files are supported",
+      "pdp_processing": "Extracting...",
+      "pdp_upload_btn": "Upload & Extract",
+      "pdp_settings": "Upload Settings",
+      "pdp_auto_save_label": "Auto-save if clean",
+      "pdp_auto_save_hint": "Automatically save the report if there are no high-severity warnings. Otherwise a draft is created for review.",
+      "pdp_saved": "Report saved — {n} items distributed",
+      "pdp_draft_created": "Draft created — review needed",
+      "pdp_distribution": "Data distribution",
+      "pdp_warnings": "Warnings",
+      "pdp_review_draft": "Review draft",
+      "pdp_upload_another": "Upload another",
+      "pdp_status_saved": "Saved — {n} items distributed to all modules",
+      "pdp_status_draft": "Draft created — review warnings before saving"
     },
     "preview": {
       "title": "Preview — review before save",
@@ -297,6 +317,18 @@
       "filter_category": "Category",
       "filter_status": "Status",
       "empty": "No contracts match the filter"
+    },
+    "folders": {
+      "new_folder": "New Folder",
+      "rename": "Rename",
+      "move_to": "Move to...",
+      "delete_folder": "Delete Folder",
+      "empty_folder": "This folder is empty",
+      "root": "All Contracts",
+      "name_placeholder": "Folder name",
+      "confirm_delete": "Delete this folder and all subfolders? Contracts inside will be moved to root.",
+      "view_grid": "Grid",
+      "view_list": "List"
     },
     "detail": {
       "title": "Contract",
