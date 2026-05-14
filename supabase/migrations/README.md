@@ -9,11 +9,12 @@
 | 005 | `005_operations_employee_lifecycle.sql` | **Yes** | 002, 003, 004 | (A) Sets `op_employees.is_active` NOT NULL. (B) Adds partial unique index `op_employees_active_full_name_uidx` then drops global UNIQUE. (C) Adds `op_employees_history.employee_id` FK with `ON DELETE SET NULL`. See `docs/operations/employee-lifecycle.md`. |
 | 006 | `006_operations_bulk_import_jobs.sql` | **Yes** | 002 | Creates `op_bulk_import_jobs` + `op_bulk_import_items` for tracked bulk-import runs with cancel/resume/dedup. See `docs/operations/bulk-import.md`. |
 | 007 | `007_operations_drafts.sql` | **Yes** | 002, 006 | Creates `op_report_drafts` (the preview-before-save staging table). Adds `op_reports.flagged_for_review`, `op_reports.draft_source_id` (FK → drafts, ON DELETE SET NULL), `op_bulk_import_jobs.auto_promote`. See `docs/operations/preview-and-drafts.md`. |
+| 008 | `008_contracts_schema.sql` | **Yes** | 002 | Contracts module Spine. Creates `ct_contracts`, `ct_contract_drafts` (mirrors `op_report_drafts`), `ct_alerts` with partial unique on `(contract_id, type) WHERE resolved_at IS NULL`. New private storage bucket `contracts`. FK `ct_contracts.draft_source_id → ct_contract_drafts(id)` ON DELETE SET NULL. Idempotency via `DO $$ IF NOT EXISTS` blocks. |
 
 ## Apply order
 
 ```
-001 → 002 → 003 → 004 → 005 → 006 → 007
+001 → 002 → 003 → 004 → 005 → 006 → 007 → 008
 ```
 
 ## Re-runs in production

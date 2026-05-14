@@ -14,6 +14,7 @@ const FILES = [
   "005_operations_employee_lifecycle.sql",
   "006_operations_bulk_import_jobs.sql",
   "007_operations_drafts.sql",
+  "008_contracts_schema.sql",
 ];
 
 const STUBS = `
@@ -49,6 +50,7 @@ const ALL_TABLES = [
   "op_employees_history",
   "op_bulk_import_jobs", "op_bulk_import_items",
   "op_report_drafts",
+  "ct_contracts", "ct_contract_drafts", "ct_alerts",
 ];
 
 async function counts(c) {
@@ -84,7 +86,7 @@ async function applyFile(c, name) {
   const c = new Client({ connectionString: URL });
   await c.connect();
 
-  console.log("=== A1: clean schema + apply 001..007 ===");
+  console.log("=== A1: clean schema + apply 001..008 ===");
   await c.query("DROP SCHEMA IF EXISTS storage CASCADE");
   await c.query("DROP SCHEMA IF EXISTS public CASCADE");
   await c.query("CREATE SCHEMA public");
@@ -104,14 +106,14 @@ async function applyFile(c, name) {
   const c1 = await counts(c);
   console.log(fmt(c1));
 
-  console.log("\n=== A1: idempotency re-run of 003..007 ===");
+  console.log("\n=== A1: idempotency re-run of 003..008 ===");
   let rerunFailed = false;
   for (const f of FILES.slice(2)) {
     const r = await applyFile(c, f);
     console.log(`  ${f}: ${r.ok ? "OK" : "FAILED — " + r.error.split("\n")[0]}`);
     if (!r.ok) rerunFailed = true;
   }
-  console.log("\n=== Row counts after 003..007 re-run ===");
+  console.log("\n=== Row counts after 003..008 re-run ===");
   const c2 = await counts(c);
   console.log(fmt(c2));
 
@@ -135,17 +137,17 @@ async function applyFile(c, name) {
 
   // Gates the CI cares about (in order of severity):
   if (rerunFailed) {
-    console.error("\nFAIL: at least one of migrations 003..007 broke on re-run.");
+    console.error("\nFAIL: at least one of migrations 003..008 broke on re-run.");
     // Exit 4 = idempotency lost. Hard CI fail.
     process.exit(4);
   }
   if (drift.length > 0) {
-    console.error("\nFAIL: row counts drifted after re-running migrations 003..007.");
+    console.error("\nFAIL: row counts drifted after re-running migrations 003..008.");
     console.error("These migrations must be re-runnable without changing row counts.");
     // Exit 3 = silent data drift. Hard CI fail.
     process.exit(3);
   }
-  console.log("\nOK: migrations 001..007 apply clean; 003..007 are idempotent.");
+  console.log("\nOK: migrations 001..008 apply clean; 003..008 are idempotent.");
 })().catch((e) => {
   console.error(e);
   process.exit(1);
