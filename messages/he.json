@@ -741,7 +741,28 @@
       "title": "צינור סיווג",
       "subtitle": "הרץ קבצים ממתינים דרך מסווג קלוד ונתב קבצים מסווגים למודולי HR.",
       "classify": "סווג ממתינים",
-      "route": "נתב מסווגים"
+      "route": "נתב מסווגים",
+      "review_files": "סקירת קבצים"
+    },
+    "files": {
+      "title": "קבצי Drive",
+      "subtitle": "סקור, תקן ונתב כל קובץ שיובא מ-Google Drive",
+      "all": "הכל",
+      "empty": "אין קבצים התואמים למסנן זה",
+      "document_type": "סוג מסמך",
+      "target_table": "טבלת יעד",
+      "save_and_route": "שמור ונתב",
+      "skip": "דלג",
+      "routed_ok": "הנתוב בוצע בהצלחה",
+      "skipped_ok": "סומן כמדולג",
+      "status": {
+        "pending": "ממתין",
+        "classified": "סווג",
+        "routed": "נותב",
+        "duplicate": "כפול",
+        "failed": "נכשל",
+        "skipped": "דולג"
+      }
     },
     "classify_failed": "הסיווג נכשל",
     "route_failed": "הניתוב נכשל",

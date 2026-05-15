@@ -741,7 +741,28 @@
       "title": "Classification pipeline",
       "subtitle": "Run pending files through Claude classifier and route classified files to HR modules.",
       "classify": "Classify pending",
-      "route": "Route classified"
+      "route": "Route classified",
+      "review_files": "Review files"
+    },
+    "files": {
+      "title": "Drive files",
+      "subtitle": "Review, fix, and route every file ingested from Google Drive",
+      "all": "All",
+      "empty": "No files match this filter",
+      "document_type": "Document type",
+      "target_table": "Target table",
+      "save_and_route": "Save & route",
+      "skip": "Skip",
+      "routed_ok": "Routed successfully",
+      "skipped_ok": "Marked as skipped",
+      "status": {
+        "pending": "Pending",
+        "classified": "Classified",
+        "routed": "Routed",
+        "duplicate": "Duplicate",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      }
     },
     "classify_failed": "Classification failed",
     "route_failed": "Routing failed",

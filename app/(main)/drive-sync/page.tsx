@@ -208,6 +208,9 @@ export default function DriveSyncPage() {
             {routing ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
             {t("drive_sync.pipeline.route")}
           </Button>
+          <Link href="/drive-sync/files">
+            <Button variant="ghost">{t("drive_sync.pipeline.review_files")}</Button>
+          </Link>
         </div>
       </div>
 

@@ -741,7 +741,28 @@
       "title": "Classification pipeline",
       "subtitle": "Patakbuhin ang mga pending file sa Claude classifier at i-route ang mga classified file sa HR modules.",
       "classify": "I-classify ang pending",
-      "route": "I-route ang classified"
+      "route": "I-route ang classified",
+      "review_files": "I-review ang files"
+    },
+    "files": {
+      "title": "Drive files",
+      "subtitle": "I-review, ayusin, at i-route ang bawat file na na-ingest mula sa Google Drive",
+      "all": "Lahat",
+      "empty": "Walang file na tumutugma sa filter na ito",
+      "document_type": "Uri ng dokumento",
+      "target_table": "Target table",
+      "save_and_route": "Save at i-route",
+      "skip": "Laktawan",
+      "routed_ok": "Matagumpay na na-route",
+      "skipped_ok": "Minarkahan bilang skipped",
+      "status": {
+        "pending": "Pending",
+        "classified": "Classified",
+        "routed": "Routed",
+        "duplicate": "Duplicate",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      }
     },
     "classify_failed": "Nabigo ang classification",
     "route_failed": "Nabigo ang routing",
