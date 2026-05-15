@@ -784,6 +784,63 @@
       "status": "Status",
       "expiration": "Mag-e-expire",
       "value": "Halaga"
+    },
+    "alerts": {
+      "title": "Kailangan ng atensyon"
+    },
+    "form": {
+      "title": "Pamagat",
+      "category": "Kategorya",
+      "counterparty": "Counterparty",
+      "counterparty_contact_name": "Pangalan ng contact",
+      "counterparty_contact_email": "Email ng contact",
+      "counterparty_contact_phone": "Telepono ng contact",
+      "summary": "Buod",
+      "signing_date": "Nilagdaan",
+      "effective_date": "Effective",
+      "expiration_date": "Mag-e-expire",
+      "renewal_date": "Renewal due",
+      "monetary_value": "Halaga",
+      "currency": "Currency",
+      "is_renewable": "Renewable",
+      "renewable_help": "Auto-renew kapag hindi tinapos",
+      "obligations": "Mga obligasyon"
+    },
+    "new": {
+      "cta": "Bagong Kontrata",
+      "title": "Bagong Kontrata",
+      "subtitle": "Gamitin ang AI para i-extract ang mga field mula sa pasted contract, o sagutan nang manu-mano",
+      "tab_ai": "AI extract",
+      "tab_manual": "Manu-mano",
+      "paste_label": "I-paste ang contract text",
+      "paste_help": "Hebrew, English, o Tagalog. I-e-extract ng Claude ang mga structured field sa baba.",
+      "paste_placeholder": "I-paste dito ang buong text ng kontrata...",
+      "extract": "I-extract gamit ang AI",
+      "extracted_ok": "Na-extract ang mga field",
+      "extract_failed": "Nabigo ang extraction",
+      "ai_warnings": "Tiningnan ng AI ang sumusunod na clauses para sa iyong atensyon",
+      "too_short": "Magbigay ng hindi bababa sa 50 characters ng contract text",
+      "required_fields": "Kailangan ang title, category, at counterparty",
+      "save": "I-save ang kontrata",
+      "save_failed": "Nabigong i-save ang kontrata",
+      "saved": "Na-save ang kontrata"
+    },
+    "detail": {
+      "summary": "Buod",
+      "dates": "Mga key date",
+      "financials": "Financials",
+      "obligations": "Mga obligasyon",
+      "counterparty": "Counterparty",
+      "alerts": "Mga alert",
+      "metadata": "Metadata",
+      "created": "Nilikha",
+      "resolved": "Naayos na",
+      "flagged": "Flagged for review",
+      "renewable_badge": "renewable",
+      "status_updated": "Na-update ang status",
+      "confirm_delete": "Burahin ang kontratang ito? Hindi na ito mababalik.",
+      "deleted": "Nabura ang kontrata",
+      "not_found": "Hindi nahanap ang kontrata"
     }
   },
   "payroll": {

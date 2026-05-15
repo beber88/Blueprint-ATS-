@@ -784,6 +784,63 @@
       "status": "Status",
       "expiration": "Expires",
       "value": "Value"
+    },
+    "alerts": {
+      "title": "Upcoming attention required"
+    },
+    "form": {
+      "title": "Title",
+      "category": "Category",
+      "counterparty": "Counterparty",
+      "counterparty_contact_name": "Contact name",
+      "counterparty_contact_email": "Contact email",
+      "counterparty_contact_phone": "Contact phone",
+      "summary": "Summary",
+      "signing_date": "Signed",
+      "effective_date": "Effective",
+      "expiration_date": "Expires",
+      "renewal_date": "Renewal due",
+      "monetary_value": "Value",
+      "currency": "Currency",
+      "is_renewable": "Renewable",
+      "renewable_help": "Auto-renews unless terminated",
+      "obligations": "Obligations"
+    },
+    "new": {
+      "cta": "New Contract",
+      "title": "New Contract",
+      "subtitle": "Use AI to extract fields from a pasted contract, or fill the form manually",
+      "tab_ai": "AI extract",
+      "tab_manual": "Manual",
+      "paste_label": "Paste contract text",
+      "paste_help": "Hebrew, English, or Tagalog. Claude will extract the structured fields below.",
+      "paste_placeholder": "Paste the full contract text here...",
+      "extract": "Extract with AI",
+      "extracted_ok": "Fields extracted",
+      "extract_failed": "Extraction failed",
+      "ai_warnings": "AI flagged the following clauses for your attention",
+      "too_short": "Provide at least 50 characters of contract text",
+      "required_fields": "Title, category, and counterparty are required",
+      "save": "Save contract",
+      "save_failed": "Failed to save contract",
+      "saved": "Contract saved"
+    },
+    "detail": {
+      "summary": "Summary",
+      "dates": "Key dates",
+      "financials": "Financials",
+      "obligations": "Obligations",
+      "counterparty": "Counterparty",
+      "alerts": "Alerts",
+      "metadata": "Metadata",
+      "created": "Created",
+      "resolved": "Resolved",
+      "flagged": "Flagged for review",
+      "renewable_badge": "renewable",
+      "status_updated": "Status updated",
+      "confirm_delete": "Delete this contract? This cannot be undone.",
+      "deleted": "Contract deleted",
+      "not_found": "Contract not found"
     }
   },
   "payroll": {

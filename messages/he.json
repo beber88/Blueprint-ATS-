@@ -784,6 +784,63 @@
       "status": "סטטוס",
       "expiration": "פוקע",
       "value": "ערך"
+    },
+    "alerts": {
+      "title": "דורש תשומת לב בקרוב"
+    },
+    "form": {
+      "title": "כותרת",
+      "category": "קטגוריה",
+      "counterparty": "צד שני",
+      "counterparty_contact_name": "שם איש קשר",
+      "counterparty_contact_email": "אימייל",
+      "counterparty_contact_phone": "טלפון",
+      "summary": "תקציר",
+      "signing_date": "נחתם",
+      "effective_date": "כניסה לתוקף",
+      "expiration_date": "פקיעה",
+      "renewal_date": "מועד חידוש",
+      "monetary_value": "ערך",
+      "currency": "מטבע",
+      "is_renewable": "ניתן לחידוש",
+      "renewable_help": "מתחדש אוטומטית אלא אם מבוטל",
+      "obligations": "התחייבויות"
+    },
+    "new": {
+      "cta": "חוזה חדש",
+      "title": "חוזה חדש",
+      "subtitle": "השתמש ב-AI לחילוץ שדות מטקסט חוזה, או מלא ידנית",
+      "tab_ai": "חילוץ AI",
+      "tab_manual": "ידני",
+      "paste_label": "הדבק טקסט החוזה",
+      "paste_help": "עברית, אנגלית או טגלית. קלוד יחלץ את השדות המובנים למטה.",
+      "paste_placeholder": "הדבק את טקסט החוזה המלא כאן...",
+      "extract": "חלץ עם AI",
+      "extracted_ok": "השדות חולצו",
+      "extract_failed": "החילוץ נכשל",
+      "ai_warnings": "ה-AI סימן את הסעיפים הבאים לתשומת לבך",
+      "too_short": "ספק לפחות 50 תווים של טקסט חוזה",
+      "required_fields": "כותרת, קטגוריה וצד שני הם שדות חובה",
+      "save": "שמור חוזה",
+      "save_failed": "שמירת החוזה נכשלה",
+      "saved": "החוזה נשמר"
+    },
+    "detail": {
+      "summary": "תקציר",
+      "dates": "תאריכים מרכזיים",
+      "financials": "פיננסים",
+      "obligations": "התחייבויות",
+      "counterparty": "צד שני",
+      "alerts": "התראות",
+      "metadata": "מטא-נתונים",
+      "created": "נוצר",
+      "resolved": "טופל",
+      "flagged": "סומן לסקירה",
+      "renewable_badge": "ניתן לחידוש",
+      "status_updated": "הסטטוס עודכן",
+      "confirm_delete": "למחוק חוזה זה? פעולה זו לא ניתנת לביטול.",
+      "deleted": "החוזה נמחק",
+      "not_found": "החוזה לא נמצא"
     }
   },
   "payroll": {
