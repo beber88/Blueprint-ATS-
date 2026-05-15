@@ -8,8 +8,12 @@ import { Loader2, Upload, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import Link from "next/link";
+import { ProfileExtraTabs, type ExtraTab } from "@/components/hr/employees/tabs/ProfileExtraTabs";
+import { useUser } from "@/lib/auth/context";
 
-type Tab = "details" | "documents" | "history" | "leave" | "assets";
+type Tab =
+  | "details" | "documents" | "history" | "leave" | "assets"
+  | ExtraTab;
 
 interface Employee {
   id: string;
@@ -73,7 +77,30 @@ const TABS: { key: Tab; labelKey: string }[] = [
   { key: "history", labelKey: "hr_mgmt.employees.tab_history" },
   { key: "leave", labelKey: "hr_mgmt.employees.tab_leave" },
   { key: "assets", labelKey: "hr_mgmt.employees.tab_assets" },
+  { key: "contract", labelKey: "hr_mgmt.employees.tab_contract" },
+  { key: "salary_schedule", labelKey: "hr_mgmt.employees.tab_salary_schedule" },
+  { key: "benefits", labelKey: "hr_mgmt.employees.tab_benefits" },
+  { key: "discipline_recognition", labelKey: "hr_mgmt.employees.tab_discipline_recognition" },
+  { key: "compliance", labelKey: "hr_mgmt.employees.tab_compliance" },
+  { key: "notes", labelKey: "hr_mgmt.employees.tab_notes" },
+  { key: "alerts", labelKey: "hr_mgmt.employees.tab_alerts" },
+  { key: "access", labelKey: "hr_mgmt.employees.tab_access" },
 ];
+
+const EXTRA_TAB_KEYS: ExtraTab[] = [
+  "contract",
+  "salary_schedule",
+  "benefits",
+  "discipline_recognition",
+  "compliance",
+  "notes",
+  "alerts",
+  "access",
+];
+
+function isExtraTab(t: Tab): t is ExtraTab {
+  return (EXTRA_TAB_KEYS as Tab[]).includes(t);
+}
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "#F59E0B",
@@ -86,6 +113,7 @@ export default function EmployeeDetailPage() {
   const { t } = useI18n();
   const params = useParams();
   const id = params.id as string;
+  const { isAdmin } = useUser();
   const [tab, setTab] = useState<Tab>("details");
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -140,7 +168,10 @@ export default function EmployeeDetailPage() {
       }
     };
 
-    if (tab !== "details") {
+    // Legacy loader only handles the original 4 tabs (documents,
+    // history, leave, assets). The new gap-fill tabs fetch their
+    // own data inside ProfileExtraTabs.
+    if (tab !== "details" && !isExtraTab(tab)) {
       loadTab();
     } else {
       setTabLoading(false);
@@ -433,6 +464,12 @@ export default function EmployeeDetailPage() {
                 </table>
               )}
             </OpsCard>
+          )}
+
+          {/* Gap-fill tabs from migration 012. Each tab manages its
+              own data-fetching and forms inside ProfileExtraTabs. */}
+          {isExtraTab(tab) && (
+            <ProfileExtraTabs employeeId={id} tab={tab} isAdmin={isAdmin} />
           )}
         </>
       )}
