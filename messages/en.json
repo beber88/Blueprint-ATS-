@@ -289,6 +289,40 @@
       "confirm_delete_project": "Delete this project?",
       "confirm_delete_department": "Delete this department?",
       "confirm_delete_item": "Delete this item?"
+    },
+    "category": {
+      "hr": "HR",
+      "attendance": "HR — Attendance",
+      "safety": "Safety",
+      "project": "Project Management & Site",
+      "permit": "Permits",
+      "procurement": "Procurement",
+      "subcontractor": "Subcontractors",
+      "site": "Site",
+      "other": "Other"
+    },
+    "draft_status": {
+      "draft": "Draft",
+      "flagged": "Flagged",
+      "saved": "Saved",
+      "discarded": "Discarded"
+    },
+    "draft_source": {
+      "manual": "Manual",
+      "bulk": "Bulk Import",
+      "retry": "Retry"
+    },
+    "detail": {
+      "next_action": "Next Action",
+      "missing_info": "Missing Information",
+      "report_source": "Report Source",
+      "category": "Category",
+      "deadline_raw": "Original Deadline",
+      "ceo_flag": "Requires CEO Decision",
+      "confidence": "Match Confidence",
+      "person_raw": "Responsible (raw)",
+      "dept_raw": "Department (raw)",
+      "project_raw": "Project (raw)"
     }
   },
   "contracts": {
@@ -382,6 +416,7 @@
     },
     "edit": {
       "title": "Edit Contract",
+      "metadata": "Metadata",
       "counterparty": "Counterparty",
       "contact_name": "Contact Name",
       "contact_email": "Contact Email",

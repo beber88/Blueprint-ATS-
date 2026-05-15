@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
-import { AlertTriangle, Calendar, CheckCircle2, Clock, Loader2, Pencil, Trash2 } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, ChevronDown, ChevronRight, Clock, Loader2, Pencil, Trash2 } from "lucide-react";
 import { EditItemDialog } from "@/components/operations/edit-item-dialog";
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
 
@@ -58,6 +58,7 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
   const [editTarget, setEditTarget] = useState<Item | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const today = new Date().toISOString().slice(0, 10);
 
   const confirmDelete = async () => {
@@ -120,10 +121,16 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
         <tbody>
           {items.map((it) => {
             const overdue = it.deadline && it.deadline < today && it.status !== "resolved";
+            const isExpanded = expandedId === it.id;
             return (
-              <tr key={it.id} style={{ borderBottom: "1px solid var(--border-light)" }}>
+              <React.Fragment key={it.id}>
+              <tr
+                style={{ borderBottom: isExpanded ? "none" : "1px solid var(--border-light)", cursor: "pointer" }}
+                onClick={() => setExpandedId(isExpanded ? null : it.id)}
+              >
                 <td style={{ padding: "10px 12px", verticalAlign: "top", maxWidth: 360 }}>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+                    {isExpanded ? <ChevronDown size={14} style={{ flexShrink: 0, marginTop: 2, color: "var(--text-secondary)" }} /> : <ChevronRight size={14} style={{ flexShrink: 0, marginTop: 2, color: "var(--text-secondary)" }} />}
                     {it.ceo_decision_needed && (
                       <span title={t("operations.flag.ceo")} style={{ background: "#5B3F9E", color: "white", padding: "2px 6px", borderRadius: 4, fontSize: 10, fontWeight: 600, flexShrink: 0 }}>CEO</span>
                     )}
@@ -132,16 +139,6 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                     )}
                   </div>
                   <div style={{ marginTop: 2 }}>{it.issue}</div>
-                  {it.next_action && (
-                    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                      ⏵ {it.next_action}
-                    </div>
-                  )}
-                  {it.missing_information && (
-                    <div style={{ fontSize: 11, color: "#A88B3D", marginTop: 4, fontStyle: "italic" }}>
-                      ? {it.missing_information}
-                    </div>
-                  )}
                 </td>
                 <td style={{ padding: "10px 12px", verticalAlign: "top" }}>{it.project?.name || it.project_raw || "—"}</td>
                 <td style={{ padding: "10px 12px", verticalAlign: "top" }}>
@@ -152,6 +149,7 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                   <select
                     value={it.status}
                     disabled={busy === it.id}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => updateItem(it.id, { status: e.target.value })}
                     style={{
                       padding: "4px 8px",
@@ -196,7 +194,7 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                   )}
                 </td>
                 <td style={{ padding: "10px 12px", verticalAlign: "top" }}>
-                  <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: 2, alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
                     {busy === it.id ? <Loader2 size={14} className="animate-spin" /> : null}
                     {it.status !== "resolved" && (
                       <button
@@ -233,6 +231,43 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                   </div>
                 </td>
               </tr>
+              {isExpanded && (
+                <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
+                  <td colSpan={8} style={{ padding: 0 }}>
+                    <div style={{
+                      padding: "16px 20px",
+                      background: "var(--bg-secondary, #f8f7f5)",
+                      borderInlineStart: "3px solid #C9A84C",
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "12px 24px",
+                      fontSize: 13,
+                    }}>
+                      {it.next_action && (
+                        <DetailField label={t("operations.detail.next_action")} value={it.next_action} accent="#1A56A8" />
+                      )}
+                      {it.missing_information && (
+                        <DetailField label={t("operations.detail.missing_info")} value={it.missing_information} accent="#A88B3D" />
+                      )}
+                      <DetailField label={t("operations.detail.category")} value={t("operations.category." + it.category) || it.category} />
+                      <DetailField label={t("operations.detail.report_source")} value={`${it.report_date}${it.report ? ` · ${it.report.source_type}` : ""}`} />
+                      {it.ceo_decision_needed && (
+                        <DetailField label={t("operations.detail.ceo_flag")} value="✓" accent="#5B3F9E" />
+                      )}
+                      {it.person_responsible_raw && (
+                        <DetailField label={t("operations.detail.person_raw")} value={it.person_responsible_raw} />
+                      )}
+                      {it.department_raw && (
+                        <DetailField label={t("operations.detail.dept_raw")} value={it.department_raw} />
+                      )}
+                      {it.project_raw && (
+                        <DetailField label={t("operations.detail.project_raw")} value={it.project_raw} />
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+              </React.Fragment>
             );
           })}
         </tbody>
@@ -256,6 +291,17 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
         onConfirm={confirmDelete}
         loading={deleteLoading}
       />
+    </div>
+  );
+}
+
+function DetailField({ label, value, accent }: { label: string; value: string; accent?: string }) {
+  return (
+    <div>
+      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: accent || "var(--text-secondary)", marginBottom: 2 }}>
+        {label}
+      </div>
+      <div style={{ color: "var(--text-primary)" }}>{value}</div>
     </div>
   );
 }

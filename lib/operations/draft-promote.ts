@@ -40,6 +40,7 @@ interface DraftRow {
 export interface PromoteResult {
   reportId: string;
   itemsCount: number;
+  alertsCount: number;
 }
 
 // Shared logic used by both /api/operations/drafts/:id/save and the
@@ -132,5 +133,75 @@ export async function promoteDraft(
     })
     .eq("id", draft.id);
 
-  return { reportId: report.id, itemsCount: itemRows.length };
+  // Auto-generate alerts for urgent / CEO / overdue items so they appear
+  // immediately on the alerts page without waiting for the cron job.
+  let alertsCount = 0;
+  try {
+    alertsCount = await generateImmediateAlerts(supabase, report.id);
+  } catch {
+    // Non-critical — don't fail the promote if alerts fail.
+  }
+
+  return { reportId: report.id, itemsCount: itemRows.length, alertsCount };
+}
+
+async function generateImmediateAlerts(
+  supabase: SupabaseClient,
+  reportId: string
+): Promise<number> {
+  const today = new Date().toISOString().slice(0, 10);
+
+  // First, get the inserted items to have their IDs.
+  const { data: insertedItems } = await supabase
+    .from("op_report_items")
+    .select("id, issue, priority, deadline, ceo_decision_needed, project_id")
+    .eq("report_id", reportId);
+
+  if (!insertedItems || insertedItems.length === 0) return 0;
+
+  const alertRows: Record<string, unknown>[] = [];
+
+  for (const item of insertedItems) {
+    // Alert for urgent items
+    if (item.priority === "urgent") {
+      alertRows.push({
+        item_id: item.id,
+        project_id: item.project_id,
+        type: "urgent_new",
+        severity: "urgent",
+        message: `פריט דחוף חדש: ${(item.issue as string).slice(0, 120)}`,
+      });
+    }
+
+    // Alert for CEO decision items
+    if (item.ceo_decision_needed) {
+      alertRows.push({
+        item_id: item.id,
+        project_id: item.project_id,
+        type: "ceo_action",
+        severity: "high",
+        message: `דורש החלטת מנכ"ל: ${(item.issue as string).slice(0, 120)}`,
+      });
+    }
+
+    // Alert for already-overdue items
+    if (item.deadline && (item.deadline as string) <= today) {
+      const days = Math.floor(
+        (Date.now() - new Date(item.deadline as string).getTime()) / 86400000
+      );
+      alertRows.push({
+        item_id: item.id,
+        project_id: item.project_id,
+        type: "overdue",
+        severity: item.priority === "urgent" ? "urgent" : item.priority === "high" ? "high" : "medium",
+        message: `פריט באיחור של ${days} ימים: ${(item.issue as string).slice(0, 120)}`,
+      });
+    }
+  }
+
+  if (alertRows.length > 0) {
+    await supabase.from("op_alerts").insert(alertRows);
+  }
+
+  return alertRows.length;
 }

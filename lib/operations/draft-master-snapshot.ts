@@ -6,7 +6,7 @@ import type { MasterDataSnapshot } from "./draft-warnings";
 export async function loadMasterSnapshot(
   supabase: SupabaseClient
 ): Promise<MasterDataSnapshot> {
-  const [{ data: projects }, { data: employees }] = await Promise.all([
+  const [projResult, empResult] = await Promise.all([
     supabase
       .from("op_projects")
       .select("id, name")
@@ -16,6 +16,14 @@ export async function loadMasterSnapshot(
       .select("id, full_name")
       .eq("is_active", true),
   ]);
+  if (projResult.error) {
+    throw new Error(`Failed to load projects for snapshot: ${projResult.error.message}`);
+  }
+  if (empResult.error) {
+    throw new Error(`Failed to load employees for snapshot: ${empResult.error.message}`);
+  }
+  const projects = projResult.data;
+  const employees = empResult.data;
   return {
     activeProjects: (projects || []).map((p) => ({
       id: p.id as string,

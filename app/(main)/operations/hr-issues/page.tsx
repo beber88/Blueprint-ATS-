@@ -9,7 +9,7 @@ export default function HRIssuesPage() {
     <ItemsListPage
       title={t("operations.nav.hr_issues")}
       subtitle={t("operations.hr_issues.subtitle")}
-      defaultFilter={{ category: "hr", priority: "urgent", open_only: true }}
+      defaultFilter={{ category: "hr,attendance", open_only: true }}
     />
   );
 }

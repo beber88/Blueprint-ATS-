@@ -296,6 +296,40 @@
       "confirm_delete_project": "למחוק פרויקט זה?",
       "confirm_delete_department": "למחוק מחלקה זו?",
       "confirm_delete_item": "למחוק פריט זה?"
+    },
+    "category": {
+      "hr": "HR",
+      "attendance": "HR — נוכחות",
+      "safety": "בטיחות",
+      "project": "ניהול פרויקטים ואתר",
+      "permit": "היתרים",
+      "procurement": "רכש",
+      "subcontractor": "קבלני משנה",
+      "site": "אתר",
+      "other": "אחר"
+    },
+    "draft_status": {
+      "draft": "טיוטה",
+      "flagged": "לבדיקה",
+      "saved": "נשמר",
+      "discarded": "הושלך"
+    },
+    "draft_source": {
+      "manual": "ידני",
+      "bulk": "ייבוא",
+      "retry": "ניסיון חוזר"
+    },
+    "detail": {
+      "next_action": "פעולה הבאה",
+      "missing_info": "מידע חסר",
+      "report_source": "מקור הדוח",
+      "category": "קטגוריה",
+      "deadline_raw": "יעד מקורי",
+      "ceo_flag": "דורש החלטת מנכ\"ל",
+      "confidence": "רמת התאמה",
+      "person_raw": "אחראי (גולמי)",
+      "dept_raw": "מחלקה (גולמי)",
+      "project_raw": "פרויקט (גולמי)"
     }
   },
   "contracts": {
@@ -389,6 +423,7 @@
     },
     "edit": {
       "title": "עריכת חוזה",
+      "metadata": "מטא-דאטה",
       "counterparty": "צד שני",
       "contact_name": "שם איש קשר",
       "contact_email": "אימייל איש קשר",

@@ -100,6 +100,11 @@ function buildUserMessage(text: string, opts: ExtractOptions): string {
   if (opts.defaultProject) lines.push(`Default project context: ${opts.defaultProject}`);
   if (opts.reportDate) lines.push(`Report date hint: ${opts.reportDate}`);
   lines.push(`Source locale hint: ${opts.locale || "he"}`);
+  if (opts.locale === "he" || !opts.locale) {
+    lines.push("CRITICAL: Write ALL free-text fields (issue, next_action, missing_information, notes) in HEBREW. Keep proper nouns (people names, project names, company names) in their original script.");
+  } else if (opts.locale === "tl") {
+    lines.push("CRITICAL: Write ALL free-text fields (issue, next_action, missing_information, notes) in TAGALOG. Keep proper nouns in their original script.");
+  }
   lines.push("");
   lines.push("Return the JSON object now.");
   return lines.join("\n");
@@ -192,6 +197,8 @@ export async function extractReportItemsFromImage(
               opts.defaultProject ? `Default project context: ${opts.defaultProject}` : "",
               opts.reportDate ? `Report date hint: ${opts.reportDate}` : "",
               `Source locale hint: ${opts.locale || "he"}`,
+              (opts.locale === "he" || !opts.locale) ? "CRITICAL: Write ALL free-text fields (issue, next_action, missing_information, notes) in HEBREW. Keep proper nouns in their original script." : "",
+              opts.locale === "tl" ? "CRITICAL: Write ALL free-text fields in TAGALOG. Keep proper nouns in their original script." : "",
               "Return the JSON object now.",
             ].filter(Boolean).join("\n"),
           },

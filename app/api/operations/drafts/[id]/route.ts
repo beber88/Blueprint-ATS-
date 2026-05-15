@@ -60,7 +60,15 @@ export async function PATCH(
     );
   }
 
-  const snapshot = await loadMasterSnapshot(supabase);
+  let snapshot;
+  try {
+    snapshot = await loadMasterSnapshot(supabase);
+  } catch (e) {
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "failed to load master data" },
+      { status: 500 }
+    );
+  }
   const warnings = computeWarnings(body.ai_output, snapshot);
 
   const { data, error } = await supabase

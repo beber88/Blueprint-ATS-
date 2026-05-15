@@ -12,7 +12,7 @@ import type { ContractSnapshot } from "./types";
 export async function loadContractSnapshot(
   supabase: SupabaseClient
 ): Promise<ContractSnapshot> {
-  const [{ data: projects }, { data: contracts }] = await Promise.all([
+  const [projResult, ctResult] = await Promise.all([
     supabase
       .from("op_projects")
       .select("id, name")
@@ -23,6 +23,14 @@ export async function loadContractSnapshot(
       .order("created_at", { ascending: false })
       .limit(500),
   ]);
+  if (projResult.error) {
+    throw new Error(`Failed to load projects for contract snapshot: ${projResult.error.message}`);
+  }
+  if (ctResult.error) {
+    throw new Error(`Failed to load contracts for snapshot: ${ctResult.error.message}`);
+  }
+  const projects = projResult.data;
+  const contracts = ctResult.data;
 
   // De-dupe counterparty names case-insensitively, preserving the first
   // (most recent) spelling we saw.

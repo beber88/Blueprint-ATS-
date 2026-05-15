@@ -48,17 +48,7 @@ interface Draft {
   status: string;
 }
 
-const CATEGORY_LABELS_EN: Record<string, string> = {
-  hr: "1. HR",
-  attendance: "1. HR — Attendance",
-  safety: "Safety",
-  project: "3. Project Management & Site",
-  permit: "Permits",
-  procurement: "4. Procurement",
-  subcontractor: "Subcontractors",
-  site: "Site",
-  other: "Other",
-};
+// Category labels now come from i18n — see operations.category.* keys
 
 const SEVERITY_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
   high:   { bg: "#FBEAEA", fg: "#7A1F1F", border: "#A32D2D" },
@@ -260,7 +250,7 @@ export default function PreviewDraftPage() {
           </OpsCard>
 
           {Object.entries(grouped).map(([cat, list]) => (
-            <OpsCard key={cat} title={CATEGORY_LABELS_EN[cat] || cat}>
+            <OpsCard key={cat} title={t("operations.category." + cat) || cat}>
               {list.map((it, idxInCat) => {
                 const i = items.indexOf(it);
                 return (

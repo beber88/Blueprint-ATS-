@@ -76,28 +76,28 @@ export default function DraftsInboxPage() {
             {t("operations.drafts.filter_status")}
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={filterSelect}>
               <option value="draft,flagged">{t("operations.drafts.status_open")}</option>
-              <option value="draft">draft</option>
-              <option value="flagged">flagged</option>
-              <option value="saved">saved</option>
-              <option value="discarded">discarded</option>
+              <option value="draft">{t("operations.draft_status.draft")}</option>
+              <option value="flagged">{t("operations.draft_status.flagged")}</option>
+              <option value="saved">{t("operations.draft_status.saved")}</option>
+              <option value="discarded">{t("operations.draft_status.discarded")}</option>
             </select>
           </label>
           <label style={filterLabel}>
             {t("operations.drafts.filter_source")}
             <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} style={filterSelect}>
               <option value="">{t("operations.drafts.source_any")}</option>
-              <option value="manual">manual</option>
-              <option value="bulk">bulk</option>
-              <option value="retry">retry</option>
+              <option value="manual">{t("operations.draft_source.manual")}</option>
+              <option value="bulk">{t("operations.draft_source.bulk")}</option>
+              <option value="retry">{t("operations.draft_source.retry")}</option>
             </select>
           </label>
           <label style={filterLabel}>
             {t("operations.drafts.filter_severity")}
             <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)} style={filterSelect}>
-              <option value="any">any</option>
-              <option value="high">high</option>
-              <option value="medium">medium</option>
-              <option value="low">low</option>
+              <option value="any">{t("operations.drafts.source_any")}</option>
+              <option value="high">{t("operations.priority.high")}</option>
+              <option value="medium">{t("operations.priority.medium")}</option>
+              <option value="low">{t("operations.priority.low")}</option>
             </select>
           </label>
         </div>
@@ -127,7 +127,7 @@ export default function DraftsInboxPage() {
                 return (
                   <tr key={d.id} style={{ borderBottom: "1px solid var(--border-light)" }}>
                     <td style={td}>{new Date(d.created_at).toLocaleString()}</td>
-                    <td style={td}>{d.source_kind}</td>
+                    <td style={td}>{t("operations.draft_source." + d.source_kind) || d.source_kind}</td>
                     <td style={td}>{d.ai_output_json?.report_date || "—"}</td>
                     <td style={td}>{pickProject(d)}</td>
                     <td style={td}>
@@ -151,7 +151,7 @@ export default function DraftsInboxPage() {
                         )}
                       </span>
                     </td>
-                    <td style={td}>{d.status}</td>
+                    <td style={td}>{t("operations.draft_status." + d.status) || d.status}</td>
                     <td style={td}>
                       <Link
                         href={`/hr/operations/intake/preview/${d.id}`}

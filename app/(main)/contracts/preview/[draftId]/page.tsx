@@ -224,7 +224,7 @@ export default function ContractsPreviewPage() {
         </OpsCard>
 
         {/* Extracted metadata, editable */}
-        <OpsCard title="metadata">
+        <OpsCard title={t("contracts.edit.metadata")}>
           <Field
             label={t("contracts.detail.title")}
             value={ai.title || ""}
@@ -236,7 +236,7 @@ export default function ContractsPreviewPage() {
             onChange={(v) => patchAi({ counterparty_name: v })}
           />
           <SelectField
-            label="category"
+            label={t("contracts.list.filter_category")}
             value={ai.category || ""}
             options={[
               { v: "customer", l: t("contracts.category.customer") },
@@ -246,19 +246,19 @@ export default function ContractsPreviewPage() {
             onChange={(v) => patchAi({ category: (v || null) as ExtractedContract["category"] })}
           />
           <Field
-            label="signing date"
+            label={t("contracts.edit.signing_date")}
             type="date"
             value={toDateInput(ai.signing_date)}
             onChange={(v) => patchAi({ signing_date: v || null })}
           />
           <Field
-            label="effective date"
+            label={t("contracts.edit.effective_date")}
             type="date"
             value={toDateInput(ai.effective_date)}
             onChange={(v) => patchAi({ effective_date: v || null })}
           />
           <Field
-            label="expiration date"
+            label={t("contracts.edit.expiration_date")}
             type="date"
             value={toDateInput(ai.expiration_date)}
             onChange={(v) => patchAi({ expiration_date: v || null })}

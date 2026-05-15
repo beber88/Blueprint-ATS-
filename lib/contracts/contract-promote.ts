@@ -47,10 +47,13 @@ async function resolveProjectId(
   hint: string | null
 ): Promise<string | null> {
   if (!hint || hint.trim() === "") return null;
-  const { data: projects } = await supabase
+  const { data: projects, error } = await supabase
     .from("op_projects")
     .select("id, name")
     .eq("status", "active");
+  if (error) {
+    throw new Error(`Failed to load projects for contract promote: ${error.message}`);
+  }
   const haystack = (projects || []).map((p) => ({
     id: p.id as string,
     name: p.name as string,

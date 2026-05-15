@@ -16,7 +16,7 @@ export async function GET(
     .from("ct_contract_drafts")
     .select("*")
     .eq("id", params.id)
-    .single();
+    .maybeSingle();
   if (error || !data) {
     return NextResponse.json({ error: "draft not found" }, { status: 404 });
   }
@@ -43,7 +43,32 @@ export async function PATCH(
   }
 
   const supabase = createAdminClient();
-  const snapshot = await loadContractSnapshot(supabase);
+
+  // Block edits on non-draft statuses to prevent silent overwrite.
+  const { data: existing } = await supabase
+    .from("ct_contract_drafts")
+    .select("status")
+    .eq("id", params.id)
+    .maybeSingle();
+  if (!existing) {
+    return NextResponse.json({ error: "draft not found" }, { status: 404 });
+  }
+  if (existing.status !== "draft" && existing.status !== "flagged") {
+    return NextResponse.json(
+      { error: `draft is ${existing.status} — cannot edit` },
+      { status: 409 }
+    );
+  }
+
+  let snapshot;
+  try {
+    snapshot = await loadContractSnapshot(supabase);
+  } catch (e) {
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "failed to load snapshot" },
+      { status: 500 }
+    );
+  }
   const warnings = computeContractWarnings(body.ai_output, snapshot);
 
   const { data, error } = await supabase

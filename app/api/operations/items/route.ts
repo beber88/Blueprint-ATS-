@@ -37,7 +37,13 @@ export async function GET(request: NextRequest) {
   if (priority) query = query.eq("priority", priority);
 
   const category = url.searchParams.get("category");
-  if (category) query = query.eq("category", category);
+  if (category) {
+    if (category.includes(",")) {
+      query = query.in("category", category.split(","));
+    } else {
+      query = query.eq("category", category);
+    }
+  }
 
   const projectId = url.searchParams.get("project_id");
   if (projectId) query = query.eq("project_id", projectId);
