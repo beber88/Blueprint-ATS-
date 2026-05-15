@@ -426,11 +426,20 @@
       "tab_history": "Kasaysayan",
       "tab_leave": "Leave",
       "tab_assets": "Kagamitan",
+      "tab_contract": "Kontrata",
+      "tab_salary_schedule": "Iskedyul ng Sahod",
+      "tab_benefits": "Benepisyo",
+      "tab_discipline_recognition": "Disiplina at Pagkilala",
+      "tab_compliance": "Compliance",
+      "tab_notes": "Tala",
+      "tab_alerts": "Alerto",
+      "tab_access": "Pag-access",
       "personal_info": "Personal na Impormasyon",
       "employment_info": "Impormasyon sa Trabaho",
       "emergency_contact": "Emergency Contact",
       "upload_document": "Mag-upload ng Dokumento",
-      "no_documents": "Walang mga dokumento"
+      "no_documents": "Walang mga dokumento",
+      "no_contracts": "Wala pang kontrata"
     },
     "attendance": {
       "title": "Attendance at Oras",

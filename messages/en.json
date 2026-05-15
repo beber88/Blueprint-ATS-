@@ -461,11 +461,20 @@
       "tab_history": "History",
       "tab_leave": "Leave",
       "tab_assets": "Assets",
+      "tab_contract": "Contract",
+      "tab_salary_schedule": "Salary Schedule",
+      "tab_benefits": "Benefits",
+      "tab_discipline_recognition": "Discipline & Recognition",
+      "tab_compliance": "Compliance",
+      "tab_notes": "Notes",
+      "tab_alerts": "Alerts",
+      "tab_access": "Access",
       "personal_info": "Personal Information",
       "employment_info": "Employment Information",
       "emergency_contact": "Emergency Contact",
       "upload_document": "Upload Document",
-      "no_documents": "No documents uploaded"
+      "no_documents": "No documents uploaded",
+      "no_contracts": "No contracts yet"
     },
     "attendance": {
       "title": "Attendance & Hours",

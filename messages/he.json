@@ -468,11 +468,20 @@
       "tab_history": "היסטוריה",
       "tab_leave": "חופשות",
       "tab_assets": "ציוד",
+      "tab_contract": "חוזה העסקה",
+      "tab_salary_schedule": "תוכנית שכר",
+      "tab_benefits": "הטבות",
+      "tab_discipline_recognition": "משמעת והוקרה",
+      "tab_compliance": "ציות רגולטורי",
+      "tab_notes": "הערות פנימיות",
+      "tab_alerts": "התראות",
+      "tab_access": "הרשאות גישה",
       "personal_info": "פרטים אישיים",
       "employment_info": "פרטי העסקה",
       "emergency_contact": "איש קשר לחירום",
       "upload_document": "העלאת מסמך",
-      "no_documents": "אין מסמכים"
+      "no_documents": "אין מסמכים",
+      "no_contracts": "אין חוזים עדיין"
     },
     "attendance": {
       "title": "נוכחות ושעות",
