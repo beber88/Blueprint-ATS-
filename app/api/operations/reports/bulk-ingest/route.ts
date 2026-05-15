@@ -7,6 +7,7 @@ import {
   matchProjectByName,
 } from "@/lib/operations/match-employee";
 import { splitReports } from "@/lib/operations/bulk-split";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -24,6 +25,8 @@ interface BulkBody {
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   try {
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({ error: "AI not configured" }, { status: 500 });

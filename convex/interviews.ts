@@ -1,9 +1,11 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireModule, requireWriteAccess } from "./lib/auth";
 
 export const list = query({
   args: {},
   handler: async (ctx) => {
+    await requireModule(ctx, "recruitment");
     const interviews = await ctx.db
       .query("interviews")
       .order("desc")
@@ -42,6 +44,7 @@ export const create = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     const id = await ctx.db.insert("interviews", {
       ...args,
       duration_minutes: args.duration_minutes || 60,
@@ -80,6 +83,7 @@ export const update = mutation({
     outcome: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
 

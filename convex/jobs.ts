@@ -1,11 +1,13 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireModule, requireWriteAccess } from "./lib/auth";
 
 export const list = query({
   args: {
     status: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     let jobs;
     if (args.status) {
       jobs = await ctx.db
@@ -42,6 +44,7 @@ export const list = query({
 export const getById = query({
   args: { id: v.id("jobs") },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     const job = await ctx.db.get(args.id);
     if (!job) return null;
 
@@ -80,6 +83,7 @@ export const create = mutation({
     employment_type: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     const now = Date.now();
     return await ctx.db.insert("jobs", {
       ...args,
@@ -103,6 +107,7 @@ export const update = mutation({
     status: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     const { id, ...updates } = args;
     await ctx.db.patch(id, { ...updates, updated_at: Date.now() });
     return id;
@@ -112,6 +117,7 @@ export const update = mutation({
 export const getMatches = query({
   args: { jobId: v.id("jobs") },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     const applications = await ctx.db
       .query("applications")
       .withIndex("by_job", (q) => q.eq("job_id", args.jobId))

@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 const FIELDS = ["name", "code", "status", "department_id", "started_at", "notes"] as const;
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const supabase = createAdminClient();
   const [{ data: project }, { data: items }] = await Promise.all([
     supabase
@@ -26,6 +29,8 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const body = await request.json().catch(() => ({}));
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const f of FIELDS) if (f in body) update[f] = body[f];
@@ -36,6 +41,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const supabase = createAdminClient();
   const { error } = await supabase.from("op_projects").delete().eq("id", params.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

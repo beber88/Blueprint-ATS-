@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,8 @@ export const dynamic = "force-dynamic";
 // Defaults: status IN ('draft','flagged') — the working inbox. saved +
 // discarded are excluded unless explicitly requested.
 export async function GET(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const params = request.nextUrl.searchParams;
   const statusFilter = (params.get("status") || "draft,flagged").split(",");
   const sourceKindFilter = params.get("source_kind");

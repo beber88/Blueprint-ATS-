@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const { id } = await params;
     const supabase = createAdminClient();
 
@@ -40,6 +44,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const { id } = await params;
     const supabase = createAdminClient();
     const body = await request.json();
@@ -67,6 +74,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const { id } = await params;
     const supabase = createAdminClient();
 

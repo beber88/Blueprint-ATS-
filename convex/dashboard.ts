@@ -1,8 +1,10 @@
 import { query } from "./_generated/server";
+import { requireAuth } from "./lib/auth";
 
 export const getStats = query({
   args: {},
   handler: async (ctx) => {
+    await requireAuth(ctx);
     const allCandidates = await ctx.db.query("candidates").collect();
     const allJobs = await ctx.db.query("jobs").collect();
     const allApplications = await ctx.db.query("applications").collect();
@@ -75,6 +77,7 @@ export const getStats = query({
 export const getProfessionAnalysis = query({
   args: {},
   handler: async (ctx) => {
+    await requireAuth(ctx);
     const candidates = await ctx.db.query("candidates").collect();
     const categories = await ctx.db
       .query("jobCategories")

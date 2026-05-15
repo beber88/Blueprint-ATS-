@@ -6,6 +6,7 @@ import {
   matchEmployeeByName,
   matchProjectByName,
 } from "@/lib/operations/match-employee";
+import { requireApiAuth } from "@/lib/api/auth";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
@@ -16,6 +17,8 @@ const MAX_FILE_SIZE = 15 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = ["pdf", "txt"];
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   try {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json({ error: "Server misconfigured: Supabase credentials missing" }, { status: 500 });

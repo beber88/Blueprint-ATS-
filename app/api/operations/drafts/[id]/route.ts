@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeWarnings, type AiOutput } from "@/lib/operations/draft-warnings";
 import { loadMasterSnapshot } from "@/lib/operations/draft-master-snapshot";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,8 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { error: authErr } = await requireApiAuth({ module: "operations" });
+  if (authErr) return authErr;
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("op_report_drafts")
@@ -29,6 +32,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   let body: { ai_output?: AiOutput };
   try {
     body = await request.json();

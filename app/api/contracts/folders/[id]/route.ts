@@ -6,6 +6,7 @@ import {
   deleteFolder,
   moveFolder,
 } from "@/lib/contracts/queries";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,9 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   const { id } = await params;
   const supabase = createAdminClient();
   try {
@@ -38,6 +42,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   const { id } = await params;
   const supabase = createAdminClient();
   try {
@@ -69,6 +76,9 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   const { id } = await params;
   const supabase = createAdminClient();
   try {

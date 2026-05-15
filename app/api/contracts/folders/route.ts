@@ -6,12 +6,16 @@ import {
   getFolderBreadcrumbs,
   createFolder,
 } from "@/lib/contracts/queries";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/contracts/folders?parent_id=<uuid>&category=&status=
 // parent_id omitted or "root" → root level (parent_id IS NULL)
 export async function GET(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   const supabase = createAdminClient();
   const url = new URL(request.url);
   const rawParent = url.searchParams.get("parent_id");
@@ -39,6 +43,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/contracts/folders  { name, parent_id?, color? }
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   const supabase = createAdminClient();
   try {
     const body = await request.json();

@@ -1,6 +1,7 @@
 import { query, mutation, action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import { requireModule, requireWriteAccess, requireAuth } from "./lib/auth";
 
 // ═══════════════════════════════════
 // TEMPLATES
@@ -9,6 +10,7 @@ import { api } from "./_generated/api";
 export const listTemplates = query({
   args: {},
   handler: async (ctx) => {
+    await requireModule(ctx, "recruitment");
     return await ctx.db.query("messageTemplates").order("desc").collect();
   },
 });
@@ -23,6 +25,7 @@ export const createTemplate = mutation({
     variables: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     return await ctx.db.insert("messageTemplates", {
       ...args,
       created_at: Date.now(),
@@ -37,6 +40,7 @@ export const createTemplate = mutation({
 export const listSent = query({
   args: {},
   handler: async (ctx) => {
+    await requireModule(ctx, "recruitment");
     const messages = await ctx.db.query("messagesSent").order("desc").take(100);
 
     const enriched = await Promise.all(
@@ -61,6 +65,7 @@ export const sendMessage = action({
     body: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     // TODO: Integrate actual email/WhatsApp sending (Gmail API, Twilio)
     // For now, just log the message
 
@@ -87,6 +92,7 @@ export const recordSent = mutation({
     body: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     const id = await ctx.db.insert("messagesSent", {
       ...args,
       status: "sent",

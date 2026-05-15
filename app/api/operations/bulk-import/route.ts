@@ -13,6 +13,7 @@ import { extractReportItems } from "@/lib/claude/extract-report";
 import { computeWarnings } from "@/lib/operations/draft-warnings";
 import { loadMasterSnapshot } from "@/lib/operations/draft-master-snapshot";
 import { promoteDraft } from "@/lib/operations/draft-promote";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -28,6 +29,8 @@ interface RunBody {
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   try {
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({ error: "AI not configured" }, { status: 500 });

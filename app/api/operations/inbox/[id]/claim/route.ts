@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +8,8 @@ export const dynamic = "force-dynamic";
 // create a real op_reports row from the quarantined payload and trigger
 // processing.
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const body = await request.json().catch(() => ({}));
   if (!body.employee_id) return NextResponse.json({ error: "employee_id required" }, { status: 400 });
 

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("message_templates")
@@ -24,10 +28,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const body = await request.json();
 
-    const { data, error } = await supabase
+    const { data, error: dbError } = await supabase
       .from("message_templates")
       .insert({
         name: body.name,
@@ -40,7 +47,7 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (error) {
+    if (dbError) {
       return NextResponse.json({ error: "Failed to create template" }, { status: 500 });
     }
 

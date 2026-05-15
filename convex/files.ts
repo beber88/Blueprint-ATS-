@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAuth, requireModule, requireWriteAccess } from "./lib/auth";
 
 // ═══════════════════════════════════
 // STORAGE
@@ -8,6 +9,7 @@ import { v } from "convex/values";
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
+    await requireAuth(ctx);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -15,6 +17,7 @@ export const generateUploadUrl = mutation({
 export const getFileUrl = query({
   args: { storageId: v.id("_storage") },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     return await ctx.storage.getUrl(args.storageId);
   },
 });
@@ -26,6 +29,7 @@ export const getFileUrl = query({
 export const getUnmatched = query({
   args: {},
   handler: async (ctx) => {
+    await requireModule(ctx, "recruitment");
     const files = await ctx.db
       .query("candidateFiles")
       .withIndex("by_match_status", (q) => q.eq("match_status", "unmatched"))
@@ -51,6 +55,7 @@ export const assignFile = mutation({
     candidateId: v.id("candidates"),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     await ctx.db.patch(args.fileId, {
       candidate_id: args.candidateId,
       match_status: "manual",
@@ -89,6 +94,7 @@ export const createFileRecord = mutation({
     raw_text: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     return await ctx.db.insert("candidateFiles", {
       ...args,
       match_status: args.match_status || "unmatched",

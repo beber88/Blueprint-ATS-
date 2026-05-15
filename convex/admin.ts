@@ -1,24 +1,47 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAuth, requireRole } from "./lib/auth";
 
 // ═══════════════════════════════════
 // USER PROFILES
 // ═══════════════════════════════════
 
 export const getCurrentUser = query({
-  args: { userId: v.optional(v.string()) },
-  handler: async (ctx, args) => {
-    if (!args.userId) return null;
-    return await ctx.db
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    // Try by tokenIdentifier first
+    let profile = await ctx.db
       .query("userProfiles")
-      .withIndex("by_user_id", (q) => q.eq("user_id", args.userId!))
+      .withIndex("by_token_identifier", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
       .first();
+
+    // Fallback to email for pre-migration profiles
+    if (!profile && identity.email) {
+      profile = await ctx.db
+        .query("userProfiles")
+        .withIndex("by_email", (q) => q.eq("email", identity.email!))
+        .first();
+
+      // Backfill tokenIdentifier
+      if (profile && !profile.tokenIdentifier) {
+        await ctx.db.patch(profile._id, {
+          tokenIdentifier: identity.tokenIdentifier,
+          updated_at: Date.now(),
+        });
+      }
+    }
+
+    return profile;
   },
 });
 
 export const listUsers = query({
   args: {},
   handler: async (ctx) => {
+    await requireRole(ctx, "admin");
     return await ctx.db.query("userProfiles").order("asc").collect();
   },
 });
@@ -32,6 +55,7 @@ export const updateUser = mutation({
     avatar_url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireRole(ctx, "admin");
     const { id, ...updates } = args;
     await ctx.db.patch(id, { ...updates, updated_at: Date.now() });
     return id;
@@ -41,6 +65,7 @@ export const updateUser = mutation({
 export const deleteUser = mutation({
   args: { id: v.id("userProfiles") },
   handler: async (ctx, args) => {
+    await requireRole(ctx, "admin");
     await ctx.db.delete(args.id);
   },
 });
@@ -55,6 +80,7 @@ export const createUserProfile = mutation({
     phone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await requireAuth(ctx);
     // Check if profile already exists
     const existing = await ctx.db
       .query("userProfiles")
@@ -78,6 +104,7 @@ export const createUserProfile = mutation({
       avatar_url: args.avatar_url,
       role: args.role || "user",
       phone: args.phone,
+      tokenIdentifier: identity.tokenIdentifier,
       created_at: now,
       updated_at: now,
     });
@@ -91,6 +118,7 @@ export const createUserProfile = mutation({
 export const listCategories = query({
   args: {},
   handler: async (ctx) => {
+    await requireAuth(ctx);
     return await ctx.db
       .query("jobCategories")
       .withIndex("by_sort_order")
@@ -107,6 +135,7 @@ export const createCategory = mutation({
     sort_order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireRole(ctx, "admin");
     return await ctx.db.insert("jobCategories", {
       ...args,
       is_active: true,

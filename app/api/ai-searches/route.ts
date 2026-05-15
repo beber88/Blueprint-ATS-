@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET - list search history
 export async function GET() {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("ai_searches")
@@ -25,6 +29,9 @@ export async function GET() {
 // POST - save a search result
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const body = await request.json();
 

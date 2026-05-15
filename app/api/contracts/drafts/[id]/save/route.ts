@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { promoteContract } from "@/lib/contracts/contract-promote";
+import { requireApiAuth } from "@/lib/api/auth";
 import type { ContractDraftRow, ContractWarning } from "@/lib/contracts/types";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   const body: { flagForReview?: boolean; force?: boolean } = await request
     .json()
     .catch(() => ({}));

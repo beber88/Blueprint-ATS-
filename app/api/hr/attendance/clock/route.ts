@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "hr-management" });
+  if (authError) return authError;
+
   const body = await request.json().catch(() => ({}));
   if (!body.employee_id || !body.action)
     return NextResponse.json({ error: "employee_id, action (clock_in|clock_out) required" }, { status: 400 });

@@ -255,16 +255,18 @@ export default defineSchema({
   // USER PROFILES (extends Convex Auth users)
   // ═══════════════════════════════════════
   userProfiles: defineTable({
-    user_id: v.string(), // matches Convex auth user ID
+    user_id: v.string(), // matches Supabase auth user ID
+    tokenIdentifier: v.optional(v.string()), // canonical identity from JWT (issuer|subject)
     email: v.string(),
     full_name: v.optional(v.string()),
     avatar_url: v.optional(v.string()),
-    role: v.string(), // admin, user
+    role: v.string(), // admin, hr, user
     phone: v.optional(v.string()),
     created_at: v.number(),
     updated_at: v.number(),
   })
     .index("by_user_id", ["user_id"])
     .index("by_email", ["email"])
-    .index("by_role", ["role"]),
+    .index("by_role", ["role"])
+    .index("by_token_identifier", ["tokenIdentifier"]),
 });

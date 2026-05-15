@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { parseCV, analyzeCV, classifyDocument } from "@/lib/claude/client";
 import { similarityScore } from "@/lib/utils";
+import { requireApiAuth } from "@/lib/api/auth";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
@@ -57,6 +58,9 @@ async function findMatchingCandidate(
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json({ error: "Server misconfigured: Supabase credentials missing" }, { status: 500 });
     }

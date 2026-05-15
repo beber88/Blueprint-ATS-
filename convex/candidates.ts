@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireModule, requireWriteAccess, requirePermission } from "./lib/auth";
 
 export const list = query({
   args: {
@@ -12,6 +13,7 @@ export const list = query({
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     const limit = args.limit || 20;
 
     let q = ctx.db.query("candidates").order("desc");
@@ -74,6 +76,7 @@ export const list = query({
 export const getById = query({
   args: { id: v.id("candidates") },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     const candidate = await ctx.db.get(args.id);
     if (!candidate) return null;
 
@@ -150,6 +153,7 @@ export const create = mutation({
     job_id: v.optional(v.id("jobs")),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     const now = Date.now();
     const id = await ctx.db.insert("candidates", {
       ...args,
@@ -206,6 +210,7 @@ export const update = mutation({
     }))),
   },
   handler: async (ctx, args) => {
+    await requireWriteAccess(ctx, "recruitment");
     const { id, ...updates } = args;
     const existing = await ctx.db.get(id);
     if (!existing) throw new Error("Candidate not found");
@@ -232,6 +237,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("candidates") },
   handler: async (ctx, args) => {
+    await requirePermission(ctx, "delete_candidates");
     // Delete related records
     const apps = await ctx.db
       .query("applications")
@@ -274,6 +280,7 @@ export const remove = mutation({
 export const bulkDelete = mutation({
   args: { ids: v.array(v.id("candidates")) },
   handler: async (ctx, args) => {
+    await requirePermission(ctx, "delete_candidates");
     for (const id of args.ids) {
       const apps = await ctx.db
         .query("applications")
@@ -322,6 +329,7 @@ export const search = query({
     preset: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     const page = args.page || 1;
     const perPage = args.per_page || 50;
 
@@ -435,6 +443,7 @@ export const search = query({
 export const getFiles = query({
   args: { candidateId: v.id("candidates") },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     return await ctx.db
       .query("candidateFiles")
       .withIndex("by_candidate", (q) => q.eq("candidate_id", args.candidateId))
@@ -445,6 +454,7 @@ export const getFiles = query({
 export const getMessages = query({
   args: { candidateId: v.id("candidates") },
   handler: async (ctx, args) => {
+    await requireModule(ctx, "recruitment");
     return await ctx.db
       .query("messagesSent")
       .withIndex("by_candidate", (q) => q.eq("candidate_id", args.candidateId))

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const { candidate_ids } = await request.json();
     if (!candidate_ids || !Array.isArray(candidate_ids)) {
       return NextResponse.json({ error: "candidate_ids array required" }, { status: 400 });

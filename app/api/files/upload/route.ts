@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { classifyDocument } from '@/lib/claude/classify-document';
 import { matchDocumentToCandidate } from '@/lib/claude/match-candidate';
+import { requireApiAuth } from '@/lib/api/auth';
 import Anthropic from '@anthropic-ai/sdk';
 
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,9 @@ const pdfParse = require('pdf-parse/lib/pdf-parse');
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({ module: 'recruitment' });
+    if (authError) return authError;
+
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
     }

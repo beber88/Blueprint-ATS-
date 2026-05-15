@@ -4,6 +4,7 @@ import { extractReportItems } from "@/lib/claude/extract-report";
 import { computeWarnings } from "@/lib/operations/draft-warnings";
 import { loadMasterSnapshot } from "@/lib/operations/draft-master-snapshot";
 import { promoteDraft } from "@/lib/operations/draft-promote";
+import { requireApiAuth } from "@/lib/api/auth";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js") as (
@@ -31,6 +32,8 @@ export const maxDuration = 120;
  */
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: "AI not configured" }, { status: 500 });
   }

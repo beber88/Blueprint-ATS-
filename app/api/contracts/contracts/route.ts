@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { listContracts } from "@/lib/contracts/queries";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/contracts/contracts?category=&status=&project_id=&expiring_within_days=&limit=
 export async function GET(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   const supabase = createAdminClient();
   const url = new URL(request.url);
   try {

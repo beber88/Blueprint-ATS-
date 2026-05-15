@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const supabase = createAdminClient();
   const { data, error } = await supabase.from("op_departments").select("*").order("name");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -11,6 +14,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const body = await request.json().catch(() => ({}));
   if (!body.code || !body.name) return NextResponse.json({ error: "code and name required" }, { status: 400 });
   const supabase = createAdminClient();

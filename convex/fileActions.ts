@@ -3,6 +3,7 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import { requireAuth } from "./lib/auth";
 
 export const processCV = action({
   args: {
@@ -11,6 +12,7 @@ export const processCV = action({
     jobId: v.optional(v.id("jobs")),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     // 1. Get file from storage
     const fileUrl = await ctx.storage.getUrl(args.storageId);
     if (!fileUrl) throw new Error("File not found in storage");
@@ -119,6 +121,7 @@ export const scoreCandidate = action({
     jobId: v.id("jobs"),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     const candidate = await ctx.runQuery(api.candidates.getById, { id: args.candidateId });
     const job = await ctx.runQuery(api.jobs.getById, { id: args.jobId });
 

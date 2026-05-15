@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("ai_searches")
@@ -31,6 +35,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { error } = await supabase
       .from("ai_searches")

@@ -203,7 +203,7 @@ export function Sidebar() {
   const router = useRouter();
   const { t, locale, setLocale } = useI18n();
   const { theme, setTheme } = useTheme();
-  const { user, isAdmin } = useUser();
+  const { user, isAdmin, hasModule } = useUser();
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -255,7 +255,7 @@ export function Sidebar() {
 
       {/* Module switcher */}
       <div style={{ padding: '12px 12px 4px 12px', display: 'flex', gap: 6 }}>
-        {modules.map((m) => {
+        {modules.filter((m) => hasModule(m.key as "recruitment" | "operations" | "contracts" | "hr-management")).map((m) => {
           const isActive = m.key === activeKey;
           const firstPath = m.groups[0]?.items[0]?.path || "/dashboard";
           return (
@@ -445,8 +445,10 @@ export function Sidebar() {
               >
                 {user.full_name || user.email}
               </p>
-              {user.role === "admin" && (
-                <p style={{ fontSize: 11, color: '#C9A84C', margin: 0 }}>Admin</p>
+              {user.role && user.role !== "user" && (
+                <p style={{ fontSize: 11, color: '#C9A84C', margin: 0, textTransform: 'uppercase' }}>
+                  {user.role}
+                </p>
               )}
             </div>
           </div>

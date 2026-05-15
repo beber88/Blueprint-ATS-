@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/gmail/client";
 import { sendWhatsApp } from "@/lib/twilio/client";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +95,9 @@ async function sendToCandidate(
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const body = await request.json();
     const { candidateId, candidateIds, templateId, channel, variables, customSubject, customBody } = body;

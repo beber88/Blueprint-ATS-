@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 import Anthropic from "@anthropic-ai/sdk";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const body = await request.json();
     const { days = 7, lang = "he" } = body;

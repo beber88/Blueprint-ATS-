@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ permission: "view_emails" });
+  if (authError) return authError;
+
   const url = new URL(request.url);
   const supabase = createAdminClient();
 

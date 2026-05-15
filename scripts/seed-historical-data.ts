@@ -2,18 +2,17 @@
  * seed-historical-data.ts
  *
  * Reads the PROJECT_INFO markdown files from /Users/admin/HR BLUE GROUP/PROJECT_INFO/
- * and imports all historical data into Blueprint via the bulk-import API.
+ * and imports all historical data into Blueprint via the single-extract API.
  *
  * Usage:
- *   npx tsx scripts/seed-historical-data.ts [--dry-run] [--auto-promote]
+ *   npx tsx scripts/seed-historical-data.ts [--dry-run] [--auto-promote] [--skip-existing] [--only=reports|resumes]
  *
  * What it does:
  *   1. Parses 03_DAILY_HR_REPORTS.md (96 daily reports)
  *   2. Parses 04_WEEKLY_CONSOLIDATED_REPORTS.md (25 weekly/consolidated reports)
- *   3. Converts each into "Date: ..." delimited text the bulk-import API expects
- *   4. POSTs to /api/operations/bulk-import/preview for a cost estimate
- *   5. POSTs to /api/operations/bulk-import to run the extraction
- *   6. Parses 06_RESUMES_CANDIDATES.md and uploads each resume to /api/cv/upload
+ *   3. Sends each report individually to /api/operations/intake/extract
+ *   4. Auto-promotes drafts with /api/operations/drafts/:id/save
+ *   5. Parses 06_RESUMES_CANDIDATES.md and creates candidates via /api/seed/candidate
  *
  * Prerequisites:
  *   - The app must be running locally on http://localhost:3000
@@ -31,6 +30,8 @@ const PROJECT_INFO_DIR =
 
 const DRY_RUN = process.argv.includes("--dry-run");
 const AUTO_PROMOTE = process.argv.includes("--auto-promote");
+const SKIP_EXISTING = process.argv.includes("--skip-existing");
+const ONLY = process.argv.find((a) => a.startsWith("--only="))?.split("=")[1];
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -45,16 +46,8 @@ function readMd(filename: string): string {
   return fs.readFileSync(p, "utf-8");
 }
 
-/**
- * Split a PROJECT_INFO markdown file into individual document blocks.
- * Each block starts with a line like:
- *   ================...
- *   FILE: 00000009-HR Office Manager Daily Report 082725.pdf
- *   ================...
- */
 function splitBlocks(md: string): Array<{ filename: string; body: string }> {
-  const sep =
-    /^={40,}\s*\n\s*FILE:\s*(.+?)\s*\n\s*={40,}\s*$/gm;
+  const sep = /^={40,}\s*\n\s*FILE:\s*(.+?)\s*\n\s*={40,}\s*$/gm;
   const blocks: Array<{ filename: string; body: string }> = [];
   let lastIndex = 0;
   let lastFilename = "";
@@ -71,107 +64,133 @@ function splitBlocks(md: string): Array<{ filename: string; body: string }> {
     lastIndex = match.index + match[0].length;
   }
   if (lastFilename) {
-    blocks.push({
-      filename: lastFilename,
-      body: md.slice(lastIndex).trim(),
-    });
+    blocks.push({ filename: lastFilename, body: md.slice(lastIndex).trim() });
   }
   return blocks;
 }
 
 /**
- * Given the body of a single report, try to extract a Date: line.
- * If no date line exists, inject one from the filename (e.g., "082725" → "08/27/2025").
+ * Try to extract a report date from filename MMDDYY pattern.
+ * The filename has a numeric prefix like "00000009-" which we skip.
  */
-function ensureDateHeader(body: string, filename: string): string {
-  const hasDateLine = /^\s*(?:date|תאריך)\s*[:\-]/im.test(body);
-  if (hasDateLine) return body;
+function extractDateFromFilename(filename: string): string | null {
+  // Strip the numeric prefix (e.g., "00000009-")
+  const stripped = filename.replace(/^\d+-/, "");
 
-  // Try to extract date from filename like "Report 082725.pdf" or "042826"
-  const m = filename.match(/(\d{2})(\d{2})(\d{2})/);
+  // Try MMDDYY at the end of the name (before extension)
+  const m = stripped.match(/(\d{2})(\d{2})(\d{2})(?:\.\w+)?$/);
   if (m) {
     const [, mm, dd, yy] = m;
     const year = parseInt(yy, 10) >= 50 ? `19${yy}` : `20${yy}`;
-    return `Date: ${year}-${mm}-${dd}\n${body}`;
+    const month = parseInt(mm, 10);
+    const day = parseInt(dd, 10);
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return `${year}-${mm}-${dd}`;
+    }
   }
 
-  // Try "Aug 28" or "28 August" etc
-  const m2 = filename.match(
-    /(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})/i
+  // Try "Aug 28" or "Month DD" in filename
+  const months: Record<string, string> = {
+    jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
+    jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
+    january: "01", february: "02", march: "03", april: "04",
+    june: "06", july: "07", august: "08", september: "09",
+    october: "10", november: "11", december: "12",
+  };
+  const m2 = stripped.match(
+    /\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{1,2})\b/i
   );
   if (m2) {
-    return `Date: ${m2[1]} ${m2[2]}, 2025\n${body}`;
+    const mo = months[m2[1].toLowerCase()];
+    if (mo) return `2025-${mo}-${m2[2].padStart(2, "0")}`;
   }
 
-  return body; // no date found — extraction will handle it
-}
-
-/**
- * Converts parsed report blocks into a single big text blob
- * with "Date: ..." headers that the bulk-import API can split on.
- */
-function blocksToReportText(
-  blocks: Array<{ filename: string; body: string }>
-): string {
-  return blocks
-    .map((b) => ensureDateHeader(b.body, b.filename))
-    .join("\n\n");
+  return null;
 }
 
 // ---------------------------------------------------------------------------
-// API calls
+// Existing dates check (for --skip-existing)
 // ---------------------------------------------------------------------------
 
-async function bulkPreview(text: string) {
-  const res = await fetch(`${BASE_URL}/api/operations/bulk-import/preview`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
-  });
-  return res.json();
+async function getExistingReportDates(): Promise<Set<string>> {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/operations/dashboard/stats`
+    );
+    const data = await res.json();
+    const dates = new Set<string>();
+    for (const r of data.reports || []) {
+      if (r.report_date) dates.add(r.report_date);
+    }
+    return dates;
+  } catch {
+    return new Set();
+  }
 }
 
-async function bulkImport(
+// ---------------------------------------------------------------------------
+// Single report extraction
+// ---------------------------------------------------------------------------
+
+async function extractSingleReport(
   text: string,
-  expectedReports: number,
-  autoPromote: boolean
-) {
-  const res = await fetch(`${BASE_URL}/api/operations/bulk-import`, {
+  reportDate?: string
+): Promise<{ draftId?: string; error?: string }> {
+  // Try API first, fall back to direct Supabase if auth blocks it
+  const res = await fetch(`${BASE_URL}/api/operations/intake/extract`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       text,
-      expectedReports,
-      force: true, // skip dedup for seed
-      autoPromote,
+      reportDate: reportDate || undefined,
     }),
   });
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    // Server returned HTML (auth redirect or crash) — use seed endpoint
+    return extractViaDirectApi(text, reportDate);
+  }
   return res.json();
 }
 
-async function uploadResume(name: string, text: string) {
-  // The /api/cv/upload endpoint only accepts .pdf and .docx extensions.
-  // We create a Blob with the text content but name it .pdf so it passes
-  // the extension check. pdf-parse will fail on the raw text, but the
-  // endpoint will still have the text from the formData "text" field
-  // if we use the seed-specific text-only endpoint instead.
-  //
-  // Better approach: use a dedicated seed endpoint that accepts text directly.
-  const fd = new FormData();
-  // Send as a .docx blob — mammoth will fail but we also send text
-  // Actually, the cleanest approach: use the Convex candidate create
-  // mutation via the app's internal API. But for simplicity, let's just
-  // POST to a simple seed endpoint.
-  const res = await fetch(`${BASE_URL}/api/seed/candidate`, {
+async function extractViaDirectApi(
+  text: string,
+  reportDate?: string
+): Promise<{ draftId?: string; error?: string }> {
+  // Uses the seed/extract endpoint which has no auth
+  const res = await fetch(`${BASE_URL}/api/seed/extract`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, filename: name }),
+    body: JSON.stringify({ text, reportDate }),
   });
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    return { error: "Server returned HTML — likely crashed" };
+  }
+  return res.json();
+}
+
+async function promoteDraft(
+  draftId: string
+): Promise<{ reportId?: string; itemsCount?: number; error?: string }> {
+  const res = await fetch(
+    `${BASE_URL}/api/seed/promote/${draftId}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ force: true }),
+    }
+  );
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    return { error: "Server returned HTML — likely crashed" };
+  }
   return res.json();
 }
 
 // ---------------------------------------------------------------------------
-// Main
+// Seed reports (one at a time via single-extract)
 // ---------------------------------------------------------------------------
 
 async function seedReports(filename: string, label: string) {
@@ -188,71 +207,99 @@ async function seedReports(filename: string, label: string) {
     return;
   }
 
-  const reportText = blocksToReportText(blocks);
-
-  // Preview first
-  console.log("\nFetching preview...");
-  const preview = await bulkPreview(reportText);
-  console.log(`  Detected reports: ${preview.detectedReports}`);
-  console.log(
-    `  Date range: ${preview.dateRange?.from || "?"} → ${preview.dateRange?.to || "?"}`
-  );
-  console.log(
-    `  Estimated cost: $${preview.estimatedCostUsd?.toFixed(4) || "?"}`
-  );
-  console.log(
-    `  Tokens: ${preview.estimatedInputTokens?.toLocaleString() || "?"} in / ${preview.estimatedOutputTokens?.toLocaleString() || "?"} out`
-  );
+  // Check existing dates if --skip-existing
+  const existingDates = SKIP_EXISTING
+    ? await getExistingReportDates()
+    : new Set<string>();
+  if (SKIP_EXISTING) {
+    console.log(`  Already have ${existingDates.size} report dates in DB`);
+  }
 
   if (DRY_RUN) {
-    console.log("\n[DRY RUN] Skipping actual import");
+    for (const b of blocks) {
+      const date = extractDateFromFilename(b.filename);
+      const skip = date && existingDates.has(date) ? " [SKIP]" : "";
+      console.log(`  ${b.filename} → date hint: ${date || "auto"}${skip}`);
+    }
+    console.log(`\n[DRY RUN] Would process ${blocks.length} reports`);
     return;
   }
 
-  // Always process in small batches of 5 to avoid HTTP timeouts.
-  // Each report takes ~10-30s of Claude extraction, so 5 reports ≈ 1-2min.
-  const BATCH_SIZE = 5;
-  let totalDone = 0;
-  let totalFailed = 0;
+  let done = 0;
+  let skipped = 0;
+  let failed = 0;
 
-  for (let i = 0; i < blocks.length; i += BATCH_SIZE) {
-    const batch = blocks.slice(i, i + BATCH_SIZE);
-    const batchText = blocksToReportText(batch);
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(blocks.length / BATCH_SIZE);
-    console.log(
-      `\n  Batch ${batchNum}/${totalBatches} (${batch.length} reports)...`
-    );
-    try {
-      const result = await bulkImport(
-        batchText,
-        batch.length,
-        AUTO_PROMOTE
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const dateHint = extractDateFromFilename(block.filename);
+
+    // Skip if already imported
+    if (SKIP_EXISTING && dateHint && existingDates.has(dateHint)) {
+      skipped++;
+      continue;
+    }
+
+    // Skip very short texts
+    if (block.body.length < 50) {
+      console.log(
+        `  [${i + 1}/${blocks.length}] ${block.filename} — SKIP (too short: ${block.body.length} chars)`
       );
-      if (result.error) {
-        console.log(`    ERROR: ${result.error}`);
-        totalFailed += batch.length;
+      skipped++;
+      continue;
+    }
+
+    console.log(
+      `  [${i + 1}/${blocks.length}] ${block.filename} (date hint: ${dateHint || "auto"})...`
+    );
+
+    try {
+      // Extract via Claude
+      const extract = await extractSingleReport(block.body, dateHint || undefined);
+      if (extract.error) {
+        console.log(`    EXTRACT ERROR: ${extract.error}`);
+        failed++;
+        continue;
+      }
+      if (!extract.draftId) {
+        console.log(`    ERROR: no draftId returned`);
+        failed++;
+        continue;
+      }
+
+      // Auto-promote if requested
+      if (AUTO_PROMOTE) {
+        const promote = await promoteDraft(extract.draftId);
+        if (promote.error) {
+          console.log(
+            `    Draft created but promote failed: ${promote.error}`
+          );
+          done++; // draft still exists
+        } else {
+          console.log(
+            `    OK → report ${promote.reportId} (${promote.itemsCount} items)`
+          );
+          done++;
+        }
       } else {
-        const done = result.counts?.done || 0;
-        const failed = result.counts?.failed || 0;
-        totalDone += done;
-        totalFailed += failed;
-        console.log(
-          `    Status: ${result.status} — done: ${done}, failed: ${failed}`
-        );
+        console.log(`    Draft ${extract.draftId} created`);
+        done++;
       }
     } catch (e) {
       console.log(
         `    FETCH ERROR: ${e instanceof Error ? e.message : String(e)}`
       );
-      totalFailed += batch.length;
+      failed++;
     }
   }
 
   console.log(
-    `\n  TOTAL: ${totalDone} done, ${totalFailed} failed (out of ${blocks.length} blocks)`
+    `\n  TOTAL: ${done} done, ${skipped} skipped, ${failed} failed (out of ${blocks.length})`
   );
 }
+
+// ---------------------------------------------------------------------------
+// Seed resumes
+// ---------------------------------------------------------------------------
 
 async function seedResumes() {
   console.log(`\n${"=".repeat(60)}`);
@@ -263,7 +310,6 @@ async function seedResumes() {
   const blocks = splitBlocks(md);
   console.log(`Parsed ${blocks.length} candidate documents`);
 
-  // Filter to actual resumes (exclude job offers, interview schedules, etc.)
   const resumeBlocks = blocks.filter((b) => {
     const fn = b.filename.toLowerCase();
     return (
@@ -271,7 +317,6 @@ async function seedResumes() {
       fn.includes("cv") ||
       fn.includes("soleta") ||
       fn.includes("applicant") ||
-      // Also look for resume-like content
       b.body.toLowerCase().includes("professional summary") ||
       b.body.toLowerCase().includes("work experience") ||
       b.body.toLowerCase().includes("educational background") ||
@@ -280,22 +325,46 @@ async function seedResumes() {
   });
 
   console.log(
-    `Filtered to ${resumeBlocks.length} actual resumes (from ${blocks.length} total documents)`
+    `Filtered to ${resumeBlocks.length} actual resumes (from ${blocks.length} total)`
   );
 
   if (DRY_RUN) {
-    console.log("\n[DRY RUN] Skipping actual upload");
     resumeBlocks.forEach((b) => console.log(`  Would upload: ${b.filename}`));
     return;
   }
 
   let success = 0;
+  let dupes = 0;
   let failed = 0;
+
   for (const block of resumeBlocks) {
+    if (block.body.length < 50) {
+      console.log(`  ${block.filename} — SKIP (too short)`);
+      failed++;
+      continue;
+    }
+
     try {
       console.log(`  Uploading: ${block.filename}...`);
-      const result = await uploadResume(block.filename, block.body);
-      if (result.error) {
+      const res = await fetch(`${BASE_URL}/api/seed/candidate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: block.body, filename: block.filename }),
+      });
+
+      if (!res.ok && res.headers.get("content-type")?.includes("text/html")) {
+        // Server returned HTML error page — likely crashed/restarting
+        console.log(`    ERROR: Server returned HTML (likely timeout). Waiting 5s...`);
+        failed++;
+        await new Promise((r) => setTimeout(r, 5000));
+        continue;
+      }
+
+      const result = await res.json();
+      if (result.duplicate) {
+        console.log(`    DUPE: ${result.existing_name || result.candidate?.full_name || "?"}`);
+        dupes++;
+      } else if (result.error) {
         console.log(`    WARN: ${result.error}`);
         failed++;
       } else {
@@ -304,8 +373,6 @@ async function seedResumes() {
         );
         success++;
       }
-      // Small delay to avoid rate limiting
-      await new Promise((r) => setTimeout(r, 500));
     } catch (e) {
       console.log(
         `    ERROR: ${e instanceof Error ? e.message : String(e)}`
@@ -313,22 +380,25 @@ async function seedResumes() {
       failed++;
     }
   }
-  console.log(`\nResumes: ${success} uploaded, ${failed} failed`);
+  console.log(`\nResumes: ${success} new, ${dupes} duplicates, ${failed} failed`);
 }
 
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
 async function main() {
-  console.log("Blueprint ATS — Historical Data Seed");
+  console.log("Blueprint ATS — Historical Data Seed (v2 — single-extract)");
   console.log(`Base URL: ${BASE_URL}`);
   console.log(`Source: ${PROJECT_INFO_DIR}`);
-  console.log(`Dry run: ${DRY_RUN}`);
-  console.log(`Auto-promote: ${AUTO_PROMOTE}`);
+  console.log(`Flags: dry=${DRY_RUN} promote=${AUTO_PROMOTE} skip=${SKIP_EXISTING} only=${ONLY || "all"}`);
 
   // Verify connectivity
   try {
     const res = await fetch(`${BASE_URL}/api/operations/projects`);
     const body = await res.text();
     if (res.status >= 500) throw new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
-    console.log(`Server is reachable (status ${res.status})`);
+    console.log(`Server is reachable`);
   } catch (e) {
     if (e instanceof Error && e.message.startsWith("HTTP ")) {
       console.error(`Server error: ${e.message}`);
@@ -340,17 +410,15 @@ async function main() {
     process.exit(1);
   }
 
-  // 1. Daily HR reports (96 files)
-  await seedReports("03_DAILY_HR_REPORTS.md", "Daily HR Reports");
+  if (!ONLY || ONLY === "reports") {
+    await seedReports("03_DAILY_HR_REPORTS.md", "Daily HR Reports");
+    await seedReports("04_WEEKLY_CONSOLIDATED_REPORTS.md", "Weekly/Consolidated Reports");
+    await seedReports("01_SAMPLE_REPORTS.md", "Sample/Template Reports");
+  }
 
-  // 2. Weekly/consolidated reports (25 files)
-  await seedReports("04_WEEKLY_CONSOLIDATED_REPORTS.md", "Weekly/Consolidated Reports");
-
-  // 3. Sample/template reports (4 files — optional context)
-  await seedReports("01_SAMPLE_REPORTS.md", "Sample/Template Reports");
-
-  // 4. Resumes and candidates
-  await seedResumes();
+  if (!ONLY || ONLY === "resumes") {
+    await seedResumes();
+  }
 
   console.log("\n" + "=".repeat(60));
   console.log("Seed complete!");

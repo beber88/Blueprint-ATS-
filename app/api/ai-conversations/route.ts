@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET - list all conversations
 export async function GET() {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("ai_conversations")
@@ -41,6 +45,9 @@ export async function GET() {
 // POST - create new conversation
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const body = await request.json();
 
@@ -66,6 +73,9 @@ export async function POST(request: NextRequest) {
 // DELETE - delete a conversation
 export async function DELETE(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { id } = await request.json();
 

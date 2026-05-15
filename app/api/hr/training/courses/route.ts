@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const { error: authError } = await requireApiAuth({ module: "hr-management" });
+  if (authError) return authError;
+
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("hr_training_courses")
@@ -15,6 +19,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "hr-management" });
+  if (authError) return authError;
+
   const body = await request.json().catch(() => ({}));
   if (!body.title)
     return NextResponse.json({ error: "title required" }, { status: 400 });

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { extractContract } from "@/lib/contracts/extract-contract";
 import { computeContractWarnings } from "@/lib/contracts/draft-warnings";
 import { loadContractSnapshot } from "@/lib/contracts/draft-master-snapshot";
+import { requireApiAuth } from "@/lib/api/auth";
 
 // Match the require pattern used by /api/cv/upload — pdf-parse has a
 // top-level side effect on its index that breaks Next's bundler.
@@ -58,6 +59,9 @@ async function parseInputs(request: NextRequest): Promise<
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "contracts" });
+  if (authError) return authError;
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: "AI not configured" }, { status: 500 });
   }

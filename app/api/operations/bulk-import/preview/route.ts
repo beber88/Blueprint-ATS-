@@ -8,6 +8,7 @@ import {
   type PreviewResult,
 } from "@/lib/operations/bulk-import";
 import { estimateBulkCost } from "@/lib/operations/bulk-cost";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -17,6 +18,8 @@ interface PreviewBody {
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   let body: PreviewBody;
   try {
     body = (await request.json()) as PreviewBody;

@@ -1,28 +1,45 @@
-export type Role = "admin" | "recruiter" | "viewer" | "user";
+export type Role = "admin" | "hr" | "user";
+export type Module = "recruitment" | "operations" | "contracts" | "hr-management" | "admin";
+export type Permission =
+  | "view_salary"
+  | "view_emails"
+  | "manage_users"
+  | "export_data"
+  | "delete_candidates"
+  | "write_recruitment";
 
-export const PERMISSIONS = {
-  admin: {
-    can_manage_users: true, can_delete_candidates: true, can_change_any_status: true,
-    can_post_jobs: true, can_manage_job_boards: true, can_view_all: true,
-    can_manage_templates: true, can_export_data: true,
-  },
-  recruiter: {
-    can_manage_users: false, can_delete_candidates: false, can_change_any_status: true,
-    can_post_jobs: true, can_manage_job_boards: true, can_view_all: true,
-    can_manage_templates: true, can_export_data: false,
-  },
-  user: {
-    can_manage_users: false, can_delete_candidates: false, can_change_any_status: true,
-    can_post_jobs: true, can_manage_job_boards: false, can_view_all: true,
-    can_manage_templates: false, can_export_data: false,
-  },
-  viewer: {
-    can_manage_users: false, can_delete_candidates: false, can_change_any_status: false,
-    can_post_jobs: false, can_manage_job_boards: false, can_view_all: true,
-    can_manage_templates: false, can_export_data: false,
-  },
-} as const;
+// ═══════════════════════════════════════
+// ROLE → MODULE ACCESS
+// ═══════════════════════════════════════
 
-export function can(role: Role, permission: keyof typeof PERMISSIONS.admin): boolean {
-  return PERMISSIONS[role]?.[permission] ?? false;
+export const ROLE_MODULES: Record<Role, Module[]> = {
+  admin: ["recruitment", "operations", "contracts", "hr-management", "admin"],
+  hr: ["recruitment", "hr-management"],
+  user: ["recruitment"],
+};
+
+// ═══════════════════════════════════════
+// ROLE → PERMISSIONS
+// ═══════════════════════════════════════
+
+export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
+  admin: ["view_salary", "view_emails", "manage_users", "export_data", "delete_candidates", "write_recruitment"],
+  hr: ["view_salary", "view_emails", "write_recruitment", "delete_candidates"],
+  user: [],
+};
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+
+export function hasModuleAccess(role: Role, module: Module): boolean {
+  return (ROLE_MODULES[role] ?? []).includes(module);
+}
+
+export function hasPermission(role: Role, permission: Permission): boolean {
+  return (ROLE_PERMISSIONS[role] ?? []).includes(permission);
+}
+
+export function can(role: Role, permission: Permission): boolean {
+  return hasPermission(role, permission);
 }

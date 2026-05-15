@@ -1,9 +1,11 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAuth } from "./lib/auth";
 
 export const listConversations = query({
   args: { userId: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     if (!args.userId) return [];
 
     const participations = await ctx.db
@@ -47,6 +49,7 @@ export const listConversations = query({
 export const getMessages = query({
   args: { conversationId: v.id("chatConversations") },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     return await ctx.db
       .query("chatMessages")
       .withIndex("by_conversation", (q) => q.eq("conversation_id", args.conversationId))
@@ -62,6 +65,7 @@ export const createConversation = mutation({
     createdBy: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     const now = Date.now();
     const convId = await ctx.db.insert("chatConversations", {
       title: args.title,
@@ -91,6 +95,7 @@ export const sendChatMessage = mutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     const now = Date.now();
 
     const msgId = await ctx.db.insert("chatMessages", {
@@ -114,6 +119,7 @@ export const markRead = mutation({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
     const participant = await ctx.db
       .query("chatParticipants")
       .withIndex("by_conversation", (q) => q.eq("conversation_id", args.conversationId))

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { translateAnalysis } from "@/lib/i18n/translate";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({});
+    if (authError) return authError;
+
     const { data, targetLang } = await request.json();
     if (!data || !targetLang) {
       return NextResponse.json({ error: "data and targetLang required" }, { status: 400 });

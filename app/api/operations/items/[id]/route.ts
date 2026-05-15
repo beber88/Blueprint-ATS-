@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,8 @@ const UPDATABLE = new Set([
 ]);
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const supabase = createAdminClient();
   const body = await request.json().catch(() => ({}));
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -64,6 +67,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const supabase = createAdminClient();
   const { error } = await supabase.from("op_report_items").delete().eq("id", params.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

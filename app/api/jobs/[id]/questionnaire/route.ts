@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 import Anthropic from "@anthropic-ai/sdk";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { data: job } = await supabase.from("jobs").select("*").eq("id", params.id).single();
     if (!job) return NextResponse.json({ error: "Job not found" }, { status: 404 });
@@ -40,6 +44,9 @@ Software options must be specific to ${job.title}. Certification options must be
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     const supabase = createAdminClient();
     const { data: job } = await supabase.from("jobs").select("*").eq("id", params.id).single();
     if (!job) return NextResponse.json({ error: "Job not found" }, { status: 404 });

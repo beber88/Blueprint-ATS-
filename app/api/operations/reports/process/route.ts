@@ -8,6 +8,7 @@ import {
 } from "@/lib/operations/match-employee";
 import { downloadTwilioMedia } from "@/lib/twilio/whatsapp-media";
 import { sendWhatsApp } from "@/lib/twilio/client";
+import { requireApiAuth } from "@/lib/api/auth";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
@@ -33,6 +34,8 @@ function classifyImage(contentType: string): "image/jpeg" | "image/png" | "image
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   let reportId: string | null = null;
   try {
     const body = (await request.json()) as ProcessBody;

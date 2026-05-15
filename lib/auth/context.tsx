@@ -1,19 +1,23 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { Role, Module, Permission, hasModuleAccess, hasPermission } from "./permissions";
 
 export interface UserData {
   id: string;
   email: string;
   full_name: string | null;
   avatar_url: string | null;
-  role: "admin" | "user";
+  role: Role;
 }
 
 interface UserContextType {
   user: UserData | null;
   loading: boolean;
   isAdmin: boolean;
+  isHR: boolean;
+  hasModule: (module: Module) => boolean;
+  hasPerm: (permission: Permission) => boolean;
   refreshUser: () => Promise<void>;
 }
 
@@ -23,7 +27,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me");
       if (res.ok) {
@@ -37,14 +41,36 @@ export function UserProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refreshUser();
-  }, []);
+  }, [refreshUser]);
+
+  const role: Role = user?.role ?? "user";
+
+  const hasModule = useCallback(
+    (module: Module) => hasModuleAccess(role, module),
+    [role]
+  );
+
+  const hasPerm = useCallback(
+    (permission: Permission) => hasPermission(role, permission),
+    [role]
+  );
 
   return (
-    <UserContext.Provider value={{ user, loading, isAdmin: user?.role === "admin", refreshUser }}>
+    <UserContext.Provider
+      value={{
+        user,
+        loading,
+        isAdmin: role === "admin",
+        isHR: role === "hr" || role === "admin",
+        hasModule,
+        hasPerm,
+        refreshUser,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

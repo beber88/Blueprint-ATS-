@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { listMessages, getMessage, markAsRead } from "@/lib/gmail/reader";
 import { classifyEmail, categoryToRoute } from "@/lib/claude/classify-email";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -17,6 +18,9 @@ function authorized(request: NextRequest): boolean {
 const HR_SENDER_QUERY = "from:nicx is:unread newer_than:1d";
 
 export async function GET(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ permission: "view_emails" });
+  if (authError) return authError;
+
   if (!authorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

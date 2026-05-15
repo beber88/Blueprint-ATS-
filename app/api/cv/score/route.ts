@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { analyzeCV } from "@/lib/claude/client";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
+    const { error: authError } = await requireApiAuth({ module: "recruitment" });
+    if (authError) return authError;
+
     if (!process.env.ANTHROPIC_API_KEY) {
       console.error("CV Score: Missing ANTHROPIC_API_KEY");
       return NextResponse.json({ error: "AI service not configured" }, { status: 500 });

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const supabase = createAdminClient();
   const [{ data: report }, { data: items }] = await Promise.all([
     supabase
@@ -26,6 +29,8 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   const supabase = createAdminClient();
   const { error } = await supabase.from("op_reports").delete().eq("id", params.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

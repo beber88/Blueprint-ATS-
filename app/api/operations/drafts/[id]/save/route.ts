@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { promoteDraft } from "@/lib/operations/draft-promote";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -15,6 +16,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { error: authError } = await requireApiAuth({ module: "operations" });
+  if (authError) return authError;
   let body: { flagForReview?: boolean; force?: boolean } = {};
   try {
     body = await request.json();

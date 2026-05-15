@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireApiAuth } from "@/lib/api/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "hr-management" });
+  if (authError) return authError;
+
   const url = new URL(request.url);
   const supabase = createAdminClient();
   const employee_id = url.searchParams.get("employee_id");
@@ -23,6 +27,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const { error: authError } = await requireApiAuth({ module: "hr-management" });
+  if (authError) return authError;
+
   const body = await request.json().catch(() => ({}));
   if (!body.employee_id || !body.shift_id || !body.date)
     return NextResponse.json({ error: "employee_id, shift_id, date required" }, { status: 400 });
