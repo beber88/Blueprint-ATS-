@@ -3,11 +3,21 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
+function slugify(name: string) {
+  return name
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40) || `dept-${Date.now()}`;
+}
+
 export async function GET() {
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
-      .from("departments")
+      .from("op_departments")
       .select("*")
       .order("name", { ascending: true });
 
@@ -17,9 +27,9 @@ export async function GET() {
     }
 
     const { data: counts } = await supabase
-      .from("employees")
+      .from("op_employees")
       .select("department_id")
-      .neq("employment_status", "terminated");
+      .eq("is_active", true);
 
     const countMap = new Map<string, number>();
     (counts || []).forEach((row: { department_id: string | null }) => {
@@ -49,9 +59,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "name is required" }, { status: 400 });
     }
 
+    const code = body.code?.trim() || slugify(body.name);
+
     const { data, error } = await supabase
-      .from("departments")
+      .from("op_departments")
       .insert({
+        code,
         name: body.name,
         name_en: body.name_en || body.name,
         name_he: body.name_he || null,
@@ -59,13 +72,17 @@ export async function POST(request: NextRequest) {
         description: body.description || null,
         parent_department_id: body.parent_department_id || null,
         cost_center: body.cost_center || null,
+        color: body.color || null,
       })
       .select()
       .single();
 
     if (error) {
       console.error("Department insert error:", error);
-      return NextResponse.json({ error: "Failed to create department" }, { status: 500 });
+      return NextResponse.json(
+        { error: error.message || "Failed to create department" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(data, { status: 201 });

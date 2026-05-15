@@ -12,7 +12,7 @@ export async function GET(
     const supabase = createAdminClient();
 
     const { data, error } = await supabase
-      .from("departments")
+      .from("op_departments")
       .select("*")
       .eq("id", id)
       .single();
@@ -22,10 +22,10 @@ export async function GET(
     }
 
     const { data: employees } = await supabase
-      .from("employees")
-      .select("id, full_name, position, employment_status, photo_url")
+      .from("op_employees")
+      .select("id, full_name, position, role, employment_status, is_active, photo_url")
       .eq("department_id", id)
-      .neq("employment_status", "terminated")
+      .eq("is_active", true)
       .order("full_name");
 
     return NextResponse.json({ ...data, employees: employees || [] });
@@ -48,6 +48,7 @@ export async function PATCH(
       updated_at: new Date().toISOString(),
     };
     for (const k of [
+      "code",
       "name",
       "name_en",
       "name_he",
@@ -56,12 +57,13 @@ export async function PATCH(
       "parent_department_id",
       "head_employee_id",
       "cost_center",
+      "color",
     ]) {
       if (k in body) update[k] = body[k];
     }
 
     const { data, error } = await supabase
-      .from("departments")
+      .from("op_departments")
       .update(update)
       .eq("id", id)
       .select()
@@ -87,18 +89,21 @@ export async function DELETE(
     const supabase = createAdminClient();
 
     const { count } = await supabase
-      .from("employees")
+      .from("op_employees")
       .select("id", { count: "exact", head: true })
       .eq("department_id", id);
 
     if (count && count > 0) {
       return NextResponse.json(
-        { error: "Cannot delete department with employees. Reassign employees first." },
+        {
+          error:
+            "Cannot delete department with active employees. Reassign them first.",
+        },
         { status: 409 }
       );
     }
 
-    const { error } = await supabase.from("departments").delete().eq("id", id);
+    const { error } = await supabase.from("op_departments").delete().eq("id", id);
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }

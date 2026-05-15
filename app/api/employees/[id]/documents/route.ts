@@ -21,6 +21,11 @@ const ALLOWED_TYPES = new Set([
   "other",
 ]);
 
+function publicUrl(supabase: ReturnType<typeof createAdminClient>, storagePath: string) {
+  const { data } = supabase.storage.from(HR_BUCKET).getPublicUrl(storagePath);
+  return data?.publicUrl || storagePath;
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -30,7 +35,7 @@ export async function GET(
     const supabase = createAdminClient();
 
     const { data, error } = await supabase
-      .from("employee_documents")
+      .from("hr_employee_documents")
       .select("*")
       .eq("employee_id", id)
       .order("created_at", { ascending: false });
@@ -39,7 +44,13 @@ export async function GET(
       console.error("Document GET error:", error);
       return NextResponse.json({ error: "Failed to fetch documents" }, { status: 500 });
     }
-    return NextResponse.json({ documents: data || [] });
+
+    const enriched = (data || []).map((d) => ({
+      ...d,
+      file_url: d.file_url || publicUrl(supabase, d.storage_path),
+    }));
+
+    return NextResponse.json({ documents: enriched });
   } catch (error) {
     console.error("Document GET error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -55,7 +66,7 @@ export async function POST(
     const supabase = createAdminClient();
 
     const { data: employee } = await supabase
-      .from("employees")
+      .from("op_employees")
       .select("id, full_name")
       .eq("id", employeeId)
       .single();
@@ -81,7 +92,7 @@ export async function POST(
     const fileHash = crypto.createHash("sha256").update(buffer).digest("hex");
 
     const { data: existing } = await supabase
-      .from("employee_documents")
+      .from("hr_employee_documents")
       .select("id")
       .eq("employee_id", employeeId)
       .eq("file_hash", fileHash)
@@ -89,7 +100,11 @@ export async function POST(
 
     if (existing) {
       return NextResponse.json(
-        { error: "duplicate", message: "This file already exists for this employee", document_id: existing.id },
+        {
+          error: "duplicate",
+          message: "This file already exists for this employee",
+          document_id: existing.id,
+        },
         { status: 409 }
       );
     }
@@ -109,15 +124,15 @@ export async function POST(
       return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
     }
 
-    const { data: urlData } = supabase.storage.from(HR_BUCKET).getPublicUrl(storagePath);
-    const fileUrl = urlData?.publicUrl || storagePath;
+    const fileUrl = publicUrl(supabase, storagePath);
 
     const { data: doc, error: insertError } = await supabase
-      .from("employee_documents")
+      .from("hr_employee_documents")
       .insert({
         employee_id: employeeId,
         document_type: documentType,
         title: title || file.name,
+        storage_path: storagePath,
         file_url: fileUrl,
         file_hash: fileHash,
         original_filename: file.name,
@@ -125,7 +140,7 @@ export async function POST(
         size_bytes: buffer.length,
         original_language: originalLanguage || "unknown",
         provenance: { source: "manual", imported_at: new Date().toISOString() },
-        metadata: { storage_path: storagePath },
+        metadata: {},
       })
       .select()
       .single();
@@ -136,12 +151,12 @@ export async function POST(
       return NextResponse.json({ error: "Failed to record document" }, { status: 500 });
     }
 
-    await supabase.from("employee_timeline").insert({
+    await supabase.from("hr_employee_timeline").insert({
       employee_id: employeeId,
       event_type: "document_uploaded",
       title: `Document uploaded: ${title || file.name}`,
       description: `Type: ${documentType}`,
-      related_table: "employee_documents",
+      related_table: "hr_employee_documents",
       related_id: doc.id,
       metadata: { document_type: documentType },
     });
@@ -164,25 +179,25 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { data: doc } = await supabase
-      .from("employee_documents")
-      .select("metadata, employee_id, title")
+      .from("hr_employee_documents")
+      .select("storage_path, employee_id, title")
       .eq("id", documentId)
       .single();
 
-    if (doc?.metadata && typeof doc.metadata === "object") {
-      const path = (doc.metadata as Record<string, string>).storage_path;
-      if (path) {
-        await supabase.storage.from(HR_BUCKET).remove([path]);
-      }
+    if (doc?.storage_path) {
+      await supabase.storage.from(HR_BUCKET).remove([doc.storage_path]);
     }
 
-    const { error } = await supabase.from("employee_documents").delete().eq("id", documentId);
+    const { error } = await supabase
+      .from("hr_employee_documents")
+      .delete()
+      .eq("id", documentId);
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     if (doc) {
-      await supabase.from("employee_timeline").insert({
+      await supabase.from("hr_employee_timeline").insert({
         employee_id: doc.employee_id,
         event_type: "document_deleted",
         title: `Document deleted: ${doc.title || "(untitled)"}`,

@@ -44,7 +44,7 @@ export function EmployeeProfileTabs({ employee, onChanged }: Props) {
           </Section>
 
           <Section title={t("employees.section.employment")}>
-            <Row icon={Briefcase} label={t("employees.form.position")} value={employee.position} />
+            <Row icon={Briefcase} label={t("employees.form.position")} value={employee.position || employee.role} />
             <Row
               icon={Building2}
               label={t("employees.form.department")}

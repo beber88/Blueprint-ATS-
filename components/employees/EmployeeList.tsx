@@ -71,7 +71,7 @@ export function EmployeeList({ employees }: Props) {
                   </div>
                 </Link>
               </td>
-              <td className="px-4 py-3 text-sm">{emp.position || "—"}</td>
+              <td className="px-4 py-3 text-sm">{emp.position || emp.role || "—"}</td>
               <td className="px-4 py-3 text-sm">{emp.department?.name || "—"}</td>
               <td className="px-4 py-3">
                 <Badge

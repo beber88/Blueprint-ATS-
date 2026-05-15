@@ -3,25 +3,45 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-const UPDATABLE_FIELDS = [
-  "full_name",
-  "full_name_en",
-  "full_name_he",
-  "full_name_tl",
-  "employee_code",
-  "email",
-  "phone",
-  "position",
-  "department_id",
-  "hire_date",
-  "employment_status",
-  "birth_date",
-  "address",
-  "emergency_contact",
-  "government_ids",
-  "photo_url",
-  "notes",
-];
+const UPDATABLE_FIELDS: Record<string, string> = {
+  full_name: "full_name",
+  full_name_en: "full_name_en",
+  full_name_he: "full_name_he",
+  full_name_tl: "full_name_tl",
+  employee_code: "employee_code",
+  email: "email",
+  phone: "phone",
+  whatsapp_phone: "whatsapp_phone",
+  position: "position",
+  role: "role",
+  department_id: "department_id",
+  project_id: "project_id",
+  hire_date: "hire_date",
+  employment_status: "employment_status",
+  employment_type: "employment_type",
+  manager_id: "manager_id",
+  salary_grade: "salary_grade",
+  birth_date: "date_of_birth",
+  date_of_birth: "date_of_birth",
+  gender: "gender",
+  address: "address",
+  emergency_contact: "emergency_contact",
+  government_ids: "government_ids",
+  national_id: "national_id",
+  photo_url: "photo_url",
+  notes: "notes",
+};
+
+const SELECT_FULL =
+  "*, department:op_departments!department_id(id, name, name_en, name_he, name_tl)";
+
+const HR_BUCKET = "hr-documents";
+
+function publicUrl(supabase: ReturnType<typeof createAdminClient>, storagePath: string | null) {
+  if (!storagePath) return null;
+  const { data } = supabase.storage.from(HR_BUCKET).getPublicUrl(storagePath);
+  return data?.publicUrl || null;
+}
 
 export async function GET(
   _request: NextRequest,
@@ -32,8 +52,8 @@ export async function GET(
     const supabase = createAdminClient();
 
     const { data: employee, error } = await supabase
-      .from("employees")
-      .select("*, department:departments(id, name, name_en, name_he, name_tl)")
+      .from("op_employees")
+      .select(SELECT_FULL)
       .eq("id", id)
       .single();
 
@@ -43,21 +63,26 @@ export async function GET(
 
     const [{ data: documents }, { data: timeline }] = await Promise.all([
       supabase
-        .from("employee_documents")
+        .from("hr_employee_documents")
         .select("*")
         .eq("employee_id", id)
         .order("created_at", { ascending: false }),
       supabase
-        .from("employee_timeline")
+        .from("hr_employee_timeline")
         .select("*")
         .eq("employee_id", id)
         .order("event_date", { ascending: false })
         .limit(100),
     ]);
 
+    const documentsWithUrls = (documents || []).map((d) => ({
+      ...d,
+      file_url: d.file_url || publicUrl(supabase, d.storage_path),
+    }));
+
     return NextResponse.json({
       ...employee,
-      documents: documents || [],
+      documents: documentsWithUrls,
       timeline: timeline || [],
     });
   } catch (error) {
@@ -78,18 +103,29 @@ export async function PATCH(
     const update: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
-    for (const key of UPDATABLE_FIELDS) {
-      if (key in body) update[key] = body[key];
+
+    for (const [bodyKey, dbColumn] of Object.entries(UPDATABLE_FIELDS)) {
+      if (bodyKey in body) update[dbColumn] = body[bodyKey];
+    }
+
+    if ("employment_status" in body) {
+      const status = body.employment_status;
+      update.is_active =
+        status === "active" || status === "probation" || status === "on_leave";
+    }
+
+    if ("position" in body && !("role" in body)) {
+      update.role = body.position;
     }
 
     const { data: previous } = await supabase
-      .from("employees")
-      .select("employment_status, position, department_id")
+      .from("op_employees")
+      .select("employment_status, position, role, department_id")
       .eq("id", id)
       .single();
 
     const { data, error } = await supabase
-      .from("employees")
+      .from("op_employees")
       .update(update)
       .eq("id", id)
       .select()
@@ -106,14 +142,16 @@ export async function PATCH(
         events.push({
           event_type: "status_changed",
           title: "Employment status changed",
-          description: `${previous.employment_status} → ${body.employment_status}`,
+          description: `${previous.employment_status ?? "—"} → ${body.employment_status}`,
         });
       }
-      if (body.position && body.position !== previous.position) {
+      const newPosition = body.position || body.role;
+      const oldPosition = previous.position || previous.role;
+      if (newPosition && newPosition !== oldPosition) {
         events.push({
           event_type: "position_changed",
           title: "Position updated",
-          description: `${previous.position ?? "—"} → ${body.position}`,
+          description: `${oldPosition ?? "—"} → ${newPosition}`,
         });
       }
       if (body.department_id && body.department_id !== previous.department_id) {
@@ -124,9 +162,9 @@ export async function PATCH(
         });
       }
       if (events.length) {
-        await supabase.from("employee_timeline").insert(
-          events.map((e) => ({ ...e, employee_id: id }))
-        );
+        await supabase
+          .from("hr_employee_timeline")
+          .insert(events.map((e) => ({ ...e, employee_id: id })));
       }
     }
 
@@ -145,7 +183,7 @@ export async function DELETE(
     const { id } = await params;
     const supabase = createAdminClient();
 
-    const { error } = await supabase.from("employees").delete().eq("id", id);
+    const { error } = await supabase.from("op_employees").delete().eq("id", id);
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }

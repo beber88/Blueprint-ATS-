@@ -132,7 +132,7 @@ export default function EmployeeProfilePage() {
             </Badge>
           </div>
           <div className="mt-1 text-sm text-muted-foreground">
-            {[employee.position, employee.department?.name, employee.employee_code]
+            {[employee.position || employee.role, employee.department?.name, employee.employee_code]
               .filter(Boolean)
               .join(" · ")}
           </div>

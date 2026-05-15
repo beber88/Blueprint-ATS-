@@ -1,3 +1,10 @@
+/**
+ * HRIS types backed by existing op_employees / op_departments / hr_employee_documents tables.
+ * Phase 1 (rebased) keeps the historical column names (`role`, `is_active`, `date_of_birth`,
+ * `national_id`) and adds new HRIS columns (`position`, `employment_status`, `government_ids`,
+ * multi-language names, etc.) via additive migration 002.
+ */
+
 export type EmploymentStatus =
   | "active"
   | "probation"
@@ -9,7 +16,8 @@ export type EmployeeSource =
   | "manual"
   | "drive_sync"
   | "migrated_from_candidate"
-  | "import";
+  | "import"
+  | "seed";
 
 export type DocumentType =
   | "contract"
@@ -46,6 +54,7 @@ export interface EmergencyContact {
 
 export interface Department {
   id: string;
+  code: string;
   name: string;
   name_en: string | null;
   name_he: string | null;
@@ -54,37 +63,56 @@ export interface Department {
   parent_department_id: string | null;
   head_employee_id: string | null;
   cost_center: string | null;
+  color: string | null;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
   employee_count?: number;
   children?: Department[];
 }
 
 export interface Employee {
   id: string;
-  candidate_id: string | null;
-  employee_code: string | null;
+  // Core identity
   full_name: string;
   full_name_en: string | null;
   full_name_he: string | null;
   full_name_tl: string | null;
+  employee_code: string | null;
   email: string | null;
   phone: string | null;
+  whatsapp_phone: string | null;
+  // Employment
   position: string | null;
+  role: string | null; // legacy column kept for backward compat
   department_id: string | null;
-  hire_date: string | null;
+  project_id: string | null;
+  is_pm: boolean | null;
+  is_active: boolean;
   employment_status: EmploymentStatus;
-  birth_date: string | null;
+  employment_type: string | null;
+  hire_date: string | null;
+  manager_id: string | null;
+  salary_grade: string | null;
+  // Personal
+  date_of_birth: string | null;
+  gender: string | null;
   address: string | null;
   emergency_contact: EmergencyContact;
+  national_id: string | null;
   government_ids: GovernmentIds;
   photo_url: string | null;
+  // Recruitment link
+  candidate_id: string | null;
+  user_profile_id: string | null;
+  // Provenance
   source: EmployeeSource;
   source_metadata: Record<string, unknown>;
   notes: string | null;
   merged_into_id: string | null;
+  // Timestamps
   created_at: string;
   updated_at: string;
+  // Joined
   department?: Department | null;
   documents?: EmployeeDocument[];
   timeline?: EmployeeTimelineEvent[];
@@ -103,7 +131,8 @@ export interface EmployeeDocument {
   id: string;
   employee_id: string;
   document_type: DocumentType;
-  title: string | null;
+  title: string;
+  storage_path: string;
   file_url: string | null;
   file_hash: string | null;
   original_filename: string | null;
@@ -114,6 +143,8 @@ export interface EmployeeDocument {
   provenance: DocumentProvenance;
   metadata: Record<string, unknown>;
   uploaded_by: string | null;
+  notes: string | null;
+  expiry_date: string | null;
   created_at: string;
 }
 
@@ -140,7 +171,9 @@ export interface EmployeeListItem
     | "email"
     | "phone"
     | "position"
+    | "role"
     | "employment_status"
+    | "is_active"
     | "hire_date"
     | "photo_url"
     | "created_at"
