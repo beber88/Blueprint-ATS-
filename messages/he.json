@@ -865,6 +865,48 @@
       "base_salary": "שכר בסיס",
       "currency": "מטבע",
       "frequency": "תדירות"
+    },
+    "actions": {
+      "adjust_salary": "עדכון שכר",
+      "generate_payslip": "הפק תלוש"
+    },
+    "dialog": {
+      "adjust_title": "רישום עדכון שכר",
+      "gen_title": "הפקת תלוש שכר",
+      "required": "נא למלא את שדות החובה",
+      "save": "שמור",
+      "generate": "הפק",
+      "notes": "הערות",
+      "from": "מ-",
+      "to": "עד",
+      "salary_saved": "עדכון השכר נרשם",
+      "payslip_generated": "התלוש הופק",
+      "save_failed": "השמירה נכשלה",
+      "gen_failed": "הפקת התלוש נכשלה",
+      "gen_help": "מושך את השכר התקף של העובד ומחשב ניכויי חובה פיליפיניים (SSS, PhilHealth, Pag-IBIG, מס במקור)."
+    },
+    "detail": {
+      "payslip": "תלוש שכר",
+      "generated": "הופק",
+      "print": "הדפס",
+      "approve": "אשר",
+      "mark_paid": "סמן כשולם",
+      "status_updated": "הסטטוס עודכן",
+      "transition_failed": "שינוי סטטוס אינו מותר",
+      "not_found": "התלוש לא נמצא",
+      "earnings": "הכנסות",
+      "base_salary": "שכר בסיס",
+      "allowances_total": "סך תוספות",
+      "gross_pay": "שכר ברוטו",
+      "statutory": "ניכויי חובה",
+      "withholding_tax": "מס במקור",
+      "statutory_total": "סך ניכויי חובה",
+      "other_deductions": "ניכויים אחרים",
+      "other_deductions_total": "סך ניכויים אחרים",
+      "total_deductions": "סך ניכויים",
+      "net_pay": "שכר נטו",
+      "no_breakdown": "לתלוש זה אין פירוט מחושב (יובא).",
+      "disclaimer": "סכומי החובה הם הערכות מחושבות לפי טבלאות הניכויים הסטנדרטיות בפיליפינים ועשויים להיות שונים מנתוני הרשויות הרשמיים."
     }
   },
   "assets": {

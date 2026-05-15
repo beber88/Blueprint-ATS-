@@ -865,6 +865,48 @@
       "base_salary": "Base salary",
       "currency": "Currency",
       "frequency": "Frequency"
+    },
+    "actions": {
+      "adjust_salary": "Salary adjustment",
+      "generate_payslip": "Generate payslip"
+    },
+    "dialog": {
+      "adjust_title": "Record salary adjustment",
+      "gen_title": "Generate payslip",
+      "required": "Please fill the required fields",
+      "save": "Save",
+      "generate": "Generate",
+      "notes": "Notes",
+      "from": "from",
+      "to": "to",
+      "salary_saved": "Salary adjustment recorded",
+      "payslip_generated": "Payslip generated",
+      "save_failed": "Failed to save",
+      "gen_failed": "Failed to generate payslip",
+      "gen_help": "Pulls the employee's effective salary and computes PH statutory deductions (SSS, PhilHealth, Pag-IBIG, withholding tax)."
+    },
+    "detail": {
+      "payslip": "Payslip",
+      "generated": "Generated",
+      "print": "Print",
+      "approve": "Approve",
+      "mark_paid": "Mark as paid",
+      "status_updated": "Status updated",
+      "transition_failed": "Status change not allowed",
+      "not_found": "Payslip not found",
+      "earnings": "Earnings",
+      "base_salary": "Base salary",
+      "allowances_total": "Allowances total",
+      "gross_pay": "Gross pay",
+      "statutory": "Statutory deductions",
+      "withholding_tax": "Withholding tax",
+      "statutory_total": "Statutory total",
+      "other_deductions": "Other deductions",
+      "other_deductions_total": "Other deductions total",
+      "total_deductions": "Total deductions",
+      "net_pay": "Net pay",
+      "no_breakdown": "This payslip has no computed breakdown (imported).",
+      "disclaimer": "Statutory amounts are computed estimates based on standard PH contribution tables and may differ from official agency figures."
     }
   },
   "assets": {

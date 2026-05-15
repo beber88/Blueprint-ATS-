@@ -865,6 +865,48 @@
       "base_salary": "Base salary",
       "currency": "Currency",
       "frequency": "Frequency"
+    },
+    "actions": {
+      "adjust_salary": "Pag-adjust ng sahod",
+      "generate_payslip": "Mag-generate ng payslip"
+    },
+    "dialog": {
+      "adjust_title": "Itala ang pag-adjust ng sahod",
+      "gen_title": "Mag-generate ng payslip",
+      "required": "Pakipunan ang mga kailangang field",
+      "save": "I-save",
+      "generate": "I-generate",
+      "notes": "Mga tala",
+      "from": "mula",
+      "to": "hanggang",
+      "salary_saved": "Naitala ang pag-adjust ng sahod",
+      "payslip_generated": "Na-generate ang payslip",
+      "save_failed": "Nabigong i-save",
+      "gen_failed": "Nabigong mag-generate ng payslip",
+      "gen_help": "Kinukuha ang effective na sahod ng empleyado at kinakalkula ang PH statutory deductions (SSS, PhilHealth, Pag-IBIG, withholding tax)."
+    },
+    "detail": {
+      "payslip": "Payslip",
+      "generated": "Na-generate",
+      "print": "I-print",
+      "approve": "Aprubahan",
+      "mark_paid": "Markahang bayad na",
+      "status_updated": "Na-update ang status",
+      "transition_failed": "Hindi pinapayagan ang pagbabago ng status",
+      "not_found": "Hindi nahanap ang payslip",
+      "earnings": "Kita",
+      "base_salary": "Base na sahod",
+      "allowances_total": "Kabuuang allowance",
+      "gross_pay": "Gross pay",
+      "statutory": "Statutory deductions",
+      "withholding_tax": "Withholding tax",
+      "statutory_total": "Kabuuang statutory",
+      "other_deductions": "Iba pang deductions",
+      "other_deductions_total": "Kabuuang iba pang deductions",
+      "total_deductions": "Kabuuang deductions",
+      "net_pay": "Net pay",
+      "no_breakdown": "Walang computed breakdown ang payslip na ito (imported).",
+      "disclaimer": "Ang statutory amounts ay computed estimates base sa standard PH contribution tables at maaaring magkaiba sa opisyal na figures ng ahensya."
     }
   },
   "assets": {
