@@ -23,7 +23,8 @@
     "chat": "Chat",
     "reports": "Mga Ulat",
     "employees": "Mga Empleyado",
-    "departments": "Mga Departamento"
+    "departments": "Mga Departamento",
+    "drive_sync": "Drive Sync"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -680,6 +681,58 @@
       "name": "Pangalan",
       "parent": "Magulang na Departamento",
       "description": "Paglalarawan"
+    }
+  },
+  "integrations": {
+    "title": "Mga Integration",
+    "subtitle": "Ikonekta ang mga external service sa iyong HR platform",
+    "drive": {
+      "title": "Google Drive",
+      "description": "Ikonekta ang Google Drive para mag-ingest ng mga HR document (kontrata, payslip, government form, ulat) at i-route ang mga ito sa tamang module nang awtomatiko.",
+      "status_connected": "Nakakonekta",
+      "status_disconnected": "Hindi nakakonekta",
+      "connected_as": "Nakakonekta bilang",
+      "connect": "Ikonekta ang Google Drive",
+      "disconnect": "Idiskonekta",
+      "open_sync": "Buksan ang Drive sync",
+      "confirm_disconnect": "Idiskonekta ang Google Drive? Mananatili sa system ang mga existing imported files.",
+      "disconnected": "Naidiskonekta ang Drive",
+      "disconnect_failed": "Nabigong magdiskonekta",
+      "connected_toast": "Nakakonekta na ang Google Drive",
+      "error_prefix": "Drive error",
+      "scope_label": "Read-only access",
+      "scope_description": "Hinihingi lang namin ang drive.readonly scope. Mababasa lang ng system ang mga files sa folder na ituturo mo, hindi makakapagbago o makakapag-delete sa iyong Drive."
+    }
+  },
+  "drive_sync": {
+    "title": "Drive Sync",
+    "subtitle": "Mag-import ng HR documents mula sa Google Drive folders",
+    "manage_connection": "Pamahalaan ang koneksyon",
+    "folder_label": "Folder URL o ID",
+    "folder_help": "I-paste ang Google Drive folder URL (https://drive.google.com/drive/folders/...) o ang ID nito.",
+    "folder_required": "Kailangan ang folder URL o ID",
+    "start": "Simulan ang sync",
+    "start_failed": "Nabigong simulan ang sync",
+    "started_toast": "Nagsimula ang sync",
+    "tick": "Patakbuhin ang batch",
+    "tick_failed": "Nabigo ang tick",
+    "history": "History ng sync",
+    "empty": "Wala pang sync run",
+    "started": "Nagsimula",
+    "last_progress": "Huling progreso",
+    "stats": {
+      "seen": "Nakita",
+      "imported": "Na-import",
+      "duplicate": "Duplicate",
+      "skipped": "Nilaktawan",
+      "errored": "May error"
+    },
+    "status": {
+      "idle": "Idle",
+      "running": "Tumatakbo",
+      "paused": "Naka-pause",
+      "error": "Error",
+      "complete": "Tapos na"
     }
   }
 }

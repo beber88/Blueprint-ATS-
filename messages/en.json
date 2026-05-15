@@ -23,7 +23,8 @@
     "chat": "Chat",
     "reports": "Reports",
     "employees": "Employees",
-    "departments": "Departments"
+    "departments": "Departments",
+    "drive_sync": "Drive Sync"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -680,6 +681,58 @@
       "name": "Name",
       "parent": "Parent Department",
       "description": "Description"
+    }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Connect external services to your HR platform",
+    "drive": {
+      "title": "Google Drive",
+      "description": "Connect Google Drive to ingest HR documents (contracts, payslips, government forms, reports) and route them to the right modules automatically.",
+      "status_connected": "Connected",
+      "status_disconnected": "Not connected",
+      "connected_as": "Connected as",
+      "connect": "Connect Google Drive",
+      "disconnect": "Disconnect",
+      "open_sync": "Open Drive sync",
+      "confirm_disconnect": "Disconnect Google Drive? Existing imported files stay in the system.",
+      "disconnected": "Drive disconnected",
+      "disconnect_failed": "Failed to disconnect",
+      "connected_toast": "Google Drive connected",
+      "error_prefix": "Drive error",
+      "scope_label": "Read-only access",
+      "scope_description": "We request only drive.readonly scope. The system can read files in folders you point to, but cannot modify or delete anything in your Drive."
+    }
+  },
+  "drive_sync": {
+    "title": "Drive Sync",
+    "subtitle": "Import HR documents from Google Drive folders",
+    "manage_connection": "Manage connection",
+    "folder_label": "Folder URL or ID",
+    "folder_help": "Paste a Google Drive folder URL (https://drive.google.com/drive/folders/...) or just its ID.",
+    "folder_required": "Folder URL or ID is required",
+    "start": "Start sync",
+    "start_failed": "Failed to start sync",
+    "started_toast": "Sync started",
+    "tick": "Run batch",
+    "tick_failed": "Tick failed",
+    "history": "Sync history",
+    "empty": "No sync runs yet",
+    "started": "Started",
+    "last_progress": "Last progress",
+    "stats": {
+      "seen": "Seen",
+      "imported": "Imported",
+      "duplicate": "Duplicate",
+      "skipped": "Skipped",
+      "errored": "Errored"
+    },
+    "status": {
+      "idle": "Idle",
+      "running": "Running",
+      "paused": "Paused",
+      "error": "Error",
+      "complete": "Complete"
     }
   }
 }

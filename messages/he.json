@@ -23,7 +23,8 @@
     "chat": "צ'אט",
     "reports": "דוחות",
     "employees": "עובדים",
-    "departments": "מחלקות"
+    "departments": "מחלקות",
+    "drive_sync": "סנכרון דרייב"
   },
   "dashboard": {
     "title": "דשבורד",
@@ -680,6 +681,58 @@
       "name": "שם",
       "parent": "מחלקת אב",
       "description": "תיאור"
+    }
+  },
+  "integrations": {
+    "title": "אינטגרציות",
+    "subtitle": "חיבור שירותים חיצוניים למערכת ה-HR",
+    "drive": {
+      "title": "Google Drive",
+      "description": "חברו את Google Drive כדי לייבא מסמכי משאבי אנוש (חוזים, תלושי שכר, טפסים ממשלתיים, דוחות) ולנתב אותם אוטומטית למודולים הנכונים.",
+      "status_connected": "מחובר",
+      "status_disconnected": "לא מחובר",
+      "connected_as": "מחובר כ",
+      "connect": "חיבור Google Drive",
+      "disconnect": "ניתוק",
+      "open_sync": "פתיחת סנכרון",
+      "confirm_disconnect": "לנתק את Google Drive? קבצים שיובאו יישארו במערכת.",
+      "disconnected": "החיבור נותק",
+      "disconnect_failed": "נכשל ניתוק החיבור",
+      "connected_toast": "Google Drive חובר בהצלחה",
+      "error_prefix": "שגיאת Drive",
+      "scope_label": "גישת קריאה בלבד",
+      "scope_description": "אנו מבקשים רק הרשאת drive.readonly. המערכת יכולה לקרוא קבצים מהתיקיות שתבחרו אך לא לשנות או למחוק דבר ב-Drive שלכם."
+    }
+  },
+  "drive_sync": {
+    "title": "סנכרון Drive",
+    "subtitle": "ייבוא מסמכי משאבי אנוש מתיקיות Google Drive",
+    "manage_connection": "ניהול חיבור",
+    "folder_label": "כתובת או מזהה תיקייה",
+    "folder_help": "הדביקו כתובת תיקייה ב-Google Drive (https://drive.google.com/drive/folders/...) או רק את המזהה.",
+    "folder_required": "כתובת תיקייה או מזהה הם שדה חובה",
+    "start": "התחל סנכרון",
+    "start_failed": "התחלת הסנכרון נכשלה",
+    "started_toast": "הסנכרון התחיל",
+    "tick": "הרץ אצווה",
+    "tick_failed": "ההרצה נכשלה",
+    "history": "היסטוריית סנכרון",
+    "empty": "אין הרצות סנכרון עדיין",
+    "started": "התחיל",
+    "last_progress": "התקדמות אחרונה",
+    "stats": {
+      "seen": "נסרקו",
+      "imported": "יובאו",
+      "duplicate": "כפילויות",
+      "skipped": "דולגו",
+      "errored": "שגיאות"
+    },
+    "status": {
+      "idle": "ממתין",
+      "running": "רץ",
+      "paused": "מושהה",
+      "error": "שגיאה",
+      "complete": "הושלם"
     }
   }
 }
