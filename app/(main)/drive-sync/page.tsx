@@ -43,6 +43,8 @@ export default function DriveSyncPage() {
   const [folderInput, setFolderInput] = useState("");
   const [starting, setStarting] = useState(false);
   const [tickingId, setTickingId] = useState<string | null>(null);
+  const [classifying, setClassifying] = useState(false);
+  const [routing, setRouting] = useState(false);
 
   const fetchSyncs = useCallback(async () => {
     try {
@@ -90,6 +92,46 @@ export default function DriveSyncPage() {
       await fetchSyncs();
     } finally {
       setStarting(false);
+    }
+  };
+
+  const handleClassify = async () => {
+    setClassifying(true);
+    try {
+      const res = await fetch("/api/drive/classify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || t("drive_sync.classify_failed"));
+        return;
+      }
+      toast.success(`${t("drive_sync.classified")}: ${data.classified} (${data.remaining} ${t("drive_sync.remaining")})`);
+    } finally {
+      setClassifying(false);
+    }
+  };
+
+  const handleRoute = async () => {
+    setRouting(true);
+    try {
+      const res = await fetch("/api/drive/route", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || t("drive_sync.route_failed"));
+        return;
+      }
+      toast.success(
+        `${t("drive_sync.routed")}: ${data.routed}, ${t("drive_sync.needs_review")}: ${data.needs_review}, ${t("drive_sync.stats.errored")}: ${data.failed}`
+      );
+    } finally {
+      setRouting(false);
     }
   };
 
@@ -149,6 +191,23 @@ export default function DriveSyncPage() {
               {t("drive_sync.start")}
             </Button>
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border bg-card p-5">
+        <div className="mb-3">
+          <h2 className="font-medium">{t("drive_sync.pipeline.title")}</h2>
+          <p className="text-xs text-muted-foreground">{t("drive_sync.pipeline.subtitle")}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={handleClassify} disabled={classifying}>
+            {classifying ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
+            {t("drive_sync.pipeline.classify")}
+          </Button>
+          <Button variant="outline" onClick={handleRoute} disabled={routing}>
+            {routing ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
+            {t("drive_sync.pipeline.route")}
+          </Button>
         </div>
       </div>
 

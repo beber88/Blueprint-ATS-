@@ -24,6 +24,9 @@
     "reports": "Mga Ulat",
     "employees": "Mga Empleyado",
     "departments": "Mga Departamento",
+    "payroll": "Sahod",
+    "attendance": "Pagdalo",
+    "contracts": "Mga Kontrata",
     "drive_sync": "Drive Sync"
   },
   "dashboard": {
@@ -733,6 +736,79 @@
       "paused": "Naka-pause",
       "error": "Error",
       "complete": "Tapos na"
+    },
+    "pipeline": {
+      "title": "Classification pipeline",
+      "subtitle": "Patakbuhin ang mga pending file sa Claude classifier at i-route ang mga classified file sa HR modules.",
+      "classify": "I-classify ang pending",
+      "route": "I-route ang classified"
+    },
+    "classify_failed": "Nabigo ang classification",
+    "route_failed": "Nabigo ang routing",
+    "classified": "Na-classify",
+    "routed": "Na-route",
+    "needs_review": "Kailangan ng review",
+    "remaining": "natitira"
+  },
+  "contracts": {
+    "title": "Mga Kontrata",
+    "subtitle": "Mga kasunduan sa counterparty, renewal, at obligations",
+    "empty": "Wala pang kontrata",
+    "col": {
+      "title": "Pamagat",
+      "counterparty": "Counterparty",
+      "category": "Kategorya",
+      "status": "Status",
+      "expiration": "Mag-e-expire",
+      "value": "Halaga"
+    }
+  },
+  "payroll": {
+    "title": "Sahod",
+    "subtitle": "Mga payslip at salary record",
+    "tabs": {
+      "payslips": "Mga Payslip",
+      "salaries": "Salary history"
+    },
+    "empty": {
+      "payslips": "Wala pang payslip",
+      "salaries": "Wala pang salary record"
+    },
+    "col": {
+      "employee": "Empleyado",
+      "period": "Panahon",
+      "gross": "Gross",
+      "deductions": "Deductions",
+      "net": "Net",
+      "status": "Status",
+      "effective_date": "Effective date",
+      "base_salary": "Base salary",
+      "currency": "Currency",
+      "frequency": "Frequency"
+    }
+  },
+  "attendance": {
+    "title": "Pagdalo",
+    "subtitle": "Pang-araw-araw na pagdalo at leave requests",
+    "tabs": {
+      "attendance": "Pagdalo",
+      "leave": "Leave requests"
+    },
+    "empty": {
+      "attendance": "Wala pang attendance record",
+      "leave": "Wala pang leave request"
+    },
+    "col": {
+      "employee": "Empleyado",
+      "date": "Petsa",
+      "clock_in": "Clock in",
+      "clock_out": "Clock out",
+      "hours": "Oras",
+      "overtime": "Overtime",
+      "status": "Status",
+      "leave_type": "Uri",
+      "range": "Range",
+      "days": "Araw"
     }
   }
 }

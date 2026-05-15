@@ -24,6 +24,9 @@
     "reports": "דוחות",
     "employees": "עובדים",
     "departments": "מחלקות",
+    "payroll": "שכר",
+    "attendance": "נוכחות",
+    "contracts": "חוזים",
     "drive_sync": "סנכרון דרייב"
   },
   "dashboard": {
@@ -733,6 +736,79 @@
       "paused": "מושהה",
       "error": "שגיאה",
       "complete": "הושלם"
+    },
+    "pipeline": {
+      "title": "צינור סיווג",
+      "subtitle": "הרץ קבצים ממתינים דרך מסווג קלוד ונתב קבצים מסווגים למודולי HR.",
+      "classify": "סווג ממתינים",
+      "route": "נתב מסווגים"
+    },
+    "classify_failed": "הסיווג נכשל",
+    "route_failed": "הניתוב נכשל",
+    "classified": "סווגו",
+    "routed": "נותבו",
+    "needs_review": "דורש סקירה",
+    "remaining": "נותרו"
+  },
+  "contracts": {
+    "title": "חוזים",
+    "subtitle": "הסכמים עם צדדים שלישיים, חידושים והתחייבויות",
+    "empty": "אין חוזים עדיין",
+    "col": {
+      "title": "כותרת",
+      "counterparty": "צד שני",
+      "category": "קטגוריה",
+      "status": "סטטוס",
+      "expiration": "פוקע",
+      "value": "ערך"
+    }
+  },
+  "payroll": {
+    "title": "שכר",
+    "subtitle": "תלושי שכר ורישומי שכר",
+    "tabs": {
+      "payslips": "תלושי שכר",
+      "salaries": "היסטוריית שכר"
+    },
+    "empty": {
+      "payslips": "אין תלושי שכר עדיין",
+      "salaries": "אין רישומי שכר עדיין"
+    },
+    "col": {
+      "employee": "עובד",
+      "period": "תקופה",
+      "gross": "ברוטו",
+      "deductions": "ניכויים",
+      "net": "נטו",
+      "status": "סטטוס",
+      "effective_date": "תאריך תוקף",
+      "base_salary": "שכר בסיס",
+      "currency": "מטבע",
+      "frequency": "תדירות"
+    }
+  },
+  "attendance": {
+    "title": "נוכחות",
+    "subtitle": "רישומי נוכחות יומיים ובקשות חופשה",
+    "tabs": {
+      "attendance": "נוכחות",
+      "leave": "בקשות חופשה"
+    },
+    "empty": {
+      "attendance": "אין רישומי נוכחות עדיין",
+      "leave": "אין בקשות חופשה עדיין"
+    },
+    "col": {
+      "employee": "עובד",
+      "date": "תאריך",
+      "clock_in": "כניסה",
+      "clock_out": "יציאה",
+      "hours": "שעות",
+      "overtime": "שעות נוספות",
+      "status": "סטטוס",
+      "leave_type": "סוג",
+      "range": "טווח",
+      "days": "ימים"
     }
   }
 }

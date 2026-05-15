@@ -24,6 +24,9 @@
     "reports": "Reports",
     "employees": "Employees",
     "departments": "Departments",
+    "payroll": "Payroll",
+    "attendance": "Attendance",
+    "contracts": "Contracts",
     "drive_sync": "Drive Sync"
   },
   "dashboard": {
@@ -733,6 +736,79 @@
       "paused": "Paused",
       "error": "Error",
       "complete": "Complete"
+    },
+    "pipeline": {
+      "title": "Classification pipeline",
+      "subtitle": "Run pending files through Claude classifier and route classified files to HR modules.",
+      "classify": "Classify pending",
+      "route": "Route classified"
+    },
+    "classify_failed": "Classification failed",
+    "route_failed": "Routing failed",
+    "classified": "Classified",
+    "routed": "Routed",
+    "needs_review": "Needs review",
+    "remaining": "remaining"
+  },
+  "contracts": {
+    "title": "Contracts",
+    "subtitle": "Counterparty agreements, renewals, and obligations",
+    "empty": "No contracts yet",
+    "col": {
+      "title": "Title",
+      "counterparty": "Counterparty",
+      "category": "Category",
+      "status": "Status",
+      "expiration": "Expires",
+      "value": "Value"
+    }
+  },
+  "payroll": {
+    "title": "Payroll",
+    "subtitle": "Payslips and salary records",
+    "tabs": {
+      "payslips": "Payslips",
+      "salaries": "Salary history"
+    },
+    "empty": {
+      "payslips": "No payslips yet",
+      "salaries": "No salary records yet"
+    },
+    "col": {
+      "employee": "Employee",
+      "period": "Period",
+      "gross": "Gross",
+      "deductions": "Deductions",
+      "net": "Net",
+      "status": "Status",
+      "effective_date": "Effective date",
+      "base_salary": "Base salary",
+      "currency": "Currency",
+      "frequency": "Frequency"
+    }
+  },
+  "attendance": {
+    "title": "Attendance",
+    "subtitle": "Daily attendance records and leave requests",
+    "tabs": {
+      "attendance": "Attendance",
+      "leave": "Leave requests"
+    },
+    "empty": {
+      "attendance": "No attendance records yet",
+      "leave": "No leave requests yet"
+    },
+    "col": {
+      "employee": "Employee",
+      "date": "Date",
+      "clock_in": "Clock in",
+      "clock_out": "Clock out",
+      "hours": "Hours",
+      "overtime": "Overtime",
+      "status": "Status",
+      "leave_type": "Type",
+      "range": "Range",
+      "days": "Days"
     }
   }
 }
