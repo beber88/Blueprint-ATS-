@@ -101,6 +101,7 @@ const modules: Module[] = [
         labelKey: "operations.nav_group.tools",
         items: [
           { key: "operations.nav.ai_agent", path: "/ai-agent", icon: Bot },
+          { key: "nav.chat", path: "/chat", icon: MessageCircle },
           { key: "operations.nav.archive", path: "/archive", icon: Search },
           { key: "operations.nav.inbox", path: "/inbox", icon: Inbox, adminOnly: true },
         ],
@@ -125,6 +126,12 @@ const modules: Module[] = [
         labelKey: "contracts.nav_group.tracking",
         items: [
           { key: "contracts.nav.alerts", path: "/alerts", icon: AlertTriangle },
+        ],
+      },
+      {
+        labelKey: "nav_group.tools",
+        items: [
+          { key: "contracts.nav.ai_agent", path: "/ai-agent", icon: Bot },
         ],
       },
     ],

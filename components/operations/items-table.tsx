@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
 import { AlertTriangle, Calendar, CheckCircle2, ChevronDown, ChevronRight, Clock, Loader2, Pencil, Trash2 } from "lucide-react";
@@ -138,7 +139,17 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                       <AlertTriangle size={14} style={{ color: "#C9A84C", flexShrink: 0, marginTop: 2 }} />
                     )}
                   </div>
-                  <div style={{ marginTop: 2 }}>{it.issue}</div>
+                  <div style={{ marginTop: 2 }}>
+                      <Link
+                        href={`/hr/operations/issues/${it.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ color: "var(--text-primary)", textDecoration: "none" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                        onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+                      >
+                        {it.issue}
+                      </Link>
+                    </div>
                 </td>
                 <td style={{ padding: "10px 12px", verticalAlign: "top" }}>{it.project?.name || it.project_raw || "—"}</td>
                 <td style={{ padding: "10px 12px", verticalAlign: "top" }}>
@@ -263,6 +274,25 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                       {it.project_raw && (
                         <DetailField label={t("operations.detail.project_raw")} value={it.project_raw} />
                       )}
+                      <div style={{ gridColumn: "1 / -1", marginTop: 4 }}>
+                        <Link
+                          href={`/hr/operations/issues/${it.id}`}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "6px 14px",
+                            background: "#C9A84C",
+                            color: "#1A1A1A",
+                            borderRadius: 6,
+                            textDecoration: "none",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {t("operations.item_detail.view_full")} →
+                        </Link>
+                      </div>
                     </div>
                   </td>
                 </tr>

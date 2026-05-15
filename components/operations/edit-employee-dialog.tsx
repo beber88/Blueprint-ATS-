@@ -14,6 +14,8 @@ import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
+const ROLE_LEVELS = [10, 20, 30, 40, 50] as const;
+
 interface Emp {
   id: string;
   full_name: string;
@@ -21,6 +23,7 @@ interface Emp {
   whatsapp_phone: string | null;
   email: string | null;
   role: string | null;
+  role_level?: number;
   is_pm: boolean;
   department_id: string | null;
   project_id: string | null;
@@ -47,6 +50,7 @@ export function EditEmployeeDialog({ open, employee, departments, projects, onCl
     whatsapp_phone: "",
     email: "",
     role: "",
+    role_level: "50",
     department_id: "",
     project_id: "",
     is_pm: false,
@@ -60,6 +64,7 @@ export function EditEmployeeDialog({ open, employee, departments, projects, onCl
         whatsapp_phone: employee.whatsapp_phone || "",
         email: employee.email || "",
         role: employee.role || "",
+        role_level: String(employee.role_level ?? 50),
         department_id: employee.department_id || "",
         project_id: employee.project_id || "",
         is_pm: employee.is_pm,
@@ -78,6 +83,7 @@ export function EditEmployeeDialog({ open, employee, departments, projects, onCl
         body: JSON.stringify({
           ...form,
           full_name: form.full_name.trim(),
+          role_level: parseInt(form.role_level, 10),
           department_id: form.department_id || null,
           project_id: form.project_id || null,
         }),
@@ -120,6 +126,14 @@ export function EditEmployeeDialog({ open, employee, departments, projects, onCl
             <div>
               <label style={labelStyle}>{t("operations.employees.role")}</label>
               <Input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} />
+            </div>
+            <div>
+              <label style={labelStyle}>{t("operations.role_level.label")}</label>
+              <select value={form.role_level} onChange={(e) => setForm({ ...form, role_level: e.target.value })} style={selectStyle}>
+                {ROLE_LEVELS.map((lvl) => (
+                  <option key={lvl} value={String(lvl)}>{t(`operations.role_level.${lvl}`)}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label style={labelStyle}>{t("operations.col.dept")}</label>

@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from("op_employees")
-    .select("*, department:op_departments(name, name_he), project:op_projects(name)")
+    .select("*, department:op_departments(id, name, name_he), project:op_projects(name)")
+    .order("role_level", { ascending: true })
     .order("full_name");
   if (!includeInactive) query = query.eq("is_active", true);
 
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
       project_id: body.project_id || null,
       is_pm: body.is_pm === true,
       is_active: body.is_active !== false,
+      role_level: typeof body.role_level === "number" ? body.role_level : 50,
     })
     .select()
     .single();

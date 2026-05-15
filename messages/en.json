@@ -323,6 +323,26 @@
       "person_raw": "Responsible (raw)",
       "dept_raw": "Department (raw)",
       "project_raw": "Project (raw)"
+    },
+    "role_level": {
+      "label": "Level",
+      "10": "CEO",
+      "20": "Director",
+      "30": "Manager",
+      "40": "Team Lead",
+      "50": "Employee"
+    },
+    "item_detail": {
+      "title": "Issue Details",
+      "source_report": "Source Report",
+      "view_full": "View Full Details",
+      "siblings": "Other Issues from Same Report",
+      "entered_at": "Entered System",
+      "source_type": "Source Type",
+      "raw_text": "Original Text",
+      "no_dept": "No Department",
+      "translate": "Translate",
+      "translated": "(translated)"
     }
   },
   "contracts": {
@@ -335,7 +355,8 @@
       "intake": "Intake",
       "drafts": "Drafts",
       "contracts": "Contracts",
-      "alerts": "Alerts"
+      "alerts": "Alerts",
+      "ai_agent": "Contracts AI"
     },
     "dashboard": {
       "title": "Contracts — Dashboard",
@@ -429,6 +450,19 @@
       "currency": "Currency",
       "is_renewable": "Renewable",
       "flagged": "Flagged for Review"
+    },
+    "agent": {
+      "title": "Contracts Assistant",
+      "subtitle": "Ask any question about contracts and agreements",
+      "ask_anything": "Ask me anything about contracts, vendors, and expirations",
+      "thinking": "Thinking...",
+      "placeholder": "Ask the assistant... (Enter to send)",
+      "suggest": {
+        "expiring": "Which contracts expire this month?",
+        "flagged": "What is flagged for review?",
+        "subcontractors": "Summarize all subcontractor contracts",
+        "briefing": "Prepare a contracts briefing for the CEO"
+      }
     }
   },
   "hr_mgmt": {
