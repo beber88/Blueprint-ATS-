@@ -15,6 +15,10 @@ const FILES = [
   "006_operations_bulk_import_jobs.sql",
   "007_operations_drafts.sql",
   "008_contracts_schema.sql",
+  "009_contract_folders.sql",
+  "010_hr_modules.sql",
+  "011_role_based_access.sql",
+  "012_employee_profile_gapfill.sql",
 ];
 
 const STUBS = `
@@ -29,6 +33,30 @@ const STUBS = `
   DO $$ BEGIN
     CREATE ROLE service_role;
   EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+  -- user_profiles is referenced by migration 011 but not created
+  -- by any migration (manual bootstrap in Supabase alongside auth).
+  CREATE TABLE IF NOT EXISTS user_profiles (
+    id TEXT PRIMARY KEY,
+    email TEXT,
+    full_name TEXT,
+    role TEXT NOT NULL DEFAULT 'user'
+  );
+  ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='Allow authenticated access') THEN
+      EXECUTE 'CREATE POLICY "Allow authenticated access" ON user_profiles FOR ALL TO authenticated USING (TRUE) WITH CHECK (TRUE)';
+    END IF;
+  END $$;
+  CREATE SCHEMA IF NOT EXISTS auth;
+  CREATE OR REPLACE FUNCTION auth.uid() RETURNS UUID LANGUAGE sql STABLE AS $a$
+    SELECT NULL::uuid;
+  $a$;
+  CREATE OR REPLACE FUNCTION auth.role() RETURNS TEXT LANGUAGE sql STABLE AS $a$
+    SELECT NULL::text;
+  $a$;
+  CREATE OR REPLACE FUNCTION auth.jwt() RETURNS JSONB LANGUAGE sql STABLE AS $a$
+    SELECT NULL::jsonb;
+  $a$;
   CREATE SCHEMA IF NOT EXISTS storage;
   CREATE TABLE IF NOT EXISTS storage.buckets (
     id TEXT PRIMARY KEY,
@@ -51,6 +79,9 @@ const ALL_TABLES = [
   "op_bulk_import_jobs", "op_bulk_import_items",
   "op_report_drafts",
   "ct_contracts", "ct_contract_drafts", "ct_alerts",
+  "hr_employment_contracts", "hr_salary_schedules", "hr_benefits",
+  "hr_disciplinary_records", "hr_recognitions", "hr_compliance_records",
+  "hr_employee_notes", "hr_alerts", "hr_profile_grants",
 ];
 
 async function counts(c) {
@@ -86,7 +117,7 @@ async function applyFile(c, name) {
   const c = new Client({ connectionString: URL });
   await c.connect();
 
-  console.log("=== A1: clean schema + apply 001..008 ===");
+  console.log("=== A1: clean schema + apply 001..012 ===");
   await c.query("DROP SCHEMA IF EXISTS storage CASCADE");
   await c.query("DROP SCHEMA IF EXISTS public CASCADE");
   await c.query("CREATE SCHEMA public");
@@ -106,14 +137,14 @@ async function applyFile(c, name) {
   const c1 = await counts(c);
   console.log(fmt(c1));
 
-  console.log("\n=== A1: idempotency re-run of 003..008 ===");
+  console.log("\n=== A1: idempotency re-run of 003..012 ===");
   let rerunFailed = false;
   for (const f of FILES.slice(2)) {
     const r = await applyFile(c, f);
     console.log(`  ${f}: ${r.ok ? "OK" : "FAILED — " + r.error.split("\n")[0]}`);
     if (!r.ok) rerunFailed = true;
   }
-  console.log("\n=== Row counts after 003..008 re-run ===");
+  console.log("\n=== Row counts after 003..012 re-run ===");
   const c2 = await counts(c);
   console.log(fmt(c2));
 
@@ -137,17 +168,17 @@ async function applyFile(c, name) {
 
   // Gates the CI cares about (in order of severity):
   if (rerunFailed) {
-    console.error("\nFAIL: at least one of migrations 003..008 broke on re-run.");
+    console.error("\nFAIL: at least one of migrations 003..012 broke on re-run.");
     // Exit 4 = idempotency lost. Hard CI fail.
     process.exit(4);
   }
   if (drift.length > 0) {
-    console.error("\nFAIL: row counts drifted after re-running migrations 003..008.");
+    console.error("\nFAIL: row counts drifted after re-running migrations 003..012.");
     console.error("These migrations must be re-runnable without changing row counts.");
     // Exit 3 = silent data drift. Hard CI fail.
     process.exit(3);
   }
-  console.log("\nOK: migrations 001..008 apply clean; 003..008 are idempotent.");
+  console.log("\nOK: migrations 001..012 apply clean; 003..012 are idempotent.");
 })().catch((e) => {
   console.error(e);
   process.exit(1);

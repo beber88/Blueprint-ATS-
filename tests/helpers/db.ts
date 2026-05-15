@@ -34,6 +34,39 @@ const SUPABASE_STUBS = `
     END IF;
   END$$;
 
+  -- Supabase exposes auth.uid() / auth.role() / auth.jwt() in production.
+  -- The test harness stubs them so RLS policies referencing auth.uid()
+  -- can plant cleanly. Return NULL — RLS bodies are parsed but never
+  -- executed in our test queries (we use direct service-role pg.Client
+  -- connections which bypass RLS entirely).
+  CREATE SCHEMA IF NOT EXISTS auth;
+  CREATE OR REPLACE FUNCTION auth.uid() RETURNS UUID LANGUAGE sql STABLE AS $auth$
+    SELECT NULL::uuid;
+  $auth$;
+  CREATE OR REPLACE FUNCTION auth.role() RETURNS TEXT LANGUAGE sql STABLE AS $auth$
+    SELECT NULL::text;
+  $auth$;
+  CREATE OR REPLACE FUNCTION auth.jwt() RETURNS JSONB LANGUAGE sql STABLE AS $auth$
+    SELECT NULL::jsonb;
+  $auth$;
+
+  -- user_profiles is referenced by migration 011's RBAC helper but
+  -- not created by any migration (it's bootstrapped manually in the
+  -- Supabase project alongside auth). Stub it here so 011 + 012 can
+  -- plant policies against it.
+  CREATE TABLE IF NOT EXISTS user_profiles (
+    id TEXT PRIMARY KEY,
+    email TEXT,
+    full_name TEXT,
+    role TEXT NOT NULL DEFAULT 'user'
+  );
+  ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='Allow authenticated access') THEN
+      EXECUTE 'CREATE POLICY "Allow authenticated access" ON user_profiles FOR ALL TO authenticated USING (TRUE) WITH CHECK (TRUE)';
+    END IF;
+  END $$;
+
   CREATE SCHEMA IF NOT EXISTS storage;
   CREATE TABLE IF NOT EXISTS storage.buckets (
     id TEXT PRIMARY KEY,
@@ -57,6 +90,10 @@ const MIGRATION_FILES = [
   "006_operations_bulk_import_jobs.sql",
   "007_operations_drafts.sql",
   "008_contracts_schema.sql",
+  "009_contract_folders.sql",
+  "010_hr_modules.sql",
+  "011_role_based_access.sql",
+  "012_employee_profile_gapfill.sql",
 ];
 
 async function dropAndRecreate(client: Client) {
