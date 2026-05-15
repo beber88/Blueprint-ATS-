@@ -27,6 +27,8 @@
     "payroll": "שכר",
     "attendance": "נוכחות",
     "contracts": "חוזים",
+    "assets": "ציוד",
+    "government": "ציות",
     "drive_sync": "סנכרון דרייב"
   },
   "dashboard": {
@@ -806,6 +808,42 @@
       "base_salary": "שכר בסיס",
       "currency": "מטבע",
       "frequency": "תדירות"
+    }
+  },
+  "assets": {
+    "title": "ציוד",
+    "subtitle": "ציוד החברה והקצאות נוכחיות",
+    "empty": "אין ציוד רשום עדיין",
+    "col": {
+      "tag": "תגית",
+      "type": "סוג",
+      "brand": "מותג / דגם",
+      "serial": "מס׳ סידורי",
+      "assigned_to": "הוקצה ל",
+      "status": "סטטוס",
+      "purchase_date": "נרכש"
+    }
+  },
+  "government": {
+    "title": "ציות ממשלתי",
+    "subtitle": "תעודות זהות ממשלתיות ומסמכים סטטוטוריים",
+    "summary": {
+      "complete": "עובדים תואמים מלאים",
+      "incomplete": "חסרות תעודות",
+      "total_documents": "סך מסמכים בתיק"
+    },
+    "compliance": {
+      "title": "ציות לפי עובד",
+      "subtitle": "עובדים שחסרים להם מסמכים ממשלתיים (SSS / Philhealth / Pag-IBIG / TIN)",
+      "all_good": "לכל העובדים הפעילים יש את כל המסמכים הממשלתיים בתיק",
+      "missing": "חסרים"
+    },
+    "documents": {
+      "title": "מסמכים ממשלתיים אחרונים",
+      "subtitle": "מסמכי ממשלה / תעודות / מס שהוגשו לאחרונה",
+      "empty": "אין מסמכים ממשלתיים בתיק",
+      "expires": "פוקע",
+      "open": "פתח"
     }
   },
   "attendance": {

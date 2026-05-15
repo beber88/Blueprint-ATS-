@@ -27,6 +27,8 @@
     "payroll": "Sahod",
     "attendance": "Pagdalo",
     "contracts": "Mga Kontrata",
+    "assets": "Mga Asset",
+    "government": "Compliance",
     "drive_sync": "Drive Sync"
   },
   "dashboard": {
@@ -806,6 +808,42 @@
       "base_salary": "Base salary",
       "currency": "Currency",
       "frequency": "Frequency"
+    }
+  },
+  "assets": {
+    "title": "Mga Asset",
+    "subtitle": "Mga asset ng kumpanya at kasalukuyang assignments",
+    "empty": "Wala pang nakarehistrong asset",
+    "col": {
+      "tag": "Tag",
+      "type": "Uri",
+      "brand": "Brand / Model",
+      "serial": "Serial",
+      "assigned_to": "Naka-assign kay",
+      "status": "Status",
+      "purchase_date": "Binili"
+    }
+  },
+  "government": {
+    "title": "Government Compliance",
+    "subtitle": "Mga PH government ID at statutory documents",
+    "summary": {
+      "complete": "Fully compliant na empleyado",
+      "incomplete": "May kulang na ID",
+      "total_documents": "Kabuuang dokumento sa file"
+    },
+    "compliance": {
+      "title": "Per-employee compliance",
+      "subtitle": "Mga empleyado na may kulang na government ID (SSS / Philhealth / Pag-IBIG / TIN)",
+      "all_good": "Lahat ng aktibong empleyado ay may kumpletong government IDs",
+      "missing": "Kulang"
+    },
+    "documents": {
+      "title": "Pinakabagong government documents",
+      "subtitle": "Pinakahuling na-file na government / ID / tax documents",
+      "empty": "Walang government documents sa file",
+      "expires": "Mag-e-expire",
+      "open": "Buksan"
     }
   },
   "attendance": {

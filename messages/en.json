@@ -27,6 +27,8 @@
     "payroll": "Payroll",
     "attendance": "Attendance",
     "contracts": "Contracts",
+    "assets": "Assets",
+    "government": "Compliance",
     "drive_sync": "Drive Sync"
   },
   "dashboard": {
@@ -806,6 +808,42 @@
       "base_salary": "Base salary",
       "currency": "Currency",
       "frequency": "Frequency"
+    }
+  },
+  "assets": {
+    "title": "Assets",
+    "subtitle": "Company assets and current assignments",
+    "empty": "No assets registered yet",
+    "col": {
+      "tag": "Tag",
+      "type": "Type",
+      "brand": "Brand / Model",
+      "serial": "Serial",
+      "assigned_to": "Assigned to",
+      "status": "Status",
+      "purchase_date": "Purchased"
+    }
+  },
+  "government": {
+    "title": "Government Compliance",
+    "subtitle": "PH government IDs and statutory documents",
+    "summary": {
+      "complete": "Fully compliant employees",
+      "incomplete": "Missing IDs",
+      "total_documents": "Total documents on file"
+    },
+    "compliance": {
+      "title": "Per-employee compliance",
+      "subtitle": "Employees missing one or more government IDs (SSS / Philhealth / Pag-IBIG / TIN)",
+      "all_good": "All active employees have all government IDs on file",
+      "missing": "Missing"
+    },
+    "documents": {
+      "title": "Latest government documents",
+      "subtitle": "Most recently filed government / ID / tax documents",
+      "empty": "No government documents on file",
+      "expires": "Expires",
+      "open": "Open"
     }
   },
   "attendance": {
