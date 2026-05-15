@@ -1,6 +1,7 @@
 {
   "nav_group": {
     "main": "ראשי",
+    "hr": "משאבי אנוש",
     "communication": "תקשורת",
     "tools": "כלים",
     "management": "ניהול"
@@ -20,7 +21,9 @@
     "job_boards": "לוחות דרושים",
     "unmatched_files": "קבצים לא משויכים",
     "chat": "צ'אט",
-    "reports": "דוחות"
+    "reports": "דוחות",
+    "employees": "עובדים",
+    "departments": "מחלקות"
   },
   "dashboard": {
     "title": "דשבורד",
@@ -398,7 +401,10 @@
     "attached": "צורפו לתיק",
     "saved_successfully": "נשמר בהצלחה",
     "save_error": "שגיאה בשמירה",
-    "admin_only_page": "דף זה זמין למנהל מערכת בלבד"
+    "admin_only_page": "דף זה זמין למנהל מערכת בלבד",
+    "saving": "שומר...",
+    "uploading": "מעלה...",
+    "create": "צור"
   },
   "theme": {
     "light": "מצב יום",
@@ -554,5 +560,126 @@
     "all_matched": "כל הקבצים משויכים למועמדים",
     "detected_name": "שם שזוהה",
     "pending": "ממתינים לשיוך"
+  },
+  "employees": {
+    "title": "עובדים",
+    "total": "סה\"כ עובדים",
+    "add": "הוסף עובד",
+    "empty": "אין עובדים עדיין",
+    "search_placeholder": "חיפוש לפי שם, אימייל, קוד או תפקיד…",
+    "not_found": "עובד לא נמצא",
+    "confirm_delete": "למחוק את העובד? פעולה זו לא ניתנת לביטול.",
+    "new": {
+      "title": "הוספת עובד חדש",
+      "subtitle": "יצירת רשומת עובד חדשה"
+    },
+    "tabs": {
+      "overview": "סקירה",
+      "documents": "מסמכים",
+      "timeline": "ציר זמן",
+      "edit": "עריכה"
+    },
+    "table": {
+      "employee": "עובד",
+      "position": "תפקיד",
+      "department": "מחלקה",
+      "status": "סטטוס",
+      "hire_date": "תאריך תחילת עבודה"
+    },
+    "filter": {
+      "status": "סטטוס",
+      "all_status": "כל הסטטוסים",
+      "department": "מחלקה",
+      "all_departments": "כל המחלקות"
+    },
+    "status": {
+      "active": "פעיל",
+      "probation": "תקופת ניסיון",
+      "on_leave": "בחופשה",
+      "terminated": "פוטר",
+      "resigned": "התפטר"
+    },
+    "section": {
+      "contact": "פרטי קשר",
+      "employment": "תעסוקה",
+      "government_ids": "מספרים ממשלתיים",
+      "emergency_contact": "איש קשר לחירום",
+      "notes": "הערות"
+    },
+    "form": {
+      "section": {
+        "basic": "מידע בסיסי",
+        "employment": "תעסוקה",
+        "personal": "אישי",
+        "government_ids": "מספרים ממשלתיים (פיליפינים)",
+        "emergency": "איש קשר לחירום",
+        "notes": "הערות"
+      },
+      "full_name": "שם מלא",
+      "employee_code": "קוד עובד",
+      "email": "אימייל",
+      "phone": "טלפון",
+      "position": "תפקיד",
+      "department": "מחלקה",
+      "hire_date": "תאריך תחילת עבודה",
+      "birth_date": "תאריך לידה",
+      "address": "כתובת",
+      "employment_status": "סטטוס תעסוקה",
+      "emergency_name": "שם איש הקשר",
+      "emergency_phone": "טלפון איש הקשר",
+      "emergency_relationship": "קרבה",
+      "notes": "הערות",
+      "name_required": "שם מלא הוא שדה חובה"
+    },
+    "documents": {
+      "type": "סוג מסמך",
+      "upload": "העלאת מסמך",
+      "uploaded": "המסמך הועלה",
+      "upload_failed": "העלאת המסמך נכשלה",
+      "deleted": "המסמך נמחק",
+      "delete_failed": "מחיקת המסמך נכשלה",
+      "duplicate": "המסמך כבר קיים עבור עובד זה",
+      "confirm_delete": "למחוק את המסמך?",
+      "empty": "אין מסמכים מועלים עדיין",
+      "types": {
+        "contract": "חוזה",
+        "id": "מסמך מזהה",
+        "certificate": "תעודה",
+        "payslip": "תלוש שכר",
+        "government": "טופס ממשלתי",
+        "warning": "אזהרה",
+        "achievement": "הישג",
+        "report": "דוח",
+        "attendance": "נוכחות",
+        "medical": "רפואי",
+        "tax": "מסמך מס",
+        "other": "אחר"
+      }
+    },
+    "timeline": {
+      "empty": "אין פעילות עדיין"
+    },
+    "toast": {
+      "created": "העובד נוצר",
+      "updated": "העובד עודכן",
+      "deleted": "העובד נמחק",
+      "delete_failed": "מחיקת העובד נכשלה",
+      "save_failed": "שמירת העובד נכשלה"
+    }
+  },
+  "departments": {
+    "title": "מחלקות",
+    "subtitle": "מבנה ארגוני",
+    "add": "הוסף מחלקה",
+    "new": "מחלקה חדשה",
+    "empty": "אין מחלקות עדיין",
+    "name_required": "שם הוא שדה חובה",
+    "created": "המחלקה נוצרה",
+    "create_failed": "יצירת המחלקה נכשלה",
+    "form": {
+      "name": "שם",
+      "parent": "מחלקת אב",
+      "description": "תיאור"
+    }
   }
 }

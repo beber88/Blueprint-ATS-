@@ -1,6 +1,7 @@
 {
   "nav_group": {
     "main": "Main",
+    "hr": "Human Resources",
     "communication": "Communication",
     "tools": "Tools",
     "management": "Management"
@@ -20,7 +21,9 @@
     "job_boards": "Job Boards",
     "unmatched_files": "Unmatched Files",
     "chat": "Chat",
-    "reports": "Reports"
+    "reports": "Reports",
+    "employees": "Employees",
+    "departments": "Departments"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -398,7 +401,10 @@
     "attached": "Attached",
     "saved_successfully": "Saved successfully",
     "save_error": "Save error",
-    "admin_only_page": "This page is available to admin only"
+    "admin_only_page": "This page is available to admin only",
+    "saving": "Saving...",
+    "uploading": "Uploading...",
+    "create": "Create"
   },
   "theme": {
     "light": "Light Mode",
@@ -554,5 +560,126 @@
     "all_matched": "All files are matched to candidates",
     "detected_name": "Detected name",
     "pending": "pending assignment"
+  },
+  "employees": {
+    "title": "Employees",
+    "total": "Total employees",
+    "add": "Add Employee",
+    "empty": "No employees yet",
+    "search_placeholder": "Search by name, email, code or position…",
+    "not_found": "Employee not found",
+    "confirm_delete": "Delete this employee? This cannot be undone.",
+    "new": {
+      "title": "Add New Employee",
+      "subtitle": "Create a new employee record"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "documents": "Documents",
+      "timeline": "Timeline",
+      "edit": "Edit"
+    },
+    "table": {
+      "employee": "Employee",
+      "position": "Position",
+      "department": "Department",
+      "status": "Status",
+      "hire_date": "Hire Date"
+    },
+    "filter": {
+      "status": "Status",
+      "all_status": "All statuses",
+      "department": "Department",
+      "all_departments": "All departments"
+    },
+    "status": {
+      "active": "Active",
+      "probation": "Probation",
+      "on_leave": "On Leave",
+      "terminated": "Terminated",
+      "resigned": "Resigned"
+    },
+    "section": {
+      "contact": "Contact",
+      "employment": "Employment",
+      "government_ids": "Government IDs",
+      "emergency_contact": "Emergency Contact",
+      "notes": "Notes"
+    },
+    "form": {
+      "section": {
+        "basic": "Basic Information",
+        "employment": "Employment",
+        "personal": "Personal",
+        "government_ids": "Government IDs (Philippines)",
+        "emergency": "Emergency Contact",
+        "notes": "Notes"
+      },
+      "full_name": "Full Name",
+      "employee_code": "Employee Code",
+      "email": "Email",
+      "phone": "Phone",
+      "position": "Position",
+      "department": "Department",
+      "hire_date": "Hire Date",
+      "birth_date": "Birth Date",
+      "address": "Address",
+      "employment_status": "Employment Status",
+      "emergency_name": "Emergency contact name",
+      "emergency_phone": "Emergency contact phone",
+      "emergency_relationship": "Relationship",
+      "notes": "Notes",
+      "name_required": "Full name is required"
+    },
+    "documents": {
+      "type": "Document Type",
+      "upload": "Upload Document",
+      "uploaded": "Document uploaded",
+      "upload_failed": "Failed to upload document",
+      "deleted": "Document deleted",
+      "delete_failed": "Failed to delete document",
+      "duplicate": "This document already exists for this employee",
+      "confirm_delete": "Delete this document?",
+      "empty": "No documents uploaded yet",
+      "types": {
+        "contract": "Contract",
+        "id": "ID Document",
+        "certificate": "Certificate",
+        "payslip": "Payslip",
+        "government": "Government Form",
+        "warning": "Warning",
+        "achievement": "Achievement",
+        "report": "Report",
+        "attendance": "Attendance",
+        "medical": "Medical",
+        "tax": "Tax Document",
+        "other": "Other"
+      }
+    },
+    "timeline": {
+      "empty": "No activity yet"
+    },
+    "toast": {
+      "created": "Employee created",
+      "updated": "Employee updated",
+      "deleted": "Employee deleted",
+      "delete_failed": "Failed to delete employee",
+      "save_failed": "Failed to save employee"
+    }
+  },
+  "departments": {
+    "title": "Departments",
+    "subtitle": "Organisational structure",
+    "add": "Add Department",
+    "new": "New Department",
+    "empty": "No departments yet",
+    "name_required": "Name is required",
+    "created": "Department created",
+    "create_failed": "Failed to create department",
+    "form": {
+      "name": "Name",
+      "parent": "Parent Department",
+      "description": "Description"
+    }
   }
 }

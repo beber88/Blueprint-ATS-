@@ -1,6 +1,7 @@
 {
   "nav_group": {
     "main": "Pangunahin",
+    "hr": "Human Resources",
     "communication": "Komunikasyon",
     "tools": "Mga Tool",
     "management": "Pamamahala"
@@ -20,7 +21,9 @@
     "job_boards": "Mga Job Board",
     "unmatched_files": "Hindi Naitugmang File",
     "chat": "Chat",
-    "reports": "Mga Ulat"
+    "reports": "Mga Ulat",
+    "employees": "Mga Empleyado",
+    "departments": "Mga Departamento"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -398,7 +401,10 @@
     "attached": "Naikabit",
     "saved_successfully": "Matagumpay na na-save",
     "save_error": "Error sa pag-save",
-    "admin_only_page": "Ang pahinang ito ay para sa admin lamang"
+    "admin_only_page": "Ang pahinang ito ay para sa admin lamang",
+    "saving": "Sine-save...",
+    "uploading": "Ina-upload...",
+    "create": "Lumikha"
   },
   "theme": {
     "light": "Light Mode",
@@ -554,5 +560,126 @@
     "all_matched": "Lahat ng file ay naitugma na",
     "detected_name": "Nakitang pangalan",
     "pending": "naghihintay ng pagtatalaga"
+  },
+  "employees": {
+    "title": "Mga Empleyado",
+    "total": "Kabuuang empleyado",
+    "add": "Magdagdag ng Empleyado",
+    "empty": "Wala pang empleyado",
+    "search_placeholder": "Hanapin ayon sa pangalan, email, code o posisyon…",
+    "not_found": "Hindi natagpuan ang empleyado",
+    "confirm_delete": "Burahin ang empleyadong ito? Hindi ito maibabalik.",
+    "new": {
+      "title": "Magdagdag ng Bagong Empleyado",
+      "subtitle": "Lumikha ng bagong rekord ng empleyado"
+    },
+    "tabs": {
+      "overview": "Pangkalahatang-ideya",
+      "documents": "Mga Dokumento",
+      "timeline": "Timeline",
+      "edit": "I-edit"
+    },
+    "table": {
+      "employee": "Empleyado",
+      "position": "Posisyon",
+      "department": "Departamento",
+      "status": "Status",
+      "hire_date": "Petsa ng Pagsisimula"
+    },
+    "filter": {
+      "status": "Status",
+      "all_status": "Lahat ng status",
+      "department": "Departamento",
+      "all_departments": "Lahat ng departamento"
+    },
+    "status": {
+      "active": "Aktibo",
+      "probation": "Probation",
+      "on_leave": "Naka-leave",
+      "terminated": "Tinanggal",
+      "resigned": "Nag-resign"
+    },
+    "section": {
+      "contact": "Kontak",
+      "employment": "Trabaho",
+      "government_ids": "Mga Government ID",
+      "emergency_contact": "Kontak sa Emergency",
+      "notes": "Mga Tala"
+    },
+    "form": {
+      "section": {
+        "basic": "Pangunahing Impormasyon",
+        "employment": "Trabaho",
+        "personal": "Personal",
+        "government_ids": "Mga Government ID (Pilipinas)",
+        "emergency": "Kontak sa Emergency",
+        "notes": "Mga Tala"
+      },
+      "full_name": "Buong Pangalan",
+      "employee_code": "Employee Code",
+      "email": "Email",
+      "phone": "Telepono",
+      "position": "Posisyon",
+      "department": "Departamento",
+      "hire_date": "Petsa ng Pagsisimula",
+      "birth_date": "Petsa ng Kapanganakan",
+      "address": "Tirahan",
+      "employment_status": "Status ng Trabaho",
+      "emergency_name": "Pangalan ng kontak sa emergency",
+      "emergency_phone": "Telepono ng kontak sa emergency",
+      "emergency_relationship": "Relasyon",
+      "notes": "Mga Tala",
+      "name_required": "Kailangan ang buong pangalan"
+    },
+    "documents": {
+      "type": "Uri ng Dokumento",
+      "upload": "Mag-upload ng Dokumento",
+      "uploaded": "Na-upload ang dokumento",
+      "upload_failed": "Nabigo ang pag-upload ng dokumento",
+      "deleted": "Nabura ang dokumento",
+      "delete_failed": "Nabigong burahin ang dokumento",
+      "duplicate": "Umiiral na ang dokumentong ito para sa empleyadong ito",
+      "confirm_delete": "Burahin ang dokumentong ito?",
+      "empty": "Wala pang na-upload na dokumento",
+      "types": {
+        "contract": "Kontrata",
+        "id": "Dokumento ng ID",
+        "certificate": "Sertipiko",
+        "payslip": "Payslip",
+        "government": "Pormularyo ng Gobyerno",
+        "warning": "Babala",
+        "achievement": "Tagumpay",
+        "report": "Ulat",
+        "attendance": "Pagdalo",
+        "medical": "Medikal",
+        "tax": "Dokumento ng Buwis",
+        "other": "Iba pa"
+      }
+    },
+    "timeline": {
+      "empty": "Wala pang aktibidad"
+    },
+    "toast": {
+      "created": "Nalikha ang empleyado",
+      "updated": "Na-update ang empleyado",
+      "deleted": "Nabura ang empleyado",
+      "delete_failed": "Nabigong burahin ang empleyado",
+      "save_failed": "Nabigong i-save ang empleyado"
+    }
+  },
+  "departments": {
+    "title": "Mga Departamento",
+    "subtitle": "Istraktura ng organisasyon",
+    "add": "Magdagdag ng Departamento",
+    "new": "Bagong Departamento",
+    "empty": "Wala pang departamento",
+    "name_required": "Kailangan ang pangalan",
+    "created": "Nalikha ang departamento",
+    "create_failed": "Nabigong likhain ang departamento",
+    "form": {
+      "name": "Pangalan",
+      "parent": "Magulang na Departamento",
+      "description": "Paglalarawan"
+    }
   }
 }
