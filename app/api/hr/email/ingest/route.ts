@@ -14,8 +14,8 @@ function authorized(request: NextRequest): boolean {
   return auth === `Bearer ${cronSecret}`;
 }
 
-// HR manager email filter — match emails from Nicx
-const HR_SENDER_QUERY = "from:nicx is:unread newer_than:1d";
+// HR manager email filter — configurable via env var
+const HR_SENDER_QUERY = process.env.EMAIL_SENDER_QUERY || "from:nicx is:unread newer_than:1d";
 
 export async function GET(request: NextRequest) {
   const { error: authError } = await requireApiAuth({ permission: "view_emails" });
@@ -109,7 +109,14 @@ export async function GET(request: NextRequest) {
               supabase,
               classification,
               emailRecord.id,
-              today
+              today,
+              {
+                gmail_message_id: email.messageId,
+                subject: email.subject,
+                from_email: email.from.email,
+                from_name: email.from.name,
+                body_text: email.bodyText,
+              }
             );
 
             if (routedRecordId) {
@@ -164,11 +171,20 @@ export const POST = GET;
 // Route classified email to the appropriate HR module
 // ---------------------------------------------------------------------------
 
+interface EmailMeta {
+  gmail_message_id: string;
+  subject: string | null;
+  from_email: string;
+  from_name: string | null;
+  body_text: string | null;
+}
+
 async function routeToModule(
   supabase: ReturnType<typeof createAdminClient>,
   classification: Awaited<ReturnType<typeof classifyEmail>>,
   emailId: string,
-  today: string
+  today: string,
+  emailMeta?: EmailMeta
 ): Promise<string | null> {
   const { category, extracted_data, employee_name, dates } = classification;
 
@@ -257,6 +273,71 @@ async function routeToModule(
         .select("id")
         .single();
       return data?.id || null;
+    }
+
+    case "daily_operations_report":
+    case "weekly_operations_report": {
+      const rawText = emailMeta?.body_text || classification.summary;
+      const { data: report } = await supabase.from("op_reports").insert({
+        source_type: "email",
+        raw_text: rawText,
+        report_date: today,
+        source_meta: {
+          email_id: emailId,
+          gmail_message_id: emailMeta?.gmail_message_id,
+          subject: emailMeta?.subject,
+          from_email: emailMeta?.from_email,
+          from_name: emailMeta?.from_name,
+          classification_category: category,
+          classification_confidence: classification.confidence,
+        },
+        processing_status: "queued",
+      }).select("id").single();
+      return report?.id || null;
+    }
+
+    case "project_update": {
+      const rawText = emailMeta?.body_text || classification.summary;
+      const { data: report } = await supabase.from("op_reports").insert({
+        source_type: "email",
+        raw_text: rawText,
+        report_date: today,
+        source_meta: {
+          email_id: emailId,
+          gmail_message_id: emailMeta?.gmail_message_id,
+          subject: emailMeta?.subject,
+          from_email: emailMeta?.from_email,
+          from_name: emailMeta?.from_name,
+          classification_category: category,
+          classification_confidence: classification.confidence,
+          project_hint: extracted_data.project_name as string || null,
+        },
+        processing_status: "queued",
+      }).select("id").single();
+      return report?.id || null;
+    }
+
+    case "safety_incident": {
+      const rawText = emailMeta?.body_text || classification.summary;
+      const { data: report } = await supabase.from("op_reports").insert({
+        source_type: "email",
+        raw_text: rawText,
+        report_date: today,
+        source_meta: {
+          email_id: emailId,
+          gmail_message_id: emailMeta?.gmail_message_id,
+          subject: emailMeta?.subject,
+          from_email: emailMeta?.from_email,
+          from_name: emailMeta?.from_name,
+          classification_category: category,
+          classification_confidence: classification.confidence,
+          incident_type: extracted_data.incident_type as string || null,
+          severity: extracted_data.severity as string || null,
+        },
+        processing_status: "queued",
+        processing_priority: "high",
+      }).select("id").single();
+      return report?.id || null;
     }
 
     default:

@@ -5,7 +5,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/context";
 import { OpsPageShell, OpsCard } from "@/components/operations/page-shell";
-import { ArrowLeft, ChevronDown, ChevronRight, FileText, Loader2, MessageSquare, Mail, Image, Type } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronRight, FileText, Loader2, MessageCircle, MessageSquare, Mail, Image, Type } from "lucide-react";
+import { IssueChatPanel } from "@/components/operations/issue-chat-panel";
 import { toast } from "sonner";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -79,6 +80,7 @@ export default function ItemDetailPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [rawExpanded, setRawExpanded] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -154,6 +156,25 @@ export default function ItemDetailPage() {
       title={t("operations.item_detail.title")}
       actions={
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button
+            onClick={() => setShowChat(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 14px",
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-light)",
+              borderRadius: 6,
+              color: "#C9A84C",
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+          >
+            <MessageCircle size={14} />
+            {locale === "he" ? "\u05D3\u05D5\u05DF \u05D1\u05E1\u05D5\u05D2\u05D9\u05D4" : "Discuss"}
+          </button>
           <select
             value={item.status}
             disabled={busy}
@@ -414,6 +435,14 @@ export default function ItemDetailPage() {
           }
         }
       `}</style>
+
+      {showChat && item && (
+        <IssueChatPanel
+          itemId={id}
+          itemIssue={item.issue}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </OpsPageShell>
   );
 }

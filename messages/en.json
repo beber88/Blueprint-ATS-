@@ -342,7 +342,14 @@
       "raw_text": "Original Text",
       "no_dept": "No Department",
       "translate": "Translate",
-      "translated": "(translated)"
+      "translate_all": "Translate All",
+      "translating": "Translating...",
+      "translated": "(translated)",
+      "discuss": "Discuss",
+      "discussion": "Discussion",
+      "send_message": "Send",
+      "type_message": "Type a message...",
+      "no_messages": "No messages yet"
     }
   },
   "contracts": {

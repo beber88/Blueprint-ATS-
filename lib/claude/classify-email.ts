@@ -36,7 +36,11 @@ export type EmailCategory =
   | "performance_review"
   | "shift_change"
   | "general_hr"
-  | "not_hr";
+  | "not_hr"
+  | "daily_operations_report"
+  | "weekly_operations_report"
+  | "project_update"
+  | "safety_incident";
 
 export interface EmailClassification {
   category: EmailCategory;
@@ -75,10 +79,14 @@ CATEGORIES:
 - shift_change: Shift schedule changes, overtime requests
 - general_hr: HR-related but doesn't fit specific categories
 - not_hr: Not HR-related, ignore
+- daily_operations_report: Daily field/site/operations report (attendance, progress, issues)
+- weekly_operations_report: Weekly summary or roundup report
+- project_update: Project-specific status update or progress report
+- safety_incident: Safety incident, accident, or near-miss report
 
 OUTPUT JSON SHAPE (return ONLY this — no prose, no markdown):
 {
-  "category": "leave_request | sick_day | attendance_report | employee_update | salary_query | equipment_request | training_request | onboarding_task | offboarding_task | performance_review | shift_change | general_hr | not_hr",
+  "category": "leave_request | sick_day | attendance_report | employee_update | salary_query | equipment_request | training_request | onboarding_task | offboarding_task | performance_review | shift_change | general_hr | not_hr | daily_operations_report | weekly_operations_report | project_update | safety_incident",
   "confidence": 0.0 to 1.0,
   "summary": "One-sentence summary of the email content",
   "employee_name": "Name of the employee this is about (or null if not about a specific employee)",
@@ -98,9 +106,19 @@ OUTPUT JSON SHAPE (return ONLY this — no prose, no markdown):
     // onboarding_task: { new_employee_name, start_date, position }
     // offboarding_task: { employee_name, last_day, reason }
     // shift_change: { shift_type, date, reason }
+    // daily_operations_report: { site_name, present_count, absent_names, issues, materials_used }
+    // weekly_operations_report: { week_ending, highlights, blockers, metrics }
+    // project_update: { project_name, milestone, status, percent_complete }
+    // safety_incident: { incident_type, location, severity, injured_persons, description }
   },
   "suggested_action": "Brief suggested next step for the system (or null)"
 }
+
+OPERATIONS CLASSIFICATION RULES:
+- If the email contains a structured daily report with attendance, site progress, issues, materials, or operational updates, classify as daily_operations_report
+- If the email contains a weekly summary, weekly roundup, or end-of-week report, classify as weekly_operations_report
+- If the email focuses on a specific project's status, milestones, or deliverables, classify as project_update
+- If the email reports a safety incident, accident, injury, or near-miss, classify as safety_incident
 
 RULES:
 - Hebrew/Tagalog/English mixing is expected. Parse all languages.
@@ -155,6 +173,7 @@ export async function classifyEmail(
     "leave_request", "sick_day", "attendance_report", "employee_update",
     "salary_query", "equipment_request", "training_request", "onboarding_task",
     "offboarding_task", "performance_review", "shift_change", "general_hr", "not_hr",
+    "daily_operations_report", "weekly_operations_report", "project_update", "safety_incident",
   ];
 
   return {
@@ -187,6 +206,10 @@ export function categoryToRoute(category: EmailCategory): string | null {
     shift_change: "shifts",
     general_hr: "general",
     not_hr: null,
+    daily_operations_report: "operations",
+    weekly_operations_report: "operations",
+    project_update: "operations",
+    safety_incident: "operations",
   };
   return map[category];
 }

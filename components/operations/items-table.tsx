@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
-import { AlertTriangle, Calendar, CheckCircle2, ChevronDown, ChevronRight, Clock, Loader2, Pencil, Trash2 } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, ChevronDown, ChevronRight, Clock, Globe, Loader2, Pencil, Trash2 } from "lucide-react";
 import { EditItemDialog } from "@/components/operations/edit-item-dialog";
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
 
@@ -60,7 +60,29 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [translatedItems, setTranslatedItems] = useState<Record<string, { issue: string; next_action?: string | null; missing_information?: string | null }>>({});
+  const [translating, setTranslating] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
+
+  const handleTranslate = async () => {
+    if (translating || items.length === 0) return;
+    setTranslating(true);
+    try {
+      const res = await fetch("/api/operations/items/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemIds: items.map((it) => it.id), targetLang: locale }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      setTranslatedItems(data.translations || {});
+      toast.success(locale === "he" ? "תורגם בהצלחה" : "Translated successfully");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -109,7 +131,29 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ borderBottom: "1px solid var(--border-light)", color: "var(--text-secondary)", textAlign: locale === "he" ? "right" : "left" }}>
-            <th style={{ padding: "10px 12px", fontWeight: 500 }}>{t("operations.col.issue")}</th>
+            <th style={{ padding: "10px 12px", fontWeight: 500 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                {t("operations.col.issue")}
+                <button
+                  onClick={handleTranslate}
+                  disabled={translating}
+                  title={locale === "he" ? "תרגם פריטים" : "Translate items"}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid var(--border-primary)",
+                    borderRadius: 4,
+                    cursor: translating ? "wait" : "pointer",
+                    padding: "2px 4px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    color: Object.keys(translatedItems).length > 0 ? "#C9A84C" : "var(--text-secondary)",
+                    opacity: translating ? 0.5 : 1,
+                  }}
+                >
+                  {translating ? <Loader2 size={13} className="animate-spin" /> : <Globe size={13} />}
+                </button>
+              </span>
+            </th>
             <th style={{ padding: "10px 12px", fontWeight: 500 }}>{t("operations.col.project")}</th>
             <th style={{ padding: "10px 12px", fontWeight: 500 }}>{t("operations.col.dept")}</th>
             <th style={{ padding: "10px 12px", fontWeight: 500 }}>{t("operations.col.responsible")}</th>
@@ -147,8 +191,11 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                         onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
                         onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
                       >
-                        {it.issue}
+                        {translatedItems[it.id]?.issue || it.issue}
                       </Link>
+                      {translatedItems[it.id]?.issue && (
+                        <span style={{ fontSize: 10, color: "#C9A84C", marginInlineStart: 4 }}>(מתורגם)</span>
+                      )}
                     </div>
                 </td>
                 <td style={{ padding: "10px 12px", verticalAlign: "top" }}>{it.project?.name || it.project_raw || "—"}</td>
@@ -255,10 +302,20 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
                       fontSize: 13,
                     }}>
                       {it.next_action && (
-                        <DetailField label={t("operations.detail.next_action")} value={it.next_action} accent="#1A56A8" />
+                        <DetailField
+                          label={t("operations.detail.next_action")}
+                          value={translatedItems[it.id]?.next_action || it.next_action}
+                          accent="#1A56A8"
+                          translated={!!translatedItems[it.id]?.next_action}
+                        />
                       )}
                       {it.missing_information && (
-                        <DetailField label={t("operations.detail.missing_info")} value={it.missing_information} accent="#A88B3D" />
+                        <DetailField
+                          label={t("operations.detail.missing_info")}
+                          value={translatedItems[it.id]?.missing_information || it.missing_information}
+                          accent="#A88B3D"
+                          translated={!!translatedItems[it.id]?.missing_information}
+                        />
                       )}
                       <DetailField label={t("operations.detail.category")} value={t("operations.category." + it.category) || it.category} />
                       <DetailField label={t("operations.detail.report_source")} value={`${it.report_date}${it.report ? ` · ${it.report.source_type}` : ""}`} />
@@ -325,13 +382,16 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
   );
 }
 
-function DetailField({ label, value, accent }: { label: string; value: string; accent?: string }) {
+function DetailField({ label, value, accent, translated }: { label: string; value: string; accent?: string; translated?: boolean }) {
   return (
     <div>
       <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: accent || "var(--text-secondary)", marginBottom: 2 }}>
         {label}
       </div>
-      <div style={{ color: "var(--text-primary)" }}>{value}</div>
+      <div style={{ color: "var(--text-primary)" }}>
+        {value}
+        {translated && <span style={{ fontSize: 10, color: "#C9A84C", marginInlineStart: 4 }}>(מתורגם)</span>}
+      </div>
     </div>
   );
 }

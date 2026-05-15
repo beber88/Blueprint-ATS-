@@ -38,6 +38,7 @@ export async function middleware(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth/callback") &&
     !request.nextUrl.pathname.startsWith("/api/webhooks") &&
+    !request.nextUrl.pathname.startsWith("/api/seed") &&
     request.nextUrl.pathname !== "/"
   ) {
     const url = request.nextUrl.clone();

@@ -349,7 +349,14 @@
       "raw_text": "טקסט מקורי",
       "no_dept": "ללא מחלקה",
       "translate": "תרגם",
-      "translated": "(מתורגם)"
+      "translate_all": "תרגם הכל",
+      "translating": "מתרגם...",
+      "translated": "(מתורגם)",
+      "discuss": "דון בסוגיה",
+      "discussion": "דיון",
+      "send_message": "שלח",
+      "type_message": "כתוב הודעה...",
+      "no_messages": "אין הודעות עדיין"
     }
   },
   "contracts": {
