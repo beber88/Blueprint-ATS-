@@ -42,6 +42,10 @@ module.exports = {
     // the extractor is mostly defensive defaults). Backlog item alongside
     // lib/claude/extract-report.ts's missing coverage.
     "!lib/contracts/extract-contract.ts",
+    // hr_* gap-fill helpers (migration 012). queries.ts is read-only
+    // glue (exercised indirectly by the profile-summary endpoint).
+    // access.ts/salary.ts/cron-deadlines.ts are gated below.
+    "!lib/hr/queries.ts",
     "!**/node_modules/**",
   ],
   // CI gate. If any file under lib/operations/* or lib/contracts/* falls
@@ -57,6 +61,12 @@ module.exports = {
       branches: 70,
     },
     "./lib/contracts/**/*.{ts,tsx}": {
+      statements: 80,
+      lines: 80,
+      functions: 80,
+      branches: 70,
+    },
+    "./lib/hr/**/*.{ts,tsx}": {
       statements: 80,
       lines: 80,
       functions: 80,

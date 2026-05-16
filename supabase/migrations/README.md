@@ -10,11 +10,15 @@
 | 006 | `006_operations_bulk_import_jobs.sql` | **Yes** | 002 | Creates `op_bulk_import_jobs` + `op_bulk_import_items` for tracked bulk-import runs with cancel/resume/dedup. See `docs/operations/bulk-import.md`. |
 | 007 | `007_operations_drafts.sql` | **Yes** | 002, 006 | Creates `op_report_drafts` (the preview-before-save staging table). Adds `op_reports.flagged_for_review`, `op_reports.draft_source_id` (FK → drafts, ON DELETE SET NULL), `op_bulk_import_jobs.auto_promote`. See `docs/operations/preview-and-drafts.md`. |
 | 008 | `008_contracts_schema.sql` | **Yes** | 002 | Contracts module Spine. Creates `ct_contracts`, `ct_contract_drafts` (mirrors `op_report_drafts`), `ct_alerts` with partial unique on `(contract_id, type) WHERE resolved_at IS NULL`. New private storage bucket `contracts`. FK `ct_contracts.draft_source_id → ct_contract_drafts(id)` ON DELETE SET NULL. Idempotency via `DO $$ IF NOT EXISTS` blocks. |
+| 009 | `009_contract_folders.sql` | **Yes** | 008 | Adds hierarchical folder support for the contracts file-manager UI: `ct_folders` table + `ct_contracts.folder_id` FK + `get_folder_breadcrumbs` RPC. |
+| 010 | `010_hr_modules.sql` | **Yes** | 002 | Full HR module: 17 `hr_*` tables (`hr_emails`, `hr_employee_documents`, `hr_role_history`, `hr_leave_balances`, `hr_leave_requests`, `hr_attendance`, `hr_salary`, `hr_payslips`, `hr_performance_reviews`, `hr_training_courses`, `hr_training_enrollments`, `hr_onboarding_templates`, `hr_onboarding_tasks`, `hr_shift_definitions`, `hr_shift_assignments`, `hr_assets`, `hr_asset_assignments`). Extends `op_employees` with `date_of_birth`, `gender`, `address`, `emergency_contact`, `hire_date`, `national_id`, `employment_type`, `salary_grade`, `manager_id`. New private `hr-documents` storage bucket. |
+| 011 | `011_role_based_access.sql` | **Yes** | 010 | RBAC: installs the `user_has_role(text[])` SECURITY DEFINER helper, restricts sensitive `hr_*` tables (salary, payslips, emails, reviews, documents, leave, leave_balances) to `admin`+`hr` roles, and locks down `user_profiles` to self-read + admin-write. |
+| 012 | `012_employee_profile_gapfill.sql` | **Yes** | 010, 011 | Employee-profile gap-fill: 9 new additive tables (`hr_employment_contracts`, `hr_salary_schedules`, `hr_benefits`, `hr_disciplinary_records`, `hr_recognitions`, `hr_compliance_records`, `hr_employee_notes`, `hr_alerts`, `hr_profile_grants`) + RLS via the migration-011 `user_has_role()` helper + grant-based read access through `hr_profile_grants`. Reuses the `hr-documents` bucket from 010 (no new bucket). Partial unique on `hr_salary_schedules(employee_id) WHERE status='pending'` and on `hr_alerts(employee_id, type) WHERE resolved_at IS NULL` for cron idempotency. |
 
 ## Apply order
 
 ```
-001 → 002 → 003 → 004 → 005 → 006 → 007 → 008
+001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011 → 012
 ```
 
 ## Re-runs in production
@@ -35,7 +39,7 @@ won't re-apply it.
 
 ## Local testing
 
-`tests/helpers/db.ts` applies all six migrations against a vanilla
+`tests/helpers/db.ts` applies all migrations against a vanilla
 Postgres 16 cluster. See `docs/development/test-harness.md` for the
 unaccent + role + storage stubs that bridge Supabase's environment
 gaps locally.
