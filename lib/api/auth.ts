@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 // TYPES
 // ═══════════════════════════════════════
 
-export type Role = "admin" | "hr" | "user";
+export type Role = "admin" | "hr" | "recruiter" | "user";
 export type Module = "recruitment" | "operations" | "contracts" | "hr-management" | "admin";
 export type Permission = "view_salary" | "view_emails" | "manage_users" | "export_data";
 
@@ -17,18 +17,21 @@ export type Permission = "view_salary" | "view_emails" | "manage_users" | "expor
 const ROLE_LEVEL: Record<Role, number> = {
   admin: 100,
   hr: 50,
+  recruiter: 40,
   user: 10,
 };
 
 const ROLE_MODULES: Record<Role, Module[]> = {
   admin: ["recruitment", "operations", "contracts", "hr-management", "admin"],
-  hr: ["recruitment", "hr-management"],
+  hr: ["recruitment", "operations", "contracts", "hr-management"],
+  recruiter: ["recruitment", "operations"],
   user: ["recruitment"],
 };
 
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   admin: ["view_salary", "view_emails", "manage_users", "export_data"],
   hr: ["view_salary", "view_emails"],
+  recruiter: ["view_emails"],
   user: [],
 };
 
