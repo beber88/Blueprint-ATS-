@@ -27,10 +27,12 @@
       "followups": "Follow-ups",
       "alerts": "Mga Alerto",
       "archive": "Archive",
+      "reports": "Mga Ulat",
       "projects": "Mga Proyekto",
       "departments": "Mga Departamento",
       "employees": "Mga Empleyado",
       "ai_agent": "Operations AI",
+      "knowledge": "Knowledge Base",
       "inbox": "Inbox"
     },
     "dashboard": {
@@ -274,6 +276,7 @@
     },
     "toast": {
       "item_updated": "Na-update ang item",
+      "translated": "Matagumpay na naisalin",
       "alert_dismissed": "Naibasura ang alerto",
       "project_created": "Nalikha ang proyekto",
       "employee_created": "Naidagdag ang empleyado",

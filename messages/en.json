@@ -27,10 +27,12 @@
       "followups": "Follow-ups",
       "alerts": "Alerts",
       "archive": "Archive",
+      "reports": "Reports",
       "projects": "Projects",
       "departments": "Departments",
       "employees": "Employees",
       "ai_agent": "Operations AI",
+      "knowledge": "Knowledge Base",
       "inbox": "Inbox"
     },
     "dashboard": {
@@ -295,6 +297,7 @@
     },
     "toast": {
       "item_updated": "Item updated",
+      "translated": "Translated successfully",
       "alert_dismissed": "Alert dismissed",
       "project_created": "Project created",
       "employee_created": "Employee added",
@@ -371,6 +374,28 @@
       "send_message": "Send",
       "type_message": "Type a message...",
       "no_messages": "No messages yet"
+    },
+    "report_list": {
+      "title": "Reports",
+      "subtitle": "All reports ingested into the system",
+      "col_date": "Report Date",
+      "col_source": "Source",
+      "col_status": "Status",
+      "col_items": "Items",
+      "col_entered": "Entered System",
+      "view": "View",
+      "no_reports": "No reports yet"
+    },
+    "report_detail": {
+      "title": "Report Detail",
+      "items_title": "Extracted Items",
+      "raw_text": "Raw Text",
+      "metadata": "Metadata",
+      "source_type": "Source Type",
+      "report_date": "Report Date",
+      "processed_at": "Processed At",
+      "confidence": "Confidence",
+      "no_items": "No items were extracted from this report"
     }
   },
   "contracts": {

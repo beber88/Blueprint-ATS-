@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { ExtractedReport, ExtractedItem } from "@/lib/operations/types";
+import type { ExtractedReport, ExtractedItem, ExtractedQuestion, ContextEntryType } from "@/lib/operations/types";
 
 const MODEL = "claude-sonnet-4-20250514";
 
@@ -60,6 +60,15 @@ OUTPUT JSON SHAPE (return ONLY this — no prose, no markdown):
       "next_action": "string or null - the next step / tomorrow plan / planned action",
       "category": "hr | attendance | safety | project | permit | procurement | subcontractor | site | other"
     }
+  ],
+  "questions": [
+    {
+      "question": "string - question in the report's locale asking the user to clarify an unknown abbreviation, entity, or reference",
+      "question_en": "string or null - English version of the question",
+      "context_snippet": "string or null - the excerpt from the report that triggered this question",
+      "suggested_type": "abbreviation | entity_mapping | project_phase | pattern | general | null",
+      "suggested_trigger": "string or null - the specific term or abbreviation you are asking about (e.g. 'PYT')"
+    }
   ]
 }
 
@@ -81,20 +90,33 @@ EXTRACTION RULES:
 - Department should be a single short label, not a sentence.
 - If a piece of information is missing from the source, use null. NEVER invent facts.
 
+QUESTIONS — When you encounter ambiguous abbreviations, unknown entity names, or unclear references that are NOT already explained in the CONTEXT KNOWLEDGE section below:
+- Add a question to the "questions" array asking the user to clarify.
+- Only ask about things that appear important (mentioned multiple times, appear in critical items, or seem like a subcontractor/project name you can't resolve).
+- Do NOT ask about things already explained in CONTEXT KNOWLEDGE.
+- Write the question in the report's locale (Hebrew/English/Tagalog), and also provide an English version in question_en.
+- Maximum 5 questions per report. If nothing is unclear, return an empty questions array.
+
 Return JSON only.`;
+
+function buildSystemPrompt(contextBlock?: string): string {
+  if (!contextBlock) return SYSTEM_PROMPT;
+  return SYSTEM_PROMPT + `\n\nCONTEXT KNOWLEDGE (learned from previous reports — use this to resolve abbreviations, entities, and patterns):\n${contextBlock}`;
+}
 
 export interface ExtractOptions {
   reporterName?: string | null;
   defaultProject?: string | null;
   reportDate?: string | null; // YYYY-MM-DD hint (e.g. inferred from upload date)
   locale?: "he" | "en" | "tl";
+  contextBlock?: string;       // learned context injected into system prompt
 }
 
 function buildUserMessage(text: string, opts: ExtractOptions): string {
   const lines: string[] = [];
   lines.push("DAILY REPORT TEXT:");
   lines.push("```");
-  lines.push(text.length > 30000 ? text.slice(0, 30000) + "\n...[truncated]" : text);
+  lines.push(text.length > 100000 ? text.slice(0, 100000) + "\n...[truncated]" : text);
   lines.push("```");
   if (opts.reporterName) lines.push(`Reporter context: submitted by ${opts.reporterName}`);
   if (opts.defaultProject) lines.push(`Default project context: ${opts.defaultProject}`);
@@ -108,6 +130,24 @@ function buildUserMessage(text: string, opts: ExtractOptions): string {
   lines.push("");
   lines.push("Return the JSON object now.");
   return lines.join("\n");
+}
+
+const VALID_QUESTION_TYPES: ContextEntryType[] = ["abbreviation", "entity_mapping", "project_phase", "pattern", "general"];
+
+function normalizeQuestions(raw: unknown): ExtractedQuestion[] {
+  if (!Array.isArray(raw)) return [];
+  return (raw as Record<string, unknown>[])
+    .map((r) => ({
+      question: typeof r.question === "string" ? r.question : "",
+      question_en: typeof r.question_en === "string" ? r.question_en : null,
+      context_snippet: typeof r.context_snippet === "string" ? r.context_snippet : null,
+      suggested_type: VALID_QUESTION_TYPES.includes(r.suggested_type as ContextEntryType)
+        ? (r.suggested_type as ContextEntryType)
+        : null,
+      suggested_trigger: typeof r.suggested_trigger === "string" ? r.suggested_trigger : null,
+    }))
+    .filter((q) => q.question.trim().length > 0)
+    .slice(0, 5);
 }
 
 function normalizeItems(raw: unknown): ExtractedItem[] {
@@ -143,8 +183,8 @@ export async function extractReportItems(
   const client = getClient();
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 8000,
-    system: SYSTEM_PROMPT,
+    max_tokens: 16000,
+    system: buildSystemPrompt(opts.contextBlock),
     messages: [{ role: "user", content: buildUserMessage(text, opts) }],
   });
 
@@ -155,10 +195,12 @@ export async function extractReportItems(
     confidence?: number;
     notes?: string;
     items?: unknown;
+    questions?: unknown;
   }>(block.text);
 
   return {
     items: normalizeItems(parsed.items),
+    questions: normalizeQuestions(parsed.questions),
     confidence: typeof parsed.confidence === "number" ? Math.max(0, Math.min(1, parsed.confidence)) : 0.7,
     model: MODEL,
     report_date: typeof parsed.report_date === "string" && /^\d{4}-\d{2}-\d{2}/.test(parsed.report_date)
@@ -178,8 +220,8 @@ export async function extractReportItemsFromImage(
   const client = getClient();
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 8000,
-    system: SYSTEM_PROMPT,
+    max_tokens: 16000,
+    system: buildSystemPrompt(opts.contextBlock),
     messages: [
       {
         role: "user",
@@ -214,11 +256,81 @@ export async function extractReportItemsFromImage(
     confidence?: number;
     notes?: string;
     items?: unknown;
+    questions?: unknown;
   }>(block.text);
 
   return {
     items: normalizeItems(parsed.items),
+    questions: normalizeQuestions(parsed.questions),
     confidence: typeof parsed.confidence === "number" ? Math.max(0, Math.min(1, parsed.confidence)) : 0.6,
+    model: MODEL,
+    report_date: typeof parsed.report_date === "string" && /^\d{4}-\d{2}-\d{2}/.test(parsed.report_date)
+      ? parsed.report_date.slice(0, 10)
+      : opts.reportDate || null,
+    notes: typeof parsed.notes === "string" ? parsed.notes : null,
+  };
+}
+
+// PDF variant — sends the raw PDF bytes as a document content block to Claude.
+// Claude natively handles both text-based and scanned (image-only) PDFs via its
+// built-in OCR. This is the fallback used when pdf-parse produces insufficient
+// text (i.e. scanned documents).
+export async function extractReportItemsFromPDF(
+  pdfBase64: string,
+  opts: ExtractOptions = {}
+): Promise<ExtractedReport> {
+  const client = getClient();
+  const contextLines = [
+    "The document above is a daily operations report (PDF).",
+    "Read all text in the document and extract items as instructed in the system prompt.",
+    opts.reporterName ? `Reporter context: submitted by ${opts.reporterName}` : "",
+    opts.defaultProject ? `Default project context: ${opts.defaultProject}` : "",
+    opts.reportDate ? `Report date hint: ${opts.reportDate}` : "",
+    `Source locale hint: ${opts.locale || "he"}`,
+    (opts.locale === "he" || !opts.locale)
+      ? "CRITICAL: Write ALL free-text fields (issue, next_action, missing_information, notes) in HEBREW. Keep proper nouns (people names, project names, company names) in their original script."
+      : "",
+    opts.locale === "tl"
+      ? "CRITICAL: Write ALL free-text fields in TAGALOG. Keep proper nouns in their original script."
+      : "",
+    "Return the JSON object now.",
+  ].filter(Boolean);
+
+  const message = await client.messages.create({
+    model: MODEL,
+    max_tokens: 16000,
+    system: buildSystemPrompt(opts.contextBlock),
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "document",
+            source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
+          },
+          {
+            type: "text",
+            text: contextLines.join("\n"),
+          },
+        ],
+      },
+    ],
+  });
+
+  const block = message.content[0];
+  if (!block || block.type !== "text") throw new Error("Unexpected Claude response type");
+  const parsed = extractJSON<{
+    report_date?: string;
+    confidence?: number;
+    notes?: string;
+    items?: unknown;
+    questions?: unknown;
+  }>(block.text);
+
+  return {
+    items: normalizeItems(parsed.items),
+    questions: normalizeQuestions(parsed.questions),
+    confidence: typeof parsed.confidence === "number" ? Math.max(0, Math.min(1, parsed.confidence)) : 0.7,
     model: MODEL,
     report_date: typeof parsed.report_date === "string" && /^\d{4}-\d{2}-\d{2}/.test(parsed.report_date)
       ? parsed.report_date.slice(0, 10)

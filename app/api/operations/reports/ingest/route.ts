@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { extractReportItems } from "@/lib/claude/extract-report";
+import { extractReportItems, extractReportItemsFromPDF } from "@/lib/claude/extract-report";
 import {
   matchDepartmentByName,
   matchEmployeeByName,
   matchProjectByName,
 } from "@/lib/operations/match-employee";
 import { requireApiAuth } from "@/lib/api/auth";
+import { loadContextBlock, trackContextUsage } from "@/lib/operations/context-loader";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
     let projectIdHint: string | null = null;
     let storagePath: string | null = null;
     let originalFileName: string | null = null;
+    let pdfBase64: string | null = null;
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await request.formData();
@@ -55,8 +57,16 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(await file.arrayBuffer());
         if (ext === "pdf") {
           sourceType = "pdf";
-          const pdfData = await pdfParse(buffer);
-          rawText = pdfData.text || "";
+          try {
+            const pdfData = await pdfParse(buffer);
+            rawText = pdfData.text || "";
+          } catch {
+            // pdf-parse failed — will fall back to Claude Vision PDF extraction
+          }
+          // Retain raw PDF for Claude Vision fallback if text extraction insufficient
+          if (rawText.trim().length < 50) {
+            pdfBase64 = buffer.toString("base64");
+          }
           const path = `${crypto.randomUUID()}.pdf`;
           const { error: upErr } = await supabase.storage
             .from("operations-reports")
@@ -78,19 +88,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (!rawText.trim()) {
+    if (!rawText.trim() && !pdfBase64) {
       return NextResponse.json({ error: "No report text supplied" }, { status: 400 });
     }
 
     // Create the report row first
+    const usePdfVision = !!pdfBase64 && rawText.trim().length < 50;
     const { data: report, error: insErr } = await supabase
       .from("op_reports")
       .insert({
         source_type: sourceType,
-        raw_text: rawText.slice(0, 200000),
+        raw_text: (usePdfVision ? `[PDF processed via Claude Vision: ${originalFileName || "upload.pdf"}]` : rawText).slice(0, 200000),
         source_meta: {
           original_filename: originalFileName,
           project_id_hint: projectIdHint,
+          pdf_vision: usePdfVision,
         },
         report_date: reportDate || new Date().toISOString().slice(0, 10),
         storage_path: storagePath,
@@ -104,9 +116,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: insErr?.message || "Failed to create report" }, { status: 500 });
     }
 
+    // Load learned context to inject into AI prompt
+    const contextBlock = await loadContextBlock(projectIdHint);
+
     let extracted;
     try {
-      extracted = await extractReportItems(rawText, { reportDate: report.report_date });
+      extracted = usePdfVision
+        ? await extractReportItemsFromPDF(pdfBase64!, { reportDate: report.report_date, contextBlock })
+        : await extractReportItems(rawText, { reportDate: report.report_date, contextBlock });
     } catch (err) {
       await supabase
         .from("op_reports")
@@ -119,11 +136,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "AI extraction failed", details: String(err) }, { status: 500 });
     }
 
+    const autoCreatedProjects = new Map<string, string>();
     const itemRows = [] as Record<string, unknown>[];
     for (const it of extracted.items) {
       const empMatch = await matchEmployeeByName(supabase, it.person_responsible);
       const deptId = await matchDepartmentByName(supabase, it.department);
-      const projId = (await matchProjectByName(supabase, it.project)) || projectIdHint;
+      let projId = (await matchProjectByName(supabase, it.project)) || projectIdHint;
+
+      // Auto-create unknown projects so every report mention gets tracked
+      if (!projId && it.project && it.project.trim().length >= 2) {
+        const normalizedName = it.project.trim();
+        if (autoCreatedProjects.has(normalizedName.toLowerCase())) {
+          projId = autoCreatedProjects.get(normalizedName.toLowerCase())!;
+        } else {
+          const { data: newProj } = await supabase
+            .from("op_projects")
+            .insert({ name: normalizedName, status: "active", department_id: deptId })
+            .select("id")
+            .single();
+          if (newProj) {
+            projId = newProj.id;
+            autoCreatedProjects.set(normalizedName.toLowerCase(), newProj.id);
+          }
+        }
+      }
       itemRows.push({
         report_id: report.id,
         report_date: report.report_date,
@@ -166,6 +202,9 @@ export async function POST(request: NextRequest) {
         },
       })
       .eq("id", report.id);
+
+    // Track which context entries were used (fire-and-forget)
+    trackContextUsage(rawText).catch(() => {});
 
     return NextResponse.json({
       report_id: report.id,

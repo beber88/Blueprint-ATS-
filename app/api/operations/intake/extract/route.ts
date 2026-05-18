@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { extractReportItems } from "@/lib/claude/extract-report";
+import { extractReportItems, extractReportItemsFromPDF } from "@/lib/claude/extract-report";
 import { computeWarnings } from "@/lib/operations/draft-warnings";
 import { loadMasterSnapshot } from "@/lib/operations/draft-master-snapshot";
 import { requireApiAuth } from "@/lib/api/auth";
+import { loadContextBlock, trackContextUsage } from "@/lib/operations/context-loader";
 
 // Match the require pattern used by /api/cv/upload — pdf-parse has a
 // top-level side effect on its index that breaks Next's bundler.
@@ -35,6 +36,7 @@ async function parseInputs(request: NextRequest): Promise<{
   text: string;
   reportDate?: string;
   projectId?: string;
+  pdfBase64?: string;
 } | { error: string; status: number }> {
   const ct = request.headers.get("content-type") || "";
   if (ct.includes("application/json")) {
@@ -54,20 +56,24 @@ async function parseInputs(request: NextRequest): Promise<{
     const form = await request.formData();
     const fileField = form.get("file");
     let text = (form.get("text") as string | null) || "";
+    let pdfBase64: string | undefined;
     if (fileField && fileField instanceof File && fileField.size > 0) {
       const buffer = Buffer.from(await fileField.arrayBuffer());
       try {
         const out = await pdfParse(buffer);
         text = (text + "\n" + out.text).trim();
-      } catch (e) {
-        return {
-          error: `pdf-parse failed: ${e instanceof Error ? e.message : String(e)}`,
-          status: 422,
-        };
+      } catch {
+        // pdf-parse failed — will fall back to Claude Vision PDF extraction
+      }
+      // If text extraction produced insufficient text, retain the raw PDF
+      // buffer so the caller can fall back to Claude's native PDF reading.
+      if (text.trim().length < 50) {
+        pdfBase64 = buffer.toString("base64");
       }
     }
     return {
       text,
+      pdfBase64,
       reportDate: (form.get("reportDate") as string | null) || undefined,
       projectId: (form.get("projectId") as string | null) || undefined,
     };
@@ -86,7 +92,8 @@ export async function POST(request: NextRequest) {
   if ("error" in parsed) {
     return NextResponse.json({ error: parsed.error }, { status: parsed.status });
   }
-  if (!parsed.text || parsed.text.trim().length < 50) {
+  const hasPdfFallback = !!parsed.pdfBase64;
+  if ((!parsed.text || parsed.text.trim().length < 50) && !hasPdfFallback) {
     return NextResponse.json(
       { error: "text required (min 50 chars; PDF must produce text)" },
       { status: 400 }
@@ -97,7 +104,13 @@ export async function POST(request: NextRequest) {
   const reportDate =
     parsed.reportDate || new Date().toISOString().slice(0, 10);
 
-  const extracted = await extractReportItems(parsed.text, { reportDate });
+  // Load learned context to inject into AI prompt
+  const contextBlock = await loadContextBlock(parsed.projectId);
+
+  // Use Claude's native PDF reading when pdf-parse produced insufficient text
+  const extracted = hasPdfFallback && parsed.text.trim().length < 50
+    ? await extractReportItemsFromPDF(parsed.pdfBase64!, { reportDate, contextBlock })
+    : await extractReportItems(parsed.text, { reportDate, contextBlock });
 
   const aiOutput = {
     report_date: reportDate,
@@ -118,7 +131,8 @@ export async function POST(request: NextRequest) {
       source_text: parsed.text.slice(0, 200_000),
       ai_output_json: aiOutput,
       warnings_json: warnings,
-      source_kind: "manual",
+      questions_json: extracted.questions,
+      source_kind: hasPdfFallback ? "pdf_vision" : "manual",
       status: "draft",
     })
     .select()
@@ -131,9 +145,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Persist AI questions to the questions table
+  if (extracted.questions.length > 0) {
+    await supabase.from("op_context_questions").insert(
+      extracted.questions.map((q) => ({
+        draft_id: draft.id,
+        question_text: q.question,
+        question_text_en: q.question_en,
+        context_snippet: q.context_snippet,
+        suggested_type: q.suggested_type,
+        suggested_trigger: q.suggested_trigger,
+        status: "pending",
+      }))
+    );
+  }
+
+  // Track which context entries were used (fire-and-forget)
+  trackContextUsage(parsed.text).catch(() => {});
+
   return NextResponse.json({
     draftId: draft.id,
     warnings,
+    questions: extracted.questions,
     ai_output: aiOutput,
   });
 }

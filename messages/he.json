@@ -27,10 +27,12 @@
       "followups": "מעקב",
       "alerts": "התראות",
       "archive": "ארכיון",
+      "reports": "דוחות",
       "projects": "פרויקטים",
       "departments": "מחלקות",
       "employees": "עובדים",
       "ai_agent": "עוזר תפעולי",
+      "knowledge": "בסיס ידע",
       "inbox": "תיבת נכנסים"
     },
     "dashboard": {
@@ -295,6 +297,7 @@
     },
     "toast": {
       "item_updated": "הפריט עודכן",
+      "translated": "תורגם בהצלחה",
       "alert_dismissed": "ההתראה נסגרה",
       "project_created": "פרויקט נוצר",
       "employee_created": "עובד נוסף",
@@ -371,6 +374,28 @@
       "send_message": "שלח",
       "type_message": "כתוב הודעה...",
       "no_messages": "אין הודעות עדיין"
+    },
+    "report_list": {
+      "title": "דוחות",
+      "subtitle": "כל הדוחות שהוזנו למערכת",
+      "col_date": "תאריך דוח",
+      "col_source": "מקור",
+      "col_status": "סטטוס",
+      "col_items": "פריטים",
+      "col_entered": "נכנס למערכת",
+      "view": "צפה",
+      "no_reports": "אין דוחות עדיין"
+    },
+    "report_detail": {
+      "title": "פרטי דוח",
+      "items_title": "פריטים שחולצו",
+      "raw_text": "טקסט מקורי",
+      "metadata": "מטא-דאטא",
+      "source_type": "סוג מקור",
+      "report_date": "תאריך דוח",
+      "processed_at": "עובד בתאריך",
+      "confidence": "רמת ביטחון",
+      "no_items": "לא חולצו פריטים מדוח זה"
     }
   },
   "contracts": {

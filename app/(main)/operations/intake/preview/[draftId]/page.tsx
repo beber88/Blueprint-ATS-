@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Save, Flag, Trash2, AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { Loader2, Save, Flag, Trash2, AlertTriangle, AlertCircle, Info, MessageCircleQuestion } from "lucide-react";
 import { OpsCard, OpsPageShell } from "@/components/operations/page-shell";
 import { useI18n } from "@/lib/i18n/context";
 
@@ -40,11 +40,21 @@ interface AiOutput {
   ceo_action_items?: AiItem[];
 }
 
+interface DraftQuestion {
+  id: string;
+  question_text: string;
+  question_text_en: string | null;
+  context_snippet: string | null;
+  suggested_trigger: string | null;
+  status: "pending" | "answered" | "dismissed";
+}
+
 interface Draft {
   id: string;
   source_text: string;
   ai_output_json: AiOutput;
   warnings_json: Warning[];
+  questions_json: Array<{ question: string; question_en?: string; context_snippet?: string; suggested_trigger?: string }>;
   status: string;
 }
 
@@ -72,17 +82,55 @@ export default function PreviewDraftPage() {
   const [saving, setSaving] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Context questions
+  const [questions, setQuestions] = useState<DraftQuestion[]>([]);
+  const [answerTexts, setAnswerTexts] = useState<Record<string, string>>({});
+  const [answerBusy, setAnswerBusy] = useState<string | null>(null);
+
   useEffect(() => {
     if (!draftId) return;
-    fetch(`/api/operations/drafts/${draftId}`)
-      .then((r) => r.json())
-      .then((d) => {
+    Promise.all([
+      fetch(`/api/operations/drafts/${draftId}`).then((r) => r.json()),
+      fetch(`/api/operations/context/questions?draft_id=${draftId}`).then((r) => r.json()),
+    ])
+      .then(([d, q]) => {
         if (d.draft) setDraft(d.draft);
         else toast.error(d.error || "Draft not found");
+        setQuestions(q.questions || []);
       })
       .catch((e) => toast.error(e.message))
       .finally(() => setLoading(false));
   }, [draftId]);
+
+  const answerQuestion = async (qId: string) => {
+    const text = answerTexts[qId];
+    if (!text?.trim()) return;
+    setAnswerBusy(qId);
+    try {
+      const res = await fetch(`/api/operations/context/questions/${qId}/answer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer_text: text.trim() }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || "failed");
+      toast.success(locale === "he" ? "תשובה נשמרה — ידע חדש נוצר" : "Answer saved — new knowledge created");
+      setQuestions((prev) => prev.filter((q) => q.id !== qId));
+      setAnswerTexts((prev) => { const n = { ...prev }; delete n[qId]; return n; });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setAnswerBusy(null);
+    }
+  };
+
+  const dismissQuestion = async (qId: string) => {
+    try {
+      await fetch(`/api/operations/context/questions/${qId}/dismiss`, { method: "POST" });
+      setQuestions((prev) => prev.filter((q) => q.id !== qId));
+    } catch {
+      toast.error("Error");
+    }
+  };
 
   const patchDraft = (next: AiOutput) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -310,10 +358,10 @@ export default function PreviewDraftPage() {
                         onChange={(e) => updateField(["items", i, "priority"], e.target.value)}
                         style={inputStyle}
                       >
-                        <option value="low">low</option>
-                        <option value="medium">medium</option>
-                        <option value="high">high</option>
-                        <option value="urgent">urgent</option>
+                        <option value="low">{t("operations.priority.low")}</option>
+                        <option value="medium">{t("operations.priority.medium")}</option>
+                        <option value="high">{t("operations.priority.high")}</option>
+                        <option value="urgent">{t("operations.priority.urgent")}</option>
                       </select>
                     </div>
                   </div>
@@ -352,8 +400,8 @@ export default function PreviewDraftPage() {
           )}
         </div>
 
-        {/* Right column: warnings */}
-        <div>
+        {/* Right column: warnings + questions */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <OpsCard title={t("operations.preview.warnings")}>
             {draft.warnings_json.length === 0 ? (
               <p style={{ color: "var(--text-secondary)", fontSize: 13 }}>
@@ -397,6 +445,104 @@ export default function PreviewDraftPage() {
               </ul>
             )}
           </OpsCard>
+
+          {/* AI Questions panel */}
+          {questions.length > 0 && (
+            <OpsCard>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10, fontWeight: 700, fontSize: 14 }}>
+                <MessageCircleQuestion size={14} />
+                {locale === "he" ? "שאלות AI" : "AI Questions"}
+                <span style={{
+                  background: "#D97706",
+                  color: "#fff",
+                  borderRadius: 10,
+                  padding: "1px 7px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                }}>
+                  {questions.length}
+                </span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {questions.map((q) => (
+                  <div
+                    key={q.id}
+                    style={{
+                      padding: 8,
+                      borderRadius: 6,
+                      background: "#FFFBEB",
+                      border: "1px solid #F59E0B",
+                      fontSize: 12,
+                    }}
+                  >
+                    <p style={{ margin: 0, fontWeight: 600, marginBottom: 4 }}>
+                      {q.question_text}
+                    </p>
+                    {q.question_text_en && q.question_text !== q.question_text_en && (
+                      <p style={{ margin: 0, fontSize: 11, color: "#6B7280", marginBottom: 4 }}>
+                        {q.question_text_en}
+                      </p>
+                    )}
+                    {q.context_snippet && (
+                      <p style={{
+                        margin: "0 0 6px",
+                        fontSize: 11,
+                        fontFamily: "monospace",
+                        background: "#F3F4F6",
+                        padding: "2px 6px",
+                        borderRadius: 4,
+                      }}>
+                        &ldquo;{q.context_snippet}&rdquo;
+                      </p>
+                    )}
+                    {q.suggested_trigger && (
+                      <span style={{
+                        display: "inline-block",
+                        fontSize: 10,
+                        background: "#FDE68A",
+                        borderRadius: 4,
+                        padding: "1px 6px",
+                        marginBottom: 6,
+                      }}>
+                        {q.suggested_trigger}
+                      </span>
+                    )}
+                    <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
+                      <input
+                        type="text"
+                        placeholder={locale === "he" ? "הקלד תשובה..." : "Type answer..."}
+                        value={answerTexts[q.id] || ""}
+                        onChange={(e) => setAnswerTexts((prev) => ({ ...prev, [q.id]: e.target.value }))}
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <button
+                        onClick={() => answerQuestion(q.id)}
+                        disabled={answerBusy === q.id || !answerTexts[q.id]?.trim()}
+                        style={{
+                          ...primaryButton,
+                          padding: "4px 10px",
+                          fontSize: 11,
+                          opacity: answerBusy === q.id || !answerTexts[q.id]?.trim() ? 0.5 : 1,
+                        }}
+                      >
+                        {answerBusy === q.id ? <Loader2 size={12} className="animate-spin" /> : (locale === "he" ? "ענה" : "Answer")}
+                      </button>
+                      <button
+                        onClick={() => dismissQuestion(q.id)}
+                        style={{
+                          ...secondaryButton,
+                          padding: "4px 10px",
+                          fontSize: 11,
+                        }}
+                      >
+                        {locale === "he" ? "התעלם" : "Dismiss"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </OpsCard>
+          )}
         </div>
       </div>
     </OpsPageShell>

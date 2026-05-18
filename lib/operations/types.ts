@@ -34,6 +34,7 @@ export interface ExtractedItem {
 
 export interface ExtractedReport {
   items: ExtractedItem[];
+  questions: ExtractedQuestion[];
   confidence: number; // 0..1
   model: string;
   report_date: string | null;
@@ -98,6 +99,51 @@ export interface OpReportItem {
   resolved_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// ─── Context Learning ────────────────────────────────────────────────────────
+
+export type ContextEntryType = "abbreviation" | "entity_mapping" | "project_phase" | "pattern" | "general";
+export type ContextSource = "admin_explanation" | "question_answer" | "auto_pattern";
+
+export interface ExtractedQuestion {
+  question: string;
+  question_en: string | null;
+  context_snippet: string | null;
+  suggested_type: ContextEntryType | null;
+  suggested_trigger: string | null;
+}
+
+export interface ContextEntry {
+  id: string;
+  entry_type: ContextEntryType;
+  trigger_text: string;
+  resolution: string;
+  scope_project_id: string | null;
+  scope_department_id: string | null;
+  confidence: number;
+  source: ContextSource;
+  source_draft_id: string | null;
+  is_active: boolean;
+  usage_count: number;
+  last_used_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ContextQuestion {
+  id: string;
+  draft_id: string;
+  question_text: string;
+  question_text_en: string | null;
+  context_snippet: string | null;
+  suggested_type: ContextEntryType | null;
+  suggested_trigger: string | null;
+  answer_text: string | null;
+  resolved_context_entry_id: string | null;
+  status: "pending" | "answered" | "dismissed";
+  created_at: string;
+  answered_at: string | null;
 }
 
 export interface OpAlert {

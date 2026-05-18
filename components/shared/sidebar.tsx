@@ -75,6 +75,7 @@ const modules: Module[] = [
           { key: "operations.nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
           { key: "operations.nav.intake", path: "/intake", icon: ClipboardList },
           { key: "operations.nav.drafts", path: "/drafts", icon: FileText },
+          { key: "operations.nav.reports", path: "/reports", icon: FileText },
           { key: "operations.nav.issues", path: "/issues", icon: Activity },
         ],
       },
@@ -101,6 +102,7 @@ const modules: Module[] = [
         labelKey: "operations.nav_group.tools",
         items: [
           { key: "operations.nav.ai_agent", path: "/ai-agent", icon: Bot },
+          { key: "operations.nav.knowledge", path: "/knowledge", icon: BookOpen },
           { key: "nav.chat", path: "/chat", icon: MessageCircle },
           { key: "operations.nav.archive", path: "/archive", icon: Search },
           { key: "operations.nav.inbox", path: "/inbox", icon: Inbox, adminOnly: true },
