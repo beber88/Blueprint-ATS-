@@ -43,12 +43,12 @@ export default function KnowledgePage() {
 
   // Add dialog state
   const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState({ entry_type: "abbreviation" as ContextEntryType, trigger_text: "", resolution: "", scope_project_id: "" });
+  const [addForm, setAddForm] = useState({ entry_type: "abbreviation" as ContextEntryType, trigger_text: "", resolution: "", resolution_he: "", scope_project_id: "" });
   const [addBusy, setAddBusy] = useState(false);
 
   // Edit dialog state
   const [editEntry, setEditEntry] = useState<ContextEntry | null>(null);
-  const [editForm, setEditForm] = useState({ trigger_text: "", resolution: "", entry_type: "general" as ContextEntryType });
+  const [editForm, setEditForm] = useState({ trigger_text: "", resolution: "", resolution_he: "", entry_type: "general" as ContextEntryType });
   const [editBusy, setEditBusy] = useState(false);
 
   // Answer question state
@@ -81,12 +81,13 @@ export default function KnowledgePage() {
           entry_type: addForm.entry_type,
           trigger_text: addForm.trigger_text.trim(),
           resolution: addForm.resolution.trim(),
+          resolution_he: addForm.resolution_he.trim() || null,
           scope_project_id: addForm.scope_project_id || null,
         }),
       });
       if (!res.ok) throw new Error(await res.text());
       toast.success(isHe ? "ידע נוסף בהצלחה" : "Knowledge added");
-      setAddForm({ entry_type: "abbreviation", trigger_text: "", resolution: "", scope_project_id: "" });
+      setAddForm({ entry_type: "abbreviation", trigger_text: "", resolution: "", resolution_he: "", scope_project_id: "" });
       setShowAdd(false);
       load();
     } catch (e) {
@@ -163,7 +164,7 @@ export default function KnowledgePage() {
     if (filterType !== "all" && e.entry_type !== filterType) return false;
     if (search) {
       const s = search.toLowerCase();
-      return e.trigger_text.toLowerCase().includes(s) || e.resolution.toLowerCase().includes(s);
+      return e.trigger_text.toLowerCase().includes(s) || e.resolution.toLowerCase().includes(s) || (e.resolution_he && e.resolution_he.toLowerCase().includes(s));
     }
     return true;
   });
@@ -243,7 +244,7 @@ export default function KnowledgePage() {
                           </span>
                         </td>
                         <td className="py-2 px-2 font-mono font-medium">{e.trigger_text}</td>
-                        <td className="py-2 px-2 max-w-[300px] truncate">{e.resolution}</td>
+                        <td className="py-2 px-2 max-w-[300px] truncate">{(isHe && e.resolution_he) ? e.resolution_he : e.resolution}</td>
                         <td className="py-2 px-2 text-xs text-muted-foreground">
                           {isHe ? SOURCE_LABELS[e.source]?.he : SOURCE_LABELS[e.source]?.en}
                         </td>
@@ -257,7 +258,7 @@ export default function KnowledgePage() {
                             size="icon"
                             onClick={() => {
                               setEditEntry(e);
-                              setEditForm({ trigger_text: e.trigger_text, resolution: e.resolution, entry_type: e.entry_type });
+                              setEditForm({ trigger_text: e.trigger_text, resolution: e.resolution, resolution_he: e.resolution_he || "", entry_type: e.entry_type });
                             }}
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -360,6 +361,15 @@ export default function KnowledgePage() {
               />
             </div>
             <div>
+              <Label>{isHe ? "משמעות בעברית" : "Hebrew Meaning"}</Label>
+              <Input
+                placeholder={isHe ? "למשל: קבלן משנה לשיפוצים" : "e.g. קבלן משנה לשיפוצים"}
+                value={addForm.resolution_he}
+                onChange={(e) => setAddForm((p) => ({ ...p, resolution_he: e.target.value }))}
+                dir="rtl"
+              />
+            </div>
+            <div>
               <Label>{isHe ? "פרויקט (אופציונלי)" : "Project Scope (optional)"}</Label>
               <Select value={addForm.scope_project_id || "none"} onValueChange={(v) => setAddForm((p) => ({ ...p, scope_project_id: v === "none" ? "" : v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -405,8 +415,12 @@ export default function KnowledgePage() {
               <Input value={editForm.trigger_text} onChange={(e) => setEditForm((p) => ({ ...p, trigger_text: e.target.value }))} />
             </div>
             <div>
-              <Label>{isHe ? "משמעות / הסבר" : "Resolution / Meaning"}</Label>
+              <Label>{isHe ? "משמעות / הסבר (אנגלית)" : "Resolution / Meaning (English)"}</Label>
               <Input value={editForm.resolution} onChange={(e) => setEditForm((p) => ({ ...p, resolution: e.target.value }))} />
+            </div>
+            <div>
+              <Label>{isHe ? "משמעות בעברית" : "Hebrew Meaning"}</Label>
+              <Input value={editForm.resolution_he} onChange={(e) => setEditForm((p) => ({ ...p, resolution_he: e.target.value }))} dir="rtl" />
             </div>
           </div>
           <DialogFooter>

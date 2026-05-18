@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
       entry_type: entryType,
       trigger_text: String(body.trigger_text).trim(),
       resolution: String(body.resolution).trim(),
+      resolution_he: body.resolution_he ? String(body.resolution_he).trim() : null,
       scope_project_id: body.scope_project_id || null,
       scope_department_id: body.scope_department_id || null,
       confidence: 1.0,

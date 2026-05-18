@@ -18,6 +18,7 @@ export async function PATCH(
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (typeof body.trigger_text === "string") updates.trigger_text = body.trigger_text.trim();
   if (typeof body.resolution === "string") updates.resolution = body.resolution.trim();
+  if (typeof body.resolution_he === "string") updates.resolution_he = body.resolution_he.trim();
   if (typeof body.entry_type === "string") updates.entry_type = body.entry_type;
   if (typeof body.is_active === "boolean") updates.is_active = body.is_active;
   if (body.scope_project_id !== undefined) updates.scope_project_id = body.scope_project_id || null;

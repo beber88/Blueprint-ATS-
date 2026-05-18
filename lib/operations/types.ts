@@ -119,6 +119,7 @@ export interface ContextEntry {
   entry_type: ContextEntryType;
   trigger_text: string;
   resolution: string;
+  resolution_he: string | null;
   scope_project_id: string | null;
   scope_department_id: string | null;
   confidence: number;
