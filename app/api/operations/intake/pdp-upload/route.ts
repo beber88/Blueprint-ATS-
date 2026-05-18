@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { extractReportItems } from "@/lib/claude/extract-report";
+import { extractReportItems, extractReportItemsFromPDF } from "@/lib/claude/extract-report";
 import { computeWarnings } from "@/lib/operations/draft-warnings";
 import { loadMasterSnapshot } from "@/lib/operations/draft-master-snapshot";
 import { promoteDraft } from "@/lib/operations/draft-promote";
@@ -64,23 +64,26 @@ export async function POST(request: NextRequest) {
   let text = "";
   const buffer = Buffer.from(await fileField.arrayBuffer());
 
+  let usePdfVision = false;
   if (name.endsWith(".pdf")) {
     try {
       const out = await pdfParse(buffer);
       text = out.text.trim();
-    } catch (e) {
-      return NextResponse.json(
-        { error: `PDF parsing failed: ${e instanceof Error ? e.message : String(e)}` },
-        { status: 422 }
-      );
+    } catch {
+      // pdf-parse failed — will fall back to Claude Vision PDF extraction
+    }
+    // If text extraction produced insufficient text, fall back to Claude's
+    // native PDF reading (handles scanned/image-only PDFs via built-in OCR).
+    if (text.length < 50) {
+      usePdfVision = true;
     }
   } else {
     text = buffer.toString("utf-8").trim();
   }
 
-  if (text.length < 50) {
+  if (text.length < 50 && !usePdfVision) {
     return NextResponse.json(
-      { error: "Extracted text is too short (min 50 chars). The PDF might be image-only — try copy-pasting the text instead." },
+      { error: "Extracted text is too short (min 50 chars)." },
       { status: 400 }
     );
   }
@@ -88,10 +91,14 @@ export async function POST(request: NextRequest) {
   const supabase = createAdminClient();
   const effectiveDate = reportDate || new Date().toISOString().slice(0, 10);
 
-  // Run Claude extraction
-  const extracted = await extractReportItems(text, {
-    reportDate: effectiveDate,
-  });
+  // Run Claude extraction — use native PDF reading for scanned documents
+  const extracted = usePdfVision
+    ? await extractReportItemsFromPDF(buffer.toString("base64"), {
+        reportDate: effectiveDate,
+      })
+    : await extractReportItems(text, {
+        reportDate: effectiveDate,
+      });
 
   const aiOutput = {
     report_date: extracted.report_date || effectiveDate,
@@ -111,10 +118,10 @@ export async function POST(request: NextRequest) {
   const { data: draft, error: draftErr } = await supabase
     .from("op_report_drafts")
     .insert({
-      source_text: text.slice(0, 200_000),
+      source_text: (usePdfVision && text.length < 50 ? `[PDF processed via Claude Vision: ${fileField.name}]` : text).slice(0, 200_000),
       ai_output_json: aiOutput,
       warnings_json: warnings,
-      source_kind: "manual",
+      source_kind: usePdfVision ? "pdf_vision" : "manual",
       status: "draft",
     })
     .select()

@@ -80,6 +80,10 @@ export async function promoteDraft(
     throw new Error(`failed to create op_reports row: ${rErr?.message}`);
   }
 
+  // Cache for auto-created projects so we don't create duplicates within
+  // the same promotion run.
+  const autoCreatedProjects = new Map<string, string>();
+
   const itemRows: Record<string, unknown>[] = [];
   for (const it of ai.items || []) {
     const issue = (it.issue as string) || "";
@@ -89,8 +93,31 @@ export async function promoteDraft(
     const person = it.person_responsible as string | null;
     const empMatch = await matchEmployeeByName(supabase, person);
     const deptId = await matchDepartmentByName(supabase, department);
-    const projId =
+    let projId =
       (await matchProjectByName(supabase, project)) || ai.project_id || null;
+
+    // Auto-create the project if it was mentioned in the report but doesn't
+    // exist yet. This ensures every extracted project name lands in op_projects.
+    if (!projId && project && project.trim().length >= 2) {
+      const normalizedName = project.trim();
+      if (autoCreatedProjects.has(normalizedName.toLowerCase())) {
+        projId = autoCreatedProjects.get(normalizedName.toLowerCase())!;
+      } else {
+        const { data: newProj } = await supabase
+          .from("op_projects")
+          .insert({
+            name: normalizedName,
+            status: "active",
+            department_id: deptId,
+          })
+          .select("id")
+          .single();
+        if (newProj) {
+          projId = newProj.id;
+          autoCreatedProjects.set(normalizedName.toLowerCase(), newProj.id);
+        }
+      }
+    }
     itemRows.push({
       report_id: report.id,
       report_date: reportDate,

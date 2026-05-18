@@ -57,9 +57,24 @@ describe("computeWarnings — 8 rule codes", () => {
     expect(w.find((x) => x.code === "DATE_OUT_OF_RANGE")?.severity).toBe("high");
   });
 
-  it("MISSING_PROJECT: no project_id and no project_name → high", () => {
-    const w = computeWarnings(happy({ project_id: null, project_name: null }), SNAPSHOT);
+  it("MISSING_PROJECT: no project_id, no project_name, no per-item projects → high", () => {
+    const w = computeWarnings(
+      happy({
+        project_id: null,
+        project_name: null,
+        items: [{ issue: "General note", project: null, person_responsible: "Daff", category: "other", ceo_decision_needed: false }],
+      }),
+      SNAPSHOT
+    );
     expect(w.find((x) => x.code === "MISSING_PROJECT")?.severity).toBe("high");
+  });
+
+  it("MISSING_PROJECT: no top-level project but items have project names → OK", () => {
+    const w = computeWarnings(
+      happy({ project_id: null, project_name: null }),
+      SNAPSHOT
+    );
+    expect(w.find((x) => x.code === "MISSING_PROJECT")).toBeUndefined();
   });
 
   it("MISSING_PROJECT: project_name set without project_id is OK", () => {
@@ -200,7 +215,7 @@ describe("computeWarnings — combined / order-independence", () => {
         items: [
           {
             issue: "x",
-            project: "Fake project",
+            project: null, // no project context anywhere → MISSING_PROJECT fires
             person_responsible: "Nobody",
             category: "attendance",
             attendance_status: "ghosted",
@@ -218,7 +233,6 @@ describe("computeWarnings — combined / order-independence", () => {
       "INVALID_ATTENDANCE_STATUS",
       "MISSING_PROJECT",
       "UNKNOWN_EMPLOYEE",
-      "UNKNOWN_PROJECT",
     ]);
   });
 

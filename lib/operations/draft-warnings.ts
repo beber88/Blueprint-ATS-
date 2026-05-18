@@ -105,8 +105,12 @@ export function computeWarnings(
     }
   }
 
-  // 2. MISSING_PROJECT — neither id nor name set at the top level.
-  if (!ai.project_id && !ai.project_name) {
+  // 2. MISSING_PROJECT — no project context at all (neither top-level nor per-item).
+  const hasAnyProjectContext =
+    ai.project_id ||
+    ai.project_name ||
+    (ai.items || []).some((it) => it.project);
+  if (!hasAnyProjectContext) {
     out.push({
       code: "MISSING_PROJECT",
       severity: "high",
@@ -145,10 +149,13 @@ export function computeWarnings(
   }
 
   // 5. UNKNOWN_EMPLOYEE — any item references a person not in active employees.
+  //    Skip items with category='subcontractor' — subcontractors (James, Arnel,
+  //    Renz, etc.) are external and are not expected to be in the employee roster.
   if (ai.items) {
     ai.items.forEach((it, i) => {
       if (
         it.person_responsible &&
+        it.category !== "subcontractor" &&
         !isKnownName(it.person_responsible, snapshot.activeEmployees)
       ) {
         out.push({

@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { similarityScore, normalizePhone } from "@/lib/utils";
+import { canonicalize, tokens } from "@/lib/shared/text-match";
 
 export interface MatchResult {
   employee_id: string | null;
@@ -97,18 +98,81 @@ export async function matchProjectByName(
   if (!rawName) return null;
   const cleaned = rawName.trim();
   if (!cleaned) return null;
-  const { data } = await supabase
+
+  // Tier 1: exact code match (case-insensitive)
+  const { data: byCode } = await supabase
+    .from("op_projects")
+    .select("id")
+    .ilike("code", cleaned)
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+  if (byCode) return byCode.id;
+
+  // Tier 2: exact name match (case-insensitive)
+  const { data: byName } = await supabase
+    .from("op_projects")
+    .select("id")
+    .ilike("name", cleaned)
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+  if (byName) return byName.id;
+
+  // Tier 3+4: token-set matching + substring matching on all active projects
+  // This catches word-reordering ("Pearl de Flore Phase 2" matches "Pearl de Flore"),
+  // partial names, and alternate forms without needing an ilike hit.
+  const { data: allProjects } = await supabase
     .from("op_projects")
     .select("id, name, code")
-    .or(`name.ilike.%${cleaned}%,code.eq.${cleaned}`)
-    .limit(10);
-  if (!data || data.length === 0) return null;
-  let best: { id: string; score: number } | null = null;
-  for (const p of data) {
-    for (const candidate of [p.name, p.code].filter(Boolean) as string[]) {
-      const score = similarityScore(candidate, cleaned);
-      if (!best || score > best.score) best = { id: p.id, score };
+    .eq("status", "active");
+
+  if (allProjects && allProjects.length > 0) {
+    const inputTokens = tokens(cleaned);
+    const inputCanon = canonicalize(cleaned);
+
+    // Tier 3: token-set matching (word-order invariant)
+    for (const p of allProjects) {
+      for (const candidate of [p.name, p.code].filter(Boolean) as string[]) {
+        const cTokens = tokens(candidate);
+        if (inputTokens.size > 0 && cTokens.size > 0) {
+          const [small, big] =
+            inputTokens.size <= cTokens.size
+              ? [inputTokens, cTokens]
+              : [cTokens, inputTokens];
+          let allIn = true;
+          small.forEach((tok) => {
+            if (!big.has(tok)) allIn = false;
+          });
+          if (allIn) return p.id;
+        }
+      }
     }
+
+    // Tier 4: substring match on canonicalized form
+    for (const p of allProjects) {
+      for (const candidate of [p.name, p.code].filter(Boolean) as string[]) {
+        const cCanon = canonicalize(candidate);
+        if (
+          cCanon === inputCanon ||
+          cCanon.includes(inputCanon) ||
+          inputCanon.includes(cCanon)
+        ) {
+          return p.id;
+        }
+      }
+    }
+
+    // Tier 5: fuzzy similarity (safety net for typos/transliterations)
+    let best: { id: string; score: number } | null = null;
+    for (const p of allProjects) {
+      for (const candidate of [p.name, p.code].filter(Boolean) as string[]) {
+        const score = similarityScore(candidate, cleaned);
+        if (!best || score > best.score) best = { id: p.id, score };
+      }
+    }
+    if (best && best.score >= 0.6) return best.id;
   }
-  return best && best.score >= 0.6 ? best.id : null;
+
+  return null;
 }

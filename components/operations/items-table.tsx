@@ -76,7 +76,7 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setTranslatedItems(data.translations || {});
-      toast.success(locale === "he" ? "תורגם בהצלחה" : "Translated successfully");
+      toast.success(t("operations.toast.translated"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("common.error"));
     } finally {
