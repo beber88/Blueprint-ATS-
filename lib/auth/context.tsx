@@ -16,6 +16,7 @@ interface UserContextType {
   loading: boolean;
   isAdmin: boolean;
   isHR: boolean;
+  isRecruiter: boolean;
   hasModule: (module: Module) => boolean;
   hasPerm: (permission: Permission) => boolean;
   refreshUser: () => Promise<void>;
@@ -66,6 +67,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         loading,
         isAdmin: role === "admin",
         isHR: role === "hr" || role === "admin",
+        isRecruiter: role === "recruiter" || role === "hr" || role === "admin",
         hasModule,
         hasPerm,
         refreshUser,

@@ -152,7 +152,7 @@ export interface AIScoreResult {
   recommendation: "strong_yes" | "yes" | "maybe" | "no";
 }
 
-export type UserRole = "admin" | "hr" | "user";
+export type UserRole = "admin" | "hr" | "recruiter" | "user";
 
 export interface UserProfile {
   id: string;

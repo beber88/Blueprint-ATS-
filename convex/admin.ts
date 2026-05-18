@@ -24,17 +24,39 @@ export const getCurrentUser = query({
         .query("userProfiles")
         .withIndex("by_email", (q) => q.eq("email", identity.email!))
         .first();
+    }
 
-      // Backfill tokenIdentifier
+    return profile;
+  },
+});
+
+// Backfill tokenIdentifier for pre-migration profiles (called on login)
+export const backfillTokenIdentifier = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await requireAuth(ctx);
+
+    const existing = await ctx.db
+      .query("userProfiles")
+      .withIndex("by_token_identifier", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .first();
+    if (existing) return existing._id;
+
+    if (identity.email) {
+      const profile = await ctx.db
+        .query("userProfiles")
+        .withIndex("by_email", (q) => q.eq("email", identity.email!))
+        .first();
       if (profile && !profile.tokenIdentifier) {
         await ctx.db.patch(profile._id, {
           tokenIdentifier: identity.tokenIdentifier,
           updated_at: Date.now(),
         });
+        return profile._id;
       }
     }
 
-    return profile;
+    return null;
   },
 });
 

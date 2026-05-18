@@ -17,7 +17,7 @@ interface UserItem {
   email: string;
   full_name: string | null;
   avatar_url: string | null;
-  role: "admin" | "hr" | "user";
+  role: "admin" | "hr" | "recruiter" | "user";
   created_at: string;
 }
 
@@ -37,7 +37,7 @@ export default function UsersPage() {
   const changeRole = async (id: string, role: string) => {
     try {
       await fetch(`/api/users/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ role }) });
-      setUsers(prev => prev.map(u => u.id === id ? { ...u, role: role as "admin" | "hr" | "user" } : u));
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, role: role as "admin" | "hr" | "recruiter" | "user" } : u));
       toast.success(t("common.success"));
     } catch { toast.error(t("common.error")); }
   };
@@ -73,9 +73,9 @@ export default function UsersPage() {
   };
 
   const labels = {
-    he: { title: "ניהול משתמשים", subtitle: "ניהול הרשאות וגישה", access_denied: "אין לך הרשאה לדף זה", admin: "מנהל", hr_role: "HR", user_role: "משתמש", role: "תפקיד", joined: "הצטרף", remove: "הסר", invite_user: "הזמן משתמש", invite_title: "הזמנת משתמש חדש", full_name: "שם מלא", email: "אימייל", role_admin: "מנהל מערכת", role_hr: "HR", role_user: "משתמש רגיל", send_invite: "שלח הזמנה" },
-    en: { title: "User Management", subtitle: "Manage permissions and access", access_denied: "You don't have permission to view this page", admin: "Admin", hr_role: "HR", user_role: "User", role: "Role", joined: "Joined", remove: "Remove", invite_user: "Invite User", invite_title: "Invite New User", full_name: "Full Name", email: "Email", role_admin: "Admin", role_hr: "HR", role_user: "User", send_invite: "Send Invite" },
-    tl: { title: "Pamamahala ng User", subtitle: "Pamahalaan ang mga permiso at access", access_denied: "Wala kang permiso na tingnan ang pahinang ito", admin: "Admin", hr_role: "HR", user_role: "User", role: "Role", joined: "Sumali", remove: "Alisin", invite_user: "Mag-imbita ng User", invite_title: "Mag-imbita ng Bagong User", full_name: "Buong Pangalan", email: "Email", role_admin: "Admin", role_hr: "HR", role_user: "User", send_invite: "Ipadala ang Imbitasyon" },
+    he: { title: "ניהול משתמשים", subtitle: "ניהול הרשאות וגישה", access_denied: "אין לך הרשאה לדף זה", admin: "מנהל", hr_role: "HR", recruiter_role: "מגייס", user_role: "משתמש", role: "תפקיד", joined: "הצטרף", remove: "הסר", invite_user: "הזמן משתמש", invite_title: "הזמנת משתמש חדש", full_name: "שם מלא", email: "אימייל", role_admin: "מנהל מערכת", role_hr: "HR", role_recruiter: "מגייס", role_user: "משתמש רגיל", send_invite: "שלח הזמנה" },
+    en: { title: "User Management", subtitle: "Manage permissions and access", access_denied: "You don't have permission to view this page", admin: "Admin", hr_role: "HR", recruiter_role: "Recruiter", user_role: "User", role: "Role", joined: "Joined", remove: "Remove", invite_user: "Invite User", invite_title: "Invite New User", full_name: "Full Name", email: "Email", role_admin: "Admin", role_hr: "HR", role_recruiter: "Recruiter", role_user: "User", send_invite: "Send Invite" },
+    tl: { title: "Pamamahala ng User", subtitle: "Pamahalaan ang mga permiso at access", access_denied: "Wala kang permiso na tingnan ang pahinang ito", admin: "Admin", hr_role: "HR", recruiter_role: "Recruiter", user_role: "User", role: "Role", joined: "Sumali", remove: "Alisin", invite_user: "Mag-imbita ng User", invite_title: "Mag-imbita ng Bagong User", full_name: "Buong Pangalan", email: "Email", role_admin: "Admin", role_hr: "HR", role_recruiter: "Recruiter", role_user: "User", send_invite: "Ipadala ang Imbitasyon" },
   };
   const l = labels[locale] || labels.he;
 
@@ -137,6 +137,7 @@ export default function UsersPage() {
                       <SelectContent>
                         <SelectItem value="admin">{l.admin}</SelectItem>
                         <SelectItem value="hr">{l.hr_role}</SelectItem>
+                        <SelectItem value="recruiter">{l.recruiter_role}</SelectItem>
                         <SelectItem value="user">{l.user_role}</SelectItem>
                       </SelectContent>
                     </Select>
@@ -179,6 +180,7 @@ export default function UsersPage() {
                 <SelectContent>
                   <SelectItem value="admin">{l.role_admin}</SelectItem>
                   <SelectItem value="hr">{l.role_hr}</SelectItem>
+                  <SelectItem value="recruiter">{l.role_recruiter}</SelectItem>
                   <SelectItem value="user">{l.role_user}</SelectItem>
                 </SelectContent>
               </Select>

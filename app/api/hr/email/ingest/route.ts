@@ -18,11 +18,11 @@ function authorized(request: NextRequest): boolean {
 const HR_SENDER_QUERY = process.env.EMAIL_SENDER_QUERY || "from:nicx is:unread newer_than:1d";
 
 export async function GET(request: NextRequest) {
-  const { error: authError } = await requireApiAuth({ permission: "view_emails" });
-  if (authError) return authError;
-
+  // Cron jobs use CRON_SECRET bearer token, not user session.
+  // Only fall back to requireApiAuth for manual browser calls.
   if (!authorized(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { error: authError } = await requireApiAuth({ permission: "view_emails" });
+    if (authError) return authError;
   }
 
   const supabase = createAdminClient();

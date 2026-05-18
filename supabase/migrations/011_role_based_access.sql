@@ -16,7 +16,7 @@ AS $$
   SELECT EXISTS (
     SELECT 1
     FROM public.user_profiles
-    WHERE id = auth.uid()::text
+    WHERE id = auth.uid()
       AND role = ANY(required_roles)
   );
 $$;
@@ -92,7 +92,7 @@ DROP POLICY IF EXISTS "Allow authenticated access" ON user_profiles;
 -- All users can read their own profile
 CREATE POLICY "user_profiles: own profile read"
   ON user_profiles FOR SELECT TO authenticated
-  USING (id = auth.uid()::text);
+  USING (id = auth.uid());
 
 -- Admins can read all profiles
 CREATE POLICY "user_profiles: admin read all"
@@ -108,7 +108,7 @@ CREATE POLICY "user_profiles: admin update"
 -- Allow upsert for auto-create on first login (user can insert own)
 CREATE POLICY "user_profiles: self insert"
   ON user_profiles FOR INSERT TO authenticated
-  WITH CHECK (id = auth.uid()::text);
+  WITH CHECK (id = auth.uid());
 
 -- Admin can delete
 CREATE POLICY "user_profiles: admin delete"

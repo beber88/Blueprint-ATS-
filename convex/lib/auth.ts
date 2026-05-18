@@ -4,25 +4,28 @@ import { QueryCtx, MutationCtx, ActionCtx } from "../_generated/server";
 // ROLE HIERARCHY & MODULE ACCESS
 // ═══════════════════════════════════════
 
-export type Role = "admin" | "hr" | "user";
+export type Role = "admin" | "hr" | "recruiter" | "user";
 export type Module = "recruitment" | "operations" | "contracts" | "hr-management" | "admin";
 export type Permission = "view_salary" | "view_emails" | "manage_users" | "export_data" | "delete_candidates" | "write_recruitment";
 
 const ROLE_LEVEL: Record<Role, number> = {
   admin: 100,
   hr: 50,
+  recruiter: 40,
   user: 10,
 };
 
 const ROLE_MODULES: Record<Role, Module[]> = {
   admin: ["recruitment", "operations", "contracts", "hr-management", "admin"],
-  hr: ["recruitment", "hr-management"],
+  hr: ["recruitment", "operations", "contracts", "hr-management"],
+  recruiter: ["recruitment", "operations"],
   user: ["recruitment"],
 };
 
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   admin: ["view_salary", "view_emails", "manage_users", "export_data", "delete_candidates", "write_recruitment"],
   hr: ["view_salary", "view_emails", "write_recruitment", "delete_candidates"],
+  recruiter: ["view_emails", "write_recruitment"],
   user: [],
 };
 
@@ -47,7 +50,6 @@ export async function requireAuth(ctx: AnyCtx) {
 /**
  * Get the authenticated user's profile from the DB.
  * Uses tokenIdentifier as the canonical key, falls back to email lookup.
- * Auto-populates tokenIdentifier on first use.
  */
 export async function getAuthenticatedUser(ctx: QueryCtx | MutationCtx) {
   const identity = await requireAuth(ctx);
@@ -70,14 +72,6 @@ export async function getAuthenticatedUser(ctx: QueryCtx | MutationCtx) {
       .query("userProfiles")
       .withIndex("by_email", (q) => q.eq("email", identity.email!))
       .first();
-
-    if (profile && !profile.tokenIdentifier) {
-      // Backfill tokenIdentifier on first authenticated access
-      await ctx.db.patch(profile._id, {
-        tokenIdentifier: identity.tokenIdentifier,
-        updated_at: Date.now(),
-      });
-    }
   }
 
   if (!profile) {
@@ -89,7 +83,7 @@ export async function getAuthenticatedUser(ctx: QueryCtx | MutationCtx) {
 
 /**
  * Require a minimum role level.
- * Role hierarchy: admin(100) > hr(50) > user(10)
+ * Role hierarchy: admin(100) > hr(50) > recruiter(40) > user(10)
  */
 export async function requireRole(ctx: QueryCtx | MutationCtx, minimumRole: Role) {
   const { identity, profile } = await getAuthenticatedUser(ctx);

@@ -1,4 +1,4 @@
-export type Role = "admin" | "hr" | "user";
+export type Role = "admin" | "hr" | "recruiter" | "user";
 export type Module = "recruitment" | "operations" | "contracts" | "hr-management" | "admin";
 export type Permission =
   | "view_salary"
@@ -14,7 +14,8 @@ export type Permission =
 
 export const ROLE_MODULES: Record<Role, Module[]> = {
   admin: ["recruitment", "operations", "contracts", "hr-management", "admin"],
-  hr: ["recruitment", "hr-management"],
+  hr: ["recruitment", "operations", "contracts", "hr-management"],
+  recruiter: ["recruitment", "operations"],
   user: ["recruitment"],
 };
 
@@ -25,6 +26,7 @@ export const ROLE_MODULES: Record<Role, Module[]> = {
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   admin: ["view_salary", "view_emails", "manage_users", "export_data", "delete_candidates", "write_recruitment"],
   hr: ["view_salary", "view_emails", "write_recruitment", "delete_candidates"],
+  recruiter: ["view_emails", "write_recruitment"],
   user: [],
 };
 
