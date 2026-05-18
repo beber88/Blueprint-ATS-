@@ -1,28 +1,48 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+/**
+ * POST /api/maintenance/create-users
+ *
+ * One-time maintenance endpoint to create initial system users.
+ * Protected by MAINTENANCE_SECRET environment variable.
+ * Credentials are read from env vars — never hardcoded.
+ */
+export async function POST(request: NextRequest) {
+  // Require maintenance secret
+  const secret = process.env.MAINTENANCE_SECRET;
+  if (secret) {
+    const auth = request.headers.get("authorization");
+    if (auth !== `Bearer ${secret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  } else if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "MAINTENANCE_SECRET not configured" }, { status: 500 });
+  }
+
   try {
     const supabase = createAdminClient();
 
+    const defaultPassword = process.env.SEED_USER_PASSWORD || "ChangeMeOnFirstLogin!";
+
     const users = [
       {
-        email: "hr@blueprint-ph.com",
-        password: "Blueprint2024!",
+        email: process.env.SEED_USER_EMAIL_1 || "hr@blueprint-ph.com",
+        password: defaultPassword,
         full_name: "Nicx",
         role: "recruiter",
         job_title: "HR and Office Manager",
-        phone: "+639542807121",
+        phone: process.env.SEED_USER_PHONE_1 || "",
       },
       {
-        email: "roseanne.penaflor8612@gmail.com",
-        password: "Blueprint2024!",
+        email: process.env.SEED_USER_EMAIL_2 || "roseanne.penaflor8612@gmail.com",
+        password: defaultPassword,
         full_name: "Rose",
         role: "recruiter",
         job_title: "Office Secretary",
-        phone: "+639673351409",
+        phone: process.env.SEED_USER_PHONE_2 || "",
       },
     ];
 

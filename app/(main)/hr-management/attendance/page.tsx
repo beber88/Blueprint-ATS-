@@ -45,13 +45,18 @@ export default function AttendancePage() {
 
   const load = async () => {
     setLoading(true);
-    const [ar, er] = await Promise.all([
-      fetch(`/api/hr/attendance?date=${selectedDate}`).then((r) => r.json()),
-      fetch("/api/operations/employees").then((r) => r.json()),
-    ]);
-    setRecords(ar.records || []);
-    setEmployees(er.employees || []);
-    setLoading(false);
+    try {
+      const [ar, er] = await Promise.all([
+        fetch(`/api/hr/attendance?date=${selectedDate}`).then((r) => r.json()),
+        fetch("/api/operations/employees").then((r) => r.json()),
+      ]);
+      setRecords(ar.records || []);
+      setEmployees(er.employees || []);
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, [selectedDate]);
@@ -104,7 +109,7 @@ export default function AttendancePage() {
             onChange={(e) => setClockForm({ ...clockForm, employee_id: e.target.value })}
             style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid var(--border-light)", background: "var(--bg-card)", color: "var(--text-primary)", fontSize: 13, minWidth: 200 }}
           >
-            <option value="">Select Employee</option>
+            <option value="">{t("hr_mgmt.attendance.select_employee")}</option>
             {employees.map((e) => <option key={e.id} value={e.id}>{e.full_name}</option>)}
           </select>
           <div style={{ display: "flex", gap: 4 }}>
@@ -155,20 +160,20 @@ export default function AttendancePage() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Employee</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Status</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.attendance.col_employee")}</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.attendance.col_status")}</th>
                 <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.attendance.clock_in")}</th>
                 <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.attendance.clock_out")}</th>
                 <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.attendance.total_hours")}</th>
                 <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.attendance.overtime")}</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Notes</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.attendance.col_notes")}</th>
               </tr>
             </thead>
             <tbody>
               {records.length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>
-                    No attendance records for this date
+                    {t("hr_mgmt.attendance.no_records_for_date")}
                   </td>
                 </tr>
               ) : records.map((rec) => {

@@ -163,12 +163,24 @@
       "open": "פתח",
       "empty": "אין טיוטות במצב הזה"
     },
-    "issues": { "subtitle": "כל הסוגיות הפתוחות" },
-    "hr_issues": { "subtitle": "סוגיות HR דחופות בלבד" },
-    "ceo_items": { "subtitle": "פריטים שדורשים החלטת מנכ\"ל" },
-    "missing_info": { "subtitle": "פריטים שחסר בהם מידע" },
-    "followups": { "subtitle": "פריטים פתוחים למעקב" },
-    "archive": { "subtitle": "חיפוש בארכיון כל הדוחות" },
+    "issues": {
+      "subtitle": "כל הסוגיות הפתוחות"
+    },
+    "hr_issues": {
+      "subtitle": "סוגיות HR דחופות בלבד"
+    },
+    "ceo_items": {
+      "subtitle": "פריטים שדורשים החלטת מנכ\"ל"
+    },
+    "missing_info": {
+      "subtitle": "פריטים שחסר בהם מידע"
+    },
+    "followups": {
+      "subtitle": "פריטים פתוחים למעקב"
+    },
+    "archive": {
+      "subtitle": "חיפוש בארכיון כל הדוחות"
+    },
     "alerts": {
       "subtitle": "התראות אקטיביות",
       "include_resolved": "כולל סגורות",
@@ -267,7 +279,9 @@
       "mark_resolved": "סמן כטופל",
       "reopen": "פתח מחדש"
     },
-    "flag": { "ceo": "דורש החלטת מנכ\"ל" },
+    "flag": {
+      "ceo": "דורש החלטת מנכ\"ל"
+    },
     "search_placeholder": "חיפוש בכל הפריטים...",
     "results": "תוצאות",
     "empty": {
@@ -398,7 +412,13 @@
       "title": "חוזים",
       "filter_category": "קטגוריה",
       "filter_status": "סטטוס",
-      "empty": "אין חוזים תואמים את הסינון"
+      "empty": "אין חוזים תואמים את הסינון",
+      "col_name": "שם",
+      "col_category": "קטגוריה",
+      "col_counterparty": "צד נגדי",
+      "col_expires": "פג תוקף",
+      "col_value": "ערך",
+      "col_status": "סטטוס"
     },
     "folders": {
       "new_folder": "תיקייה חדשה",
@@ -513,7 +533,25 @@
       "employment_info": "פרטי העסקה",
       "emergency_contact": "איש קשר לחירום",
       "upload_document": "העלאת מסמך",
-      "no_documents": "אין מסמכים"
+      "no_documents": "אין מסמכים",
+      "total_employees": "סה\"כ עובדים",
+      "active": "פעילים",
+      "departments": "מחלקות",
+      "search_placeholder": "חיפוש עובדים...",
+      "all_types": "כל הסוגים",
+      "no_employees_found": "לא נמצאו עובדים",
+      "col_name": "שם",
+      "col_position": "תפקיד",
+      "col_department": "מחלקה",
+      "col_type": "סוג",
+      "col_hire_date": "תאריך קליטה",
+      "col_contact": "יצירת קשר",
+      "view": "צפה",
+      "type_full_time": "משרה מלאה",
+      "type_part_time": "משרה חלקית",
+      "type_contract": "חוזה",
+      "type_intern": "מתמחה",
+      "type_probation": "ניסיון"
     },
     "attendance": {
       "title": "נוכחות ושעות",
@@ -530,7 +568,12 @@
       "holiday": "חג",
       "rest_day": "יום מנוחה",
       "monthly_summary": "סיכום חודשי",
-      "daily_view": "תצוגה יומית"
+      "daily_view": "תצוגה יומית",
+      "select_employee": "בחר עובד",
+      "col_employee": "עובד",
+      "col_status": "סטטוס",
+      "col_notes": "הערות",
+      "no_records_for_date": "אין רשומות נוכחות לתאריך זה"
     },
     "leave": {
       "title": "חופשות והיעדרויות",
@@ -578,7 +621,27 @@
       "morning": "בוקר",
       "afternoon": "צהריים",
       "night": "לילה",
-      "no_shifts": "אין משמרות מוגדרות"
+      "no_shifts": "אין משמרות מוגדרות",
+      "shift_types": "סוגי משמרות",
+      "assignments": "שיבוצים",
+      "employees_scheduled": "עובדים משובצים",
+      "tab_definitions": "הגדרות משמרות",
+      "tab_calendar": "לוח משמרות",
+      "shift_name_placeholder": "שם משמרת",
+      "break_placeholder": "הפסקה (דקות)",
+      "col_employee": "עובד",
+      "break_label": "הפסקה",
+      "min_label": "דק׳",
+      "prev": "הקודם",
+      "next": "הבא",
+      "no_assignments": "לא נמצאו שיבוצים",
+      "day_mon": "ראשון",
+      "day_tue": "שני",
+      "day_wed": "שלישי",
+      "day_thu": "רביעי",
+      "day_fri": "חמישי",
+      "day_sat": "שישי",
+      "day_sun": "שבת"
     },
     "reviews": {
       "title": "הערכות ביצוע",
@@ -603,7 +666,19 @@
       "mandatory": "חובה",
       "completed": "הושלם",
       "in_progress": "בתהליך",
-      "no_courses": "אין קורסים זמינים"
+      "no_courses": "אין קורסים זמינים",
+      "course_name_placeholder": "שם קורס",
+      "description_placeholder": "תיאור",
+      "duration_placeholder": "משך (שעות)",
+      "enrolled_label": "רשומים",
+      "completed_label": "סיימו",
+      "no_enrollments": "אין הרשמות עדיין",
+      "col_employee": "עובד",
+      "col_course": "קורס",
+      "col_status": "סטטוס",
+      "col_enrolled": "נרשם",
+      "col_completed": "הושלם",
+      "col_score": "ציון"
     },
     "onboarding": {
       "title": "קליטת עובד",
@@ -633,7 +708,19 @@
       "maintenance": "בתחזוקה",
       "retired": "הוצא משימוש",
       "lost": "אבד",
-      "no_assets": "אין נכסים רשומים"
+      "no_assets": "אין נכסים רשומים",
+      "search_placeholder": "חיפוש נכסים...",
+      "asset_name_placeholder": "שם נכס",
+      "asset_type_placeholder": "סוג (למשל מחשב, טלפון)",
+      "serial_number_placeholder": "מספר סידורי",
+      "col_name": "שם",
+      "col_type": "סוג",
+      "col_serial": "מספר סידורי",
+      "col_status": "סטטוס",
+      "col_assigned_to": "משויך ל",
+      "assignment_history": "היסטוריית שיוך",
+      "no_assignment_history": "אין היסטוריית שיוך",
+      "present_label": "נוכחי"
     },
     "org_chart": {
       "title": "מבנה ארגוני",

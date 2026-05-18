@@ -21,16 +21,16 @@ interface Employee {
   status?: string | null;
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  full_time: "Full-time",
-  part_time: "Part-time",
-  contract: "Contract",
-  intern: "Intern",
-  probation: "Probation",
-};
+
 
 export default function EmployeesPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const isRTL = locale === "he";
+  const typeLabel = (tp: string) => {
+    const key = `hr_mgmt.employees.type_${tp}`;
+    const val = t(key);
+    return val !== key ? val : tp;
+  };
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -40,6 +40,7 @@ export default function EmployeesPage() {
     fetch("/api/operations/employees")
       .then((r) => r.json())
       .then((d) => setEmployees(d.employees || []))
+      .catch(() => { /* silent — empty list is acceptable fallback */ })
       .finally(() => setLoading(false));
   }, []);
 
@@ -63,22 +64,22 @@ export default function EmployeesPage() {
     >
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 20 }}>
-        <KpiCard label="Total Employees" value={employees.length} accent="#C9A84C" />
-        <KpiCard label="Active" value={activeCount} accent="#10B981" />
-        <KpiCard label="Departments" value={new Set(employees.map((e) => e.department_id).filter(Boolean)).size} accent="#3B82F6" />
+        <KpiCard label={t("hr_mgmt.employees.total_employees")} value={employees.length} accent="#C9A84C" />
+        <KpiCard label={t("hr_mgmt.employees.active")} value={activeCount} accent="#10B981" />
+        <KpiCard label={t("hr_mgmt.employees.departments")} value={new Set(employees.map((e) => e.department_id).filter(Boolean)).size} accent="#3B82F6" />
       </div>
 
       {/* Filters */}
       <OpsCard style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <Search size={14} style={{ position: "absolute", left: 10, top: 10, color: "var(--text-secondary)" }} />
+            <Search size={14} style={{ position: "absolute", [isRTL ? "right" : "left"]: 10, top: 10, color: "var(--text-secondary)" }} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search employees..."
+              placeholder={t("hr_mgmt.employees.search_placeholder")}
               style={{
-                width: "100%", padding: "8px 12px 8px 30px", borderRadius: 6,
+                width: "100%", padding: "8px 12px", paddingInlineStart: 30, borderRadius: 6,
                 border: "1px solid var(--border-light)", background: "var(--bg-card)",
                 color: "var(--text-primary)", fontSize: 13,
               }}
@@ -92,9 +93,9 @@ export default function EmployeesPage() {
               background: "var(--bg-card)", color: "var(--text-primary)", fontSize: 13,
             }}
           >
-            <option value="all">All Types</option>
+            <option value="all">{t("hr_mgmt.employees.all_types")}</option>
             {types.map((tp) => (
-              <option key={tp} value={tp!}>{TYPE_LABELS[tp!] || tp}</option>
+              <option key={tp} value={tp!}>{typeLabel(tp!)}</option>
             ))}
           </select>
         </div>
@@ -107,7 +108,7 @@ export default function EmployeesPage() {
       ) : filtered.length === 0 ? (
         <OpsCard>
           <p style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>
-            No employees found
+            {t("hr_mgmt.employees.no_employees_found")}
           </p>
         </OpsCard>
       ) : (
@@ -115,12 +116,12 @@ export default function EmployeesPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Name</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Position</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Department</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Type</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Hire Date</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Contact</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_name")}</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_position")}</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_department")}</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_type")}</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_hire_date")}</th>
+                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_contact")}</th>
                 <th style={{ padding: "8px 12px" }}></th>
               </tr>
             </thead>
@@ -142,7 +143,7 @@ export default function EmployeesPage() {
                         padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 500,
                         background: "rgba(201,168,76,0.12)", color: "#C9A84C",
                       }}>
-                        {TYPE_LABELS[emp.employment_type] || emp.employment_type}
+                        {typeLabel(emp.employment_type)}
                       </span>
                     ) : "—"}
                   </td>
@@ -157,7 +158,7 @@ export default function EmployeesPage() {
                       href={`/hr-management/employees/${emp.id}`}
                       style={{ color: "#C9A84C", display: "flex", alignItems: "center", gap: 2, textDecoration: "none", fontSize: 12 }}
                     >
-                      View <ChevronRight size={14} />
+                      {t("hr_mgmt.employees.view")} <ChevronRight size={14} />
                     </Link>
                   </td>
                 </tr>

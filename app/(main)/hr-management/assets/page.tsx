@@ -40,7 +40,8 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AssetsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const isRTL = locale === "he";
   const [assets, setAssets] = useState<Asset[]>([]);
   const [assignments, setAssignments] = useState<AssetAssignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -129,12 +130,12 @@ export default function AssetsPage() {
       <OpsCard style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <Search size={14} style={{ position: "absolute", left: 10, top: 10, color: "var(--text-secondary)" }} />
+            <Search size={14} style={{ position: "absolute", [isRTL ? "right" : "left"]: 10, top: 10, color: "var(--text-secondary)" }} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search assets..."
-              style={{ ...inputStyle, width: "100%", paddingLeft: 30 }}
+              placeholder={t("hr_mgmt.assets.search_placeholder")}
+              style={{ ...inputStyle, width: "100%", paddingInlineStart: 30 }}
             />
           </div>
           <div style={{ display: "flex", gap: 4 }}>
@@ -160,9 +161,9 @@ export default function AssetsPage() {
       {showForm && (
         <OpsCard style={{ marginBottom: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-            <input placeholder="Asset Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={inputStyle} />
-            <input placeholder="Type (e.g. Laptop, Phone)" value={form.asset_type} onChange={(e) => setForm({ ...form, asset_type: e.target.value })} style={inputStyle} />
-            <input placeholder="Serial Number" value={form.serial_number} onChange={(e) => setForm({ ...form, serial_number: e.target.value })} style={inputStyle} />
+            <input placeholder={t("hr_mgmt.assets.asset_name_placeholder")} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={inputStyle} />
+            <input placeholder={t("hr_mgmt.assets.asset_type_placeholder")} value={form.asset_type} onChange={(e) => setForm({ ...form, asset_type: e.target.value })} style={inputStyle} />
+            <input placeholder={t("hr_mgmt.assets.serial_number_placeholder")} value={form.serial_number} onChange={(e) => setForm({ ...form, serial_number: e.target.value })} style={inputStyle} />
             <button onClick={createAsset} disabled={busy} style={{ padding: "8px 16px", borderRadius: 6, border: "none", background: "#C9A84C", color: "#1A1A1A", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
               {busy ? <Loader2 size={14} className="animate-spin" /> : t("common.save")}
             </button>
@@ -187,11 +188,11 @@ export default function AssetsPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Name</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Type</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Serial #</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Status</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Assigned To</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.assets.col_name")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.assets.col_type")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.assets.col_serial")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.assets.col_status")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.assets.col_assigned_to")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -230,10 +231,10 @@ export default function AssetsPage() {
 
         {/* Assignment history panel */}
         {selectedAsset && (
-          <OpsCard title="Assignment History">
+          <OpsCard title={t("hr_mgmt.assets.assignment_history")}>
             {assetHistory.length === 0 ? (
               <p style={{ textAlign: "center", padding: 20, color: "var(--text-secondary)", fontSize: 13 }}>
-                No assignment history
+                {t("hr_mgmt.assets.no_assignment_history")}
               </p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -244,7 +245,7 @@ export default function AssetsPage() {
                     </div>
                     <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
                       {format(new Date(ah.assigned_at), "MMM d, yyyy")}
-                      {ah.returned_at ? ` — ${format(new Date(ah.returned_at), "MMM d, yyyy")}` : " — present"}
+                      {ah.returned_at ? ` — ${format(new Date(ah.returned_at), "MMM d, yyyy")}` : ` — ${t("hr_mgmt.assets.present_label")}`}
                     </div>
                     {ah.notes && <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>{ah.notes}</div>}
                   </div>

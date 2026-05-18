@@ -17,7 +17,8 @@ interface Dept { id: string; code: string; name: string; name_he: string | null;
 const emptyForm = { code: "", name: "", name_he: "", name_en: "", name_tl: "", color: "#C9A84C" };
 
 export default function DepartmentsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const isRTL = locale === "he";
   const [items, setItems] = useState<Dept[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -134,7 +135,7 @@ export default function DepartmentsPage() {
                 position: "relative",
               }}
             >
-              <div style={{ position: "absolute", top: 10, left: 10, display: "flex", gap: 4 }}>
+              <div style={{ position: "absolute", top: 10, [isRTL ? "right" : "left"]: 10, display: "flex", gap: 4 }}>
                 <button onClick={() => openEdit(d)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "var(--text-secondary)" }}>
                   <Pencil size={14} />
                 </button>

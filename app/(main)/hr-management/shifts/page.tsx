@@ -28,10 +28,15 @@ interface ShiftAssignment {
 
 type View = "definitions" | "calendar";
 
-const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 
 export default function ShiftsPage() {
   const { t } = useI18n();
+  const DAY_LABELS = [
+    t("hr_mgmt.shifts.day_mon"), t("hr_mgmt.shifts.day_tue"), t("hr_mgmt.shifts.day_wed"),
+    t("hr_mgmt.shifts.day_thu"), t("hr_mgmt.shifts.day_fri"), t("hr_mgmt.shifts.day_sat"),
+    t("hr_mgmt.shifts.day_sun"),
+  ];
   const [definitions, setDefinitions] = useState<ShiftDefinition[]>([]);
   const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,9 +126,9 @@ export default function ShiftsPage() {
     >
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 20 }}>
-        <KpiCard label="Shift Types" value={definitions.length} accent="#C9A84C" />
-        <KpiCard label="Assignments" value={assignments.length} accent="#3B82F6" />
-        <KpiCard label="Employees Scheduled" value={employeeMap.size} accent="#10B981" />
+        <KpiCard label={t("hr_mgmt.shifts.shift_types")} value={definitions.length} accent="#C9A84C" />
+        <KpiCard label={t("hr_mgmt.shifts.assignments")} value={assignments.length} accent="#3B82F6" />
+        <KpiCard label={t("hr_mgmt.shifts.employees_scheduled")} value={employeeMap.size} accent="#10B981" />
       </div>
 
       {/* View tabs */}
@@ -143,7 +148,7 @@ export default function ShiftsPage() {
             }}
           >
             {v === "calendar" && <Calendar size={12} />}
-            {v === "definitions" ? "Shift Definitions" : "Schedule Calendar"}
+            {v === "definitions" ? t("hr_mgmt.shifts.tab_definitions") : t("hr_mgmt.shifts.tab_calendar")}
           </button>
         ))}
       </div>
@@ -153,7 +158,7 @@ export default function ShiftsPage() {
         <OpsCard style={{ marginBottom: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
             <input
-              placeholder="Shift Name"
+              placeholder={t("hr_mgmt.shifts.shift_name_placeholder")}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid var(--border-light)", background: "var(--bg-card)", color: "var(--text-primary)", fontSize: 13 }}
@@ -172,7 +177,7 @@ export default function ShiftsPage() {
             />
             <input
               type="number"
-              placeholder="Break (min)"
+              placeholder={t("hr_mgmt.shifts.break_placeholder")}
               value={form.break_minutes}
               onChange={(e) => setForm({ ...form, break_minutes: Number(e.target.value) })}
               style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid var(--border-light)", background: "var(--bg-card)", color: "var(--text-primary)", fontSize: 13 }}
@@ -214,7 +219,7 @@ export default function ShiftsPage() {
                   {def.start_time} - {def.end_time}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-                  Break: {def.break_minutes} min
+                  {t("hr_mgmt.shifts.break_label")}: {def.break_minutes} {t("hr_mgmt.shifts.min_label")}
                 </div>
                 {def.description && (
                   <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{def.description}</div>
@@ -231,7 +236,7 @@ export default function ShiftsPage() {
               onClick={() => setWeekOffset((o) => o - 1)}
               style={{ background: "none", border: "1px solid var(--border-light)", borderRadius: 6, padding: "4px 12px", cursor: "pointer", color: "var(--text-primary)", fontSize: 12 }}
             >
-              &larr; Prev
+              &larr; {t("hr_mgmt.shifts.prev")}
             </button>
             <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>
               {weekDates[0]} &mdash; {weekDates[6]}
@@ -240,17 +245,17 @@ export default function ShiftsPage() {
               onClick={() => setWeekOffset((o) => o + 1)}
               style={{ background: "none", border: "1px solid var(--border-light)", borderRadius: 6, padding: "4px 12px", cursor: "pointer", color: "var(--text-primary)", fontSize: 12 }}
             >
-              Next &rarr;
+              {t("hr_mgmt.shifts.next")} &rarr;
             </button>
           </div>
           {employeeMap.size === 0 ? (
-            <p style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>No shift assignments found</p>
+            <p style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>{t("hr_mgmt.shifts.no_assignments")}</p>
           ) : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 600 }}>
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                    <th style={{ textAlign: "left", padding: "8px 10px", color: "var(--text-secondary)", fontWeight: 500, minWidth: 120 }}>Employee</th>
+                    <th style={{ textAlign: "left", padding: "8px 10px", color: "var(--text-secondary)", fontWeight: 500, minWidth: 120 }}>{t("hr_mgmt.shifts.col_employee")}</th>
                     {weekDates.map((d, i) => (
                       <th key={d} style={{ textAlign: "center", padding: "8px 6px", color: "var(--text-secondary)", fontWeight: 500 }}>
                         <div>{DAY_LABELS[i]}</div>

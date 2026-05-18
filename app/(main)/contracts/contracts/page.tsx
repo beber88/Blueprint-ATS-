@@ -295,12 +295,12 @@ function ContractsFileManager() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
               <tr style={{ textAlign: "start", color: "var(--text-secondary)", fontSize: 11 }}>
-                <th style={{ padding: 8 }}>Name</th>
-                <th style={{ padding: 8 }}>Category</th>
-                <th style={{ padding: 8 }}>Counterparty</th>
-                <th style={{ padding: 8 }}>Expires</th>
-                <th style={{ padding: 8 }}>Value</th>
-                <th style={{ padding: 8 }}>Status</th>
+                <th style={{ padding: 8 }}>{t("contracts.list.col_name")}</th>
+                <th style={{ padding: 8 }}>{t("contracts.list.col_category")}</th>
+                <th style={{ padding: 8 }}>{t("contracts.list.col_counterparty")}</th>
+                <th style={{ padding: 8 }}>{t("contracts.list.col_expires")}</th>
+                <th style={{ padding: 8 }}>{t("contracts.list.col_value")}</th>
+                <th style={{ padding: 8 }}>{t("contracts.list.col_status")}</th>
               </tr>
             </thead>
             <tbody>

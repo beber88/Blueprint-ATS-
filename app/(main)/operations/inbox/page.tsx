@@ -28,13 +28,18 @@ export default function InboxPage() {
 
   const load = async () => {
     setLoading(true);
-    const [ir, er] = await Promise.all([
-      fetch("/api/operations/inbox").then((r) => r.json()),
-      fetch("/api/operations/employees").then((r) => r.json()),
-    ]);
-    setInbox(ir.inbox || []);
-    setEmps(er.employees || []);
-    setLoading(false);
+    try {
+      const [ir, er] = await Promise.all([
+        fetch("/api/operations/inbox").then((r) => r.json()),
+        fetch("/api/operations/employees").then((r) => r.json()),
+      ]);
+      setInbox(ir.inbox || []);
+      setEmps(er.employees || []);
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { load(); }, []);
 

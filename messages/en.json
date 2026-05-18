@@ -163,12 +163,24 @@
       "open": "Open",
       "empty": "No drafts in this state"
     },
-    "issues": { "subtitle": "All open issues" },
-    "hr_issues": { "subtitle": "Urgent HR-only issues" },
-    "ceo_items": { "subtitle": "Items requiring a CEO decision" },
-    "missing_info": { "subtitle": "Items with missing information" },
-    "followups": { "subtitle": "Open items to follow up on" },
-    "archive": { "subtitle": "Search across all reports" },
+    "issues": {
+      "subtitle": "All open issues"
+    },
+    "hr_issues": {
+      "subtitle": "Urgent HR-only issues"
+    },
+    "ceo_items": {
+      "subtitle": "Items requiring a CEO decision"
+    },
+    "missing_info": {
+      "subtitle": "Items with missing information"
+    },
+    "followups": {
+      "subtitle": "Open items to follow up on"
+    },
+    "archive": {
+      "subtitle": "Search across all reports"
+    },
     "alerts": {
       "subtitle": "Active alerts",
       "include_resolved": "Include resolved",
@@ -194,7 +206,14 @@
         "completed": "Completed"
       }
     },
-    "departments": { "subtitle": "Departments", "new": "New Department", "name_he": "Name (Hebrew)", "name_en": "Name (English)", "name_tl": "Name (Tagalog)", "color": "Color" },
+    "departments": {
+      "subtitle": "Departments",
+      "new": "New Department",
+      "name_he": "Name (Hebrew)",
+      "name_en": "Name (English)",
+      "name_tl": "Name (Tagalog)",
+      "color": "Color"
+    },
     "employees": {
       "subtitle": "Employees authorized to submit reports",
       "new": "New employee",
@@ -260,7 +279,9 @@
       "mark_resolved": "Mark resolved",
       "reopen": "Reopen"
     },
-    "flag": { "ceo": "Requires CEO decision" },
+    "flag": {
+      "ceo": "Requires CEO decision"
+    },
     "search_placeholder": "Search across items...",
     "results": "Results",
     "empty": {
@@ -391,7 +412,13 @@
       "title": "Contracts",
       "filter_category": "Category",
       "filter_status": "Status",
-      "empty": "No contracts match the filter"
+      "empty": "No contracts match the filter",
+      "col_name": "Name",
+      "col_category": "Category",
+      "col_counterparty": "Counterparty",
+      "col_expires": "Expires",
+      "col_value": "Value",
+      "col_status": "Status"
     },
     "folders": {
       "new_folder": "New Folder",
@@ -506,7 +533,25 @@
       "employment_info": "Employment Information",
       "emergency_contact": "Emergency Contact",
       "upload_document": "Upload Document",
-      "no_documents": "No documents uploaded"
+      "no_documents": "No documents uploaded",
+      "total_employees": "Total Employees",
+      "active": "Active",
+      "departments": "Departments",
+      "search_placeholder": "Search employees...",
+      "all_types": "All Types",
+      "no_employees_found": "No employees found",
+      "col_name": "Name",
+      "col_position": "Position",
+      "col_department": "Department",
+      "col_type": "Type",
+      "col_hire_date": "Hire Date",
+      "col_contact": "Contact",
+      "view": "View",
+      "type_full_time": "Full-time",
+      "type_part_time": "Part-time",
+      "type_contract": "Contract",
+      "type_intern": "Intern",
+      "type_probation": "Probation"
     },
     "attendance": {
       "title": "Attendance & Hours",
@@ -523,7 +568,12 @@
       "holiday": "Holiday",
       "rest_day": "Rest Day",
       "monthly_summary": "Monthly Summary",
-      "daily_view": "Daily View"
+      "daily_view": "Daily View",
+      "select_employee": "Select Employee",
+      "col_employee": "Employee",
+      "col_status": "Status",
+      "col_notes": "Notes",
+      "no_records_for_date": "No attendance records for this date"
     },
     "leave": {
       "title": "Leave & Absence",
@@ -571,7 +621,27 @@
       "morning": "Morning",
       "afternoon": "Afternoon",
       "night": "Night",
-      "no_shifts": "No shifts defined"
+      "no_shifts": "No shifts defined",
+      "shift_types": "Shift Types",
+      "assignments": "Assignments",
+      "employees_scheduled": "Employees Scheduled",
+      "tab_definitions": "Shift Definitions",
+      "tab_calendar": "Schedule Calendar",
+      "shift_name_placeholder": "Shift Name",
+      "break_placeholder": "Break (min)",
+      "col_employee": "Employee",
+      "break_label": "Break",
+      "min_label": "min",
+      "prev": "Prev",
+      "next": "Next",
+      "no_assignments": "No shift assignments found",
+      "day_mon": "Mon",
+      "day_tue": "Tue",
+      "day_wed": "Wed",
+      "day_thu": "Thu",
+      "day_fri": "Fri",
+      "day_sat": "Sat",
+      "day_sun": "Sun"
     },
     "reviews": {
       "title": "Performance Reviews",
@@ -596,7 +666,19 @@
       "mandatory": "Mandatory",
       "completed": "Completed",
       "in_progress": "In Progress",
-      "no_courses": "No courses available"
+      "no_courses": "No courses available",
+      "course_name_placeholder": "Course Name",
+      "description_placeholder": "Description",
+      "duration_placeholder": "Duration (hours)",
+      "enrolled_label": "enrolled",
+      "completed_label": "completed",
+      "no_enrollments": "No enrollments yet",
+      "col_employee": "Employee",
+      "col_course": "Course",
+      "col_status": "Status",
+      "col_enrolled": "Enrolled",
+      "col_completed": "Completed",
+      "col_score": "Score"
     },
     "onboarding": {
       "title": "Onboarding",
@@ -626,7 +708,19 @@
       "maintenance": "In Maintenance",
       "retired": "Retired",
       "lost": "Lost",
-      "no_assets": "No assets registered"
+      "no_assets": "No assets registered",
+      "search_placeholder": "Search assets...",
+      "asset_name_placeholder": "Asset Name",
+      "asset_type_placeholder": "Type (e.g. Laptop, Phone)",
+      "serial_number_placeholder": "Serial Number",
+      "col_name": "Name",
+      "col_type": "Type",
+      "col_serial": "Serial #",
+      "col_status": "Status",
+      "col_assigned_to": "Assigned To",
+      "assignment_history": "Assignment History",
+      "no_assignment_history": "No assignment history",
+      "present_label": "present"
     },
     "org_chart": {
       "title": "Organization Chart",

@@ -145,20 +145,20 @@ export default function TrainingPage() {
         <OpsCard style={{ marginBottom: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
             <input
-              placeholder="Course Name"
+              placeholder={t("hr_mgmt.training.course_name_placeholder")}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               style={inputStyle}
             />
             <input
-              placeholder="Description"
+              placeholder={t("hr_mgmt.training.description_placeholder")}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               style={inputStyle}
             />
             <input
               type="number"
-              placeholder="Duration (hours)"
+              placeholder={t("hr_mgmt.training.duration_placeholder")}
               value={form.duration_hours}
               onChange={(e) => setForm({ ...form, duration_hours: Number(e.target.value) })}
               style={inputStyle}
@@ -216,8 +216,8 @@ export default function TrainingPage() {
                   )}
                   <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--text-secondary)" }}>
                     {course.duration_hours && <span>{course.duration_hours}h</span>}
-                    <span>{enrolled.length} enrolled</span>
-                    <span>{completed} completed</span>
+                    <span>{enrolled.length} {t("hr_mgmt.training.enrolled_label")}</span>
+                    <span>{completed} {t("hr_mgmt.training.completed_label")}</span>
                   </div>
                 </OpsCard>
               );
@@ -228,7 +228,7 @@ export default function TrainingPage() {
         enrollments.length === 0 ? (
           <OpsCard>
             <p style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>
-              No enrollments yet
+              {t("hr_mgmt.training.no_enrollments")}
             </p>
           </OpsCard>
         ) : (
@@ -236,12 +236,12 @@ export default function TrainingPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Employee</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Course</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Status</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Enrolled</th>
-                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Completed</th>
-                  <th style={{ textAlign: "center", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Score</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.training.col_employee")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.training.col_course")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.training.col_status")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.training.col_enrolled")}</th>
+                  <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.training.col_completed")}</th>
+                  <th style={{ textAlign: "center", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.training.col_score")}</th>
                 </tr>
               </thead>
               <tbody>

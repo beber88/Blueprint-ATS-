@@ -7,6 +7,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Responsive
 import { AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE } from "@/lib/chart-config";
 import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, FileText, Loader2, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 interface Stats {
   kpis: { open: number; overdue: number; urgent: number; ceo_pending: number; missing_info: number; alerts: number };
@@ -39,6 +40,9 @@ export default function OperationsDashboard() {
       const res = await fetch("/api/operations/dashboard/stats");
       const data = await res.json();
       if (res.ok) setStats(data);
+      else toast.error(data.error || "Failed to load dashboard");
+    } catch {
+      toast.error("Failed to load dashboard");
     } finally {
       setLoading(false);
       setRefreshing(false);
