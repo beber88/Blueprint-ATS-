@@ -20,12 +20,8 @@ interface ComplianceData {
   summary: { total: number; compliant: number; non_compliant: number; compliance_rate: number };
 }
 
-const ID_LABELS: Record<string, { en: string; he: string }> = {
-  sss: { en: "SSS", he: "SSS" },
-  philhealth: { en: "PhilHealth", he: "PhilHealth" },
-  pagibig: { en: "Pag-IBIG", he: "Pag-IBIG" },
-  tin: { en: "TIN", he: "TIN" },
-};
+// ID type labels for future use in detail views
+// const ID_LABELS = { sss: "SSS", philhealth: "PhilHealth", pagibig: "Pag-IBIG", tin: "TIN" };
 
 export default function CompliancePage() {
   const { locale } = useI18n();
