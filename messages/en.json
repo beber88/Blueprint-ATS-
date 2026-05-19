@@ -534,8 +534,10 @@
       "tools": "Tools"
     },
     "nav": {
+      "dashboard": "Dashboard",
       "ai_brain": "AI Brain",
       "employees": "Employees",
+      "compliance": "Compliance",
       "attendance": "Attendance",
       "leave": "Leave & Absence",
       "salary": "Salary & Benefits",

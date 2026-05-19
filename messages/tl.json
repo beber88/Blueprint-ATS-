@@ -409,8 +409,10 @@
       "tools": "Mga Tool"
     },
     "nav": {
+      "dashboard": "Dashboard",
       "ai_brain": "AI Brain",
       "employees": "Mga Empleyado",
+      "compliance": "Government Compliance",
       "attendance": "Attendance",
       "leave": "Leave at Absences",
       "salary": "Sahod at Benepisyo",

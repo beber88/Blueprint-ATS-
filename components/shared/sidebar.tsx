@@ -146,6 +146,7 @@ const modules: Module[] = [
       {
         labelKey: "hr_mgmt.nav_group.intelligence",
         items: [
+          { key: "hr_mgmt.nav.dashboard", path: "/dashboard", icon: LayoutDashboard },
           { key: "hr_mgmt.nav.ai_brain", path: "/ai-brain", icon: Brain },
         ],
       },
@@ -153,6 +154,7 @@ const modules: Module[] = [
         labelKey: "hr_mgmt.nav_group.main",
         items: [
           { key: "hr_mgmt.nav.employees", path: "/employees", icon: Users },
+          { key: "hr_mgmt.nav.compliance", path: "/compliance", icon: ClipboardList },
           { key: "hr_mgmt.nav.attendance", path: "/attendance", icon: ClipboardCheck },
           { key: "hr_mgmt.nav.leave", path: "/leave", icon: Calendar },
         ],

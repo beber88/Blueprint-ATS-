@@ -534,8 +534,10 @@
       "tools": "כלים"
     },
     "nav": {
+      "dashboard": "דשבורד",
       "ai_brain": "מוח AI",
       "employees": "עובדים",
+      "compliance": "התאמה ממשלתית",
       "attendance": "נוכחות",
       "leave": "חופשות והיעדרויות",
       "salary": "שכר והטבות",
