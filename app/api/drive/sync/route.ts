@@ -68,11 +68,11 @@ export async function POST() {
     }
 
     // Match project
-    let projectId: string | null = null;
+    let matchedProjectId: string | null = null;
     if (classification.needs_project_match) {
       const parts = fullPath.split("/");
       if (parts[0]?.toLowerCase() === "projects" && parts.length >= 2) {
-        projectId = await matchProjectByName(supabase, parts[1]);
+        matchedProjectId = await matchProjectByName(supabase, parts[1]);
       }
     }
 
@@ -97,7 +97,7 @@ export async function POST() {
         target_id: targetId,
         target_employee_id: employeeId,
         document_type: classification.document_type,
-        classification: { ...classification, full_path: fullPath } as unknown as Record<string, unknown>,
+        classification: { ...classification, full_path: fullPath, matched_project_id: matchedProjectId } as unknown as Record<string, unknown>,
         imported_at: new Date().toISOString(),
       }).eq("id", file.id);
       routed++;
@@ -106,7 +106,7 @@ export async function POST() {
         classification_status: classification.target_table ? "error" : "needs_review",
         target_table: classification.target_table,
         document_type: classification.document_type,
-        classification: { ...classification, full_path: fullPath } as unknown as Record<string, unknown>,
+        classification: { ...classification, full_path: fullPath, matched_project_id: matchedProjectId } as unknown as Record<string, unknown>,
       }).eq("id", file.id);
       errors++;
     }
