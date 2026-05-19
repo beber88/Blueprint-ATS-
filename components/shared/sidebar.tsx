@@ -178,6 +178,7 @@ const modules: Module[] = [
         items: [
           { key: "hr_mgmt.nav.org_chart", path: "/org-chart", icon: Network },
           { key: "hr_mgmt.nav.email_inbox", path: "/email-inbox", icon: Mail },
+          { key: "hr_mgmt.nav.drive_sync", path: "/drive-sync", icon: FolderOpen },
         ],
       },
     ],

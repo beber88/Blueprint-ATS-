@@ -419,16 +419,21 @@
       "offboarding": "Offboarding",
       "assets": "Kagamitan",
       "org_chart": "Org Chart",
-      "email_inbox": "HR Inbox"
+      "email_inbox": "HR Inbox",
+      "drive_sync": "Drive Sync"
     },
     "employees": {
       "title": "Pamamahala ng Empleyado",
       "subtitle": "File ng empleyado, dokumento, at kasaysayan ng posisyon",
       "tab_details": "Detalye",
       "tab_documents": "Dokumento",
-      "tab_history": "Kasaysayan",
+      "tab_salary": "Sahod",
+      "tab_attendance": "Attendance",
       "tab_leave": "Leave",
+      "tab_reviews": "Reviews",
+      "tab_training": "Training",
       "tab_assets": "Kagamitan",
+      "tab_history": "Kasaysayan",
       "personal_info": "Personal na Impormasyon",
       "employment_info": "Impormasyon sa Trabaho",
       "emergency_contact": "Emergency Contact",

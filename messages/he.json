@@ -544,16 +544,21 @@
       "offboarding": "עזיבת עובד",
       "assets": "ציוד ונכסים",
       "org_chart": "מבנה ארגוני",
-      "email_inbox": "תיבת HR"
+      "email_inbox": "תיבת HR",
+      "drive_sync": "סנכרון Drive"
     },
     "employees": {
       "title": "ניהול עובדים",
       "subtitle": "תיק עובד, מסמכים, היסטוריית תפקידים",
       "tab_details": "פרטים",
       "tab_documents": "מסמכים",
-      "tab_history": "היסטוריה",
+      "tab_salary": "שכר",
+      "tab_attendance": "נוכחות",
       "tab_leave": "חופשות",
+      "tab_reviews": "הערכות",
+      "tab_training": "הדרכות",
       "tab_assets": "ציוד",
+      "tab_history": "היסטוריה",
       "personal_info": "פרטים אישיים",
       "employment_info": "פרטי העסקה",
       "emergency_contact": "איש קשר לחירום",
