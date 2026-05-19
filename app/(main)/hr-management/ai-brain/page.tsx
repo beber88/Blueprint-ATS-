@@ -8,7 +8,7 @@ import { useTheme } from "@/lib/theme/context";
 import {
   Brain, RefreshCw, Loader2, AlertTriangle, TrendingDown, Lightbulb,
   DollarSign, Target, ShieldAlert, GraduationCap, UserX,
-  ChevronRight, Send, Bot, User, X,
+  ChevronRight, Send, Bot, User, X, Upload,
 } from "lucide-react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -62,6 +62,12 @@ export default function AIBrainPage() {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
+  // Import state
+  const [importing, setImporting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [importResult, setImportResult] = useState<{ ok: boolean; employees_updated: number; salary_records: number; attendance_records: number; errors: string[] } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Chat state
   const [chatOpen, setChatOpen] = useState(false);
@@ -122,6 +128,25 @@ export default function AIBrainPage() {
     setInsights(prev => prev.filter(i => i.id !== id));
   };
 
+  const handleImportPayroll = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    setImportResult(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/ai-brain/import-payroll", { method: "POST", body: fd });
+      const data = await res.json();
+      setImportResult(data);
+      if (data.ok) await fetchData(); // Refresh scores after import
+    } catch {
+      setImportResult({ ok: false, employees_updated: 0, salary_records: 0, attendance_records: 0, errors: ["Import failed"] });
+    }
+    setImporting(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const sendChatMessage = async () => {
     const msg = chatInput.trim();
     if (!msg || chatLoading) return;
@@ -165,12 +190,25 @@ export default function AIBrainPage() {
       title={t("hr_mgmt.ai_brain.title")}
       subtitle={t("hr_mgmt.ai_brain.subtitle")}
       actions={
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           {lastUpdated && (
             <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>
               {t("hr_mgmt.ai_brain.last_updated")}: {new Date(lastUpdated).toLocaleString()}
             </span>
           )}
+          <input ref={fileInputRef} type="file" accept=".xlsx,.xls" onChange={handleImportPayroll} style={{ display: "none" }} />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            style={{
+              display: "flex", alignItems: "center", gap: 6, padding: "8px 16px",
+              borderRadius: 8, border: "1px solid var(--border-light)", cursor: importing ? "wait" : "pointer",
+              background: "var(--bg-card)", color: "var(--text-primary)", fontSize: 13, fontWeight: 500,
+            }}
+          >
+            {importing ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+            {importing ? (locale === "he" ? "מייבא..." : "Importing...") : (locale === "he" ? "ייבוא פיירול" : "Import Payroll")}
+          </button>
           <button
             onClick={handleRefresh}
             disabled={analyzing}
@@ -219,6 +257,35 @@ export default function AIBrainPage() {
           </div>
         )}
       </OpsCard>
+
+      {/* ── Import Result Banner ─────────────────────────────────────── */}
+      {importResult && (
+        <div style={{
+          padding: "12px 16px", marginBottom: 16, borderRadius: 8,
+          background: importResult.ok ? "rgba(45,122,62,0.1)" : "rgba(163,45,45,0.1)",
+          border: `1px solid ${importResult.ok ? "#2D7A3E" : "#A32D2D"}`,
+          display: "flex", alignItems: "center", gap: 10, fontSize: 13,
+        }}>
+          <span style={{ fontWeight: 600, color: importResult.ok ? "#2D7A3E" : "#A32D2D" }}>
+            {importResult.ok ? (locale === "he" ? "ייבוא הושלם!" : "Import complete!") : (locale === "he" ? "שגיאה בייבוא" : "Import error")}
+          </span>
+          {importResult.ok && (
+            <span style={{ color: "var(--text-secondary)" }}>
+              {locale === "he"
+                ? `${importResult.employees_updated} עובדים עודכנו · ${importResult.salary_records} רשומות שכר · ${importResult.attendance_records} רשומות נוכחות`
+                : `${importResult.employees_updated} employees · ${importResult.salary_records} salary records · ${importResult.attendance_records} attendance records`}
+            </span>
+          )}
+          {importResult.errors?.length > 0 && (
+            <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
+              ({importResult.errors.length} {locale === "he" ? "שגיאות" : "errors"})
+            </span>
+          )}
+          <button onClick={() => setImportResult(null)} style={{ marginInlineStart: "auto", background: "none", border: "none", cursor: "pointer", color: "var(--text-tertiary)" }}>
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* ── KPI Strip ─────────────────────────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 20 }}>
