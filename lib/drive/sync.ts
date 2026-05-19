@@ -285,6 +285,7 @@ function extractProjectName(path: string): string | null {
 }
 
 /** Try to extract a date from a filename (e.g. "Payroll_2026-01-15.pdf") */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function extractDateFromName(name: string, _type: "start" | "end"): string | null {
   const match = name.match(/(\d{4}[-/]\d{2}[-/]\d{2})/);
   if (match) return match[1].replace(/\//g, "-");
