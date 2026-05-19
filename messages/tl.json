@@ -401,6 +401,7 @@
   },
   "hr_mgmt": {
     "nav_group": {
+      "intelligence": "Intelligence",
       "main": "Pangunahin",
       "compensation": "Sahod at Benepisyo",
       "development": "Pag-unlad",
@@ -408,10 +409,12 @@
       "tools": "Mga Tool"
     },
     "nav": {
+      "ai_brain": "AI Brain",
       "employees": "Mga Empleyado",
       "attendance": "Attendance",
       "leave": "Leave at Absences",
       "salary": "Sahod at Benepisyo",
+      "payroll": "Payroll Run",
       "shifts": "Mga Shift",
       "reviews": "Performance Reviews",
       "training": "Training",
@@ -581,6 +584,95 @@
       "category": "Kategorya",
       "status": "Status",
       "received": "Natanggap"
+    },
+    "ai_brain": {
+      "title": "AI Brain",
+      "subtitle": "Proactive HR intelligence at efficiency advisor",
+      "health_score": "Company Health Score",
+      "breakdown": {
+        "attendance": "Attendance",
+        "performance": "Performance",
+        "training": "Training",
+        "leave_health": "Leave Health",
+        "operations": "Operations"
+      },
+      "kpi": {
+        "active_insights": "Active Insights",
+        "critical_alerts": "Critical Alerts",
+        "at_risk": "At-Risk Employees",
+        "training_compliance": "Training Compliance",
+        "attendance_rate": "Attendance Rate"
+      },
+      "insight_types": {
+        "cost_saving": "Cost Savings",
+        "performance_alert": "Performance Alerts",
+        "efficiency_tip": "Efficiency Tips",
+        "strategic": "Strategic",
+        "risk_alert": "Risk Alerts",
+        "attendance_pattern": "Attendance Patterns",
+        "training_gap": "Training Gaps",
+        "turnover_risk": "Turnover Risk"
+      },
+      "severity": {
+        "info": "Info",
+        "warning": "Warning",
+        "critical": "Critical"
+      },
+      "status": {
+        "active": "Active",
+        "acknowledged": "Acknowledged",
+        "resolved": "Resolved",
+        "dismissed": "Dismissed"
+      },
+      "actions": {
+        "refresh": "I-refresh ang Analysis",
+        "refreshing": "Nag-a-analyze...",
+        "acknowledge": "Kilalanin",
+        "resolve": "Resolbahin",
+        "dismiss": "I-dismiss",
+        "view_employee": "Tingnan ang Empleyado"
+      },
+      "risk_radar": {
+        "title": "Employee Risk Radar",
+        "col_name": "Empleyado",
+        "col_department": "Department",
+        "col_factors": "Risk Factors",
+        "col_score": "Risk Score",
+        "no_risks": "Walang naka-flag na empleyado"
+      },
+      "risk_factors": {
+        "frequent_absence": "Madalas na Absences",
+        "low_performance": "Mababang Performance",
+        "overdue_review": "Overdue Review",
+        "incomplete_training": "Hindi Kumpleto ang Training",
+        "high_leave_usage": "Mataas na Leave Usage",
+        "declining_trend": "Bumababang Trend"
+      },
+      "dept_comparison": "Department Efficiency",
+      "trends": {
+        "attendance": "Attendance Trend (30d)",
+        "overtime": "Overtime Trend (30d)"
+      },
+      "chat": {
+        "title": "Tanungin ang AI Brain",
+        "placeholder": "Magtanong tungkol sa performance ng empleyado, efficiency ng department, pagtitipid...",
+        "thinking": "Nag-iisip...",
+        "empty": "Tanungin ako tungkol sa performance ng empleyado, efficiency ng department, pagtitipid, at workforce optimization"
+      },
+      "last_updated": "Huling na-analyze",
+      "no_insights": "Wala pang nabuong insights. I-click ang Refresh para magsimula.",
+      "landing": {
+        "title": "HR Management",
+        "subtitle": "Pamamahala ng empleyado at HR intelligence",
+        "quick_stats": "Quick Stats",
+        "total_employees": "Kabuuang Empleyado",
+        "pending_leave": "Naghihintay na Leave",
+        "overdue_reviews": "Overdue Reviews",
+        "today_attendance": "Presente Ngayon",
+        "top_insights": "Nangungunang Insights",
+        "no_insights": "Walang active insights",
+        "modules": "HR Modules"
+      }
     }
   },
   "nav_group": {

@@ -526,6 +526,7 @@
   },
   "hr_mgmt": {
     "nav_group": {
+      "intelligence": "מודיעין",
       "main": "ראשי",
       "compensation": "שכר ותנאים",
       "development": "פיתוח",
@@ -533,10 +534,12 @@
       "tools": "כלים"
     },
     "nav": {
+      "ai_brain": "מוח AI",
       "employees": "עובדים",
       "attendance": "נוכחות",
       "leave": "חופשות והיעדרויות",
       "salary": "שכר והטבות",
+      "payroll": "הרצת שכר",
       "shifts": "משמרות",
       "reviews": "הערכות ביצוע",
       "training": "הכשרות",
@@ -773,6 +776,95 @@
       "category": "קטגוריה",
       "status": "סטטוס",
       "received": "התקבל"
+    },
+    "ai_brain": {
+      "title": "מוח AI",
+      "subtitle": "יועץ HR חכם — ניתוח יזום, תובנות וייעול",
+      "health_score": "ציון בריאות החברה",
+      "breakdown": {
+        "attendance": "נוכחות",
+        "performance": "ביצועים",
+        "training": "הכשרות",
+        "leave_health": "ניצול חופשות",
+        "operations": "תפעול"
+      },
+      "kpi": {
+        "active_insights": "תובנות פעילות",
+        "critical_alerts": "התראות קריטיות",
+        "at_risk": "עובדים בסיכון",
+        "training_compliance": "עמידה בהכשרות",
+        "attendance_rate": "שיעור נוכחות"
+      },
+      "insight_types": {
+        "cost_saving": "חיסכון בעלויות",
+        "performance_alert": "התראות ביצועים",
+        "efficiency_tip": "טיפים לייעול",
+        "strategic": "אסטרטגי",
+        "risk_alert": "התראות סיכון",
+        "attendance_pattern": "דפוסי נוכחות",
+        "training_gap": "פערי הכשרה",
+        "turnover_risk": "סיכון עזיבה"
+      },
+      "severity": {
+        "info": "מידע",
+        "warning": "אזהרה",
+        "critical": "קריטי"
+      },
+      "status": {
+        "active": "פעיל",
+        "acknowledged": "אושר",
+        "resolved": "טופל",
+        "dismissed": "נדחה"
+      },
+      "actions": {
+        "refresh": "רענן ניתוח",
+        "refreshing": "מנתח...",
+        "acknowledge": "אשר",
+        "resolve": "טפל",
+        "dismiss": "דחה",
+        "view_employee": "צפה בעובד"
+      },
+      "risk_radar": {
+        "title": "רדאר סיכוני עובדים",
+        "col_name": "עובד",
+        "col_department": "מחלקה",
+        "col_factors": "גורמי סיכון",
+        "col_score": "ציון סיכון",
+        "no_risks": "אין עובדים מסומנים כרגע"
+      },
+      "risk_factors": {
+        "frequent_absence": "היעדרות תכופה",
+        "low_performance": "ביצועים נמוכים",
+        "overdue_review": "הערכה באיחור",
+        "incomplete_training": "הכשרה לא הושלמה",
+        "high_leave_usage": "ניצול חופשה גבוה",
+        "declining_trend": "מגמת ירידה"
+      },
+      "dept_comparison": "יעילות מחלקות",
+      "trends": {
+        "attendance": "מגמת נוכחות (30 יום)",
+        "overtime": "מגמת שעות נוספות (30 יום)"
+      },
+      "chat": {
+        "title": "שאל את המוח",
+        "placeholder": "שאל על ביצועי עובדים, יעילות מחלקות, חיסכון בעלויות...",
+        "thinking": "חושב...",
+        "empty": "שאל אותי כל שאלה על ביצועי עובדים, יעילות מחלקות, חיסכון בעלויות ואופטימיזציה של כוח האדם"
+      },
+      "last_updated": "ניתוח אחרון",
+      "no_insights": "עדיין לא נוצרו תובנות. לחץ על רענן כדי להתחיל ניתוח.",
+      "landing": {
+        "title": "ניהול HR",
+        "subtitle": "ניהול עובדים ומודיעין HR",
+        "quick_stats": "סטטיסטיקות מהירות",
+        "total_employees": "סה\"כ עובדים",
+        "pending_leave": "חופשות ממתינות",
+        "overdue_reviews": "הערכות באיחור",
+        "today_attendance": "נוכחים היום",
+        "top_insights": "תובנות מובילות",
+        "no_insights": "אין תובנות פעילות",
+        "modules": "מודולי HR"
+      }
     }
   },
   "nav_group": {

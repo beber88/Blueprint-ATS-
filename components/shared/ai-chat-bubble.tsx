@@ -21,8 +21,16 @@ export function AIChatBubble() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Don't show on the full AI agent page
-  if (pathname === "/ai-agent" || pathname === "/ai-search") return null;
+  // Don't show on the full AI agent page or AI Brain page
+  if (pathname === "/ai-agent" || pathname === "/ai-search" || pathname === "/hr-management/ai-brain") return null;
+
+  // Route to the correct AI endpoint based on the current module
+  const getApiEndpoint = () => {
+    if (pathname.startsWith("/hr-management") || pathname.startsWith("/hr/hr-management")) return "/api/ai-brain/chat";
+    if (pathname.startsWith("/operations") || pathname.startsWith("/hr/operations")) return "/api/operations/ai-agent/chat";
+    if (pathname.startsWith("/contracts") || pathname.startsWith("/hr/contracts")) return "/api/contracts/ai-agent/chat";
+    return "/api/ai-agent/chat";
+  };
 
   const labels = {
     he: { placeholder: "שאל שאלה...", title: "עוזר AI", thinking: "חושב..." },
@@ -47,7 +55,7 @@ export function AIChatBubble() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/ai-agent/chat", {
+      const res = await fetch(getApiEndpoint(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

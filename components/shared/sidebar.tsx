@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
   Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart,
   Activity, Inbox, AlertTriangle, Building2, HardHat, ClipboardList, ClipboardCheck, Crown, Search,
-  Mail, Clock, DollarSign, Star, GraduationCap, UserPlus, UserMinus, Package, Network,
+  Mail, Clock, DollarSign, Star, GraduationCap, UserPlus, UserMinus, Package, Network, Brain,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -144,6 +144,12 @@ const modules: Module[] = [
     prefix: "/hr/hr-management",
     groups: [
       {
+        labelKey: "hr_mgmt.nav_group.intelligence",
+        items: [
+          { key: "hr_mgmt.nav.ai_brain", path: "/ai-brain", icon: Brain },
+        ],
+      },
+      {
         labelKey: "hr_mgmt.nav_group.main",
         items: [
           { key: "hr_mgmt.nav.employees", path: "/employees", icon: Users },
@@ -155,6 +161,7 @@ const modules: Module[] = [
         labelKey: "hr_mgmt.nav_group.compensation",
         items: [
           { key: "hr_mgmt.nav.salary", path: "/salary", icon: DollarSign },
+          { key: "hr_mgmt.nav.payroll", path: "/payroll", icon: FileBarChart },
           { key: "hr_mgmt.nav.shifts", path: "/shifts", icon: Clock },
         ],
       },

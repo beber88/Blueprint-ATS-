@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { Loader2, Search, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
+import { getScoreColor } from "@/lib/chart-config";
 
 interface Employee {
   id: string;
@@ -35,6 +36,7 @@ export default function EmployeesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [empScores, setEmpScores] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetch("/api/operations/employees")
@@ -42,6 +44,15 @@ export default function EmployeesPage() {
       .then((d) => setEmployees(d.employees || []))
       .catch(() => { /* silent — empty list is acceptable fallback */ })
       .finally(() => setLoading(false));
+    // Fetch employee brain scores for inline indicators
+    fetch("/api/ai-brain/scores?scope=employee")
+      .then((r) => r.json())
+      .then((d) => {
+        const map: Record<string, number> = {};
+        for (const s of d.scores || []) if (s.scope_id) map[s.scope_id] = s.score;
+        setEmpScores(map);
+      })
+      .catch(() => {});
   }, []);
 
   const filtered = employees.filter((e) => {
@@ -129,7 +140,15 @@ export default function EmployeesPage() {
               {filtered.map((emp) => (
                 <tr key={emp.id} style={{ borderBottom: "1px solid var(--border-light)" }}>
                   <td style={{ padding: "10px 12px", fontWeight: 500, color: "var(--text-primary)" }}>
-                    {emp.full_name}
+                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      {empScores[emp.id] != null && (
+                        <span style={{
+                          width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                          background: getScoreColor(empScores[emp.id]),
+                        }} title={`Score: ${empScores[emp.id]}`} />
+                      )}
+                      {emp.full_name}
+                    </span>
                   </td>
                   <td style={{ padding: "10px 12px", color: "var(--text-secondary)" }}>
                     {emp.position || "—"}
