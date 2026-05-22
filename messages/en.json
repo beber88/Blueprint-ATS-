@@ -30,7 +30,8 @@
     "assets": "Assets",
     "government": "Compliance",
     "drive_sync": "Drive Sync",
-    "conduct": "Conduct"
+    "conduct": "Conduct",
+    "hr_reports": "HR Reports"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1073,6 +1074,35 @@
       "save": "Save",
       "saved": "Record saved",
       "save_failed": "Failed to save record"
+    }
+  },
+  "hr_reports": {
+    "title": "HR Reports",
+    "subtitle": "Company-wide HR analytics and AI briefing",
+    "generate_insights": "AI briefing",
+    "insights_failed": "Failed to generate insights",
+    "load_failed": "Failed to load the HR report",
+    "ai_briefing": "AI executive briefing",
+    "highlights": "Highlights",
+    "concerns": "Concerns",
+    "recommendations": "Recommendations",
+    "metric": {
+      "headcount": "Active headcount",
+      "new_hires": "{n} new hires this year",
+      "payroll": "Monthly payroll cost",
+      "payslips": "{n} payslips this month",
+      "attendance": "Attendance records (month)",
+      "overtime": "{n} overtime hours",
+      "pending_leave": "Pending leave requests",
+      "approved_leave": "{n} approved this year",
+      "conduct": "Recognition / discipline",
+      "conduct_sub": "this year",
+      "contracts": "Active contracts",
+      "expiring": "{n} expiring within 60 days"
+    },
+    "breakdown": {
+      "department": "Headcount by department",
+      "attendance": "Attendance by status"
     }
   }
 }

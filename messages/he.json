@@ -30,7 +30,8 @@
     "assets": "ציוד",
     "government": "ציות",
     "drive_sync": "סנכרון דרייב",
-    "conduct": "התנהלות"
+    "conduct": "התנהלות",
+    "hr_reports": "דוחות משאבי אנוש"
   },
   "dashboard": {
     "title": "דשבורד",
@@ -1073,6 +1074,35 @@
       "save": "שמור",
       "saved": "הרשומה נשמרה",
       "save_failed": "שמירת הרשומה נכשלה"
+    }
+  },
+  "hr_reports": {
+    "title": "דוחות משאבי אנוש",
+    "subtitle": "אנליטיקת משאבי אנוש ותדריך AI",
+    "generate_insights": "תדריך AI",
+    "insights_failed": "הפקת התובנות נכשלה",
+    "load_failed": "טעינת הדוח נכשלה",
+    "ai_briefing": "תדריך מנהלים מבוסס AI",
+    "highlights": "נקודות חיוביות",
+    "concerns": "נקודות לתשומת לב",
+    "recommendations": "המלצות",
+    "metric": {
+      "headcount": "כוח אדם פעיל",
+      "new_hires": "{n} עובדים חדשים השנה",
+      "payroll": "עלות שכר חודשית",
+      "payslips": "{n} תלושים החודש",
+      "attendance": "רשומות נוכחות (חודש)",
+      "overtime": "{n} שעות נוספות",
+      "pending_leave": "בקשות חופשה ממתינות",
+      "approved_leave": "{n} אושרו השנה",
+      "conduct": "הוקרה / משמעת",
+      "conduct_sub": "השנה",
+      "contracts": "חוזים פעילים",
+      "expiring": "{n} פוקעים תוך 60 יום"
+    },
+    "breakdown": {
+      "department": "כוח אדם לפי מחלקה",
+      "attendance": "נוכחות לפי סטטוס"
     }
   }
 }

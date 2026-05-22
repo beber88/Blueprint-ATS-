@@ -30,7 +30,8 @@
     "assets": "Mga Asset",
     "government": "Compliance",
     "drive_sync": "Drive Sync",
-    "conduct": "Pag-uugali"
+    "conduct": "Pag-uugali",
+    "hr_reports": "HR Reports"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1073,6 +1074,35 @@
       "save": "I-save",
       "saved": "Na-save ang record",
       "save_failed": "Nabigong i-save ang record"
+    }
+  },
+  "hr_reports": {
+    "title": "HR Reports",
+    "subtitle": "Company-wide na HR analytics at AI briefing",
+    "generate_insights": "AI briefing",
+    "insights_failed": "Nabigong mag-generate ng insights",
+    "load_failed": "Nabigong i-load ang HR report",
+    "ai_briefing": "AI executive briefing",
+    "highlights": "Mga highlight",
+    "concerns": "Mga alalahanin",
+    "recommendations": "Mga rekomendasyon",
+    "metric": {
+      "headcount": "Aktibong headcount",
+      "new_hires": "{n} bagong hire ngayong taon",
+      "payroll": "Buwanang payroll cost",
+      "payslips": "{n} payslip ngayong buwan",
+      "attendance": "Attendance records (buwan)",
+      "overtime": "{n} overtime hours",
+      "pending_leave": "Pending na leave request",
+      "approved_leave": "{n} naaprubahan ngayong taon",
+      "conduct": "Recognition / discipline",
+      "conduct_sub": "ngayong taon",
+      "contracts": "Aktibong kontrata",
+      "expiring": "{n} mag-e-expire sa loob ng 60 araw"
+    },
+    "breakdown": {
+      "department": "Headcount ayon sa departamento",
+      "attendance": "Attendance ayon sa status"
     }
   }
 }

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
   Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart,
-  IdCard, Building2, Cloud, Receipt, Clock, FileSignature, Package, ShieldCheck, Award,
+  IdCard, Building2, Cloud, Receipt, Clock, FileSignature, Package, ShieldCheck, Award, BarChart3,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ const navGroups: { labelKey: string; items: { key: string; href: string; icon: L
       { key: "nav.contracts", href: "/contracts", icon: FileSignature },
       { key: "nav.assets", href: "/assets", icon: Package },
       { key: "nav.conduct", href: "/conduct", icon: Award },
+      { key: "nav.hr_reports", href: "/hr-reports", icon: BarChart3 },
       { key: "nav.government", href: "/government", icon: ShieldCheck },
       { key: "nav.drive_sync", href: "/drive-sync", icon: Cloud },
     ],
