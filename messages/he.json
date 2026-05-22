@@ -31,7 +31,8 @@
     "government": "ציות",
     "drive_sync": "סנכרון דרייב",
     "conduct": "התנהלות",
-    "hr_reports": "דוחות משאבי אנוש"
+    "hr_reports": "דוחות משאבי אנוש",
+    "qc": "בקרת איכות"
   },
   "dashboard": {
     "title": "דשבורד",
@@ -1109,5 +1110,60 @@
     "translate": "תרגם",
     "show_original": "הצג מקור",
     "failed": "התרגום נכשל"
+  },
+  "qc": {
+    "title": "בקרת איכות נתונים",
+    "subtitle": "זיהוי כפילויות ושלמות נתוני עובדים",
+    "tabs": {
+      "duplicates": "כפילויות",
+      "quality": "איכות נתונים"
+    },
+    "confidence": {
+      "high": "התאמה גבוהה",
+      "medium": "התאמה אפשרית",
+      "low": "התאמה חלשה"
+    },
+    "reason": {
+      "email": "אותו אימייל",
+      "phone": "אותו טלפון",
+      "national_id": "אותה ת.ז.",
+      "employee_code": "אותו קוד",
+      "identical_name": "שם זהה",
+      "similar_name": "שם דומה"
+    },
+    "field": {
+      "email": "אימייל",
+      "phone": "טלפון",
+      "national_id": "ת.ז.",
+      "employee_code": "קוד"
+    },
+    "duplicates": {
+      "scanned": "נסרקו {n} רשומות עובדים פעילות.",
+      "none": "לא נמצאו רשומות כפולות סבירות",
+      "keep_this": "שמור זו, מזג את השנייה",
+      "confirm_merge": "למזג רשומות אלו? הרשומה השנייה תושבת ותקושר לזו. שדות ריקים כאן ימולאו ממנה.",
+      "merged": "הרשומות מוזגו",
+      "merge_failed": "המיזוג נכשל"
+    },
+    "quality": {
+      "scanned": "נסרקו",
+      "clean": "מלאות",
+      "flagged": "סומנו",
+      "high_issues": "פערים חמורים",
+      "issues": "בעיות",
+      "all_clean": "כל רשומות העובדים מלאות",
+      "load_failed": "טעינת דוח איכות הנתונים נכשלה"
+    },
+    "issue": {
+      "full_name": "חסר שם",
+      "department": "אין מחלקה",
+      "position": "אין תפקיד",
+      "hire_date": "אין תאריך גיוס",
+      "salary": "אין רשומת שכר",
+      "contact": "אין פרטי קשר",
+      "date_of_birth": "אין תאריך לידה",
+      "employee_code": "אין קוד עובד",
+      "government_ids": "מזהים ממשלתיים חסרים"
+    }
   }
 }

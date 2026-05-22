@@ -31,7 +31,8 @@
     "government": "Compliance",
     "drive_sync": "Drive Sync",
     "conduct": "Pag-uugali",
-    "hr_reports": "HR Reports"
+    "hr_reports": "HR Reports",
+    "qc": "Data QC"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1109,5 +1110,60 @@
     "translate": "Isalin",
     "show_original": "Ipakita ang orihinal",
     "failed": "Nabigo ang pagsasalin"
+  },
+  "qc": {
+    "title": "Data Quality Control",
+    "subtitle": "Pagtukoy ng duplicate at pagkakumpleto ng data ng empleyado",
+    "tabs": {
+      "duplicates": "Mga Duplicate",
+      "quality": "Data quality"
+    },
+    "confidence": {
+      "high": "Mataas na tugma",
+      "medium": "Posibleng tugma",
+      "low": "Mahinang tugma"
+    },
+    "reason": {
+      "email": "Parehong email",
+      "phone": "Parehong telepono",
+      "national_id": "Parehong national ID",
+      "employee_code": "Parehong code",
+      "identical_name": "Magkaparehong pangalan",
+      "similar_name": "Magkatulad na pangalan"
+    },
+    "field": {
+      "email": "Email",
+      "phone": "Telepono",
+      "national_id": "National ID",
+      "employee_code": "Code"
+    },
+    "duplicates": {
+      "scanned": "Na-scan ang {n} aktibong employee records.",
+      "none": "Walang nakitang malamang na duplicate",
+      "keep_this": "Panatilihin ito, i-merge ang isa",
+      "confirm_merge": "I-merge ang mga record na ito? Ide-deactivate ang isa at ituturo dito. Mapupunan ang mga blankong field dito mula doon.",
+      "merged": "Na-merge ang mga record",
+      "merge_failed": "Nabigo ang merge"
+    },
+    "quality": {
+      "scanned": "Na-scan",
+      "clean": "Kumpleto",
+      "flagged": "Na-flag",
+      "high_issues": "Mga mataas na isyu",
+      "issues": "mga isyu",
+      "all_clean": "Kumpleto ang lahat ng employee records",
+      "load_failed": "Nabigong i-load ang data-quality report"
+    },
+    "issue": {
+      "full_name": "Walang pangalan",
+      "department": "Walang departamento",
+      "position": "Walang posisyon",
+      "hire_date": "Walang hire date",
+      "salary": "Walang salary record",
+      "contact": "Walang contact info",
+      "date_of_birth": "Walang petsa ng kapanganakan",
+      "employee_code": "Walang employee code",
+      "government_ids": "Kulang ang government IDs"
+    }
   }
 }
