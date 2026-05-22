@@ -29,7 +29,8 @@
     "contracts": "Mga Kontrata",
     "assets": "Mga Asset",
     "government": "Compliance",
-    "drive_sync": "Drive Sync"
+    "drive_sync": "Drive Sync",
+    "conduct": "Pag-uugali"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1030,6 +1031,48 @@
       "action_failed": "Nabigo ang aksyon",
       "cancel": "Kanselahin ang leave",
       "reject_prompt": "Dahilan ng pagtanggi sa leave request na ito:"
+    }
+  },
+  "conduct": {
+    "title": "Pag-uugali",
+    "subtitle": "Mga disciplinary action at recognition ng empleyado",
+    "tabs": {
+      "discipline": "Disciplinary",
+      "recognition": "Recognition"
+    },
+    "actions": {
+      "log_discipline": "Mag-log ng disciplinary action",
+      "log_recognition": "Mag-log ng recognition"
+    },
+    "empty": {
+      "discipline": "Walang naitalang disciplinary action",
+      "recognition": "Walang naitalang recognition"
+    },
+    "card": {
+      "points": "puntos",
+      "acknowledge": "Kilalanin",
+      "acknowledged": "Namarkahang kinilala",
+      "acknowledged_badge": "Kinilala",
+      "confirm_delete": "Burahin ang record na ito?",
+      "deleted": "Nabura ang record"
+    },
+    "dialog": {
+      "discipline_title": "Mag-log ng disciplinary action",
+      "recognition_title": "Mag-log ng recognition",
+      "employee": "Empleyado",
+      "title_field": "Pamagat",
+      "date": "Petsa",
+      "severity": "Severity",
+      "points": "Puntos",
+      "category": "Kategorya",
+      "category_ph": "hal. attendance, safety, conduct",
+      "award": "Award",
+      "award_ph": "hal. Employee of the Month",
+      "description": "Paglalarawan",
+      "required": "Kailangan ang empleyado at pamagat",
+      "save": "I-save",
+      "saved": "Na-save ang record",
+      "save_failed": "Nabigong i-save ang record"
     }
   }
 }

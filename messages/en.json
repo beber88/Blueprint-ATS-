@@ -29,7 +29,8 @@
     "contracts": "Contracts",
     "assets": "Assets",
     "government": "Compliance",
-    "drive_sync": "Drive Sync"
+    "drive_sync": "Drive Sync",
+    "conduct": "Conduct"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1030,6 +1031,48 @@
       "action_failed": "Action failed",
       "cancel": "Cancel leave",
       "reject_prompt": "Reason for rejecting this leave request:"
+    }
+  },
+  "conduct": {
+    "title": "Conduct",
+    "subtitle": "Disciplinary actions and employee recognition",
+    "tabs": {
+      "discipline": "Disciplinary",
+      "recognition": "Recognition"
+    },
+    "actions": {
+      "log_discipline": "Log disciplinary action",
+      "log_recognition": "Log recognition"
+    },
+    "empty": {
+      "discipline": "No disciplinary actions on record",
+      "recognition": "No recognition on record"
+    },
+    "card": {
+      "points": "pts",
+      "acknowledge": "Acknowledge",
+      "acknowledged": "Marked as acknowledged",
+      "acknowledged_badge": "Acknowledged",
+      "confirm_delete": "Delete this record?",
+      "deleted": "Record deleted"
+    },
+    "dialog": {
+      "discipline_title": "Log disciplinary action",
+      "recognition_title": "Log recognition",
+      "employee": "Employee",
+      "title_field": "Title",
+      "date": "Date",
+      "severity": "Severity",
+      "points": "Points",
+      "category": "Category",
+      "category_ph": "e.g. attendance, safety, conduct",
+      "award": "Award",
+      "award_ph": "e.g. Employee of the Month",
+      "description": "Description",
+      "required": "Employee and title are required",
+      "save": "Save",
+      "saved": "Record saved",
+      "save_failed": "Failed to save record"
     }
   }
 }
