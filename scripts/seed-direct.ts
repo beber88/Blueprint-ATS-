@@ -251,6 +251,132 @@ async function seedResumes() {
   console.log(`Resumes: ${done} new, ${dupes} dupes, ${failed} failed`);
 }
 
+// ─────────────────────────────────────────────────
+// Seed contracts
+// ─────────────────────────────────────────────────
+
+const CONTRACT_KEYWORDS = [
+  "contract", "agreement", "lease", "engagement", "addendum",
+  "settlement", "scaffolding cost transfer", "construction agreement",
+  "vehicle rental",
+];
+
+async function seedContracts() {
+  console.log(`\n${"=".repeat(60)}\nContracts\n${"=".repeat(60)}`);
+
+  const sources = [
+    "05_PEARL_DE_FLORE.md",
+    "09_OTHER_DOCUMENTS.md",
+    "07_HR_DOCUMENTATION.md",
+  ];
+
+  const allBlocks: Array<{ filename: string; body: string }> = [];
+  for (const src of sources) {
+    const blocks = splitBlocks(readMd(src));
+    for (const b of blocks) {
+      const fn = b.filename.toLowerCase();
+      if (CONTRACT_KEYWORDS.some((kw) => fn.includes(kw)) && b.body.length > 50) {
+        allBlocks.push(b);
+      }
+    }
+  }
+
+  console.log(`${allBlocks.length} contract documents found`);
+
+  // Check existing
+  const { data: existing } = await supabase.from("ct_contracts").select("title");
+  const existingTitles = new Set((existing || []).map((c: any) => c.title?.toLowerCase()));
+
+  let done = 0, skipped = 0, failed = 0;
+  for (const block of allBlocks) {
+    process.stdout.write(`  ${block.filename.slice(0, 55)}...`);
+    try {
+      const msg = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        messages: [{
+          role: "user",
+          content: `Parse this contract/agreement document and return JSON:
+{
+  "category": "customer" | "subcontractor" | "vendor",
+  "counterparty_name": "name of the other party",
+  "counterparty_contact_name": "contact person or null",
+  "counterparty_contact_email": "email or null",
+  "counterparty_contact_phone": "phone or null",
+  "title": "short descriptive title for this contract",
+  "summary": "2-3 sentence summary of what this contract covers",
+  "project_name": "related project name or null",
+  "signing_date": "YYYY-MM-DD or null",
+  "effective_date": "YYYY-MM-DD or null",
+  "expiration_date": "YYYY-MM-DD or null",
+  "monetary_value": number or null,
+  "currency": "PHP" or "USD" or null,
+  "status": "active" | "expired" | "terminated"
+}
+
+DOCUMENT:
+${block.body.slice(0, 20000)}`
+        }],
+      });
+
+      const text = msg.content[0]?.type === "text" ? msg.content[0].text : "";
+      const m = text.match(/\{[\s\S]*\}/);
+      if (!m) throw new Error("No JSON");
+      const parsed = JSON.parse(m[0]);
+
+      // Dedup by title
+      if (existingTitles.has((parsed.title || "").toLowerCase())) {
+        skipped++;
+        console.log(` DUPE`);
+        continue;
+      }
+
+      // Match project
+      let projectId = null;
+      if (parsed.project_name) {
+        const { data: proj } = await supabase
+          .from("op_projects")
+          .select("id")
+          .ilike("name", `%${parsed.project_name.split(" ")[0]}%`)
+          .limit(1)
+          .single();
+        if (proj) projectId = proj.id;
+      }
+
+      const validCategory = ["customer", "subcontractor", "vendor"].includes(parsed.category)
+        ? parsed.category : "vendor";
+      const validStatus = ["draft", "active", "expired", "terminated", "renewed"].includes(parsed.status)
+        ? parsed.status : "active";
+
+      const { error } = await supabase.from("ct_contracts").insert({
+        category: validCategory,
+        counterparty_name: parsed.counterparty_name || "Unknown",
+        counterparty_contact_name: parsed.counterparty_contact_name || null,
+        counterparty_contact_email: parsed.counterparty_contact_email || null,
+        counterparty_contact_phone: parsed.counterparty_contact_phone || null,
+        project_id: projectId,
+        title: parsed.title || block.filename,
+        summary: parsed.summary || null,
+        signing_date: parsed.signing_date || null,
+        effective_date: parsed.effective_date || null,
+        expiration_date: parsed.expiration_date || null,
+        monetary_value: parsed.monetary_value || null,
+        currency: parsed.currency || "PHP",
+        status: validStatus,
+      });
+      if (error) throw new Error(error.message);
+
+      existingTitles.add((parsed.title || "").toLowerCase());
+      done++;
+      console.log(` OK (${parsed.title})`);
+    } catch (e: any) {
+      failed++;
+      console.log(` ERROR: ${e.message.slice(0, 80)}`);
+    }
+  }
+  console.log(`Contracts: ${done} new, ${skipped} dupes, ${failed} failed`);
+}
+
 async function main() {
   console.log("Blueprint ATS — Direct Seed (no Next.js)");
   if (!ONLY || ONLY === "reports") {
@@ -260,6 +386,9 @@ async function main() {
   }
   if (!ONLY || ONLY === "resumes") {
     await seedResumes();
+  }
+  if (!ONLY || ONLY === "contracts") {
+    await seedContracts();
   }
   console.log("\nDone!");
 }
