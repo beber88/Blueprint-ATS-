@@ -105,6 +105,17 @@ export async function GET(request: NextRequest) {
             today
           );
 
+          // If HR is involved (from/to/cc) but AI said "not_hr", override to "general_hr"
+          const hrEmail = "hr@blueprint-ph.com";
+          const hrInvolved =
+            email.from.email.toLowerCase() === hrEmail ||
+            (email.to || "").toLowerCase().includes(hrEmail);
+
+          if (classification.category === "not_hr" && hrInvolved) {
+            classification.category = "general_hr";
+            classification.summary = `[HR involved] ${classification.summary}`;
+          }
+
           const routedTo = categoryToRoute(classification.category);
 
           // 6. Update email record with classification
