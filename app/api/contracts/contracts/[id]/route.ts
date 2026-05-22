@@ -30,7 +30,66 @@ export async function GET(
   if (error || !data) {
     return NextResponse.json({ error: "contract not found" }, { status: 404 });
   }
-  return NextResponse.json({ contract: data });
+
+  // Join project name when project_id exists
+  let project_name: string | null = null;
+  if (data.project_id) {
+    const { data: proj } = await supabase
+      .from("op_projects")
+      .select("name")
+      .eq("id", data.project_id)
+      .single();
+    if (proj) project_name = proj.name;
+  }
+
+  // Fetch source text from the draft if draft_source_id exists
+  let source_text: string | null = null;
+  if (data.draft_source_id) {
+    const { data: draft } = await supabase
+      .from("ct_contract_drafts")
+      .select("source_text")
+      .eq("id", data.draft_source_id)
+      .single();
+    if (draft) source_text = draft.source_text;
+  }
+
+  // Find related op_report_items by searching counterparty_name and title
+  // in project_raw, person_responsible_raw, or issue columns
+  const searchTerms = [data.counterparty_name];
+  // Add meaningful title words (skip very short or generic words)
+  const titleWords = (data.title || "")
+    .split(/\s+/)
+    .filter((w: string) => w.length > 3)
+    .slice(0, 3);
+  const searchPattern = searchTerms.concat(titleWords).join("|");
+
+  let related_items: Array<{
+    id: string;
+    issue: string;
+    status: string;
+    priority: string;
+    report_date: string;
+    project_raw: string | null;
+  }> = [];
+
+  if (searchPattern) {
+    const { data: items } = await supabase
+      .from("op_report_items")
+      .select("id, issue, status, priority, report_date, project_raw")
+      .or(
+        `project_raw.ilike.%${data.counterparty_name}%,person_responsible_raw.ilike.%${data.counterparty_name}%,issue.ilike.%${data.counterparty_name}%`
+      )
+      .order("report_date", { ascending: false })
+      .limit(20);
+    related_items = items || [];
+  }
+
+  return NextResponse.json({
+    contract: data,
+    project_name,
+    source_text,
+    related_items,
+  });
 }
 
 // PATCH /api/contracts/contracts/:id

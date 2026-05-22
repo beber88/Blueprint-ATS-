@@ -460,11 +460,19 @@
     "detail": {
       "title": "חוזה",
       "counterparty": "צד נגדי",
-      "project": "פרויקט",
+      "project": "פרויקט קשור",
       "dates": "תאריכים",
       "value": "ערך כספי",
       "summary": "תקציר",
-      "document": "מסמך"
+      "document": "מסמך",
+      "source_text": "טקסט מקור",
+      "related_items": "פריטי דוח קשורים",
+      "no_related_items": "לא נמצאו פריטים קשורים",
+      "no_project": "אין פרויקט מקושר",
+      "view_project": "צפה בפרויקט",
+      "view_item": "צפה בפריט",
+      "show_source": "הצג טקסט מקור",
+      "hide_source": "הסתר טקסט מקור"
     },
     "alerts": {
       "title": "התראות חוזים",

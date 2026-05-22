@@ -460,11 +460,19 @@
     "detail": {
       "title": "Contract",
       "counterparty": "Counterparty",
-      "project": "Project",
+      "project": "Related Project",
       "dates": "Dates",
       "value": "Monetary value",
       "summary": "Summary",
-      "document": "Document"
+      "document": "Document",
+      "source_text": "Source Text",
+      "related_items": "Related Report Items",
+      "no_related_items": "No related items found",
+      "no_project": "No project linked",
+      "view_project": "View project",
+      "view_item": "View item",
+      "show_source": "Show source text",
+      "hide_source": "Hide source text"
     },
     "alerts": {
       "title": "Contract alerts",

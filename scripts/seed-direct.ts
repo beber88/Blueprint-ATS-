@@ -258,7 +258,9 @@ async function seedResumes() {
 const CONTRACT_KEYWORDS = [
   "contract", "agreement", "lease", "engagement", "addendum",
   "settlement", "scaffolding cost transfer", "construction agreement",
-  "vehicle rental",
+  "vehicle rental", "proposal", "quotation", "purchase order",
+  "final pay", "final notice", "project final turn over",
+  "billing", "work order", "scope of work", "mechanical",
 ];
 
 async function seedContracts() {
@@ -268,6 +270,7 @@ async function seedContracts() {
     "05_PEARL_DE_FLORE.md",
     "09_OTHER_DOCUMENTS.md",
     "07_HR_DOCUMENTATION.md",
+    "08_PAYROLL_INVENTORY.md",
   ];
 
   const allBlocks: Array<{ filename: string; body: string }> = [];
@@ -293,23 +296,23 @@ async function seedContracts() {
     try {
       const msg = await anthropic.messages.create({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 2000,
+        max_tokens: 3000,
         messages: [{
           role: "user",
-          content: `Parse this contract/agreement document and return JSON:
+          content: `Parse this contract/agreement document for Blueprint Building Group (Philippine construction company) and return JSON:
 {
   "category": "customer" | "subcontractor" | "vendor",
-  "counterparty_name": "name of the other party",
-  "counterparty_contact_name": "contact person or null",
+  "counterparty_name": "full legal name of the other party",
+  "counterparty_contact_name": "contact person name or null",
   "counterparty_contact_email": "email or null",
   "counterparty_contact_phone": "phone or null",
-  "title": "short descriptive title for this contract",
-  "summary": "2-3 sentence summary of what this contract covers",
-  "project_name": "related project name or null",
+  "title": "short descriptive title (max 80 chars)",
+  "summary": "Detailed 5-8 sentence summary: what is this contract about, what work/services are covered, key terms, payment structure, any special conditions or risks. Be specific about scope of work, materials, areas of responsibility.",
+  "project_name": "which Blueprint project this relates to (e.g. 'Pearl de Flore', 'Icon 18H', 'Tresor Rare', 'Fixifoot', 'Bohol', '4 Storey') or null",
   "signing_date": "YYYY-MM-DD or null",
   "effective_date": "YYYY-MM-DD or null",
   "expiration_date": "YYYY-MM-DD or null",
-  "monetary_value": number or null,
+  "monetary_value": number or null (in PHP unless stated otherwise),
   "currency": "PHP" or "USD" or null,
   "status": "active" | "expired" | "terminated"
 }
