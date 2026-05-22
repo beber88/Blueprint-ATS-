@@ -999,7 +999,37 @@
       "status": "Status",
       "leave_type": "Uri",
       "range": "Range",
-      "days": "Araw"
+      "days": "Araw",
+      "actions": "Mga aksyon"
+    },
+    "actions": {
+      "add": "Magdagdag ng record",
+      "new_leave": "Bagong leave request"
+    },
+    "dialog": {
+      "add_title": "Magdagdag ng attendance record",
+      "edit_title": "I-edit ang attendance record",
+      "required": "Pakipunan ang mga kailangang field",
+      "save": "I-save",
+      "saved": "Na-save ang attendance",
+      "save_failed": "Nabigong i-save",
+      "deleted": "Nabura ang record",
+      "confirm_delete": "Burahin ang attendance record na ito?",
+      "break_minutes": "Break (minuto)",
+      "notes": "Mga tala",
+      "start_date": "Petsa ng simula",
+      "end_date": "Petsa ng tapos",
+      "reason": "Dahilan",
+      "hours_help": "Awtomatikong kinakalkula ang worked at overtime hours mula sa clock in/out at break."
+    },
+    "leave": {
+      "new_title": "Bagong leave request",
+      "submit": "I-submit ang request",
+      "created": "Nagawa ang leave request",
+      "updated": "Na-update ang leave request",
+      "action_failed": "Nabigo ang aksyon",
+      "cancel": "Kanselahin ang leave",
+      "reject_prompt": "Dahilan ng pagtanggi sa leave request na ito:"
     }
   }
 }

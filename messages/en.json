@@ -999,7 +999,37 @@
       "status": "Status",
       "leave_type": "Type",
       "range": "Range",
-      "days": "Days"
+      "days": "Days",
+      "actions": "Actions"
+    },
+    "actions": {
+      "add": "Add record",
+      "new_leave": "New leave request"
+    },
+    "dialog": {
+      "add_title": "Add attendance record",
+      "edit_title": "Edit attendance record",
+      "required": "Please fill the required fields",
+      "save": "Save",
+      "saved": "Attendance saved",
+      "save_failed": "Failed to save",
+      "deleted": "Record deleted",
+      "confirm_delete": "Delete this attendance record?",
+      "break_minutes": "Break (minutes)",
+      "notes": "Notes",
+      "start_date": "Start date",
+      "end_date": "End date",
+      "reason": "Reason",
+      "hours_help": "Worked and overtime hours are computed automatically from clock in/out and break."
+    },
+    "leave": {
+      "new_title": "New leave request",
+      "submit": "Submit request",
+      "created": "Leave request created",
+      "updated": "Leave request updated",
+      "action_failed": "Action failed",
+      "cancel": "Cancel leave",
+      "reject_prompt": "Reason for rejecting this leave request:"
     }
   }
 }
