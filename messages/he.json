@@ -1104,5 +1104,10 @@
       "department": "כוח אדם לפי מחלקה",
       "attendance": "נוכחות לפי סטטוס"
     }
+  },
+  "translate": {
+    "translate": "תרגם",
+    "show_original": "הצג מקור",
+    "failed": "התרגום נכשל"
   }
 }

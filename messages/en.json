@@ -1104,5 +1104,10 @@
       "department": "Headcount by department",
       "attendance": "Attendance by status"
     }
+  },
+  "translate": {
+    "translate": "Translate",
+    "show_original": "Show original",
+    "failed": "Translation failed"
   }
 }

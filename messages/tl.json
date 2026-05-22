@@ -1104,5 +1104,10 @@
       "department": "Headcount ayon sa departamento",
       "attendance": "Attendance ayon sa status"
     }
+  },
+  "translate": {
+    "translate": "Isalin",
+    "show_original": "Ipakita ang orihinal",
+    "failed": "Nabigo ang pagsasalin"
   }
 }
