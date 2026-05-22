@@ -48,6 +48,12 @@ export async function GET() {
         id: emp.id,
         full_name: emp.full_name,
         national_id: emp.national_id,
+        government_ids: {
+          sss_no: ids.sss_no || "",
+          philhealth_no: ids.philhealth_no || "",
+          pagibig_no: ids.pagibig_no || "",
+          tin: ids.tin || "",
+        },
         filled_count: filled.length,
         total_count: fields.length,
         missing: fields.filter((f) => !ids[f]),

@@ -49,6 +49,26 @@ export function computeSSS(monthlyBasic: number): number {
   return round2(msc * 0.045);
 }
 
+/**
+ * Employer-share statutory contributions, needed for remittance filings
+ * (SSS R-3/R-5, PhilHealth RF-1, Pag-IBIG MCRF). Withholding tax has no
+ * employer share — it is the employee's income tax.
+ */
+export interface EmployerContributions {
+  sss: number;
+  philhealth: number;
+  pagibig: number;
+  total: number;
+}
+
+export function computeEmployerContributions(monthlyBasic: number): EmployerContributions {
+  const msc = clamp(monthlyBasic, 4000, 30000);
+  const sss = round2(msc * 0.095);
+  const philhealth = round2(clamp(monthlyBasic, 10000, 100000) * 0.05 * 0.5);
+  const pagibig = round2(Math.min(monthlyBasic * 0.02, 100));
+  return { sss, philhealth, pagibig, total: round2(sss + philhealth + pagibig) };
+}
+
 export function computePhilHealth(monthlyBasic: number): number {
   const base = clamp(monthlyBasic, 10000, 100000);
   return round2(base * 0.05 * 0.5);

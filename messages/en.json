@@ -935,7 +935,8 @@
       "title": "Per-employee compliance",
       "subtitle": "Employees missing one or more government IDs (SSS / Philhealth / Pag-IBIG / TIN)",
       "all_good": "All active employees have all government IDs on file",
-      "missing": "Missing"
+      "missing": "Missing",
+      "all_filled": "All IDs on file"
     },
     "documents": {
       "title": "Latest government documents",
@@ -943,6 +944,38 @@
       "empty": "No government documents on file",
       "expires": "Expires",
       "open": "Open"
+    },
+    "tabs": {
+      "compliance": "Compliance",
+      "remittance": "Remittance",
+      "deadlines": "Deadlines"
+    },
+    "edit": {
+      "title": "Edit government IDs",
+      "save": "Save IDs",
+      "saved": "Government IDs updated",
+      "save_failed": "Failed to update IDs"
+    },
+    "remittance": {
+      "from": "Period from",
+      "to": "Period to",
+      "run": "Generate report",
+      "failed": "Failed to generate remittance report",
+      "employee": "Employee",
+      "tax": "Withholding tax",
+      "bir": "BIR (tax)",
+      "grand_total": "Total",
+      "empty": "No approved/paid payslips in this period",
+      "disclaimer": "Totals include employee + employer share, computed from approved/paid payslips using standard PH contribution tables. Verify against official agency tables before filing."
+    },
+    "deadlines": {
+      "agency": "Agency",
+      "form": "Form",
+      "applicable": "For month",
+      "due": "Due date",
+      "status": "Status",
+      "overdue": "Overdue",
+      "in_days": "in {n}d"
     }
   },
   "attendance": {

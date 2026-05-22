@@ -935,7 +935,8 @@
       "title": "Per-employee compliance",
       "subtitle": "Mga empleyado na may kulang na government ID (SSS / Philhealth / Pag-IBIG / TIN)",
       "all_good": "Lahat ng aktibong empleyado ay may kumpletong government IDs",
-      "missing": "Kulang"
+      "missing": "Kulang",
+      "all_filled": "Kompleto ang IDs"
     },
     "documents": {
       "title": "Pinakabagong government documents",
@@ -943,6 +944,38 @@
       "empty": "Walang government documents sa file",
       "expires": "Mag-e-expire",
       "open": "Buksan"
+    },
+    "tabs": {
+      "compliance": "Compliance",
+      "remittance": "Remittance",
+      "deadlines": "Mga Deadline"
+    },
+    "edit": {
+      "title": "I-edit ang government IDs",
+      "save": "I-save ang IDs",
+      "saved": "Na-update ang government IDs",
+      "save_failed": "Nabigong i-update ang IDs"
+    },
+    "remittance": {
+      "from": "Period mula",
+      "to": "Period hanggang",
+      "run": "Mag-generate ng ulat",
+      "failed": "Nabigong mag-generate ng remittance report",
+      "employee": "Empleyado",
+      "tax": "Withholding tax",
+      "bir": "BIR (buwis)",
+      "grand_total": "Kabuuan",
+      "empty": "Walang approved/paid na payslip sa period na ito",
+      "disclaimer": "Kasama sa totals ang employee + employer share, kinalkula mula sa approved/paid payslips gamit ang standard PH contribution tables. I-verify sa opisyal na agency tables bago mag-file."
+    },
+    "deadlines": {
+      "agency": "Ahensya",
+      "form": "Form",
+      "applicable": "Para sa buwan",
+      "due": "Deadline",
+      "status": "Status",
+      "overdue": "Lampas na",
+      "in_days": "sa {n}d"
     }
   },
   "attendance": {
