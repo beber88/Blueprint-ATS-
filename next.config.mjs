@@ -24,6 +24,8 @@ const RECRUITMENT_ROUTES = [
 const OPERATIONS_ROUTES = [
   'dashboard',
   'intake',
+  'drafts',
+  'reports',
   'issues',
   'hr-issues',
   'ceo-items',
@@ -36,18 +38,24 @@ const OPERATIONS_ROUTES = [
   'departments',
   'employees',
   'ai-agent',
+  'knowledge',
   'inbox',
   'digest',
+  'chat',
 ];
 
 // HR Management module top-level routes mounted under /hr/hr-management.
 // Files live in app/(main)/hr-management/* — this rewrite block exposes them
 // under the namespaced HR URL.
 const HR_MANAGEMENT_ROUTES = [
+  'dashboard',
+  'ai-brain',
   'employees',
+  'compliance',
   'attendance',
   'leave',
   'salary',
+  'payroll',
   'shifts',
   'reviews',
   'training',
@@ -56,6 +64,7 @@ const HR_MANAGEMENT_ROUTES = [
   'assets',
   'org-chart',
   'email-inbox',
+  'drive-sync',
 ];
 
 // Contracts module top-level routes mounted under /hr/contracts. Files live in
