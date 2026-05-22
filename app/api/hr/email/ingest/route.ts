@@ -14,8 +14,12 @@ function authorized(request: NextRequest): boolean {
   return auth === `Bearer ${cronSecret}`;
 }
 
-// HR manager email filter — configurable via env var
-const HR_SENDER_QUERY = process.env.EMAIL_SENDER_QUERY || "from:nicx is:unread newer_than:1d";
+// HR email queries — catch all emails where HR sends, receives, or is CC'd
+const HR_QUERIES = [
+  "from:hr@blueprint-ph.com newer_than:2d",
+  "to:hr@blueprint-ph.com newer_than:2d",
+  "cc:hr@blueprint-ph.com newer_than:2d",
+];
 
 export async function GET(request: NextRequest) {
   // Cron jobs use CRON_SECRET bearer token, not user session.
@@ -33,8 +37,18 @@ export async function GET(request: NextRequest) {
   let failed = 0;
 
   try {
-    // 1. List unread messages from HR manager
-    const messages = await listMessages(HR_SENDER_QUERY, 20);
+    // 1. Collect messages from all HR queries (from, to, cc) and deduplicate
+    const seenIds = new Set<string>();
+    const messages: { id: string; threadId: string }[] = [];
+    for (const query of HR_QUERIES) {
+      const results = await listMessages(query, 30);
+      for (const r of results) {
+        if (!seenIds.has(r.id)) {
+          seenIds.add(r.id);
+          messages.push(r);
+        }
+      }
+    }
 
     for (const msg of messages) {
       try {
