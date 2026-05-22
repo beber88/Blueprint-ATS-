@@ -109,7 +109,7 @@ function ContractsFileManager() {
   }
 
   function openContract(id: string) {
-    router.push(`/contracts/contracts/${id}`);
+    router.push(`/hr/contracts/contracts/${id}`);
   }
 
   async function handleDeleteFolder(id: string) {

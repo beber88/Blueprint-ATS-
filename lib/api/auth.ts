@@ -24,7 +24,7 @@ const ROLE_LEVEL: Record<Role, number> = {
 const ROLE_MODULES: Record<Role, Module[]> = {
   admin: ["recruitment", "operations", "contracts", "hr-management", "admin"],
   hr: ["recruitment", "operations", "contracts", "hr-management"],
-  recruiter: ["recruitment", "operations"],
+  recruiter: ["recruitment", "operations", "contracts"],
   user: ["recruitment"],
 };
 

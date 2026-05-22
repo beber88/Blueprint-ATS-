@@ -111,45 +111,92 @@ interface ContractGridProps {
   onMove: () => void;
 }
 
+const CATEGORY_COLORS: Record<string, string> = {
+  subcontractor: "#3D8A7D",
+  vendor: "#1A56A8",
+  customer: "#C9A84C",
+};
+
+function formatCurrency(value: number | null, currency: string | null): string {
+  if (value == null) return "";
+  const sym = currency === "USD" ? "$" : "₱";
+  return `${sym}${value.toLocaleString()}`;
+}
+
 export function ContractGridItem({ contract, onOpen, onMove }: ContractGridProps) {
   return (
     <div
+      onClick={onOpen}
       onDoubleClick={onOpen}
       style={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        gap: 8,
-        padding: 16,
+        gap: 6,
+        padding: "14px 16px",
         borderRadius: 8,
         border: "1px solid var(--border-light)",
         background: "var(--bg-card)",
         cursor: "pointer",
         position: "relative",
-        minHeight: 120,
-        justifyContent: "center",
+        minHeight: 140,
         transition: "border-color 0.15s",
       }}
       onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)")}
       onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-light)")}
     >
-      <div style={{ position: "absolute", top: 6, insetInlineEnd: 6 }}>
+      {/* Top row: category + menu */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{
+          fontSize: 10,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          padding: "2px 8px",
+          borderRadius: 4,
+          background: `${CATEGORY_COLORS[contract.category] || "#666"}15`,
+          color: CATEGORY_COLORS[contract.category] || "#666",
+        }}>
+          {contract.category}
+        </span>
         <ContractMenu onMove={onMove} />
       </div>
-      <FileText size={36} style={{ color: "var(--text-secondary)" }} />
-      <span
-        style={{
-          fontSize: 12,
-          fontWeight: 500,
-          textAlign: "center",
-          color: "var(--text-primary)",
-          wordBreak: "break-word",
-          maxWidth: "100%",
-        }}
-      >
+
+      {/* Title */}
+      <div style={{
+        fontSize: 13,
+        fontWeight: 600,
+        color: "var(--text-primary)",
+        lineHeight: 1.3,
+        display: "-webkit-box",
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: "vertical" as const,
+        overflow: "hidden",
+      }}>
         {contract.title}
-      </span>
-      <StatusBadge status={contract.status as ContractStatus} />
+      </div>
+
+      {/* Counterparty */}
+      <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+        {contract.counterparty_name}
+      </div>
+
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* Bottom: value + status */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "#C9A84C" }}>
+          {formatCurrency(contract.monetary_value, contract.currency) || "—"}
+        </span>
+        <StatusBadge status={contract.status as ContractStatus} />
+      </div>
+
+      {/* Expiration */}
+      {contract.expiration_date && (
+        <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+          Expires: {contract.expiration_date}
+        </div>
+      )}
     </div>
   );
 }
