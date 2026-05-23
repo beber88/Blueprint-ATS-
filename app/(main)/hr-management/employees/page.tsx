@@ -1,191 +1,240 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { OpsPageShell, OpsCard, KpiCard } from "@/components/operations/page-shell";
 import { useI18n } from "@/lib/i18n/context";
-import { Loader2, Search, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Search, Users, CheckCircle, AlertTriangle, FileText, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns";
-import { getScoreColor } from "@/lib/chart-config";
+
+interface Department { id: string; name: string; name_he: string | null; color: string | null }
 
 interface Employee {
   id: string;
   full_name: string;
-  email?: string | null;
-  phone?: string | null;
-  department_id?: string | null;
-  department_name?: string | null;
-  position?: string | null;
-  hire_date?: string | null;
-  employment_type?: string | null;
-  manager_id?: string | null;
-  status?: string | null;
+  email: string | null;
+  phone: string | null;
+  role: string | null;
+  department_id: string | null;
+  department: Department | null;
+  hire_date: string | null;
+  employment_type: string | null;
+  is_active: boolean;
+  doc_count: number;
+  current_salary: number | null;
+  has_salary: boolean;
+  missing_gov_ids: string[];
+  compliance_score: number;
+  data_completeness: number;
 }
 
+interface Summary {
+  total: number;
+  active: number;
+  with_salary: number;
+  with_docs: number;
+  fully_compliant: number;
+  avg_completeness: number;
+}
 
+function fmt(n: number) {
+  return "₱" + n.toLocaleString("en-PH");
+}
 
 export default function EmployeesPage() {
-  const { t, locale } = useI18n();
-  const isRTL = locale === "he";
-  const typeLabel = (tp: string) => {
-    const key = `hr_mgmt.employees.type_${tp}`;
-    const val = t(key);
-    return val !== key ? val : tp;
-  };
+  const { locale } = useI18n();
+  const isHe = locale === "he";
+
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [empScores, setEmpScores] = useState<Record<string, number>>({});
+  const [deptFilter, setDeptFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("active");
 
-  useEffect(() => {
-    fetch("/api/operations/employees")
-      .then((r) => r.json())
-      .then((d) => setEmployees(d.employees || []))
-      .catch(() => { /* silent — empty list is acceptable fallback */ })
-      .finally(() => setLoading(false));
-    // Fetch employee brain scores for inline indicators
-    fetch("/api/ai-brain/scores?scope=employee")
-      .then((r) => r.json())
-      .then((d) => {
-        const map: Record<string, number> = {};
-        for (const s of d.scores || []) if (s.scope_id) map[s.scope_id] = s.score;
-        setEmpScores(map);
-      })
-      .catch(() => {});
-  }, []);
+  const load = async () => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (statusFilter === "all") params.set("include_inactive", "true");
+    if (search) params.set("search", search);
+    if (deptFilter !== "all") params.set("department_id", deptFilter);
+
+    const res = await fetch(`/api/hr/employees?${params}`);
+    const data = await res.json();
+    setEmployees(data.employees || []);
+    setDepartments(data.departments || []);
+    setSummary(data.summary || null);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, [deptFilter, statusFilter]);
 
   const filtered = employees.filter((e) => {
-    const matchSearch =
-      !search ||
-      e.full_name.toLowerCase().includes(search.toLowerCase()) ||
-      e.email?.toLowerCase().includes(search.toLowerCase()) ||
-      e.position?.toLowerCase().includes(search.toLowerCase());
-    const matchType = typeFilter === "all" || e.employment_type === typeFilter;
-    return matchSearch && matchType;
+    if (statusFilter === "active" && !e.is_active) return false;
+    if (statusFilter === "inactive" && e.is_active) return false;
+    if (search) {
+      const s = search.toLowerCase();
+      return e.full_name.toLowerCase().includes(s) || (e.role || "").toLowerCase().includes(s) || (e.email || "").toLowerCase().includes(s);
+    }
+    return true;
   });
 
-  const activeCount = employees.filter((e) => e.status !== "terminated").length;
-  const types = Array.from(new Set(employees.map((e) => e.employment_type).filter(Boolean)));
-
   return (
-    <OpsPageShell
-      title={t("hr_mgmt.employees.title")}
-      subtitle={t("hr_mgmt.employees.subtitle")}
-    >
-      {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 20 }}>
-        <KpiCard label={t("hr_mgmt.employees.total_employees")} value={employees.length} accent="#C9A84C" />
-        <KpiCard label={t("hr_mgmt.employees.active")} value={activeCount} accent="#10B981" />
-        <KpiCard label={t("hr_mgmt.employees.departments")} value={new Set(employees.map((e) => e.department_id).filter(Boolean)).size} accent="#3B82F6" />
+    <div className="p-6 space-y-6" dir={isHe ? "rtl" : "ltr"}>
+      <div>
+        <h1 className="text-2xl font-bold">{isHe ? "ניהול עובדים" : "Employee Management"}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          {isHe ? "תיק עובד מלא — פרטים, מסמכים, שכר, תנאי העסקה" : "Complete employee file — details, documents, salary, employment terms"}
+        </p>
       </div>
 
-      {/* Filters */}
-      <OpsCard style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <Search size={14} style={{ position: "absolute", [isRTL ? "right" : "left"]: 10, top: 10, color: "var(--text-secondary)" }} />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("hr_mgmt.employees.search_placeholder")}
-              style={{
-                width: "100%", padding: "8px 12px", paddingInlineStart: 30, borderRadius: 6,
-                border: "1px solid var(--border-light)", background: "var(--bg-card)",
-                color: "var(--text-primary)", fontSize: 13,
-              }}
-            />
+      {/* KPI Cards */}
+      {summary && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="rounded-lg border p-3">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+              <Users className="h-3.5 w-3.5" />
+              {isHe ? "פעילים" : "Active"}
+            </div>
+            <p className="text-xl font-bold">{summary.active}</p>
           </div>
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            style={{
-              padding: "8px 12px", borderRadius: 6, border: "1px solid var(--border-light)",
-              background: "var(--bg-card)", color: "var(--text-primary)", fontSize: 13,
-            }}
-          >
-            <option value="all">{t("hr_mgmt.employees.all_types")}</option>
-            {types.map((tp) => (
-              <option key={tp} value={tp!}>{typeLabel(tp!)}</option>
-            ))}
-          </select>
+          <div className="rounded-lg border p-3">
+            <div className="flex items-center gap-2 text-xs mb-1" style={{ color: summary.fully_compliant === summary.active ? "#10B981" : "#F59E0B" }}>
+              <CheckCircle className="h-3.5 w-3.5" />
+              {isHe ? "תקינים (Gov)" : "Compliant"}
+            </div>
+            <p className="text-xl font-bold">{summary.fully_compliant}/{summary.active}</p>
+          </div>
+          <div className="rounded-lg border p-3">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+              <FileText className="h-3.5 w-3.5" />
+              {isHe ? "עם מסמכים" : "With Docs"}
+            </div>
+            <p className="text-xl font-bold">{summary.with_docs}/{summary.active}</p>
+          </div>
+          <div className="rounded-lg border p-3">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+              {isHe ? "עם שכר" : "With Salary"}
+            </div>
+            <p className="text-xl font-bold">{summary.with_salary}/{summary.active}</p>
+          </div>
+          <div className="rounded-lg border p-3">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+              {isHe ? "שלמות ממוצעת" : "Avg Completeness"}
+            </div>
+            <p className="text-xl font-bold" style={{ color: summary.avg_completeness >= 70 ? "#10B981" : summary.avg_completeness >= 40 ? "#F59E0B" : "#EF4444" }}>
+              {summary.avg_completeness}%
+            </p>
+          </div>
         </div>
-      </OpsCard>
+      )}
 
-      {loading ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: 60 }}>
-          <Loader2 size={24} className="animate-spin" style={{ color: "#C9A84C" }} />
+      {/* Filters */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={isHe ? "חיפוש עובד..." : "Search employee..."}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && load()}
+            className="ps-9"
+          />
         </div>
-      ) : filtered.length === 0 ? (
-        <OpsCard>
-          <p style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>
-            {t("hr_mgmt.employees.no_employees_found")}
-          </p>
-        </OpsCard>
+        <Select value={deptFilter} onValueChange={setDeptFilter}>
+          <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{isHe ? "כל המחלקות" : "All Departments"}</SelectItem>
+            {departments.map((d) => (
+              <SelectItem key={d.id} value={d.id}>{isHe ? (d.name_he || d.name) : d.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[130px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">{isHe ? "פעילים" : "Active"}</SelectItem>
+            <SelectItem value="inactive">{isHe ? "לא פעילים" : "Inactive"}</SelectItem>
+            <SelectItem value="all">{isHe ? "הכל" : "All"}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Employees Table */}
+      {loading ? (
+        <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
       ) : (
-        <OpsCard>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_name")}</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_position")}</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_department")}</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_type")}</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_hire_date")}</th>
-                <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.col_contact")}</th>
-                <th style={{ padding: "8px 12px" }}></th>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-start py-2.5 px-3 font-medium">{isHe ? "עובד" : "Employee"}</th>
+                <th className="text-start py-2.5 px-3 font-medium">{isHe ? "תפקיד" : "Role"}</th>
+                <th className="text-start py-2.5 px-3 font-medium">{isHe ? "מחלקה" : "Department"}</th>
+                <th className="text-start py-2.5 px-3 font-medium">{isHe ? "תאריך גיוס" : "Hire Date"}</th>
+                <th className="text-end py-2.5 px-3 font-medium">{isHe ? "שכר" : "Salary"}</th>
+                <th className="text-center py-2.5 px-3 font-medium">{isHe ? "מסמכים" : "Docs"}</th>
+                <th className="text-center py-2.5 px-3 font-medium">{isHe ? "שלמות" : "Complete"}</th>
+                <th className="text-center py-2.5 px-3 font-medium">Gov</th>
+                <th className="py-2.5 px-3"></th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((emp) => (
-                <tr key={emp.id} style={{ borderBottom: "1px solid var(--border-light)" }}>
-                  <td style={{ padding: "10px 12px", fontWeight: 500, color: "var(--text-primary)" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      {empScores[emp.id] != null && (
-                        <span style={{
-                          width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
-                          background: getScoreColor(empScores[emp.id]),
-                        }} title={`Score: ${empScores[emp.id]}`} />
-                      )}
-                      {emp.full_name}
+              {filtered.map((e) => (
+                <tr key={e.id} className="border-t hover:bg-muted/30">
+                  <td className="py-2.5 px-3">
+                    <Link href={`/hr/hr-management/employees/${e.id}`} className="font-medium text-foreground hover:underline">
+                      {e.full_name}
+                    </Link>
+                    {e.email && <p className="text-xs text-muted-foreground">{e.email}</p>}
+                  </td>
+                  <td className="py-2.5 px-3 text-muted-foreground">{e.role || "—"}</td>
+                  <td className="py-2.5 px-3">
+                    {e.department ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        {e.department.color && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: e.department.color }} />}
+                        <span className="text-sm">{isHe ? (e.department.name_he || e.department.name) : e.department.name}</span>
+                      </span>
+                    ) : <span className="text-muted-foreground">—</span>}
+                  </td>
+                  <td className="py-2.5 px-3 text-muted-foreground">
+                    {e.hire_date ? new Date(e.hire_date).toLocaleDateString(isHe ? "he-IL" : "en-US", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                  </td>
+                  <td className="py-2.5 px-3 text-end font-mono">
+                    {e.current_salary ? fmt(e.current_salary) : <span className="text-muted-foreground">—</span>}
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    {e.doc_count > 0 ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        {e.doc_count}
+                      </span>
+                    ) : <span className="text-muted-foreground text-xs">0</span>}
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    <span className={`text-xs font-bold ${e.data_completeness >= 70 ? "text-green-600" : e.data_completeness >= 40 ? "text-yellow-600" : "text-red-500"}`}>
+                      {e.data_completeness}%
                     </span>
                   </td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-secondary)" }}>
-                    {emp.position || "—"}
+                  <td className="py-2.5 px-3 text-center">
+                    {e.missing_gov_ids.length === 0 ? (
+                      <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
+                    ) : (
+                      <AlertTriangle className="h-4 w-4 text-yellow-500 mx-auto" />
+                    )}
                   </td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-secondary)" }}>
-                    {emp.department_name || "—"}
-                  </td>
-                  <td style={{ padding: "10px 12px" }}>
-                    {emp.employment_type ? (
-                      <span style={{
-                        padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 500,
-                        background: "rgba(201,168,76,0.12)", color: "#C9A84C",
-                      }}>
-                        {typeLabel(emp.employment_type)}
-                      </span>
-                    ) : "—"}
-                  </td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-secondary)" }}>
-                    {emp.hire_date ? format(new Date(emp.hire_date), "MMM d, yyyy") : "—"}
-                  </td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-secondary)", fontSize: 12 }}>
-                    {emp.email || emp.phone || "—"}
-                  </td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <Link
-                      href={`/hr-management/employees/${emp.id}`}
-                      style={{ color: "#C9A84C", display: "flex", alignItems: "center", gap: 2, textDecoration: "none", fontSize: 12 }}
-                    >
-                      {t("hr_mgmt.employees.view")} <ChevronRight size={14} />
+                  <td className="py-2.5 px-3">
+                    <Link href={`/hr/hr-management/employees/${e.id}`}>
+                      <Button variant="ghost" size="icon"><ChevronRight className="h-4 w-4" /></Button>
                     </Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </OpsCard>
+        </div>
       )}
-    </OpsPageShell>
+    </div>
   );
 }

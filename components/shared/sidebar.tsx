@@ -95,7 +95,6 @@ const modules: Module[] = [
         items: [
           { key: "operations.nav.projects", path: "/projects", icon: HardHat },
           { key: "operations.nav.departments", path: "/departments", icon: Building2 },
-          { key: "operations.nav.employees", path: "/employees", icon: Users, adminOnly: true },
         ],
       },
       {
