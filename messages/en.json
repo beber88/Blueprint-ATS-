@@ -595,7 +595,16 @@
       "type_part_time": "Part-time",
       "type_contract": "Contract",
       "type_intern": "Intern",
-      "type_probation": "Probation"
+      "type_probation": "Probation",
+      "tab_contract": "Contract",
+      "tab_salary_schedule": "Salary Schedule",
+      "tab_benefits": "Benefits",
+      "tab_discipline_recognition": "Discipline & Recognition",
+      "tab_compliance": "Compliance",
+      "tab_notes": "Notes",
+      "tab_alerts": "Alerts",
+      "tab_access": "Access",
+      "no_contracts": "No contracts yet"
     },
     "attendance": {
       "title": "Attendance & Hours",
