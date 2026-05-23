@@ -558,7 +558,8 @@
       "assets": "Equipment",
       "org_chart": "Org Chart",
       "email_inbox": "HR Inbox",
-      "drive_sync": "Drive Sync"
+      "drive_sync": "Drive Sync",
+      "qc": "Data QC"
     },
     "employees": {
       "title": "Employee Management",
@@ -874,6 +875,61 @@
         "top_insights": "Top Insights",
         "no_insights": "No active insights",
         "modules": "HR Modules"
+      }
+    },
+    "qc": {
+      "title": "Data Quality Control",
+      "subtitle": "Duplicate detection and employee data completeness",
+      "tabs": {
+        "duplicates": "Duplicates",
+        "quality": "Data quality"
+      },
+      "confidence": {
+        "high": "High match",
+        "medium": "Possible match",
+        "low": "Weak match"
+      },
+      "reason": {
+        "email": "Same email",
+        "phone": "Same phone",
+        "national_id": "Same national ID",
+        "employee_code": "Same code",
+        "identical_name": "Identical name",
+        "similar_name": "Similar name"
+      },
+      "field": {
+        "email": "Email",
+        "phone": "Phone",
+        "national_id": "National ID",
+        "employee_code": "Code"
+      },
+      "duplicates": {
+        "scanned": "Scanned {n} active employee records.",
+        "none": "No likely duplicate records found",
+        "keep_this": "Keep this, merge the other",
+        "confirm_merge": "Merge these records? The other record will be deactivated and pointed at this one. Empty fields here will be filled from it.",
+        "merged": "Records merged",
+        "merge_failed": "Merge failed"
+      },
+      "quality": {
+        "scanned": "Scanned",
+        "clean": "Complete",
+        "flagged": "Flagged",
+        "high_issues": "High-severity gaps",
+        "issues": "issues",
+        "all_clean": "All employee records are complete",
+        "load_failed": "Failed to load the data-quality report"
+      },
+      "issue": {
+        "full_name": "Name missing",
+        "department": "No department",
+        "position": "No position",
+        "hire_date": "No hire date",
+        "salary": "No salary record",
+        "contact": "No contact info",
+        "date_of_birth": "No birth date",
+        "employee_code": "No employee code",
+        "government_ids": "Incomplete government IDs"
       }
     }
   },
