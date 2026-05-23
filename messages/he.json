@@ -595,7 +595,16 @@
       "type_part_time": "משרה חלקית",
       "type_contract": "חוזה",
       "type_intern": "מתמחה",
-      "type_probation": "ניסיון"
+      "type_probation": "ניסיון",
+      "tab_contract": "חוזה העסקה",
+      "tab_salary_schedule": "תוכנית שכר",
+      "tab_benefits": "הטבות",
+      "tab_discipline_recognition": "משמעת והוקרה",
+      "tab_compliance": "ציות רגולטורי",
+      "tab_notes": "הערות פנימיות",
+      "tab_alerts": "התראות",
+      "tab_access": "הרשאות גישה",
+      "no_contracts": "אין חוזים עדיין"
     },
     "attendance": {
       "title": "נוכחות ושעות",
