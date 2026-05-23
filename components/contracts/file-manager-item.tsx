@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder, FileText, MoreVertical, Pencil, Move, Trash2 } from "lucide-react";
+import { Folder, FileText, MoreVertical, Pencil, Move, Trash2, Calendar, Building2, DollarSign } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,39 +22,36 @@ interface FolderGridProps {
 export function FolderGridItem({ folder, onOpen, onRename, onMove, onDelete }: FolderGridProps) {
   return (
     <div
-      onDoubleClick={onOpen}
+      onClick={onOpen}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         gap: 8,
         padding: 16,
-        borderRadius: 8,
+        borderRadius: 10,
         border: "1px solid var(--border-light)",
         background: "var(--bg-card)",
         cursor: "pointer",
         position: "relative",
         minHeight: 120,
         justifyContent: "center",
-        transition: "border-color 0.15s",
+        transition: "border-color 0.15s, box-shadow 0.15s",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#C9A84C")}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-light)")}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "#C9A84C";
+        e.currentTarget.style.boxShadow = "0 2px 8px rgba(201,168,76,0.15)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "var(--border-light)";
+        e.currentTarget.style.boxShadow = "none";
+      }}
     >
       <div style={{ position: "absolute", top: 6, insetInlineEnd: 6 }}>
         <ItemMenu onRename={onRename} onMove={onMove} onDelete={onDelete} />
       </div>
       <Folder size={40} style={{ color: folder.color || "#C9A84C" }} />
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 500,
-          textAlign: "center",
-          color: "var(--text-primary)",
-          wordBreak: "break-word",
-          maxWidth: "100%",
-        }}
-      >
+      <span style={{ fontSize: 13, fontWeight: 500, textAlign: "center", color: "var(--text-primary)", wordBreak: "break-word", maxWidth: "100%" }}>
         {folder.name}
       </span>
     </div>
@@ -73,10 +70,7 @@ interface FolderListProps {
 
 export function FolderListItem({ folder, onOpen, onRename, onMove, onDelete }: FolderListProps) {
   return (
-    <tr
-      onDoubleClick={onOpen}
-      style={{ borderTop: "1px solid var(--border-light)", cursor: "pointer" }}
-    >
+    <tr onClick={onOpen} style={{ borderTop: "1px solid var(--border-light)", cursor: "pointer" }}>
       <td style={{ padding: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Folder size={18} style={{ color: folder.color || "#C9A84C", flexShrink: 0 }} />
@@ -92,6 +86,28 @@ export function FolderListItem({ folder, onOpen, onRename, onMove, onDelete }: F
       </td>
     </tr>
   );
+}
+
+// ── Colors & helpers ───────────────────────────────────────────────────────
+
+const CATEGORY_STYLE: Record<string, { bg: string; text: string; label: string }> = {
+  subcontractor: { bg: "rgba(61,138,125,0.1)", text: "#3D8A7D", label: "Subcontractor" },
+  vendor: { bg: "rgba(26,86,168,0.1)", text: "#1A56A8", label: "Vendor" },
+  customer: { bg: "rgba(201,168,76,0.1)", text: "#A88B3D", label: "Customer" },
+};
+
+const STATUS_STYLE: Record<string, { bg: string; text: string }> = {
+  active: { bg: "rgba(45,122,62,0.1)", text: "#2D7A3E" },
+  expired: { bg: "rgba(163,45,45,0.1)", text: "#A32D2D" },
+  terminated: { bg: "rgba(163,45,45,0.08)", text: "#7A1F1F" },
+  draft: { bg: "rgba(0,0,0,0.05)", text: "var(--text-secondary)" },
+  renewed: { bg: "rgba(26,86,168,0.1)", text: "#1A56A8" },
+};
+
+function formatPHP(value: number | null, currency: string | null): string {
+  if (value == null) return "";
+  const sym = currency === "USD" ? "$" : "₱";
+  return `${sym}${value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
 // ── Contract card (grid) ────────────────────────────────────────────────────
@@ -111,92 +127,127 @@ interface ContractGridProps {
   onMove: () => void;
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  subcontractor: "#3D8A7D",
-  vendor: "#1A56A8",
-  customer: "#C9A84C",
-};
-
-function formatCurrency(value: number | null, currency: string | null): string {
-  if (value == null) return "";
-  const sym = currency === "USD" ? "$" : "₱";
-  return `${sym}${value.toLocaleString()}`;
-}
-
 export function ContractGridItem({ contract, onOpen, onMove }: ContractGridProps) {
+  const cat = CATEGORY_STYLE[contract.category] || CATEGORY_STYLE.vendor;
+  const stat = STATUS_STYLE[contract.status] || STATUS_STYLE.draft;
+
   return (
     <div
       onClick={onOpen}
-      onDoubleClick={onOpen}
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 6,
-        padding: "14px 16px",
-        borderRadius: 8,
+        padding: 0,
+        borderRadius: 10,
         border: "1px solid var(--border-light)",
         background: "var(--bg-card)",
         cursor: "pointer",
-        position: "relative",
-        minHeight: 140,
-        transition: "border-color 0.15s",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)")}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-light)")}
-    >
-      {/* Top row: category + menu */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{
-          fontSize: 10,
-          fontWeight: 600,
-          textTransform: "uppercase",
-          letterSpacing: "0.05em",
-          padding: "2px 8px",
-          borderRadius: 4,
-          background: `${CATEGORY_COLORS[contract.category] || "#666"}15`,
-          color: CATEGORY_COLORS[contract.category] || "#666",
-        }}>
-          {contract.category}
-        </span>
-        <ContractMenu onMove={onMove} />
-      </div>
-
-      {/* Title */}
-      <div style={{
-        fontSize: 13,
-        fontWeight: 600,
-        color: "var(--text-primary)",
-        lineHeight: 1.3,
-        display: "-webkit-box",
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: "vertical" as const,
         overflow: "hidden",
-      }}>
-        {contract.title}
-      </div>
+        transition: "border-color 0.15s, box-shadow 0.15s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "#C9A84C";
+        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "var(--border-light)";
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      {/* Color accent top bar */}
+      <div style={{ height: 3, background: cat.text }} />
 
-      {/* Counterparty */}
-      <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-        {contract.counterparty_name}
-      </div>
-
-      {/* Spacer */}
-      <div style={{ flex: 1 }} />
-
-      {/* Bottom: value + status */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#C9A84C" }}>
-          {formatCurrency(contract.monetary_value, contract.currency) || "—"}
-        </span>
-        <StatusBadge status={contract.status as ContractStatus} />
-      </div>
-
-      {/* Expiration */}
-      {contract.expiration_date && (
-        <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-          Expires: {contract.expiration_date}
+      <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+        {/* Header: category + menu */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{
+            fontSize: 10,
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            padding: "3px 8px",
+            borderRadius: 4,
+            background: cat.bg,
+            color: cat.text,
+          }}>
+            {cat.label}
+          </span>
+          <div onClick={(e) => e.stopPropagation()}>
+            <ContractMenu onMove={onMove} />
+          </div>
         </div>
-      )}
+
+        {/* Title */}
+        <div style={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: "var(--text-primary)",
+          lineHeight: 1.35,
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical" as const,
+          overflow: "hidden",
+          minHeight: 38,
+        }}>
+          {contract.title}
+        </div>
+
+        {/* Counterparty */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Building2 size={12} style={{ color: "var(--text-secondary)", flexShrink: 0 }} />
+          <span style={{ fontSize: 12, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {contract.counterparty_name || "—"}
+          </span>
+        </div>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Bottom section */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          borderTop: "1px solid var(--border-light)",
+          paddingTop: 10,
+          marginTop: 2,
+        }}>
+          {/* Value */}
+          <div>
+            {contract.monetary_value != null ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <DollarSign size={13} style={{ color: "#C9A84C" }} />
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#C9A84C" }}>
+                  {formatPHP(contract.monetary_value, contract.currency)}
+                </span>
+              </div>
+            ) : (
+              <span style={{ fontSize: 12, color: "var(--text-secondary)", fontStyle: "italic" }}>No value</span>
+            )}
+            {contract.expiration_date && (
+              <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 4 }}>
+                <Calendar size={10} style={{ color: "var(--text-secondary)" }} />
+                <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+                  {contract.expiration_date}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Status */}
+          <span style={{
+            fontSize: 11,
+            fontWeight: 600,
+            padding: "3px 10px",
+            borderRadius: 12,
+            background: stat.bg,
+            color: stat.text,
+            textTransform: "capitalize",
+          }}>
+            {contract.status}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -219,31 +270,58 @@ interface ContractListItemProps {
 }
 
 export function ContractListRow({ contract, onOpen, onMove }: ContractListItemProps) {
+  const cat = CATEGORY_STYLE[contract.category] || CATEGORY_STYLE.vendor;
+  const stat = STATUS_STYLE[contract.status] || STATUS_STYLE.draft;
+
   return (
     <tr
-      onDoubleClick={onOpen}
+      onClick={onOpen}
       style={{ borderTop: "1px solid var(--border-light)", cursor: "pointer" }}
     >
-      <td style={{ padding: 8 }}>
+      <td style={{ padding: "10px 8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <FileText size={16} style={{ color: "var(--text-secondary)", flexShrink: 0 }} />
-          <span style={{ color: "#C9A84C" }}>{contract.title}</span>
+          <FileText size={16} style={{ color: cat.text, flexShrink: 0 }} />
+          <span style={{ fontWeight: 500, color: "var(--text-primary)" }}>{contract.title}</span>
         </div>
       </td>
-      <td style={{ padding: 8, color: "var(--text-secondary)" }}>{contract.category}</td>
-      <td style={{ padding: 8 }}>{contract.counterparty_name}</td>
-      <td style={{ padding: 8, color: "var(--text-secondary)" }}>
+      <td style={{ padding: "10px 8px" }}>
+        <span style={{
+          fontSize: 10,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          padding: "2px 6px",
+          borderRadius: 4,
+          background: cat.bg,
+          color: cat.text,
+        }}>
+          {cat.label}
+        </span>
+      </td>
+      <td style={{ padding: "10px 8px", color: "var(--text-secondary)", fontSize: 13 }}>
+        {contract.counterparty_name}
+      </td>
+      <td style={{ padding: "10px 8px", color: "var(--text-secondary)", fontSize: 13 }}>
         {contract.expiration_date || "—"}
       </td>
-      <td style={{ padding: 8 }}>
-        {contract.monetary_value != null
-          ? `${contract.monetary_value} ${contract.currency || ""}`.trim()
-          : "—"}
+      <td style={{ padding: "10px 8px", fontWeight: 600, color: "#C9A84C", fontSize: 13 }}>
+        {formatPHP(contract.monetary_value, contract.currency) || "—"}
       </td>
-      <td style={{ padding: 8 }}>
+      <td style={{ padding: "10px 8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <StatusBadge status={contract.status as ContractStatus} />
-          <ContractMenu onMove={onMove} />
+          <span style={{
+            fontSize: 11,
+            fontWeight: 600,
+            padding: "2px 8px",
+            borderRadius: 12,
+            background: stat.bg,
+            color: stat.text,
+            textTransform: "capitalize",
+          }}>
+            {contract.status}
+          </span>
+          <div onClick={(e) => e.stopPropagation()}>
+            <ContractMenu onMove={onMove} />
+          </div>
         </div>
       </td>
     </tr>
@@ -251,20 +329,6 @@ export function ContractListRow({ contract, onOpen, onMove }: ContractListItemPr
 }
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: ContractStatus }) {
-  const bg =
-    status === "active"
-      ? "rgba(26,86,168,0.1)"
-      : status === "expired"
-      ? "rgba(163,45,45,0.1)"
-      : "rgba(0,0,0,0.05)";
-  return (
-    <span style={{ padding: "2px 8px", borderRadius: 4, background: bg, fontSize: 11 }}>
-      {status}
-    </span>
-  );
-}
 
 function ItemMenu({
   onRename,
