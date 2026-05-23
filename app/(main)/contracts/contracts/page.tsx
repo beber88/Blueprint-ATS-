@@ -15,7 +15,7 @@ import {
   ContractGridItem,
   ContractListRow,
 } from "@/components/contracts/file-manager-item";
-import { Loader2, FolderPlus } from "lucide-react";
+import { Loader2, FolderPlus, ArrowUpDown } from "lucide-react";
 import type { ContractFolder, FolderBreadcrumb as Crumb } from "@/lib/contracts/types";
 
 interface ContractItem {
@@ -34,10 +34,26 @@ interface ContractItem {
 
 const CATEGORY_FILTERS = ["", "customer", "subcontractor", "vendor"];
 const STATUS_FILTERS = ["", "active", "expired", "terminated", "renewed", "draft"];
+type SortKey = "title" | "counterparty" | "value" | "date" | "category" | "status";
 
 function getStoredView(): "grid" | "list" {
-  if (typeof window === "undefined") return "grid";
-  return (localStorage.getItem("contracts_view") as "grid" | "list") || "grid";
+  if (typeof window === "undefined") return "list";
+  return (localStorage.getItem("contracts_view") as "grid" | "list") || "list";
+}
+
+function sortContracts(items: ContractItem[], key: SortKey, asc: boolean): ContractItem[] {
+  return [...items].sort((a, b) => {
+    let cmp = 0;
+    switch (key) {
+      case "title": cmp = a.title.localeCompare(b.title); break;
+      case "counterparty": cmp = a.counterparty_name.localeCompare(b.counterparty_name); break;
+      case "value": cmp = (a.monetary_value || 0) - (b.monetary_value || 0); break;
+      case "date": cmp = (a.created_at || "").localeCompare(b.created_at || ""); break;
+      case "category": cmp = a.category.localeCompare(b.category); break;
+      case "status": cmp = a.status.localeCompare(b.status); break;
+    }
+    return asc ? cmp : -cmp;
+  });
 }
 
 export default function ContractsFileManagerPage() {
@@ -58,6 +74,8 @@ function ContractsFileManager() {
   const [viewMode, setViewMode] = useState<"grid" | "list">(getStoredView);
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("category");
+  const [sortAsc, setSortAsc] = useState(true);
   const [folders, setFolders] = useState<ContractFolder[]>([]);
   const [contracts, setContracts] = useState<ContractItem[]>([]);
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([]);
@@ -113,7 +131,7 @@ function ContractsFileManager() {
   }
 
   async function handleDeleteFolder(id: string) {
-    if (!confirm(t("contracts.folders.confirm_delete") || "Delete this folder and all subfolders? Contracts inside will be moved to root.")) return;
+    if (!confirm(t("contracts.folders.confirm_delete"))) return;
     await fetch(`/api/contracts/folders/${id}`, { method: "DELETE" });
     load();
   }
@@ -140,7 +158,27 @@ function ContractsFileManager() {
     }
   }
 
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortKey(key);
+      setSortAsc(true);
+    }
+  }
+
+  const sorted = sortContracts(contracts, sortKey, sortAsc);
   const isEmpty = folders.length === 0 && contracts.length === 0;
+
+  // Group contracts by category for grid view
+  const grouped = new Map<string, ContractItem[]>();
+  if (sortKey === "category") {
+    for (const c of sorted) {
+      const arr = grouped.get(c.category) || [];
+      arr.push(c);
+      grouped.set(c.category, arr);
+    }
+  }
 
   return (
     <OpsPageShell
@@ -165,13 +203,13 @@ function ContractsFileManager() {
             }}
           >
             <FolderPlus size={16} />
-            {t("contracts.folders.new_folder") || "New Folder"}
+            {t("contracts.folders.new_folder")}
           </button>
         </div>
       }
     >
-      {/* Filters */}
-      <div style={{ display: "flex", gap: 16, marginBottom: 8, flexWrap: "wrap" }}>
+      {/* Filters + Sort */}
+      <div style={{ display: "flex", gap: 16, marginBottom: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
         <div>
           <div style={{ fontSize: 10, color: "var(--text-secondary)", marginBottom: 4 }}>
             {t("contracts.list.filter_category")}
@@ -179,18 +217,11 @@ function ContractsFileManager() {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            style={{
-              padding: "6px 8px",
-              borderRadius: 6,
-              border: "1px solid var(--border-light)",
-              background: "var(--bg-input)",
-              color: "var(--text-primary)",
-              fontSize: 13,
-            }}
+            style={{ padding: "6px 8px", borderRadius: 6, border: "1px solid var(--border-light)", background: "var(--bg-input)", color: "var(--text-primary)", fontSize: 13 }}
           >
             {CATEGORY_FILTERS.map((c) => (
               <option key={c} value={c}>
-                {c || "all"}
+                {c ? (t(`contracts.category.${c}`) || c) : t("contracts.list.filter_all") || "All"}
               </option>
             ))}
           </select>
@@ -202,21 +233,35 @@ function ContractsFileManager() {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            style={{
-              padding: "6px 8px",
-              borderRadius: 6,
-              border: "1px solid var(--border-light)",
-              background: "var(--bg-input)",
-              color: "var(--text-primary)",
-              fontSize: 13,
-            }}
+            style={{ padding: "6px 8px", borderRadius: 6, border: "1px solid var(--border-light)", background: "var(--bg-input)", color: "var(--text-primary)", fontSize: 13 }}
           >
             {STATUS_FILTERS.map((s) => (
               <option key={s} value={s}>
-                {s || "all"}
+                {s ? (t(`contracts.status.${s}`) || s) : t("contracts.list.filter_all") || "All"}
               </option>
             ))}
           </select>
+        </div>
+        <div>
+          <div style={{ fontSize: 10, color: "var(--text-secondary)", marginBottom: 4 }}>
+            <ArrowUpDown size={10} style={{ display: "inline", verticalAlign: "middle" }} />
+            {" "}{t("contracts.list.sort_by") || "Sort by"}
+          </div>
+          <select
+            value={sortKey}
+            onChange={(e) => handleSort(e.target.value as SortKey)}
+            style={{ padding: "6px 8px", borderRadius: 6, border: "1px solid var(--border-light)", background: "var(--bg-input)", color: "var(--text-primary)", fontSize: 13 }}
+          >
+            <option value="category">{t("contracts.list.col_category")}</option>
+            <option value="title">{t("contracts.list.col_name")}</option>
+            <option value="counterparty">{t("contracts.list.col_counterparty")}</option>
+            <option value="value">{t("contracts.list.col_value")}</option>
+            <option value="date">{t("contracts.list.sort_date") || "Date"}</option>
+            <option value="status">{t("contracts.list.col_status")}</option>
+          </select>
+        </div>
+        <div style={{ fontSize: 12, color: "var(--text-secondary)", paddingBottom: 6 }}>
+          {contracts.length} {t("contracts.list.title")?.toLowerCase() || "contracts"}
         </div>
       </div>
 
@@ -230,77 +275,83 @@ function ContractsFileManager() {
             <Loader2 className="animate-spin" style={{ margin: "0 auto" }} />
           </div>
         ) : isEmpty ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 12,
-              padding: 48,
-              color: "var(--text-secondary)",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: 48, color: "var(--text-secondary)" }}>
             <FolderPlus size={40} style={{ opacity: 0.4 }} />
-            <span style={{ fontSize: 14 }}>
-              {t("contracts.folders.empty_folder") || "This folder is empty"}
-            </span>
-            <button
-              onClick={() => setShowCreateFolder(true)}
-              style={{
-                padding: "6px 16px",
-                borderRadius: 6,
-                border: "1px solid var(--border-light)",
-                background: "var(--bg-card)",
-                cursor: "pointer",
-                fontSize: 13,
-                color: "#C9A84C",
-              }}
-            >
-              {t("contracts.folders.new_folder") || "New Folder"}
-            </button>
+            <span style={{ fontSize: 14 }}>{t("contracts.folders.empty_folder")}</span>
           </div>
         ) : viewMode === "grid" ? (
-          /* ── Grid view ─────────────────────────────────────────── */
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: 12,
-              padding: 12,
-            }}
-          >
-            {folders.map((f) => (
-              <FolderGridItem
-                key={f.id}
-                folder={f}
-                onOpen={() => navigateToFolder(f.id)}
-                onRename={() => setRenameTarget(f)}
-                onMove={() =>
-                  setMoveTarget({ type: "folder", id: f.id, excludeFolderId: f.id })
-                }
-                onDelete={() => handleDeleteFolder(f.id)}
-              />
-            ))}
-            {contracts.map((c) => (
-              <ContractGridItem
-                key={c.id}
-                contract={c}
-                onOpen={() => openContract(c.id)}
-                onMove={() => setMoveTarget({ type: "contract", id: c.id })}
-              />
-            ))}
+          /* ── Grid view — grouped by category ──────────────────── */
+          <div style={{ padding: 16 }}>
+            {/* Folders first */}
+            {folders.length > 0 && (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 }}>
+                  {folders.map((f) => (
+                    <FolderGridItem
+                      key={f.id}
+                      folder={f}
+                      onOpen={() => navigateToFolder(f.id)}
+                      onRename={() => setRenameTarget(f)}
+                      onMove={() => setMoveTarget({ type: "folder", id: f.id, excludeFolderId: f.id })}
+                      onDelete={() => handleDeleteFolder(f.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Contracts grouped by category or flat */}
+            {sortKey === "category" ? (
+              Array.from(grouped.entries()).map(([cat, items]) => (
+                <div key={cat} style={{ marginBottom: 24 }}>
+                  <div style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    color: "var(--text-secondary)",
+                    borderBottom: "1px solid var(--border-light)",
+                    paddingBottom: 6,
+                    marginBottom: 12,
+                  }}>
+                    {t(`contracts.category.${cat}`) || cat} ({items.length})
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+                    {items.map((c) => (
+                      <ContractGridItem
+                        key={c.id}
+                        contract={c}
+                        onOpen={() => openContract(c.id)}
+                        onMove={() => setMoveTarget({ type: "contract", id: c.id })}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+                {sorted.map((c) => (
+                  <ContractGridItem
+                    key={c.id}
+                    contract={c}
+                    onOpen={() => openContract(c.id)}
+                    onMove={() => setMoveTarget({ type: "contract", id: c.id })}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           /* ── List view ──────────────────────────────────────────── */
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
               <tr style={{ textAlign: "start", color: "var(--text-secondary)", fontSize: 11 }}>
-                <th style={{ padding: 8 }}>{t("contracts.list.col_name")}</th>
-                <th style={{ padding: 8 }}>{t("contracts.list.col_category")}</th>
-                <th style={{ padding: 8 }}>{t("contracts.list.col_counterparty")}</th>
+                <SortHeader label={t("contracts.list.col_name")} field="title" current={sortKey} asc={sortAsc} onClick={handleSort} />
+                <SortHeader label={t("contracts.list.col_category")} field="category" current={sortKey} asc={sortAsc} onClick={handleSort} />
+                <SortHeader label={t("contracts.list.col_counterparty")} field="counterparty" current={sortKey} asc={sortAsc} onClick={handleSort} />
                 <th style={{ padding: 8 }}>{t("contracts.list.col_expires")}</th>
-                <th style={{ padding: 8 }}>{t("contracts.list.col_value")}</th>
-                <th style={{ padding: 8 }}>{t("contracts.list.col_status")}</th>
+                <SortHeader label={t("contracts.list.col_value")} field="value" current={sortKey} asc={sortAsc} onClick={handleSort} />
+                <SortHeader label={t("contracts.list.col_status")} field="status" current={sortKey} asc={sortAsc} onClick={handleSort} />
               </tr>
             </thead>
             <tbody>
@@ -310,25 +361,14 @@ function ContractsFileManager() {
                   folder={f}
                   onOpen={() => navigateToFolder(f.id)}
                   onRename={() => setRenameTarget(f)}
-                  onMove={() =>
-                    setMoveTarget({ type: "folder", id: f.id, excludeFolderId: f.id })
-                  }
+                  onMove={() => setMoveTarget({ type: "folder", id: f.id, excludeFolderId: f.id })}
                   onDelete={() => handleDeleteFolder(f.id)}
                 />
               ))}
               {folders.length > 0 && contracts.length > 0 && (
-                <tr>
-                  <td colSpan={6}>
-                    <div
-                      style={{
-                        borderTop: "2px solid var(--border-light)",
-                        margin: "4px 0",
-                      }}
-                    />
-                  </td>
-                </tr>
+                <tr><td colSpan={6}><div style={{ borderTop: "2px solid var(--border-light)", margin: "4px 0" }} /></td></tr>
               )}
-              {contracts.map((c) => (
+              {sorted.map((c) => (
                 <ContractListRow
                   key={c.id}
                   contract={c}
@@ -342,31 +382,38 @@ function ContractsFileManager() {
       </OpsCard>
 
       {/* Dialogs */}
-      <CreateFolderDialog
-        open={showCreateFolder}
-        parentId={currentFolderId}
-        onClose={() => setShowCreateFolder(false)}
-        onCreated={load}
-      />
-
+      <CreateFolderDialog open={showCreateFolder} parentId={currentFolderId} onClose={() => setShowCreateFolder(false)} onCreated={load} />
       {renameTarget && (
-        <RenameFolderDialog
-          open
-          folderId={renameTarget.id}
-          currentName={renameTarget.name}
-          onClose={() => setRenameTarget(null)}
-          onRenamed={load}
-        />
+        <RenameFolderDialog open folderId={renameTarget.id} currentName={renameTarget.name} onClose={() => setRenameTarget(null)} onRenamed={load} />
       )}
-
       {moveTarget && (
-        <MoveDialog
-          open
-          excludeFolderId={moveTarget.excludeFolderId}
-          onClose={() => setMoveTarget(null)}
-          onSelect={handleMoveConfirm}
-        />
+        <MoveDialog open excludeFolderId={moveTarget.excludeFolderId} onClose={() => setMoveTarget(null)} onSelect={handleMoveConfirm} />
       )}
     </OpsPageShell>
+  );
+}
+
+function SortHeader({ label, field, current, asc, onClick }: {
+  label: string;
+  field: SortKey;
+  current: SortKey;
+  asc: boolean;
+  onClick: (k: SortKey) => void;
+}) {
+  const active = current === field;
+  return (
+    <th
+      onClick={() => onClick(field)}
+      style={{
+        padding: 8,
+        cursor: "pointer",
+        userSelect: "none",
+        color: active ? "#C9A84C" : "var(--text-secondary)",
+        fontWeight: active ? 700 : 500,
+      }}
+    >
+      {label}
+      {active && <span style={{ marginInlineStart: 4, fontSize: 9 }}>{asc ? "▲" : "▼"}</span>}
+    </th>
   );
 }

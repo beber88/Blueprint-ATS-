@@ -184,39 +184,33 @@ export default function ContractDetailPage() {
       >
         {/* Counterparty */}
         <OpsCard title={t("contracts.detail.counterparty")}>
-          <Row label="name" value={contract.counterparty_name} />
-          <Row label="contact" value={contract.counterparty_contact_name || "\u2014"} />
-          <Row label="email" value={contract.counterparty_contact_email || "\u2014"} />
-          <Row label="phone" value={contract.counterparty_contact_phone || "\u2014"} />
+          <Row label={t("contracts.edit.counterparty") || "Counterparty"} value={contract.counterparty_name} />
+          <Row label={t("contracts.edit.contact_name") || "Contact"} value={contract.counterparty_contact_name || "\u2014"} />
+          <Row label={t("contracts.edit.contact_email") || "Email"} value={contract.counterparty_contact_email || "\u2014"} />
+          <Row label={t("contracts.edit.contact_phone") || "Phone"} value={contract.counterparty_contact_phone || "\u2014"} />
         </OpsCard>
 
         {/* Dates */}
         <OpsCard title={t("contracts.detail.dates")}>
-          <Row label="signing" value={contract.signing_date || "\u2014"} />
-          <Row label="effective" value={contract.effective_date || "\u2014"} />
-          <Row label="expiration" value={contract.expiration_date || "\u2014"} />
-          <Row label="renewal" value={contract.renewal_date || "\u2014"} />
-          <Row
-            label="renewable"
-            value={contract.is_renewable ? "yes" : "no"}
-          />
+          <Row label={t("contracts.edit.signing_date") || "Signing"} value={contract.signing_date || "\u2014"} />
+          <Row label={t("contracts.edit.effective_date") || "Effective"} value={contract.effective_date || "\u2014"} />
+          <Row label={t("contracts.edit.expiration_date") || "Expiration"} value={contract.expiration_date || "\u2014"} />
+          <Row label={t("contracts.edit.renewal_date") || "Renewal"} value={contract.renewal_date || "\u2014"} />
+          <Row label={t("contracts.edit.is_renewable") || "Renewable"} value={contract.is_renewable ? t("common.yes") || "Yes" : t("common.no") || "No"} />
         </OpsCard>
 
         {/* Value & Status */}
         <OpsCard title={t("contracts.detail.value")}>
           <Row
-            label="amount"
+            label={t("contracts.edit.monetary_value") || "Value"}
             value={
               contract.monetary_value != null
-                ? `${contract.monetary_value} ${contract.currency || ""}`.trim()
+                ? `${(contract.currency === "USD" ? "$" : "₱")}${Number(contract.monetary_value).toLocaleString()}`
                 : "\u2014"
             }
           />
-          <Row label="status" value={t(`contracts.status.${contract.status}`) || contract.status} />
-          <Row
-            label="flagged"
-            value={contract.flagged_for_review ? "yes" : "no"}
-          />
+          <Row label={t("contracts.list.col_status") || "Status"} value={t(`contracts.status.${contract.status}`) || contract.status} />
+          <Row label={t("contracts.edit.flagged") || "Flagged"} value={contract.flagged_for_review ? t("common.yes") || "Yes" : t("common.no") || "No"} />
         </OpsCard>
 
         {/* Related Project */}

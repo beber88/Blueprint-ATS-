@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/context";
 import { Folder, FileText, MoreVertical, Pencil, Move, Trash2, Calendar, Building2, DollarSign } from "lucide-react";
 import {
   DropdownMenu,
@@ -128,8 +129,11 @@ interface ContractGridProps {
 }
 
 export function ContractGridItem({ contract, onOpen, onMove }: ContractGridProps) {
+  const { t } = useI18n();
   const cat = CATEGORY_STYLE[contract.category] || CATEGORY_STYLE.vendor;
   const stat = STATUS_STYLE[contract.status] || STATUS_STYLE.draft;
+  const catLabel = t(`contracts.category.${contract.category}`) || contract.category;
+  const statLabel = t(`contracts.status.${contract.status}`) || contract.status;
 
   return (
     <div
@@ -170,7 +174,7 @@ export function ContractGridItem({ contract, onOpen, onMove }: ContractGridProps
             background: cat.bg,
             color: cat.text,
           }}>
-            {cat.label}
+            {catLabel}
           </span>
           <div onClick={(e) => e.stopPropagation()}>
             <ContractMenu onMove={onMove} />
@@ -244,7 +248,7 @@ export function ContractGridItem({ contract, onOpen, onMove }: ContractGridProps
             color: stat.text,
             textTransform: "capitalize",
           }}>
-            {contract.status}
+            {statLabel}
           </span>
         </div>
       </div>
@@ -270,8 +274,11 @@ interface ContractListItemProps {
 }
 
 export function ContractListRow({ contract, onOpen, onMove }: ContractListItemProps) {
+  const { t } = useI18n();
   const cat = CATEGORY_STYLE[contract.category] || CATEGORY_STYLE.vendor;
   const stat = STATUS_STYLE[contract.status] || STATUS_STYLE.draft;
+  const catLabel = t(`contracts.category.${contract.category}`) || contract.category;
+  const statLabel = t(`contracts.status.${contract.status}`) || contract.status;
 
   return (
     <tr
@@ -294,7 +301,7 @@ export function ContractListRow({ contract, onOpen, onMove }: ContractListItemPr
           background: cat.bg,
           color: cat.text,
         }}>
-          {cat.label}
+          {catLabel}
         </span>
       </td>
       <td style={{ padding: "10px 8px", color: "var(--text-secondary)", fontSize: 13 }}>
@@ -317,7 +324,7 @@ export function ContractListRow({ contract, onOpen, onMove }: ContractListItemPr
             color: stat.text,
             textTransform: "capitalize",
           }}>
-            {contract.status}
+            {statLabel}
           </span>
           <div onClick={(e) => e.stopPropagation()}>
             <ContractMenu onMove={onMove} />
