@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ContractFolder, ContractStatus } from "@/lib/contracts/types";
+import type { ContractFolder } from "@/lib/contracts/types";
 
 // ── Folder card (grid) ─────────────────────────────────────────────────────
 
