@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Briefcase, Calendar, MessageSquare, MessageCircle, Settings, LogOut, FileText, Bot, FolderOpen,
   Sun, Moon, UserCog, BookOpen, Globe, FileQuestion, FileBarChart,
   Activity, Inbox, AlertTriangle, Building2, HardHat, ClipboardList, ClipboardCheck, Crown, Search,
-  Mail, Clock, DollarSign, Star, GraduationCap, UserPlus, UserMinus, Package, Network, Brain,
+  Mail, Clock, DollarSign, Star, GraduationCap, UserPlus, UserMinus, Package, Network, Brain, ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -188,6 +188,7 @@ const modules: Module[] = [
           { key: "hr_mgmt.nav.org_chart", path: "/org-chart", icon: Network },
           { key: "hr_mgmt.nav.email_inbox", path: "/email-inbox", icon: Mail },
           { key: "hr_mgmt.nav.drive_sync", path: "/drive-sync", icon: FolderOpen },
+          { key: "hr_mgmt.nav.qc", path: "/qc", icon: ShieldCheck },
         ],
       },
     ],

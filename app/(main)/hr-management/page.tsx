@@ -6,7 +6,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { getScoreColor } from "@/lib/chart-config";
 import {
   Brain, Users, ClipboardCheck, Calendar, DollarSign, Star, GraduationCap,
-  UserPlus, UserMinus, Package, Network, Clock, Loader2, ChevronRight,
+  UserPlus, UserMinus, Package, Network, Clock, Loader2, ChevronRight, ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import type { BrainInsight, BrainScore } from "@/types/ai-brain";
@@ -23,6 +23,7 @@ const HR_MODULES = [
   { key: "offboarding", path: "/hr-management/offboarding", icon: UserMinus },
   { key: "assets", path: "/hr-management/assets", icon: Package },
   { key: "org_chart", path: "/hr-management/org-chart", icon: Network },
+  { key: "qc", path: "/hr-management/qc", icon: ShieldCheck },
 ];
 
 export default function HRManagementLanding() {

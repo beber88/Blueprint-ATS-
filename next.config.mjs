@@ -65,6 +65,7 @@ const HR_MANAGEMENT_ROUTES = [
   'org-chart',
   'email-inbox',
   'drive-sync',
+  'qc',
 ];
 
 // Contracts module top-level routes mounted under /hr/contracts. Files live in

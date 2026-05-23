@@ -165,12 +165,24 @@
       "open": "Buksan",
       "empty": "Walang draft sa state na ito"
     },
-    "issues": { "subtitle": "Lahat ng nakabukas na isyu" },
-    "hr_issues": { "subtitle": "Mga mapagmadaling HR isyu lamang" },
-    "ceo_items": { "subtitle": "Mga itong nangangailangan ng desisyon ng CEO" },
-    "missing_info": { "subtitle": "Mga itong may kulang na impormasyon" },
-    "followups": { "subtitle": "Mga bukas na item para sa follow-up" },
-    "archive": { "subtitle": "Hanapin sa lahat ng ulat" },
+    "issues": {
+      "subtitle": "Lahat ng nakabukas na isyu"
+    },
+    "hr_issues": {
+      "subtitle": "Mga mapagmadaling HR isyu lamang"
+    },
+    "ceo_items": {
+      "subtitle": "Mga itong nangangailangan ng desisyon ng CEO"
+    },
+    "missing_info": {
+      "subtitle": "Mga itong may kulang na impormasyon"
+    },
+    "followups": {
+      "subtitle": "Mga bukas na item para sa follow-up"
+    },
+    "archive": {
+      "subtitle": "Hanapin sa lahat ng ulat"
+    },
     "alerts": {
       "subtitle": "Mga aktibong alerto",
       "include_resolved": "Isama ang naayos na",
@@ -196,7 +208,14 @@
         "completed": "Tapos na"
       }
     },
-    "departments": { "subtitle": "Mga departamento", "new": "Bagong Departamento", "name_he": "Pangalan (Hebrew)", "name_en": "Pangalan (English)", "name_tl": "Pangalan (Tagalog)", "color": "Kulay" },
+    "departments": {
+      "subtitle": "Mga departamento",
+      "new": "Bagong Departamento",
+      "name_he": "Pangalan (Hebrew)",
+      "name_en": "Pangalan (English)",
+      "name_tl": "Pangalan (Tagalog)",
+      "color": "Kulay"
+    },
     "employees": {
       "subtitle": "Mga empleyadong pinahihintulutang mag-ulat",
       "new": "Bagong empleyado",
@@ -262,7 +281,9 @@
       "mark_resolved": "Markahang naayos",
       "reopen": "Buksang muli"
     },
-    "flag": { "ceo": "Nangangailangan ng desisyon ng CEO" },
+    "flag": {
+      "ceo": "Nangangailangan ng desisyon ng CEO"
+    },
     "search_placeholder": "Hanapin sa lahat ng item...",
     "results": "Mga resulta",
     "empty": {
@@ -425,7 +446,8 @@
       "assets": "Kagamitan",
       "org_chart": "Org Chart",
       "email_inbox": "HR Inbox",
-      "drive_sync": "Drive Sync"
+      "drive_sync": "Drive Sync",
+      "qc": "Data QC"
     },
     "employees": {
       "title": "Pamamahala ng Empleyado",
@@ -674,6 +696,61 @@
         "top_insights": "Nangungunang Insights",
         "no_insights": "Walang active insights",
         "modules": "HR Modules"
+      }
+    },
+    "qc": {
+      "title": "Data Quality Control",
+      "subtitle": "Pagtukoy ng duplicate at pagkakumpleto ng employee data",
+      "tabs": {
+        "duplicates": "Mga Duplicate",
+        "quality": "Data quality"
+      },
+      "confidence": {
+        "high": "Mataas na tugma",
+        "medium": "Posibleng tugma",
+        "low": "Mahinang tugma"
+      },
+      "reason": {
+        "email": "Parehong email",
+        "phone": "Parehong telepono",
+        "national_id": "Parehong national ID",
+        "employee_code": "Parehong code",
+        "identical_name": "Magkaparehong pangalan",
+        "similar_name": "Magkatulad na pangalan"
+      },
+      "field": {
+        "email": "Email",
+        "phone": "Telepono",
+        "national_id": "National ID",
+        "employee_code": "Code"
+      },
+      "duplicates": {
+        "scanned": "Na-scan ang {n} aktibong employee records.",
+        "none": "Walang nakitang malamang na duplicate",
+        "keep_this": "Panatilihin ito, i-merge ang isa",
+        "confirm_merge": "I-merge ang mga record na ito? Ide-deactivate ang isa at ituturo dito. Mapupunan ang mga blankong field dito mula doon.",
+        "merged": "Na-merge ang mga record",
+        "merge_failed": "Nabigo ang merge"
+      },
+      "quality": {
+        "scanned": "Na-scan",
+        "clean": "Kumpleto",
+        "flagged": "Na-flag",
+        "high_issues": "Mga mataas na isyu",
+        "issues": "mga isyu",
+        "all_clean": "Kumpleto ang lahat ng employee records",
+        "load_failed": "Nabigong i-load ang data-quality report"
+      },
+      "issue": {
+        "full_name": "Walang pangalan",
+        "department": "Walang departamento",
+        "position": "Walang posisyon",
+        "hire_date": "Walang hire date",
+        "salary": "Walang salary record",
+        "contact": "Walang contact info",
+        "date_of_birth": "Walang petsa ng kapanganakan",
+        "employee_code": "Walang employee code",
+        "government_ids": "Kulang ang government IDs"
       }
     }
   },
