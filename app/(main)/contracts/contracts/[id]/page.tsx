@@ -14,7 +14,6 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
-  Languages,
 } from "lucide-react";
 import { toast } from "sonner";
 import { EditContractDialog } from "@/components/contracts/edit-contract-dialog";
@@ -83,9 +82,8 @@ export default function ContractDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [sourceExpanded, setSourceExpanded] = useState(false);
 
-  // Translation state
+  // Translation state — auto-translate when locale !== "en"
   const [translated, setTranslated] = useState<{ title?: string; summary?: string; counterparty_name?: string } | null>(null);
-  const [translating, setTranslating] = useState(false);
 
   const isHe = locale === "he";
   const dateFmt = isHe ? "he-IL" : "en-US";
@@ -124,40 +122,32 @@ export default function ContractDetailPage() {
     load();
   }, [load]);
 
-  // Reset translation when contract changes or locale changes
+  // Auto-translate contract fields when locale is not English
   useEffect(() => {
-    setTranslated(null);
-  }, [locale, id]);
-
-  async function handleTranslate() {
-    if (!contract || translating) return;
-    setTranslating(true);
-    try {
-      const res = await fetch("/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          data: {
-            title: contract.title,
-            summary: contract.summary || "",
-            counterparty_name: contract.counterparty_name,
-          },
-          targetLang: locale,
-        }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        setTranslated(json.translated || null);
-        toast.success(t("common.success"));
-      } else {
-        toast.error(t("common.error"));
-      }
-    } catch {
-      toast.error(t("common.error"));
-    } finally {
-      setTranslating(false);
+    if (!contract || locale === "en") {
+      setTranslated(null);
+      return;
     }
-  }
+    let cancelled = false;
+    fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: {
+          title: contract.title,
+          summary: contract.summary || "",
+          counterparty_name: contract.counterparty_name,
+        },
+        targetLang: locale,
+      }),
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((json) => {
+        if (!cancelled && json?.translated) setTranslated(json.translated);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [contract, locale]);
 
   async function remove() {
     setDeleting(true);
@@ -197,28 +187,6 @@ export default function ContractDetailPage() {
       backHref="/hr/contracts/contracts"
       actions={
         <div style={{ display: "flex", gap: 8 }}>
-          {locale !== "en" && (
-            <button
-              onClick={handleTranslate}
-              disabled={translating}
-              style={{
-                background: translated ? "#C9A84C" : "transparent",
-                color: translated ? "#1A1A1A" : "var(--text-primary)",
-                padding: "8px 14px",
-                borderRadius: 8,
-                border: `1px solid ${translated ? "#C9A84C" : "var(--border-primary)"}`,
-                fontSize: 13,
-                cursor: translating ? "wait" : "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                opacity: translating ? 0.6 : 1,
-              }}
-            >
-              {translating ? <Loader2 size={14} className="animate-spin" /> : <Languages size={14} />}
-              {t("contracts.detail.translate")}
-            </button>
-          )}
           <button
             onClick={() => setEditOpen(true)}
             style={{
