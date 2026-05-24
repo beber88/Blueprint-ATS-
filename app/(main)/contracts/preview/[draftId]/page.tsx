@@ -125,7 +125,7 @@ export default function ContractsPreviewPage() {
 
   if (loading) {
     return (
-      <OpsPageShell title={t("contracts.preview.title")}>
+      <OpsPageShell title={t("contracts.preview.title")} backHref="/hr/contracts/drafts">
         <div style={{ padding: 60, textAlign: "center" }}>
           <Loader2 className="animate-spin" />
         </div>
@@ -137,6 +137,7 @@ export default function ContractsPreviewPage() {
   return (
     <OpsPageShell
       title={t("contracts.preview.title")}
+      backHref="/hr/contracts/drafts"
       actions={
         <div style={{ display: "flex", gap: 8 }}>
           <button

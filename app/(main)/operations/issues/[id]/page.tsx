@@ -131,7 +131,7 @@ export default function ItemDetailPage() {
 
   if (loading) {
     return (
-      <OpsPageShell title={t("operations.item_detail.title")}>
+      <OpsPageShell title={t("operations.item_detail.title")} backHref="/hr/operations/issues">
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: 64 }}>
           <Loader2 size={28} className="animate-spin" style={{ color: "#C9A84C" }} />
         </div>
@@ -141,7 +141,7 @@ export default function ItemDetailPage() {
 
   if (!item) {
     return (
-      <OpsPageShell title={t("operations.item_detail.title")}>
+      <OpsPageShell title={t("operations.item_detail.title")} backHref="/hr/operations/issues">
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-secondary)" }}>
           {t("common.not_found") || "Item not found"}
         </div>
@@ -154,6 +154,7 @@ export default function ItemDetailPage() {
   return (
     <OpsPageShell
       title={t("operations.item_detail.title")}
+      backHref="/hr/operations/issues"
       actions={
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button

@@ -87,7 +87,7 @@ export default function ReportDetailPage() {
 
   if (loading) {
     return (
-      <OpsPageShell title={t("operations.report_detail.title")}>
+      <OpsPageShell title={t("operations.report_detail.title")} backHref="/hr/operations/reports">
         <div style={{ display: "flex", justifyContent: "center", padding: 64 }}>
           <Loader2 size={28} className="animate-spin" style={{ color: "#C9A84C" }} />
         </div>
@@ -97,7 +97,7 @@ export default function ReportDetailPage() {
 
   if (!report) {
     return (
-      <OpsPageShell title={t("operations.report_detail.title")}>
+      <OpsPageShell title={t("operations.report_detail.title")} backHref="/hr/operations/reports">
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-secondary)" }}>
           {t("common.not_found") || "Not found"}
         </div>
@@ -112,6 +112,7 @@ export default function ReportDetailPage() {
   return (
     <OpsPageShell
       title={`${t("operations.report_detail.title")} — ${report.report_date}`}
+      backHref="/hr/operations/reports"
       actions={
         <Link
           href="/hr/operations/reports"

@@ -45,6 +45,7 @@ export default function DepartmentDetailPage() {
   return (
     <OpsPageShell
       title={data.department?.name_he || data.department?.name || t("operations.nav.departments")}
+      backHref="/hr/operations/departments"
       actions={
         <div style={{ display: "flex", gap: 8 }}>
           <Button variant="outline" size="sm" className="rounded-lg gap-1" onClick={() => router.push("/hr/operations/departments")}>

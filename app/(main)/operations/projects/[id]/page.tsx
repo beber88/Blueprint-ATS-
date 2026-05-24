@@ -46,6 +46,7 @@ export default function ProjectDetailPage() {
     <OpsPageShell
       title={data.project?.name || t("operations.nav.projects")}
       subtitle={data.project?.code || undefined}
+      backHref="/hr/operations/projects"
       actions={
         <div style={{ display: "flex", gap: 8 }}>
           <Button variant="outline" size="sm" className="rounded-lg gap-1" onClick={() => router.push(`/hr/operations/projects`)}>

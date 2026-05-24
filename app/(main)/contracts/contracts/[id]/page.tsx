@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
+  Languages,
 } from "lucide-react";
 import { toast } from "sonner";
 import { EditContractDialog } from "@/components/contracts/edit-contract-dialog";
@@ -68,7 +69,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function ContractDetailPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = params.id;
@@ -81,6 +82,25 @@ export default function ContractDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [sourceExpanded, setSourceExpanded] = useState(false);
+
+  // Translation state
+  const [translated, setTranslated] = useState<{ title?: string; summary?: string; counterparty_name?: string } | null>(null);
+  const [translating, setTranslating] = useState(false);
+
+  const isHe = locale === "he";
+  const dateFmt = isHe ? "he-IL" : "en-US";
+
+  const fmtDate = (d: string | null) => {
+    if (!d) return "\u2014";
+    return new Date(d).toLocaleDateString(dateFmt, { day: "numeric", month: "short", year: "numeric" });
+  };
+
+  const fmtDatetime = (d: string) => {
+    return new Date(d).toLocaleString(dateFmt, {
+      day: "numeric", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
+  };
 
   const load = useCallback(async () => {
     try {
@@ -104,6 +124,41 @@ export default function ContractDetailPage() {
     load();
   }, [load]);
 
+  // Reset translation when contract changes or locale changes
+  useEffect(() => {
+    setTranslated(null);
+  }, [locale, id]);
+
+  async function handleTranslate() {
+    if (!contract || translating) return;
+    setTranslating(true);
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: {
+            title: contract.title,
+            summary: contract.summary || "",
+            counterparty_name: contract.counterparty_name,
+          },
+          targetLang: locale,
+        }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setTranslated(json.translated || null);
+        toast.success(t("common.success"));
+      } else {
+        toast.error(t("common.error"));
+      }
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setTranslating(false);
+    }
+  }
+
   async function remove() {
     setDeleting(true);
     try {
@@ -122,7 +177,7 @@ export default function ContractDetailPage() {
 
   if (loading) {
     return (
-      <OpsPageShell title={t("contracts.detail.title")}>
+      <OpsPageShell title={t("contracts.detail.title")} backHref="/hr/contracts/contracts">
         <div style={{ padding: 60, textAlign: "center" }}>
           <Loader2 className="animate-spin" />
         </div>
@@ -131,12 +186,39 @@ export default function ContractDetailPage() {
   }
   if (!contract) return null;
 
+  const displayTitle = translated?.title || contract.title;
+  const displayCounterparty = translated?.counterparty_name || contract.counterparty_name;
+  const displaySummary = translated?.summary || contract.summary;
+
   return (
     <OpsPageShell
-      title={contract.title}
-      subtitle={`${t(`contracts.category.${contract.category}`) || contract.category} · ${contract.counterparty_name}`}
+      title={displayTitle}
+      subtitle={`${t(`contracts.category.${contract.category}`) || contract.category} · ${displayCounterparty}`}
+      backHref="/hr/contracts/contracts"
       actions={
         <div style={{ display: "flex", gap: 8 }}>
+          {locale !== "en" && (
+            <button
+              onClick={handleTranslate}
+              disabled={translating}
+              style={{
+                background: translated ? "#C9A84C" : "transparent",
+                color: translated ? "#1A1A1A" : "var(--text-primary)",
+                padding: "8px 14px",
+                borderRadius: 8,
+                border: `1px solid ${translated ? "#C9A84C" : "var(--border-primary)"}`,
+                fontSize: 13,
+                cursor: translating ? "wait" : "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                opacity: translating ? 0.6 : 1,
+              }}
+            >
+              {translating ? <Loader2 size={14} className="animate-spin" /> : <Languages size={14} />}
+              {t("contracts.detail.translate")}
+            </button>
+          )}
           <button
             onClick={() => setEditOpen(true)}
             style={{
@@ -184,7 +266,7 @@ export default function ContractDetailPage() {
       >
         {/* Counterparty */}
         <OpsCard title={t("contracts.detail.counterparty")}>
-          <Row label={t("contracts.edit.counterparty") || "Counterparty"} value={contract.counterparty_name} />
+          <Row label={t("contracts.edit.counterparty") || "Counterparty"} value={displayCounterparty} />
           <Row label={t("contracts.edit.contact_name") || "Contact"} value={contract.counterparty_contact_name || "\u2014"} />
           <Row label={t("contracts.edit.contact_email") || "Email"} value={contract.counterparty_contact_email || "\u2014"} />
           <Row label={t("contracts.edit.contact_phone") || "Phone"} value={contract.counterparty_contact_phone || "\u2014"} />
@@ -192,10 +274,10 @@ export default function ContractDetailPage() {
 
         {/* Dates */}
         <OpsCard title={t("contracts.detail.dates")}>
-          <Row label={t("contracts.edit.signing_date") || "Signing"} value={contract.signing_date || "\u2014"} />
-          <Row label={t("contracts.edit.effective_date") || "Effective"} value={contract.effective_date || "\u2014"} />
-          <Row label={t("contracts.edit.expiration_date") || "Expiration"} value={contract.expiration_date || "\u2014"} />
-          <Row label={t("contracts.edit.renewal_date") || "Renewal"} value={contract.renewal_date || "\u2014"} />
+          <Row label={t("contracts.edit.signing_date") || "Signing"} value={fmtDate(contract.signing_date)} />
+          <Row label={t("contracts.edit.effective_date") || "Effective"} value={fmtDate(contract.effective_date)} />
+          <Row label={t("contracts.edit.expiration_date") || "Expiration"} value={fmtDate(contract.expiration_date)} />
+          <Row label={t("contracts.edit.renewal_date") || "Renewal"} value={fmtDate(contract.renewal_date)} />
           <Row label={t("contracts.edit.is_renewable") || "Renewable"} value={contract.is_renewable ? t("common.yes") || "Yes" : t("common.no") || "No"} />
         </OpsCard>
 
@@ -246,6 +328,14 @@ export default function ContractDetailPage() {
         </OpsCard>
       </div>
 
+      {/* ── Record Info — full width ── */}
+      <div style={{ marginTop: 16 }}>
+        <OpsCard title={t("contracts.detail.record_info")}>
+          <Row label={t("contracts.detail.created_at")} value={fmtDatetime(contract.created_at)} />
+          <Row label={t("contracts.detail.updated_at")} value={fmtDatetime(contract.updated_at)} />
+        </OpsCard>
+      </div>
+
       {/* ── Summary — full width ── */}
       <div style={{ marginTop: 16 }}>
         <OpsCard
@@ -261,7 +351,7 @@ export default function ContractDetailPage() {
               minHeight: 60,
             }}
           >
-            {contract.summary || "\u2014"}
+            {displaySummary || "\u2014"}
           </div>
         </OpsCard>
       </div>
@@ -293,7 +383,7 @@ export default function ContractDetailPage() {
                 }}
               >
                 <ExternalLink size={12} />
-                Open
+                {t("contracts.detail.open_document")}
               </a>
             </div>
           </OpsCard>
@@ -357,7 +447,7 @@ export default function ContractDetailPage() {
                       flexShrink: 0,
                     }}
                   >
-                    {item.status}
+                    {t(`operations.status.${item.status}`) || item.status}
                   </span>
                 </a>
               ))}

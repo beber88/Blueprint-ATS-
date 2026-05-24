@@ -1,20 +1,46 @@
 "use client";
 
 import { ReactNode } from "react";
+import Link from "next/link";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n/context";
 
 export function OpsPageShell({
   title,
   subtitle,
   actions,
   children,
+  backHref,
 }: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
   children: ReactNode;
+  backHref?: string;
 }) {
+  const { t, locale } = useI18n();
+  const isRtl = locale === "he";
+  const BackArrow = isRtl ? ArrowRight : ArrowLeft;
+
   return (
     <div style={{ padding: "24px 28px", maxWidth: 1400, margin: "0 auto" }}>
+      {backHref && (
+        <Link
+          href={backHref}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 13,
+            color: "var(--text-secondary)",
+            textDecoration: "none",
+            marginBottom: 12,
+          }}
+        >
+          <BackArrow size={14} />
+          {t("common.back")}
+        </Link>
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0, color: "var(--text-primary)" }}>{title}</h1>

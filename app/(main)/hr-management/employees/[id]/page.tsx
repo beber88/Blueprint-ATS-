@@ -4,31 +4,42 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { OpsPageShell, OpsCard } from "@/components/operations/page-shell";
 import { useI18n } from "@/lib/i18n/context";
-import { Loader2, Upload, ArrowLeft } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import Link from "next/link";
 
 type Tab = "details" | "documents" | "salary" | "attendance" | "leave" | "reviews" | "training" | "assets" | "history";
+
+interface Department {
+  id: string;
+  name: string;
+  name_he: string | null;
+  color: string | null;
+}
 
 interface Employee {
   id: string;
   full_name: string;
   email?: string | null;
   phone?: string | null;
+  role?: string | null;
   department_id?: string | null;
-  department_name?: string | null;
-  position?: string | null;
+  department?: Department | null;
   hire_date?: string | null;
   employment_type?: string | null;
   manager_id?: string | null;
-  status?: string | null;
+  is_active?: boolean;
   date_of_birth?: string | null;
+  gender?: string | null;
   address?: string | null;
   national_id?: string | null;
-  emergency_contact_name?: string | null;
-  emergency_contact_phone?: string | null;
-  emergency_contact_relation?: string | null;
+  salary_grade?: string | null;
+  government_ids?: Record<string, string> | null;
+  sss_number?: string | null;
+  philhealth_number?: string | null;
+  pagibig_number?: string | null;
+  tin_number?: string | null;
+  emergency_contact?: { name?: string; phone?: string; relation?: string } | null;
 }
 
 interface Document {
@@ -121,7 +132,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function EmployeeDetailPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const params = useParams();
   const id = params.id as string;
   const [tab, setTab] = useState<Tab>("details");
@@ -137,13 +148,26 @@ export default function EmployeeDetailPage() {
   const [loading, setLoading] = useState(true);
   const [tabLoading, setTabLoading] = useState(false);
 
+  const isHe = locale === "he";
+  const dateFmt = isHe ? "he-IL" : "en-US";
+
+  const fmtDate = (d: string | null | undefined) => {
+    if (!d) return null;
+    return new Date(d).toLocaleDateString(dateFmt, { day: "numeric", month: "short", year: "numeric" });
+  };
+
   useEffect(() => {
     setLoading(true);
-    fetch("/api/operations/employees")
+    fetch(`/api/hr/employees/${id}`)
       .then((r) => r.json())
       .then((d) => {
-        const emp = (d.employees || []).find((e: Employee) => e.id === id);
-        setEmployee(emp || null);
+        setEmployee(d.employee || null);
+        // Pre-populate tab data from the single API response
+        if (d.documents) setDocuments(d.documents);
+        if (d.salary_records) setSalary(d.salary_records);
+        if (d.leave_requests) setLeaves(d.leave_requests);
+        if (d.performance_reviews) setReviews(d.performance_reviews);
+        if (d.assets) setAssets(d.assets);
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -229,7 +253,7 @@ export default function EmployeeDetailPage() {
 
   if (loading) {
     return (
-      <OpsPageShell title={t("hr_mgmt.employees.title")}>
+      <OpsPageShell title={t("hr_mgmt.employees.title")} backHref="/hr/hr-management/employees">
         <div style={{ display: "flex", justifyContent: "center", padding: 60 }}>
           <Loader2 size={24} className="animate-spin" style={{ color: "#C9A84C" }} />
         </div>
@@ -239,10 +263,10 @@ export default function EmployeeDetailPage() {
 
   if (!employee) {
     return (
-      <OpsPageShell title={t("hr_mgmt.employees.title")}>
+      <OpsPageShell title={t("hr_mgmt.employees.title")} backHref="/hr/hr-management/employees">
         <OpsCard>
           <p style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>
-            Employee not found
+            {t("common.not_found") || "Employee not found"}
           </p>
         </OpsCard>
       </OpsPageShell>
@@ -256,33 +280,36 @@ export default function EmployeeDetailPage() {
     </div>
   );
 
+  // Get gov IDs from either flat columns or the JSONB field
+  const govIds = employee.government_ids || {};
+  const sss = employee.sss_number || govIds.sss || null;
+  const philhealth = employee.philhealth_number || govIds.philhealth || null;
+  const pagibig = employee.pagibig_number || govIds.pagibig || null;
+  const tin = employee.tin_number || govIds.tin || null;
+
+  // Get emergency contact from JSONB
+  const ec = employee.emergency_contact;
+
+  // Get department name localized
+  const deptName = employee.department
+    ? (isHe ? (employee.department.name_he || employee.department.name) : employee.department.name)
+    : null;
+
   return (
     <OpsPageShell
       title={employee.full_name}
-      subtitle={employee.position || undefined}
-      actions={
-        <Link
-          href="/hr-management/employees"
-          style={{
-            display: "flex", alignItems: "center", gap: 4,
-            padding: "8px 14px", borderRadius: 8, fontSize: 13,
-            color: "var(--text-secondary)", textDecoration: "none",
-            border: "1px solid var(--border-light)", background: "var(--bg-card)",
-          }}
-        >
-          <ArrowLeft size={14} /> {t("common.back")}
-        </Link>
-      }
+      subtitle={employee.role || undefined}
+      backHref="/hr/hr-management/employees"
     >
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 16, borderBottom: "1px solid var(--border-light)", paddingBottom: 0 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 16, borderBottom: "1px solid var(--border-light)", paddingBottom: 0, overflowX: "auto" }}>
         {TABS.map((tb) => (
           <button
             key={tb.key}
             onClick={() => setTab(tb.key)}
             style={{
               padding: "8px 16px", fontSize: 13, fontWeight: 500, cursor: "pointer",
-              border: "none", background: "none",
+              border: "none", background: "none", whiteSpace: "nowrap",
               color: tab === tb.key ? "#C9A84C" : "var(--text-secondary)",
               borderBottom: tab === tb.key ? "2px solid #C9A84C" : "2px solid transparent",
               marginBottom: -1,
@@ -303,24 +330,31 @@ export default function EmployeeDetailPage() {
           {tab === "details" && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 16 }}>
               <OpsCard title={t("hr_mgmt.employees.personal_info")}>
-                {infoRow("Full Name", employee.full_name)}
-                {infoRow("Email", employee.email)}
-                {infoRow("Phone", employee.phone)}
-                {infoRow("Date of Birth", employee.date_of_birth ? format(new Date(employee.date_of_birth), "MMM d, yyyy") : null)}
-                {infoRow("Address", employee.address)}
-                {infoRow("National ID", employee.national_id)}
+                {infoRow(t("hr_mgmt.employees.field.full_name"), employee.full_name)}
+                {infoRow(t("hr_mgmt.employees.field.email"), employee.email)}
+                {infoRow(t("hr_mgmt.employees.field.phone"), employee.phone)}
+                {infoRow(t("hr_mgmt.employees.field.date_of_birth"), fmtDate(employee.date_of_birth))}
+                {infoRow(t("hr_mgmt.employees.field.gender"), employee.gender)}
+                {infoRow(t("hr_mgmt.employees.field.address"), employee.address)}
+                {infoRow(t("hr_mgmt.employees.field.national_id"), employee.national_id)}
               </OpsCard>
               <OpsCard title={t("hr_mgmt.employees.employment_info")}>
-                {infoRow("Position", employee.position)}
-                {infoRow("Department", employee.department_name)}
-                {infoRow("Employment Type", employee.employment_type)}
-                {infoRow("Hire Date", employee.hire_date ? format(new Date(employee.hire_date), "MMM d, yyyy") : null)}
-                {infoRow("Status", employee.status)}
+                {infoRow(t("hr_mgmt.employees.field.position"), employee.role)}
+                {infoRow(t("hr_mgmt.employees.field.department"), deptName)}
+                {infoRow(t("hr_mgmt.employees.field.employment_type"), employee.employment_type)}
+                {infoRow(t("hr_mgmt.employees.field.hire_date"), fmtDate(employee.hire_date))}
+                {infoRow(t("hr_mgmt.employees.field.status"), employee.is_active ? t("hr_mgmt.employees.field.active") : t("hr_mgmt.employees.field.inactive"))}
               </OpsCard>
               <OpsCard title={t("hr_mgmt.employees.emergency_contact")}>
-                {infoRow("Name", employee.emergency_contact_name)}
-                {infoRow("Phone", employee.emergency_contact_phone)}
-                {infoRow("Relation", employee.emergency_contact_relation)}
+                {infoRow(t("hr_mgmt.employees.field.ec_name"), ec?.name || null)}
+                {infoRow(t("hr_mgmt.employees.field.ec_phone"), ec?.phone || null)}
+                {infoRow(t("hr_mgmt.employees.field.ec_relation"), ec?.relation || null)}
+              </OpsCard>
+              <OpsCard title={t("hr_mgmt.employees.field.gov_ids")}>
+                {infoRow("SSS", sss)}
+                {infoRow("PhilHealth", philhealth)}
+                {infoRow("Pag-IBIG", pagibig)}
+                {infoRow("TIN", tin)}
               </OpsCard>
             </div>
           )}
@@ -350,9 +384,9 @@ export default function EmployeeDetailPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Name</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Type</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Uploaded</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.doc_name")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.doc_type")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.doc_uploaded")}</th>
                       <th style={{ padding: "8px 12px" }}></th>
                     </tr>
                   </thead>
@@ -384,7 +418,7 @@ export default function EmployeeDetailPage() {
             <OpsCard>
               {history.length === 0 ? (
                 <p style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>
-                  No history records
+                  {t("hr_mgmt.employees.no_history")}
                 </p>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -420,11 +454,11 @@ export default function EmployeeDetailPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Type</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Dates</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Days</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Status</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Reason</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.leave_type")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.dates")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.days")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.status")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.reason")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -466,10 +500,10 @@ export default function EmployeeDetailPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Effective Date</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Base Salary</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Currency</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Frequency</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.effective_date")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.base_salary")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.currency")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.frequency")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -498,11 +532,11 @@ export default function EmployeeDetailPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Date</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Clock In</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Clock Out</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Hours</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Status</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.date")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.clock_in")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.clock_out")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.hours")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.status")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -540,10 +574,10 @@ export default function EmployeeDetailPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Review Date</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Period</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Rating</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Status</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.review_date")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.period")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.rating")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.status")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -580,11 +614,11 @@ export default function EmployeeDetailPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Course</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Enrolled</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Completed</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Score</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Status</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.course")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.enrolled")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.completed")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.score")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.status")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -622,11 +656,11 @@ export default function EmployeeDetailPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Asset</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Type</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Serial #</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Assigned</th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>Returned</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.asset")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.doc_type")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.serial")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.assigned")}</th>
+                      <th style={{ textAlign: "start", padding: "8px 12px", color: "var(--text-secondary)", fontWeight: 500 }}>{t("hr_mgmt.employees.field.returned")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -639,7 +673,7 @@ export default function EmployeeDetailPage() {
                           {format(new Date(a.assigned_at), "MMM d, yyyy")}
                         </td>
                         <td style={{ padding: "10px 12px", color: a.returned_at ? "var(--text-secondary)" : "#10B981" }}>
-                          {a.returned_at ? format(new Date(a.returned_at), "MMM d, yyyy") : "Active"}
+                          {a.returned_at ? format(new Date(a.returned_at), "MMM d, yyyy") : t("hr_mgmt.employees.field.active")}
                         </td>
                       </tr>
                     ))}
