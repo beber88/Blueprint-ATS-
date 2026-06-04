@@ -254,24 +254,55 @@ async function routeToModule(
     }
 
     case "attendance_report": {
-      // Store as a general record — the attendance page will show it
-      return null;
+      // Create an op_report so it can be processed by the extraction pipeline
+      const attText = emailMeta?.body_text || classification.summary;
+      const { data: attReport } = await supabase.from("op_reports").insert({
+        source_type: "email",
+        raw_text: attText?.slice(0, 200000) || "",
+        report_date: dates?.single || today,
+        source_meta: {
+          email_id: emailId,
+          gmail_message_id: emailMeta?.gmail_message_id,
+          subject: emailMeta?.subject,
+          from_name: emailMeta?.from_name,
+          classification_category: category,
+        },
+        processing_status: "queued",
+      }).select("id").single();
+      return attReport?.id || null;
+    }
+
+    case "general_hr":
+    case "employee_update": {
+      // Store as an HR document note linked to employee if matched
+      const { data: hrDoc } = await supabase.from("hr_employee_documents").insert({
+        employee_id: employeeId,
+        document_type: "memo",
+        title: emailMeta?.subject || classification.summary?.slice(0, 100) || "Email note",
+        storage_path: `email://${emailMeta?.gmail_message_id || emailId}`,
+        notes: `Auto-filed from email (${category}): ${classification.summary || ""}`.slice(0, 500),
+      }).select("id").single();
+      return hrDoc?.id || null;
     }
 
     case "equipment_request": {
-      if (!employeeId) return null;
-      // Create asset request note — will appear in the assets module
-      return null;
+      // Create an HR document for tracking
+      const { data: eqDoc } = await supabase.from("hr_employee_documents").insert({
+        employee_id: employeeId,
+        document_type: "memo",
+        title: `Equipment Request: ${emailMeta?.subject || ""}`.slice(0, 200),
+        storage_path: `email://${emailMeta?.gmail_message_id || emailId}`,
+        notes: `Auto-filed from email: ${classification.summary || ""}`.slice(0, 500),
+      }).select("id").single();
+      return eqDoc?.id || null;
     }
 
     case "onboarding_task": {
-      const newEmployeeName = extracted_data.new_employee_name as string || employee_name;
-      if (!newEmployeeName) return null;
-
+      if (!employeeId) return null;
       const { data } = await supabase
         .from("hr_onboarding_tasks")
         .insert({
-          employee_id: employeeId || "00000000-0000-0000-0000-000000000000",
+          employee_id: employeeId,
           process_type: "onboarding",
           task: classification.summary,
           status: "pending",
