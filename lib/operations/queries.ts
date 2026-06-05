@@ -13,6 +13,8 @@ export async function getOperationsStats() {
     { data: projects },
     { data: departments },
     { data: themes },
+    { data: lastReport },
+    { data: lastEmail },
   ] = await Promise.all([
     supabase
       .from("op_report_items")
@@ -24,6 +26,8 @@ export async function getOperationsStats() {
     supabase.from("op_projects").select("id, name, status, department_id").order("name"),
     supabase.from("op_departments").select("id, code, name, name_he, name_en, name_tl, color"),
     supabase.from("op_recurring_themes").select("*").order("occurrence_count", { ascending: false }).limit(10),
+    supabase.from("op_reports").select("created_at").order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("hr_emails").select("received_at").order("received_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
   const rows = items || [];
@@ -81,6 +85,10 @@ export async function getOperationsStats() {
     alerts: (alerts || []).slice(0, 20),
     reports: reports || [],
     recurringThemes: themes || [],
+    lastActivity: {
+      last_report: lastReport?.created_at || null,
+      last_email: lastEmail?.received_at || null,
+    },
   };
 }
 

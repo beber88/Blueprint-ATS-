@@ -16,9 +16,9 @@ function authorized(request: NextRequest): boolean {
 
 // HR email queries — catch all emails where HR sends, receives, or is CC'd
 const HR_QUERIES = [
-  "from:hr@blueprint-ph.com newer_than:2d",
-  "to:hr@blueprint-ph.com newer_than:2d",
-  "cc:hr@blueprint-ph.com newer_than:2d",
+  "from:hr@blueprint-ph.com newer_than:7d",
+  "to:hr@blueprint-ph.com newer_than:7d",
+  "cc:hr@blueprint-ph.com newer_than:7d",
 ];
 
 export async function GET(request: NextRequest) {

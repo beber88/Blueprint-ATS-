@@ -10,6 +10,7 @@ const RECRUITMENT_ROUTES = [
   'messages',
   'templates',
   'ai-agent',
+  'ai-search',
   'categories',
   'files',
   'reports',
