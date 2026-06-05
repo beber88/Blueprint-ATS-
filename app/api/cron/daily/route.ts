@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         ok: res.ok,
         ms: Date.now() - start,
       });
-    } catch (err) {
+    } catch {
       results.push({
         name: job.name,
         status: 0,
