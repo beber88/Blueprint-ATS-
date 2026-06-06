@@ -14,11 +14,14 @@ function authorized(request: NextRequest): boolean {
   return auth === `Bearer ${cronSecret}`;
 }
 
-// HR email queries — catch all emails where HR sends, receives, or is CC'd
+// Email queries — catch HR emails, daily reports, and operational updates
 const HR_QUERIES = [
   "from:hr@blueprint-ph.com newer_than:7d",
   "to:hr@blueprint-ph.com newer_than:7d",
   "cc:hr@blueprint-ph.com newer_than:7d",
+  "subject:(daily report OR consolidated OR דוח יומי) newer_than:7d",
+  "from:blueprint.humanresources@gmail.com newer_than:7d",
+  "to:blueprint.humanresources@gmail.com newer_than:7d",
 ];
 
 export async function GET(request: NextRequest) {

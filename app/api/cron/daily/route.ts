@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
 
   const jobs = [
     { name: "email-ingest", path: "/api/hr/email/ingest" },
+    { name: "process-queued-reports", path: "/api/operations/reports/process-queued" },
     { name: "scan-overdue", path: "/api/operations/cron/scan-overdue" },
     { name: "missing-reports", path: "/api/operations/cron/missing-reports" },
     { name: "daily-digest", path: "/api/operations/cron/daily-digest" },
