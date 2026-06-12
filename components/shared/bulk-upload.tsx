@@ -78,6 +78,7 @@ export function BulkUpload({ onComplete, onClose }: BulkUploadProps) {
       const formData = new FormData();
       formData.append("file", files[i]);
       formData.append("batchId", batchId);
+      formData.append("locale", locale);
 
       try {
         const res = await fetch("/api/cv/upload", { method: "POST", body: formData });

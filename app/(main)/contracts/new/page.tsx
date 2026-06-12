@@ -34,7 +34,7 @@ interface ExtractedDraft {
 const CATEGORIES = ["employment", "service", "supply", "subcontract", "lease", "nda", "consulting", "purchase", "other"];
 
 export default function NewContractPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const router = useRouter();
 
   const [tab, setTab] = useState<"ai" | "manual">("ai");
@@ -73,7 +73,7 @@ export default function NewContractPage() {
       const res = await fetch("/api/contracts/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source_text: sourceText }),
+        body: JSON.stringify({ source_text: sourceText, locale }),
       });
       const data = await res.json();
       if (!res.ok) {

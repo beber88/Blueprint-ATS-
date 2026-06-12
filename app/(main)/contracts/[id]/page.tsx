@@ -24,7 +24,7 @@ import {
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { TranslateButton } from "@/components/shared/TranslateButton";
+import { LocalizedText } from "@/components/shared/LocalizedText";
 
 interface Obligation {
   party: string;
@@ -186,7 +186,13 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         <div className="space-y-4 lg:col-span-2">
           {contract.summary && (
             <Section title={t("contracts.detail.summary")}>
-              <TranslateButton text={contract.summary} className="text-sm text-muted-foreground" />
+              <LocalizedText
+                table="ct_contracts"
+                record={contract}
+                field="summary"
+                as="p"
+                className="whitespace-pre-wrap text-sm text-muted-foreground"
+              />
             </Section>
           )}
 

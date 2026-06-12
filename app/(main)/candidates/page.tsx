@@ -159,6 +159,7 @@ export default function CandidatesPage() {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("locale", locale);
 
     try {
       const res = await fetch("/api/cv/upload", { method: "POST", body: formData });

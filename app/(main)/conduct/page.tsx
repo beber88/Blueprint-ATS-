@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
-import { TranslateButton } from "@/components/shared/TranslateButton";
+import { LocalizedText } from "@/components/shared/LocalizedText";
 
 interface Employee {
   id: string;
@@ -219,7 +219,13 @@ function ConductCard({ record, onChanged }: { record: ConductRecord; onChanged: 
               {!isDiscipline && m.award && <span> · {m.award}</span>}
             </div>
             {record.description && (
-              <TranslateButton text={record.description} className="mt-1 text-sm" />
+              <LocalizedText
+                table="hr_employee_timeline"
+                record={record}
+                field="description"
+                as="p"
+                className="mt-1 whitespace-pre-wrap text-sm"
+              />
             )}
           </div>
         </div>

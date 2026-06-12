@@ -212,7 +212,7 @@ export default function MessagesPage() {
                           ) : (
                             <MessageCircle className="h-3 w-3" />
                           )}
-                          {template.type === "email" ? t("messages.channel.email") : "WhatsApp"}
+                          {template.type === "email" ? t("messages.channel.email") : t("messages.channel.whatsapp")}
                         </span>
                         <span className="text-xs px-2.5 py-0.5 rounded-lg font-medium" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-gold)' }}>
                           {template.category}
@@ -281,7 +281,7 @@ export default function MessagesPage() {
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-lg font-medium" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>
                           {msg.channel === "email" ? <Mail className="h-3 w-3" /> : <MessageCircle className="h-3 w-3" />}
-                          {msg.channel === "email" ? t("messages.channel.email") : "WhatsApp"}
+                          {msg.channel === "email" ? t("messages.channel.email") : t("messages.channel.whatsapp")}
                         </span>
                       </td>
                       <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>{msg.subject}</td>
@@ -343,7 +343,7 @@ export default function MessagesPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="email">{t("messages.channel.email")}</SelectItem>
-                      <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                      <SelectItem value="whatsapp">{t("messages.channel.whatsapp")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

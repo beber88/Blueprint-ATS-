@@ -18,6 +18,7 @@ import { Job, Application, Candidate } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n/context";
+import { LocalizedText } from "@/components/shared/LocalizedText";
 import {
   BarChart,
   Bar,
@@ -46,7 +47,7 @@ type TabKey = "table" | "charts" | "top" | "requirements";
 export default function JobDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [scoring, setScoring] = useState(false);
@@ -90,7 +91,11 @@ export default function JobDetailPage() {
     setMatching(true);
     toast.info(t("requirements.matching"));
     try {
-      const res = await fetch(`/api/jobs/${params.id}/match-candidates`, { method: "POST" });
+      const res = await fetch(`/api/jobs/${params.id}/match-candidates`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
       const data = await res.json();
       toast.success(`${t("candidates.toast.matched")} ${data.matched}/${data.total}`);
       // Refresh matches
@@ -132,7 +137,7 @@ export default function JobDetailPage() {
         const res = await fetch("/api/cv/score", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ candidateId: app.candidate_id, jobId: job.id }),
+          body: JSON.stringify({ candidateId: app.candidate_id, jobId: job.id, locale }),
         });
         if (res.ok) {
           scored++;
@@ -319,13 +324,25 @@ export default function JobDetailPage() {
                     <FileText className="h-4 w-4 text-[color:var(--text-tertiary)]" />
                     {t("jobs.form.description")}
                   </h3>
-                  <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed whitespace-pre-wrap">{job.description}</p>
+                  <LocalizedText
+                    table="jobs"
+                    record={job}
+                    field="description"
+                    as="p"
+                    className="text-sm text-[color:var(--text-secondary)] leading-relaxed whitespace-pre-wrap"
+                  />
                 </div>
               )}
               {job.requirements && (
                 <div>
                   <h3 className="text-sm font-semibold text-[color:var(--text-primary)] mb-2">{t("jobs.form.requirements")}</h3>
-                  <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed whitespace-pre-wrap">{job.requirements}</p>
+                  <LocalizedText
+                    table="jobs"
+                    record={job}
+                    field="requirements"
+                    as="p"
+                    className="text-sm text-[color:var(--text-secondary)] leading-relaxed whitespace-pre-wrap"
+                  />
                 </div>
               )}
             </div>
@@ -682,7 +699,13 @@ export default function JobDetailPage() {
                               <StatusBadge status={app.status} />
                             </div>
                             {app.ai_reasoning && (
-                              <p className="text-sm text-[color:var(--text-secondary)] mt-2 line-clamp-2">{app.ai_reasoning}</p>
+                              <LocalizedText
+                                table="applications"
+                                record={app}
+                                field="ai_reasoning"
+                                as="p"
+                                className="text-sm text-[color:var(--text-secondary)] mt-2 line-clamp-2"
+                              />
                             )}
                             {app.candidate?.skills && app.candidate.skills.length > 0 && (
                               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -744,7 +767,17 @@ export default function JobDetailPage() {
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-[color:var(--text-tertiary)] mb-1.5">{t("common.ai_reasoning")}</p>
-                        <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed">{app.ai_reasoning || t("common.not_available")}</p>
+                        {app.ai_reasoning ? (
+                          <LocalizedText
+                            table="applications"
+                            record={app}
+                            field="ai_reasoning"
+                            as="p"
+                            className="text-sm text-[color:var(--text-secondary)] leading-relaxed"
+                          />
+                        ) : (
+                          <p className="text-sm text-[color:var(--text-secondary)] leading-relaxed">{t("common.not_available")}</p>
+                        )}
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-[color:var(--text-tertiary)] mb-1.5">{t("candidates.table.experience")}</p>

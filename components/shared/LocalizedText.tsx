@@ -2,19 +2,17 @@
 
 import { useEffect, useState, type ElementType } from "react";
 import { useI18n } from "@/lib/i18n/context";
-import { getLocalizedField } from "@/lib/i18n/get-localized";
-
-interface TranslatableRecord {
-  id?: string | null;
-  original_language?: string | null;
-  gen_locale?: string | null;
-  translations?: Record<string, Record<string, string>> | null;
-  [k: string]: unknown;
-}
 
 interface LocalizedTextProps {
   table: string;
-  record: TranslatableRecord | null | undefined;
+  /**
+   * The DB row. Reads `record.id`, `record.original_language` (or
+   * `record.gen_locale`), `record.translations` and `record[field]`. We
+   * intentionally accept `unknown` here — the component is used across
+   * many strict row types (Application, Interview, Job, …) and they all
+   * carry these columns at runtime via supabase `select("*")`.
+   */
+  record: unknown;
   field: string;
   /** Override the id if the record is a denormalised projection without `id`. */
   id?: string;
@@ -23,6 +21,29 @@ interface LocalizedTextProps {
   className?: string;
   /** Render nothing instead of an empty string when the field is empty. */
   skipIfEmpty?: boolean;
+}
+
+type Translatable = {
+  id?: string | null;
+  original_language?: string | null;
+  gen_locale?: string | null;
+  translations?: Record<string, Record<string, string>> | null;
+  [k: string]: unknown;
+};
+
+function asTranslatable(record: unknown): Translatable | null {
+  if (!record || typeof record !== "object") return null;
+  return record as Translatable;
+}
+
+function pickField(record: Translatable | null, field: string, locale: string): string {
+  if (!record) return "";
+  const original = (record[field] as string | null | undefined) ?? "";
+  const sourceLocale = record.original_language ?? record.gen_locale ?? null;
+  if (sourceLocale === locale) return String(original);
+  const cached = record.translations?.[locale]?.[field];
+  if (cached) return cached;
+  return String(original);
 }
 
 /**
@@ -46,25 +67,26 @@ export function LocalizedText({
   skipIfEmpty = false,
 }: LocalizedTextProps) {
   const { locale } = useI18n();
-  const rowId = id ?? (record?.id as string | undefined);
-  const original = (record?.[field] as string | null | undefined) ?? "";
-  const initial = record ? getLocalizedField(record, field, locale) : "";
+  const row = asTranslatable(record);
+  const rowId = id ?? (row?.id as string | undefined);
+  const original = ((row?.[field] as string | null | undefined) ?? "");
+  const initial = pickField(row, field, locale);
 
   const [display, setDisplay] = useState<string>(initial);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setDisplay(record ? getLocalizedField(record, field, locale) : "");
-  }, [record, field, locale]);
+    setDisplay(pickField(row, field, locale));
+  }, [row, field, locale]);
 
   useEffect(() => {
-    if (!record || !rowId) return;
+    if (!row || !rowId) return;
     if (!original || original.length < 2) return;
 
-    const sourceLocale = record.original_language ?? record.gen_locale ?? null;
+    const sourceLocale = row.original_language ?? row.gen_locale ?? null;
     if (sourceLocale === locale) return;
 
-    const cached = record.translations?.[locale]?.[field];
+    const cached = row.translations?.[locale]?.[field];
     if (cached) return;
 
     let aborted = false;
@@ -94,7 +116,7 @@ export function LocalizedText({
     return () => {
       aborted = true;
     };
-  }, [table, rowId, field, locale, original, record]);
+  }, [table, rowId, field, locale, original, row]);
 
   if (skipIfEmpty && !display) return null;
 

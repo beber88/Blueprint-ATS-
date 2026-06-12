@@ -86,7 +86,7 @@ export default function TemplatesPage() {
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
               style={channelFilter === ch ? { background: 'var(--brand-gold)', color: '#fff' } : { background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
             >
-              {ch === "all" ? t("templates.all_channels") : ch === "email" ? t("messages.channel.email") : "WhatsApp"}
+              {ch === "all" ? t("templates.all_channels") : ch === "email" ? t("messages.channel.email") : t("messages.channel.whatsapp")}
             </button>
           ))}
         </div>
@@ -107,7 +107,7 @@ export default function TemplatesPage() {
                   <div className="flex gap-1.5">
                     <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded" style={{ background: template.type === 'email' ? 'var(--bg-tertiary)' : 'var(--green-light)', color: template.type === 'email' ? 'var(--brand-gold)' : 'var(--green)' }}>
                       {template.type === 'email' ? <Mail className="h-3 w-3" /> : <MessageCircle className="h-3 w-3" />}
-                      {template.type === 'email' ? t("messages.channel.email") : 'WhatsApp'}
+                      {template.type === 'email' ? t("messages.channel.email") : t("messages.channel.whatsapp")}
                     </span>
                     <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ background: 'var(--purple-light)', color: 'var(--purple)' }}>
                       {categoryLabels[template.category] || template.category}
@@ -140,7 +140,7 @@ export default function TemplatesPage() {
                   <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="email">{t("messages.channel.email")}</SelectItem>
-                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="whatsapp">{t("messages.channel.whatsapp")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

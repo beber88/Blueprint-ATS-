@@ -24,6 +24,7 @@ import { Candidate, Application, Interview, MessageSent, ActivityLog } from "@/t
 import { formatDate, formatDateTime, getStatusLabel } from "@/lib/utils";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n/context";
+import { LocalizedText } from "@/components/shared/LocalizedText";
 
 interface CandidateDetail extends Candidate {
   applications: (Application & { job?: { id: string; title: string } })[];
@@ -217,7 +218,7 @@ export default function CandidateProfilePage() {
       const res = await fetch("/api/cv/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ candidateId: candidate.id, jobId }),
+        body: JSON.stringify({ candidateId: candidate.id, jobId, locale }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Failed" }));
@@ -778,7 +779,13 @@ export default function CandidateProfilePage() {
                     {app.ai_reasoning && (
                       <div className="mt-4 p-3 rounded-lg" style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)' }}>
                         <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>{t("profile.ai_analysis")}</p>
-                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{app.ai_reasoning}</p>
+                        <LocalizedText
+                          table="applications"
+                          record={app}
+                          field="ai_reasoning"
+                          as="p"
+                          className="text-sm leading-relaxed"
+                        />
                       </div>
                     )}
                   </div>
@@ -839,7 +846,13 @@ export default function CandidateProfilePage() {
                     </div>
                     {interview.notes && (
                       <div className="mt-4 p-3 rounded-lg" style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)' }}>
-                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{interview.notes}</p>
+                        <LocalizedText
+                          table="interviews"
+                          record={interview}
+                          field="notes"
+                          as="p"
+                          className="text-sm leading-relaxed whitespace-pre-wrap"
+                        />
                       </div>
                     )}
                   </div>

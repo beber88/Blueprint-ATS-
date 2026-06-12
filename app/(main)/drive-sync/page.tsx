@@ -37,7 +37,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 export default function DriveSyncPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [syncs, setSyncs] = useState<SyncState[]>([]);
   const [loading, setLoading] = useState(true);
   const [folderInput, setFolderInput] = useState("");
@@ -101,7 +101,7 @@ export default function DriveSyncPage() {
       const res = await fetch("/api/drive/classify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ locale }),
       });
       const data = await res.json();
       if (!res.ok) {
