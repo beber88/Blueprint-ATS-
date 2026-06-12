@@ -313,6 +313,42 @@
       "confirm_delete_project": "Tanggalin ang proyektong ito?",
       "confirm_delete_department": "Tanggalin ang departamentong ito?",
       "confirm_delete_item": "Tanggalin ang item na ito?"
+    },
+    "journal": {
+      "title": "Pang-araw-araw na Journal",
+      "subtitle": "Bawat ulat na natanggap, naproseso at na-summarize — araw-araw",
+      "today": "Ngayon",
+      "no_reports": "Walang natanggap na ulat sa napiling panahon",
+      "unknown_sender": "Hindi kilalang nagpadala",
+      "items_count": "mga item",
+      "view_report": "Buong ulat",
+      "ceo_needed": "Kailangan ng desisyon ng CEO",
+      "general_items": "Pangkalahatan",
+      "reprocess": "I-proseso muli",
+      "pending_processing": "Naghihintay ng pagproseso",
+      "processing_failed": "Nabigo ang pagproseso",
+      "brain_questions_badge": "Mga tanong ng Brain",
+      "missing_info": "Kulang na impormasyon",
+      "priority_urgent": "Apurahan",
+      "priority_high": "Mataas",
+      "show_more": "Ipakita pa ang mga proyekto",
+      "show_less": "Ipakita nang mas kaunti",
+      "range_week": "Nakaraang linggo",
+      "range_two_weeks": "Dalawang linggo",
+      "range_month": "Buwan"
+    },
+    "system_health": {
+      "title": "Kalagayan ng System",
+      "loading": "Sinusuri ang kalagayan ng system...",
+      "ok": "Maayos ang system",
+      "problems": "May problema ang system",
+      "last_run": "Huling takbo",
+      "never": "Hindi pa tumakbo",
+      "failures": "Nabigong trabaho",
+      "stuck_reports": "ulat sa pila",
+      "failed_reports": "nabigong ulat",
+      "stuck_emails": "hindi naprosesong email",
+      "in_queue": "sa pila"
     }
   },
   "contracts": {

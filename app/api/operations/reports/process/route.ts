@@ -9,6 +9,7 @@ import {
 import { downloadTwilioMedia } from "@/lib/twilio/whatsapp-media";
 import { sendWhatsApp } from "@/lib/twilio/client";
 import { requireApiAuth } from "@/lib/api/auth";
+import { processReportRow } from "@/lib/operations/report-intake";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
@@ -47,6 +48,29 @@ export async function POST(request: NextRequest) {
     if (!report) return NextResponse.json({ error: "report not found" }, { status: 404 });
 
     await supabase.from("op_reports").update({ processing_status: "processing" }).eq("id", reportId);
+
+    // Non-WhatsApp reports (email/pdf/text) go through the unified intake
+    // pipeline — vision fallback, learning questions, project auto-create.
+    const twilioMedia: string[] = Array.isArray(report.source_meta?.media_urls)
+      ? report.source_meta.media_urls
+      : [];
+    if (twilioMedia.length === 0 && report.source_type !== "whatsapp") {
+      // Re-process semantics: clear previous items so we don't duplicate
+      await supabase.from("op_report_items").delete().eq("report_id", reportId);
+      const res = await processReportRow(report);
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: res.error || "Processing failed" },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json({
+        ok: true,
+        report_id: reportId,
+        items: res.itemsCount,
+        status: res.status,
+      });
+    }
 
     // Resolve reporter context
     let reporterName: string | null = null;

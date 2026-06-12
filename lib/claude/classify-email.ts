@@ -134,32 +134,51 @@ Return JSON only.`;
 // Classify an email
 // ---------------------------------------------------------------------------
 
+export interface ClassifyEmailOptions {
+  /** Learned knowledge (op_context_entries) injected into the system prompt. */
+  contextBlock?: string;
+  /** Attachment filenames — a "Consolidated Daily Report.pdf" is a strong signal. */
+  attachmentNames?: string[];
+}
+
 export async function classifyEmail(
   subject: string | null,
   bodyText: string | null,
   fromName: string | null,
-  today: string = new Date().toISOString().slice(0, 10)
+  today: string = new Date().toISOString().slice(0, 10),
+  opts: ClassifyEmailOptions = {}
 ): Promise<EmailClassification> {
   const client = getClient();
 
-  const userMessage = [
+  const lines = [
     `Today's date: ${today}`,
     "",
     `From: ${fromName || "Unknown"}`,
     `Subject: ${subject || "(no subject)"}`,
+  ];
+  if (opts.attachmentNames && opts.attachmentNames.length > 0) {
+    lines.push(`Attachments: ${opts.attachmentNames.join(", ")}`);
+  }
+  lines.push(
     "",
     "Email body:",
     "```",
     (bodyText || "(empty)").slice(0, 15000),
     "```",
     "",
-    "Classify this email and return JSON.",
-  ].join("\n");
+    "Classify this email and return JSON."
+  );
+  const userMessage = lines.join("\n");
+
+  const system = opts.contextBlock
+    ? SYSTEM_PROMPT +
+      `\n\nCONTEXT KNOWLEDGE (learned from previous reports — use this to resolve abbreviations, entities, and patterns):\n${opts.contextBlock}`
+    : SYSTEM_PROMPT;
 
   const message = await client.messages.create({
     model: MODEL,
     max_tokens: 2000,
-    system: SYSTEM_PROMPT,
+    system,
     messages: [{ role: "user", content: userMessage }],
   });
 

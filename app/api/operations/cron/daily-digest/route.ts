@@ -14,7 +14,7 @@ function authorized(request: NextRequest): boolean {
   return auth === `Bearer ${cronSecret}`;
 }
 
-function buildEmailHtml(stats: Awaited<ReturnType<typeof getOperationsStats>>, link: string): string {
+function buildEmailHtml(stats: Awaited<ReturnType<typeof getOperationsStats>>, link: string, journalLink: string): string {
   const { kpis } = stats;
   const today = new Date().toISOString().slice(0, 10);
   const topAlerts = stats.alerts.slice(0, 10);
@@ -52,11 +52,13 @@ function buildEmailHtml(stats: Awaited<ReturnType<typeof getOperationsStats>>, l
       `}
 
       <p style="margin-top: 24px;">
-        <a href="${link}" style="display: inline-block; padding: 10px 16px; background: #C9A84C; color: #1A1A1A; text-decoration: none; border-radius: 8px; font-weight: 600;">
-          צפייה בדיגסט המלא
+        <a href="${journalLink}" style="display: inline-block; padding: 10px 16px; background: #C9A84C; color: #1A1A1A; text-decoration: none; border-radius: 8px; font-weight: 600;">
+          צפייה ביומן היומי (נתונים חיים)
         </a>
       </p>
-      <p style="font-size: 12px; color: #8A7D6B;">קישור זה תקף ל-24 שעות.</p>
+      <p style="font-size: 12px; color: #8A7D6B;">
+        <a href="${link}" style="color: #8A7D6B;">תצלום סטטי של הדיגסט</a> (ללא צורך בהתחברות, תקף ל-24 שעות)
+      </p>
     </div>
   `;
 }
@@ -74,7 +76,7 @@ function buildWhatsAppSummary(stats: Awaited<ReturnType<typeof getOperationsStat
     `מידע חסר: ${kpis.missing_info}`,
     `התראות: ${kpis.alerts}`,
     "",
-    `דיגסט מלא: ${link}`,
+    `יומן יומי (חי): ${link}`,
   ].join("\n");
 }
 
@@ -87,6 +89,7 @@ export async function GET(request: NextRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || "http://localhost:3000";
   const baseWithProtocol = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
   const link = `${baseWithProtocol}/hr/operations/digest/${token}`;
+  const journalLink = `${baseWithProtocol}/hr/operations/reports`;
 
   const ceoEmail = process.env.OPERATIONS_CEO_EMAIL;
   const ceoWhatsApp = process.env.OPERATIONS_CEO_WHATSAPP;
@@ -95,7 +98,7 @@ export async function GET(request: NextRequest) {
 
   if (ceoEmail) {
     try {
-      await sendEmail(ceoEmail, `דיגסט תפעול יומי — ${new Date().toISOString().slice(0, 10)}`, buildEmailHtml(stats, link));
+      await sendEmail(ceoEmail, `דיגסט תפעול יומי — ${new Date().toISOString().slice(0, 10)}`, buildEmailHtml(stats, link, journalLink));
       results.sent_email = true;
     } catch (e) {
       console.error("daily-digest: email failed", e);
@@ -105,12 +108,23 @@ export async function GET(request: NextRequest) {
 
   if (ceoWhatsApp) {
     try {
-      await sendWhatsApp(ceoWhatsApp, buildWhatsAppSummary(stats, link));
+      await sendWhatsApp(ceoWhatsApp, buildWhatsAppSummary(stats, journalLink));
       results.sent_whatsapp = true;
     } catch (e) {
       console.error("daily-digest: whatsapp failed", e);
       results.whatsapp_error = e instanceof Error ? e.message : String(e);
     }
+  }
+
+  // A digest that reached no configured channel is a failure, not a success —
+  // otherwise the CEO silently stops receiving it while the cron reports OK.
+  const channelsConfigured = [!!ceoEmail, !!ceoWhatsApp].filter(Boolean).length;
+  const channelsSent = [results.sent_email, results.sent_whatsapp].filter(Boolean).length;
+  if (channelsConfigured > 0 && channelsSent === 0) {
+    return NextResponse.json(
+      { ok: false, error: "Digest delivery failed on all channels", ...results },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ ok: true, ...results });

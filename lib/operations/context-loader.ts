@@ -77,10 +77,15 @@ export async function trackContextUsage(reportText: string): Promise<void> {
 
   if (usedIds.length === 0) return;
 
-  // Batch update — fire-and-forget, performance acceptable.
+  // Batch update — fire-and-forget, but failures must be visible in logs.
   await Promise.all(
     usedIds.map((id) =>
-      supabase.rpc("increment_context_usage", { entry_id: id }).then(() => {}, () => {})
+      supabase.rpc("increment_context_usage", { entry_id: id }).then(
+        ({ error }) => {
+          if (error) console.error("trackContextUsage: rpc failed", id, error);
+        },
+        (err) => console.error("trackContextUsage: rpc rejected", id, err)
+      )
     )
   );
 }

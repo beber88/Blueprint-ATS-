@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { listMessages, getMessage, markAsRead } from "@/lib/gmail/reader";
+import { listMessages, getMessage, markAsRead, ParsedEmail } from "@/lib/gmail/reader";
+import {
+  findReportAttachmentMeta,
+  loadReportAttachment,
+  extractDocxText,
+} from "@/lib/gmail/report-attachments";
 import { classifyEmail, categoryToRoute } from "@/lib/claude/classify-email";
 import { requireApiAuth } from "@/lib/api/auth";
+import { createAndProcessReport } from "@/lib/operations/report-intake";
+import { loadContextBlock } from "@/lib/operations/context-loader";
+import { withRunLog } from "@/lib/system/run-logger";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 function authorized(request: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
@@ -24,6 +32,9 @@ const HR_QUERIES = [
   "to:blueprint.humanresources@gmail.com newer_than:7d",
 ];
 
+const REPORT_SENDERS = ["hr@blueprint-ph.com", "blueprint.humanresources@gmail.com"];
+const REPORT_SUBJECT_RE = /consolidated|daily report|weekly report|דוח יומי|דוח שבועי/i;
+
 export async function GET(request: NextRequest) {
   // Cron jobs use CRON_SECRET bearer token, not user session.
   // Only fall back to requireApiAuth for manual browser calls.
@@ -32,14 +43,18 @@ export async function GET(request: NextRequest) {
     if (authError) return authError;
   }
 
-  const supabase = createAdminClient();
-  const today = new Date().toISOString().slice(0, 10);
+  const result = await withRunLog("email-ingest", async (log) => {
+    const supabase = createAdminClient();
+    const today = new Date().toISOString().slice(0, 10);
 
-  let processed = 0;
-  let skipped = 0;
-  let failed = 0;
+    let processed = 0;
+    let skipped = 0;
+    let failed = 0;
+    let reportsCreated = 0;
 
-  try {
+    // Learned knowledge improves classification of abbreviations/entities
+    const contextBlock = await loadContextBlock();
+
     // 1. Collect messages from all HR queries (from, to, cc) and deduplicate
     const seenIds = new Set<string>();
     const messages: { id: string; threadId: string }[] = [];
@@ -105,7 +120,11 @@ export async function GET(request: NextRequest) {
             email.subject,
             email.bodyText,
             email.from.name,
-            today
+            today,
+            {
+              contextBlock,
+              attachmentNames: email.attachments.map((a) => a.filename),
+            }
           );
 
           // If HR is involved (from/to/cc) but AI said "not_hr", override to "general_hr"
@@ -117,6 +136,24 @@ export async function GET(request: NextRequest) {
           if (classification.category === "not_hr" && hrInvolved) {
             classification.category = "general_hr";
             classification.summary = `[HR involved] ${classification.summary}`;
+          }
+
+          // Belt-and-braces: a consolidated/daily-report email from HR with a
+          // document attached is ALWAYS a daily/weekly operations report,
+          // regardless of what the classifier said.
+          const isKnownReport =
+            REPORT_SENDERS.includes(email.from.email.toLowerCase()) &&
+            REPORT_SUBJECT_RE.test(email.subject || "") &&
+            !!findReportAttachmentMeta(email);
+          if (
+            isKnownReport &&
+            classification.category !== "daily_operations_report" &&
+            classification.category !== "weekly_operations_report"
+          ) {
+            classification.category = /weekly|שבועי/i.test(email.subject || "")
+              ? "weekly_operations_report"
+              : "daily_operations_report";
+            classification.summary = `[forced: report sender+subject+attachment] ${classification.summary}`;
           }
 
           const routedTo = categoryToRoute(classification.category);
@@ -133,25 +170,29 @@ export async function GET(request: NextRequest) {
 
           // 7. Auto-route to the appropriate module
           if (routedTo) {
-            const routedRecordId = await routeToModule(
+            const routed = await routeToModule(
               supabase,
               classification,
               emailRecord.id,
               today,
-              {
-                gmail_message_id: email.messageId,
-                subject: email.subject,
-                from_email: email.from.email,
-                from_name: email.from.name,
-                body_text: email.bodyText,
-              }
+              email
             );
 
-            if (routedRecordId) {
+            if (routed.error) {
               await supabase
                 .from("hr_emails")
                 .update({
-                  routed_record_id: routedRecordId,
+                  processing_status: "failed",
+                  processing_error: routed.error,
+                })
+                .eq("id", emailRecord.id);
+              failed++;
+            } else if (routed.recordId) {
+              if (routed.isReport) reportsCreated++;
+              await supabase
+                .from("hr_emails")
+                .update({
+                  routed_record_id: routed.recordId,
                   processing_status: "routed",
                 })
                 .eq("id", emailRecord.id);
@@ -166,29 +207,37 @@ export async function GET(request: NextRequest) {
               processing_error: classifyError instanceof Error ? classifyError.message : "Classification failed",
             })
             .eq("id", emailRecord.id);
+          failed++;
         }
 
         // 8. Mark as read in Gmail
         await markAsRead(email.messageId);
         processed++;
+        log.addItems(1);
       } catch (msgError) {
         console.error(`Failed to process message ${msg.id}:`, msgError);
         failed++;
       }
     }
-  } catch (error) {
-    console.error("Email ingestion failed:", error);
+
+    log.setDetail("processed", processed);
+    log.setDetail("skipped", skipped);
+    log.setDetail("failed", failed);
+    log.setDetail("reports_created", reportsCreated);
+
+    return { processed, skipped, failed, reports_created: reportsCreated };
+  });
+
+  if (!result.ok) {
     return NextResponse.json(
-      { error: "Email ingestion failed", detail: error instanceof Error ? error.message : "Unknown error" },
+      { ok: false, error: "Email ingestion failed", detail: result.error },
       { status: 500 }
     );
   }
 
   return NextResponse.json({
     ok: true,
-    processed,
-    skipped,
-    failed,
+    ...result.value,
     timestamp: new Date().toISOString(),
   });
 }
@@ -199,12 +248,61 @@ export const POST = GET;
 // Route classified email to the appropriate HR module
 // ---------------------------------------------------------------------------
 
-interface EmailMeta {
-  gmail_message_id: string;
-  subject: string | null;
-  from_email: string;
-  from_name: string | null;
-  body_text: string | null;
+interface RouteResult {
+  recordId: string | null;
+  isReport?: boolean;
+  error?: string;
+}
+
+/**
+ * Creates an op_reports row from an email — downloading and parsing the
+ * PDF/DOCX attachment when present, so the actual report content (not just
+ * the email body) reaches the extraction pipeline. The row is queued; the
+ * process-queued cron runs the AI extraction.
+ */
+async function createReportFromEmail(
+  classification: Awaited<ReturnType<typeof classifyEmail>>,
+  emailId: string,
+  email: ParsedEmail,
+  reportDate: string,
+  extraMeta: Record<string, unknown> = {}
+): Promise<RouteResult> {
+  const attachment = await loadReportAttachment(email);
+
+  let rawText = email.bodyText || classification.summary || "";
+  let pdfBuffer: Buffer | undefined;
+  if (attachment?.kind === "docx") {
+    const docxText = await extractDocxText(attachment.buffer);
+    if (docxText.trim()) rawText = docxText;
+  } else if (attachment?.kind === "pdf") {
+    pdfBuffer = attachment.buffer;
+    rawText = ""; // let the intake pipeline extract text from the PDF itself
+  }
+
+  const intake = await createAndProcessReport({
+    rawText,
+    pdfBuffer,
+    sourceType: "email",
+    reportDate,
+    sourceMeta: {
+      email_id: emailId,
+      gmail_message_id: email.messageId,
+      subject: email.subject,
+      from_email: email.from.email,
+      from_name: email.from.name,
+      attachment_filename: attachment?.filename || null,
+      email_body_text: (email.bodyText || "").slice(0, 5000),
+      classification_category: classification.category,
+      classification_confidence: classification.confidence,
+      ...extraMeta,
+    },
+    processNow: false,
+  });
+
+  if (!intake.ok) {
+    return { recordId: null, error: intake.error || "Failed to create report from email" };
+  }
+  return { recordId: intake.reportId, isReport: true };
 }
 
 async function routeToModule(
@@ -212,9 +310,10 @@ async function routeToModule(
   classification: Awaited<ReturnType<typeof classifyEmail>>,
   emailId: string,
   today: string,
-  emailMeta?: EmailMeta
-): Promise<string | null> {
+  email: ParsedEmail
+): Promise<RouteResult> {
   const { category, extracted_data, employee_name, dates } = classification;
+  const receivedDate = email.receivedAt.toISOString().slice(0, 10);
 
   // Try to find employee by name
   let employeeId: string | null = null;
@@ -231,14 +330,14 @@ async function routeToModule(
   switch (category) {
     case "leave_request":
     case "sick_day": {
-      if (!employeeId) return null;
+      if (!employeeId) return { recordId: null };
       const leaveType = category === "sick_day" ? "sick" : (extracted_data.leave_type as string) || "vacation";
       const startDate = dates?.start || dates?.single || today;
       const endDate = dates?.end || startDate;
       const daysCount = extracted_data.days_count as number ||
         Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000) + 1);
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("hr_leave_requests")
         .insert({
           employee_id: employeeId,
@@ -253,56 +352,49 @@ async function routeToModule(
         })
         .select("id")
         .single();
-      return data?.id || null;
+      if (error) return { recordId: null, error: error.message };
+      return { recordId: data?.id || null };
     }
 
     case "attendance_report": {
-      // Create an op_report so it can be processed by the extraction pipeline
-      const attText = emailMeta?.body_text || classification.summary;
-      const { data: attReport } = await supabase.from("op_reports").insert({
-        source_type: "email",
-        raw_text: attText?.slice(0, 200000) || "",
-        report_date: dates?.single || today,
-        source_meta: {
-          email_id: emailId,
-          gmail_message_id: emailMeta?.gmail_message_id,
-          subject: emailMeta?.subject,
-          from_name: emailMeta?.from_name,
-          classification_category: category,
-        },
-        processing_status: "queued",
-      }).select("id").single();
-      return attReport?.id || null;
+      return createReportFromEmail(
+        classification,
+        emailId,
+        email,
+        dates?.single || receivedDate
+      );
     }
 
     case "general_hr":
     case "employee_update": {
       // Store as an HR document note linked to employee if matched
-      const { data: hrDoc } = await supabase.from("hr_employee_documents").insert({
+      const { data: hrDoc, error } = await supabase.from("hr_employee_documents").insert({
         employee_id: employeeId,
         document_type: "memo",
-        title: emailMeta?.subject || classification.summary?.slice(0, 100) || "Email note",
-        storage_path: `email://${emailMeta?.gmail_message_id || emailId}`,
+        title: email.subject || classification.summary?.slice(0, 100) || "Email note",
+        storage_path: `email://${email.messageId}`,
         notes: `Auto-filed from email (${category}): ${classification.summary || ""}`.slice(0, 500),
       }).select("id").single();
-      return hrDoc?.id || null;
+      if (error) return { recordId: null, error: error.message };
+      return { recordId: hrDoc?.id || null };
     }
 
     case "equipment_request": {
       // Create an HR document for tracking
-      const { data: eqDoc } = await supabase.from("hr_employee_documents").insert({
+      const { data: eqDoc, error } = await supabase.from("hr_employee_documents").insert({
         employee_id: employeeId,
         document_type: "memo",
-        title: `Equipment Request: ${emailMeta?.subject || ""}`.slice(0, 200),
-        storage_path: `email://${emailMeta?.gmail_message_id || emailId}`,
+        title: `Equipment Request: ${email.subject || ""}`.slice(0, 200),
+        storage_path: `email://${email.messageId}`,
         notes: `Auto-filed from email: ${classification.summary || ""}`.slice(0, 500),
       }).select("id").single();
-      return eqDoc?.id || null;
+      if (error) return { recordId: null, error: error.message };
+      return { recordId: eqDoc?.id || null };
     }
 
     case "onboarding_task": {
-      if (!employeeId) return null;
-      const { data } = await supabase
+      if (!employeeId) return { recordId: null };
+      const { data, error } = await supabase
         .from("hr_onboarding_tasks")
         .insert({
           employee_id: employeeId,
@@ -314,12 +406,13 @@ async function routeToModule(
         })
         .select("id")
         .single();
-      return data?.id || null;
+      if (error) return { recordId: null, error: error.message };
+      return { recordId: data?.id || null };
     }
 
     case "offboarding_task": {
-      if (!employeeId) return null;
-      const { data } = await supabase
+      if (!employeeId) return { recordId: null };
+      const { data, error } = await supabase
         .from("hr_onboarding_tasks")
         .insert({
           employee_id: employeeId,
@@ -331,75 +424,44 @@ async function routeToModule(
         })
         .select("id")
         .single();
-      return data?.id || null;
+      if (error) return { recordId: null, error: error.message };
+      return { recordId: data?.id || null };
     }
 
     case "daily_operations_report":
     case "weekly_operations_report": {
-      const rawText = emailMeta?.body_text || classification.summary;
-      const { data: report } = await supabase.from("op_reports").insert({
-        source_type: "email",
-        raw_text: rawText,
-        report_date: today,
-        source_meta: {
-          email_id: emailId,
-          gmail_message_id: emailMeta?.gmail_message_id,
-          subject: emailMeta?.subject,
-          from_email: emailMeta?.from_email,
-          from_name: emailMeta?.from_name,
-          classification_category: category,
-          classification_confidence: classification.confidence,
-        },
-        processing_status: "queued",
-      }).select("id").single();
-      return report?.id || null;
+      return createReportFromEmail(
+        classification,
+        emailId,
+        email,
+        dates?.single || receivedDate
+      );
     }
 
     case "project_update": {
-      const rawText = emailMeta?.body_text || classification.summary;
-      const { data: report } = await supabase.from("op_reports").insert({
-        source_type: "email",
-        raw_text: rawText,
-        report_date: today,
-        source_meta: {
-          email_id: emailId,
-          gmail_message_id: emailMeta?.gmail_message_id,
-          subject: emailMeta?.subject,
-          from_email: emailMeta?.from_email,
-          from_name: emailMeta?.from_name,
-          classification_category: category,
-          classification_confidence: classification.confidence,
-          project_hint: extracted_data.project_name as string || null,
-        },
-        processing_status: "queued",
-      }).select("id").single();
-      return report?.id || null;
+      return createReportFromEmail(
+        classification,
+        emailId,
+        email,
+        dates?.single || receivedDate,
+        { project_hint: (extracted_data.project_name as string) || null }
+      );
     }
 
     case "safety_incident": {
-      const rawText = emailMeta?.body_text || classification.summary;
-      const { data: report } = await supabase.from("op_reports").insert({
-        source_type: "email",
-        raw_text: rawText,
-        report_date: today,
-        source_meta: {
-          email_id: emailId,
-          gmail_message_id: emailMeta?.gmail_message_id,
-          subject: emailMeta?.subject,
-          from_email: emailMeta?.from_email,
-          from_name: emailMeta?.from_name,
-          classification_category: category,
-          classification_confidence: classification.confidence,
-          incident_type: extracted_data.incident_type as string || null,
-          severity: extracted_data.severity as string || null,
-        },
-        processing_status: "queued",
-        processing_priority: "high",
-      }).select("id").single();
-      return report?.id || null;
+      return createReportFromEmail(
+        classification,
+        emailId,
+        email,
+        dates?.single || receivedDate,
+        {
+          incident_type: (extracted_data.incident_type as string) || null,
+          severity: (extracted_data.severity as string) || null,
+        }
+      );
     }
 
     default:
-      return null;
+      return { recordId: null };
   }
 }

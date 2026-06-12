@@ -396,6 +396,42 @@
       "processed_at": "עובד בתאריך",
       "confidence": "רמת ביטחון",
       "no_items": "לא חולצו פריטים מדוח זה"
+    },
+    "journal": {
+      "title": "יומן יומי",
+      "subtitle": "כל הדיווחים שהתקבלו, מעובדים ומסוכמים — יום אחר יום",
+      "today": "היום",
+      "no_reports": "לא התקבלו דוחות בתקופה שנבחרה",
+      "unknown_sender": "שולח לא ידוע",
+      "items_count": "פריטים",
+      "view_report": "לדוח המלא",
+      "ceo_needed": "דרושה החלטת מנכ\"ל",
+      "general_items": "כללי",
+      "reprocess": "עבד מחדש",
+      "pending_processing": "ממתין לעיבוד",
+      "processing_failed": "העיבוד נכשל",
+      "brain_questions_badge": "שאלות המוח",
+      "missing_info": "מידע חסר",
+      "priority_urgent": "דחוף",
+      "priority_high": "חשוב",
+      "show_more": "הצג עוד פרויקטים",
+      "show_less": "הצג פחות",
+      "range_week": "שבוע אחרון",
+      "range_two_weeks": "שבועיים",
+      "range_month": "חודש"
+    },
+    "system_health": {
+      "title": "מצב המערכת",
+      "loading": "בודק את מצב המערכת...",
+      "ok": "המערכת תקינה",
+      "problems": "בעיות במערכת",
+      "last_run": "ריצה אחרונה",
+      "never": "טרם רצה",
+      "failures": "משימות שנכשלו",
+      "stuck_reports": "דוחות בתור",
+      "failed_reports": "דוחות שנכשלו",
+      "stuck_emails": "מיילים שלא טופלו",
+      "in_queue": "בתור לעיבוד"
     }
   },
   "contracts": {
