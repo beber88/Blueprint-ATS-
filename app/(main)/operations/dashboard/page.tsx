@@ -9,6 +9,7 @@ import { AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE } from "@/lib/chart-config";
 import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, FileText, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { LocalizedText } from "@/components/shared/LocalizedText";
 
 interface Stats {
   kpis: { open: number; overdue: number; urgent: number; ceo_pending: number; missing_info: number; alerts: number };
@@ -24,7 +25,13 @@ interface Stats {
   departments: Array<{ id: string; name: string; name_he?: string; color?: string }>;
   alerts: Array<{ id: string; type: string; severity: string; message: string; created_at: string }>;
   reports: Array<{ id: string; report_date: string; source_type: string; processing_status: string }>;
-  recurringThemes: Array<{ id: string; theme: string; occurrence_count: number }>;
+  recurringThemes: Array<{
+    id: string;
+    theme: string;
+    occurrence_count: number;
+    original_language?: "he" | "en" | "tl" | "unknown" | null;
+    translations?: Record<string, Record<string, string>> | null;
+  }>;
 }
 
 const PRIORITY_COLORS: Record<string, string> = { urgent: "#A32D2D", high: "#C9A84C", medium: "#1A56A8", low: "#6B6356" };
@@ -203,10 +210,10 @@ export default function OperationsDashboard() {
             <div style={{ color: "var(--text-secondary)" }}>{t("operations.empty.no_themes")}</div>
           ) : (
             <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-              {stats.recurringThemes.slice(0, 8).map((t) => (
-                <li key={t.id} style={{ padding: "8px 0", borderBottom: "1px solid var(--border-light)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>{t.theme}</span>
-                  <span style={{ background: "#C9A84C20", color: "#A88B3D", padding: "2px 8px", borderRadius: 4, fontWeight: 600, fontSize: 12 }}>{t.occurrence_count}×</span>
+              {stats.recurringThemes.slice(0, 8).map((th) => (
+                <li key={th.id} style={{ padding: "8px 0", borderBottom: "1px solid var(--border-light)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <LocalizedText table="op_recurring_themes" record={th} field="theme" />
+                  <span style={{ background: "#C9A84C20", color: "#A88B3D", padding: "2px 8px", borderRadius: 4, fontWeight: 600, fontSize: 12 }}>{th.occurrence_count}×</span>
                 </li>
               ))}
             </ul>
