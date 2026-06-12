@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
 import { OpsPageShell, OpsCard, KpiCard } from "@/components/operations/page-shell";
+import { SystemHealthStrip } from "@/components/operations/system-health-strip";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE } from "@/lib/chart-config";
 import Link from "next/link";
@@ -86,6 +87,8 @@ export default function OperationsDashboard() {
         </button>
       }
     >
+      <SystemHealthStrip />
+
       {/* KPI strip */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 20 }}>
         <KpiCard label={t("operations.kpi.open")} value={stats.kpis.open} accent="#1A56A8" />

@@ -134,7 +134,8 @@ export interface ContextEntry {
 
 export interface ContextQuestion {
   id: string;
-  draft_id: string;
+  draft_id: string | null;
+  report_id: string | null;
   question_text: string;
   question_text_en: string | null;
   context_snippet: string | null;

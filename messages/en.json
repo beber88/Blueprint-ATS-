@@ -396,6 +396,42 @@
       "processed_at": "Processed At",
       "confidence": "Confidence",
       "no_items": "No items were extracted from this report"
+    },
+    "journal": {
+      "title": "Daily Journal",
+      "subtitle": "Every report received, processed and summarized — day by day",
+      "today": "Today",
+      "no_reports": "No reports received in the selected period",
+      "unknown_sender": "Unknown sender",
+      "items_count": "items",
+      "view_report": "Full report",
+      "ceo_needed": "CEO decision needed",
+      "general_items": "General",
+      "reprocess": "Re-process",
+      "pending_processing": "Pending processing",
+      "processing_failed": "Processing failed",
+      "brain_questions_badge": "Brain questions",
+      "missing_info": "Missing info",
+      "priority_urgent": "Urgent",
+      "priority_high": "High",
+      "show_more": "Show more projects",
+      "show_less": "Show less",
+      "range_week": "Last week",
+      "range_two_weeks": "Two weeks",
+      "range_month": "Month"
+    },
+    "system_health": {
+      "title": "System Health",
+      "loading": "Checking system health...",
+      "ok": "System healthy",
+      "problems": "System issues",
+      "last_run": "Last run",
+      "never": "Never ran",
+      "failures": "Failed jobs",
+      "stuck_reports": "reports queued",
+      "failed_reports": "reports failed",
+      "stuck_emails": "unprocessed emails",
+      "in_queue": "in queue"
     }
   },
   "contracts": {

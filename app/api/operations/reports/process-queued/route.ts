@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { extractReportItems } from "@/lib/claude/extract-report";
-import { loadContextBlock, trackContextUsage } from "@/lib/operations/context-loader";
-import {
-  matchDepartmentByName,
-  matchEmployeeByName,
-  matchProjectByName,
-} from "@/lib/operations/match-employee";
+import { processReportRow } from "@/lib/operations/report-intake";
+import { withRunLog } from "@/lib/system/run-logger";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
+const TIME_BUDGET_MS = 240_000; // leave headroom inside maxDuration
+const BATCH_SIZE = 10;
+const MAX_ATTEMPTS = 3;
+
 /**
- * POST /api/operations/reports/process-queued
+ * POST/GET /api/operations/reports/process-queued
  *
- * Processes queued email reports — runs AI extraction on raw_text,
- * creates op_report_items, and updates status to completed.
- * Called by the daily cron.
+ * Drains the queue of unprocessed reports through the unified intake
+ * pipeline (lib/operations/report-intake.ts) — oldest first, in batches,
+ * until the queue is empty or the time budget runs out. Called by the
+ * ingest cron; safe to invoke manually.
  */
 export async function GET(request: NextRequest) {
-  // Auth: cron secret or user session
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret) {
     const auth = request.headers.get("authorization");
@@ -32,113 +31,55 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "AI not configured" }, { status: 500 });
   }
 
-  const supabase = createAdminClient();
+  const result = await withRunLog("process-queued", async (log) => {
+    const supabase = createAdminClient();
+    const deadline = Date.now() + TIME_BUDGET_MS;
 
-  // Get queued reports (max 5 per run to stay within time limit)
-  const { data: queued } = await supabase
-    .from("op_reports")
-    .select("id, raw_text, report_date, source_meta")
-    .eq("processing_status", "queued")
-    .order("report_date", { ascending: false })
-    .limit(5);
+    let processed = 0;
+    let failed = 0;
+    let skipped = 0;
 
-  if (!queued || queued.length === 0) {
-    return NextResponse.json({ ok: true, processed: 0, message: "No queued reports" });
-  }
+    while (Date.now() < deadline) {
+      const { data: queued, error } = await supabase
+        .from("op_reports")
+        .select("id, raw_text, report_date, source_meta, storage_path, attempts")
+        .eq("processing_status", "queued")
+        .lt("attempts", MAX_ATTEMPTS)
+        .order("created_at", { ascending: true })
+        .limit(BATCH_SIZE);
 
-  let processed = 0;
-  let failed = 0;
+      if (error) throw new Error(`queue fetch failed: ${error.message}`);
+      if (!queued || queued.length === 0) break;
 
-  for (const report of queued) {
-    try {
-      // Skip if no text content
-      if (!report.raw_text || report.raw_text.trim().length < 30) {
-        await supabase.from("op_reports").update({
-          processing_status: "completed",
-          processed_at: new Date().toISOString(),
-        }).eq("id", report.id);
-        continue;
+      for (const report of queued) {
+        if (Date.now() >= deadline) break;
+        const res = await processReportRow(report);
+        if (res.status === "failed") failed++;
+        else if (res.status === "skipped") skipped++;
+        else processed++;
+        log.addItems(1);
       }
-
-      // Mark as processing
-      await supabase.from("op_reports").update({
-        processing_status: "processing",
-      }).eq("id", report.id);
-
-      // Load context knowledge
-      const contextBlock = await loadContextBlock();
-
-      // Extract with AI
-      const extracted = await extractReportItems(report.raw_text, {
-        reportDate: report.report_date,
-        contextBlock,
-      });
-
-      // Create report items
-      const itemRows = [];
-      for (const it of extracted.items) {
-        const empMatch = await matchEmployeeByName(supabase, it.person_responsible);
-        const deptId = await matchDepartmentByName(supabase, it.department);
-        const projId = await matchProjectByName(supabase, it.project);
-
-        itemRows.push({
-          report_id: report.id,
-          report_date: report.report_date,
-          department_id: deptId,
-          department_raw: it.department,
-          project_id: projId,
-          project_raw: it.project,
-          person_responsible_id: empMatch.employee_id,
-          person_responsible_raw: it.person_responsible,
-          person_responsible_match_confidence: empMatch.confidence || null,
-          issue: it.issue,
-          status: it.status,
-          deadline: it.deadline,
-          deadline_raw: it.deadline_raw,
-          deadline_uncertain: it.deadline_uncertain,
-          missing_information: it.missing_information,
-          ceo_decision_needed: it.ceo_decision_needed,
-          priority: it.priority,
-          next_action: it.next_action,
-          category: it.category,
-        });
-      }
-
-      if (itemRows.length > 0) {
-        await supabase.from("op_report_items").insert(itemRows);
-      }
-
-      // Mark as completed
-      await supabase.from("op_reports").update({
-        processing_status: "completed",
-        processed_at: new Date().toISOString(),
-        source_meta: {
-          ...(report.source_meta as Record<string, unknown> || {}),
-          claude_model: extracted.model,
-          claude_confidence: extracted.confidence,
-          items_extracted: itemRows.length,
-        },
-      }).eq("id", report.id);
-
-      // Track context usage
-      trackContextUsage(report.raw_text).catch(() => {});
-
-      processed++;
-    } catch (err) {
-      failed++;
-      await supabase.from("op_reports").update({
-        processing_status: "failed",
-        processing_error: err instanceof Error ? err.message : String(err),
-      }).eq("id", report.id);
     }
+
+    const { count: remaining } = await supabase
+      .from("op_reports")
+      .select("id", { count: "exact", head: true })
+      .eq("processing_status", "queued")
+      .lt("attempts", MAX_ATTEMPTS);
+
+    log.setDetail("processed", processed);
+    log.setDetail("failed", failed);
+    log.setDetail("skipped", skipped);
+    log.setDetail("remaining", remaining || 0);
+
+    return { processed, failed, skipped, remaining: remaining || 0 };
+  });
+
+  if (!result.ok) {
+    return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
   }
 
-  return NextResponse.json({
-    ok: true,
-    processed,
-    failed,
-    total_queued: queued.length,
-  });
+  return NextResponse.json({ ok: true, ...result.value });
 }
 
 export const POST = GET;

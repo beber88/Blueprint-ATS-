@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { extractReportItems, extractReportItemsFromPDF } from "@/lib/claude/extract-report";
-import {
-  matchDepartmentByName,
-  matchEmployeeByName,
-  matchProjectByName,
-} from "@/lib/operations/match-employee";
 import { requireApiAuth } from "@/lib/api/auth";
-import { loadContextBlock, trackContextUsage } from "@/lib/operations/context-loader";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse/lib/pdf-parse.js");
+import { createAndProcessReport } from "@/lib/operations/report-intake";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -17,6 +8,12 @@ export const maxDuration = 300;
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = ["pdf", "txt"];
 
+/**
+ * POST /api/operations/reports/ingest — manual report upload (PDF/TXT/text).
+ * Thin wrapper around the unified intake pipeline in
+ * lib/operations/report-intake.ts (shared with email ingestion and the
+ * queued-report cron).
+ */
 export async function POST(request: NextRequest) {
   const { error: authError } = await requireApiAuth({ module: "operations" });
   if (authError) return authError;
@@ -28,16 +25,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "AI not configured" }, { status: 500 });
     }
 
-    const supabase = createAdminClient();
     const contentType = request.headers.get("content-type") || "";
 
     let rawText = "";
+    let pdfBuffer: Buffer | undefined;
     let sourceType: "pdf" | "text" = "text";
     let reportDate: string | null = null;
     let projectIdHint: string | null = null;
-    let storagePath: string | null = null;
     let originalFileName: string | null = null;
-    let pdfBase64: string | null = null;
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await request.formData();
@@ -57,21 +52,7 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(await file.arrayBuffer());
         if (ext === "pdf") {
           sourceType = "pdf";
-          try {
-            const pdfData = await pdfParse(buffer);
-            rawText = pdfData.text || "";
-          } catch {
-            // pdf-parse failed — will fall back to Claude Vision PDF extraction
-          }
-          // Retain raw PDF for Claude Vision fallback if text extraction insufficient
-          if (rawText.trim().length < 50) {
-            pdfBase64 = buffer.toString("base64");
-          }
-          const path = `${crypto.randomUUID()}.pdf`;
-          const { error: upErr } = await supabase.storage
-            .from("operations-reports")
-            .upload(path, buffer, { contentType: file.type || "application/pdf" });
-          if (!upErr) storagePath = path;
+          pdfBuffer = buffer;
         } else {
           rawText = buffer.toString("utf8");
         }
@@ -88,130 +69,32 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (!rawText.trim() && !pdfBase64) {
+    if (!rawText.trim() && !pdfBuffer) {
       return NextResponse.json({ error: "No report text supplied" }, { status: 400 });
     }
 
-    // Create the report row first
-    const usePdfVision = !!pdfBase64 && rawText.trim().length < 50;
-    const { data: report, error: insErr } = await supabase
-      .from("op_reports")
-      .insert({
-        source_type: sourceType,
-        raw_text: (usePdfVision ? `[PDF processed via Claude Vision: ${originalFileName || "upload.pdf"}]` : rawText).slice(0, 200000),
-        source_meta: {
-          original_filename: originalFileName,
-          project_id_hint: projectIdHint,
-          pdf_vision: usePdfVision,
-        },
-        report_date: reportDate || new Date().toISOString().slice(0, 10),
-        storage_path: storagePath,
-        processing_status: "processing",
-      })
-      .select()
-      .single();
+    const result = await createAndProcessReport({
+      rawText,
+      pdfBuffer,
+      sourceType,
+      reportDate,
+      projectIdHint,
+      sourceMeta: { original_filename: originalFileName },
+    });
 
-    if (insErr || !report) {
-      console.error("ingest: failed to create report row", insErr);
-      return NextResponse.json({ error: insErr?.message || "Failed to create report" }, { status: 500 });
+    if (!result.ok) {
+      return NextResponse.json(
+        { error: result.error || "Ingestion failed" },
+        { status: 500 }
+      );
     }
-
-    // Load learned context to inject into AI prompt
-    const contextBlock = await loadContextBlock(projectIdHint);
-
-    let extracted;
-    try {
-      extracted = usePdfVision
-        ? await extractReportItemsFromPDF(pdfBase64!, { reportDate: report.report_date, contextBlock })
-        : await extractReportItems(rawText, { reportDate: report.report_date, contextBlock });
-    } catch (err) {
-      await supabase
-        .from("op_reports")
-        .update({
-          processing_status: "failed",
-          processing_error: err instanceof Error ? err.message : String(err),
-          processed_at: new Date().toISOString(),
-        })
-        .eq("id", report.id);
-      return NextResponse.json({ error: "AI extraction failed", details: String(err) }, { status: 500 });
-    }
-
-    const autoCreatedProjects = new Map<string, string>();
-    const itemRows = [] as Record<string, unknown>[];
-    for (const it of extracted.items) {
-      const empMatch = await matchEmployeeByName(supabase, it.person_responsible);
-      const deptId = await matchDepartmentByName(supabase, it.department);
-      let projId = (await matchProjectByName(supabase, it.project)) || projectIdHint;
-
-      // Auto-create unknown projects so every report mention gets tracked
-      if (!projId && it.project && it.project.trim().length >= 2) {
-        const normalizedName = it.project.trim();
-        if (autoCreatedProjects.has(normalizedName.toLowerCase())) {
-          projId = autoCreatedProjects.get(normalizedName.toLowerCase())!;
-        } else {
-          const { data: newProj } = await supabase
-            .from("op_projects")
-            .insert({ name: normalizedName, status: "active", department_id: deptId })
-            .select("id")
-            .single();
-          if (newProj) {
-            projId = newProj.id;
-            autoCreatedProjects.set(normalizedName.toLowerCase(), newProj.id);
-          }
-        }
-      }
-      itemRows.push({
-        report_id: report.id,
-        report_date: report.report_date,
-        department_id: deptId,
-        department_raw: it.department,
-        project_id: projId,
-        project_raw: it.project,
-        person_responsible_id: empMatch.employee_id,
-        person_responsible_raw: it.person_responsible,
-        person_responsible_match_confidence: empMatch.confidence || null,
-        issue: it.issue,
-        status: it.status,
-        deadline: it.deadline,
-        deadline_raw: it.deadline_raw,
-        deadline_uncertain: it.deadline_uncertain,
-        missing_information: it.missing_information,
-        ceo_decision_needed: it.ceo_decision_needed,
-        priority: it.priority,
-        next_action: it.next_action,
-        category: it.category,
-      });
-    }
-
-    if (itemRows.length > 0) {
-      const { error: itErr } = await supabase.from("op_report_items").insert(itemRows);
-      if (itErr) console.error("ingest: failed to insert items", itErr);
-    }
-
-    await supabase
-      .from("op_reports")
-      .update({
-        processing_status: "completed",
-        processed_at: new Date().toISOString(),
-        source_meta: {
-          original_filename: originalFileName,
-          project_id_hint: projectIdHint,
-          claude_model: extracted.model,
-          claude_confidence: extracted.confidence,
-          notes: extracted.notes,
-        },
-      })
-      .eq("id", report.id);
-
-    // Track which context entries were used (fire-and-forget)
-    trackContextUsage(rawText).catch(() => {});
 
     return NextResponse.json({
-      report_id: report.id,
-      items_count: itemRows.length,
-      confidence: extracted.confidence,
-      report_date: report.report_date,
-      notes: extracted.notes,
+      report_id: result.reportId,
+      items_count: result.itemsCount,
+      confidence: result.confidence,
+      report_date: result.reportDate,
+      notes: result.notes,
     });
   } catch (error) {
     console.error("ingest: unhandled", error);

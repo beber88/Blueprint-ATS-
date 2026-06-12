@@ -1,66 +1,57 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cronAuthorized, runJobs, JobOutcome } from "@/lib/system/cron-dispatcher";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /**
- * Unified daily cron — runs all sub-crons in sequence.
- * Vercel Hobby plan limits cron jobs, so we consolidate
- * everything into one endpoint that fires at 6:00 AM UTC daily.
+ * Manual "run everything now" fallback. The scheduled work moved to the
+ * staged dispatchers (/api/cron/ingest, /api/cron/analyze, /api/cron/digest,
+ * /api/cron/sweep — see vercel.json); this endpoint remains for manual
+ * recovery and debugging.
  */
 export async function GET(request: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  if (!cronAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const baseUrl = request.nextUrl.origin;
-  const headers: Record<string, string> = {};
-  if (cronSecret) headers["authorization"] = `Bearer ${cronSecret}`;
+  const all: JobOutcome[] = [];
 
-  const jobs = [
-    { name: "email-ingest", path: "/api/hr/email/ingest" },
-    { name: "process-queued-reports", path: "/api/operations/reports/process-queued" },
-    { name: "scan-overdue", path: "/api/operations/cron/scan-overdue" },
-    { name: "missing-reports", path: "/api/operations/cron/missing-reports" },
-    { name: "daily-digest", path: "/api/operations/cron/daily-digest" },
-    { name: "contract-deadlines", path: "/api/contracts/cron/scan-deadlines" },
-    { name: "refresh-themes", path: "/api/operations/cron/refresh-themes" },
-  ];
+  const ingest = await runJobs(
+    "ingest",
+    [
+      { name: "email-ingest", path: "/api/hr/email/ingest" },
+      { name: "process-queued-reports", path: "/api/operations/reports/process-queued" },
+    ],
+    request
+  );
+  all.push(...ingest.results);
 
-  const results: { name: string; status: number; ok: boolean; ms: number }[] = [];
+  const analyze = await runJobs(
+    "analyze",
+    [
+      { name: "scan-overdue", path: "/api/operations/cron/scan-overdue" },
+      { name: "missing-reports", path: "/api/operations/cron/missing-reports" },
+      { name: "contract-deadlines", path: "/api/contracts/cron/scan-deadlines" },
+      { name: "refresh-themes", path: "/api/operations/cron/refresh-themes" },
+      { name: "ai-brain", path: "/api/ai-brain/cron" },
+    ],
+    request
+  );
+  all.push(...analyze.results);
 
-  for (const job of jobs) {
-    const start = Date.now();
-    try {
-      const res = await fetch(`${baseUrl}${job.path}`, {
-        method: "GET",
-        headers,
-      });
-      results.push({
-        name: job.name,
-        status: res.status,
-        ok: res.ok,
-        ms: Date.now() - start,
-      });
-    } catch {
-      results.push({
-        name: job.name,
-        status: 0,
-        ok: false,
-        ms: Date.now() - start,
-      });
-    }
-  }
-
-  const allOk = results.every((r) => r.ok);
+  const digest = await runJobs(
+    "digest",
+    [{ name: "daily-digest", path: "/api/operations/cron/daily-digest" }],
+    request
+  );
+  all.push(...digest.results);
 
   return NextResponse.json({
-    ok: allOk,
+    ok: all.every((r) => r.ok),
     ran_at: new Date().toISOString(),
-    jobs: results,
+    jobs: all,
   });
 }
+
+export const POST = GET;
