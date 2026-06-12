@@ -1,6 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { CVParseResult, AIScoreResult } from "@/types";
 
+export type ClaudeLocale = "he" | "en" | "tl";
+
 function getAnthropicClient() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -8,6 +10,23 @@ function getAnthropicClient() {
     throw new Error("Claude AI is not configured. Missing ANTHROPIC_API_KEY.");
   }
   return new Anthropic({ apiKey });
+}
+
+function localeName(locale: ClaudeLocale): string {
+  if (locale === "he") return "Hebrew (עברית)";
+  if (locale === "tl") return "Tagalog";
+  return "English";
+}
+
+/**
+ * Returns a prompt suffix instructing Claude to emit every free-text value
+ * in the user's UI locale. Append to any prompt that produces user-visible
+ * reasoning, summaries, descriptions, recommendations, or notes. Structural
+ * JSON keys, enums, and proper nouns stay as-is — only string *values* are
+ * targeted.
+ */
+function localeInstruction(locale: ClaudeLocale): string {
+  return `\n\nLANGUAGE REQUIREMENT (CRITICAL): Every free-text string value in your JSON response MUST be written in ${localeName(locale)}. JSON keys, enum values (e.g. "strong_yes", "HIRE", category keys), email addresses, URLs, and proper nouns (people, companies, product names, technical terms like AutoCAD/Revit) stay as-is. All reasoning, descriptions, notes, summaries, strengths, weaknesses, recommendations, and any other narrative text must be in ${localeName(locale)}. This is non-negotiable — the viewer's UI is set to ${localeName(locale)}.`;
 }
 
 function extractJSON<T>(text: string): T {
@@ -52,28 +71,30 @@ export async function parseCV(cvText: string): Promise<CVParseResult> {
     messages: [
       {
         role: "user",
-        content: `You are an expert HR assistant. Extract the following information from this CV text and return ONLY valid JSON with no additional text:
+        content: `You are an expert HR assistant. The CV may be in Hebrew, English, or Tagalog (Filipino). Extract the following information and return ONLY valid JSON with no additional text. PRESERVE the original CV's language in all extracted text fields (do not translate education, role descriptions, or skills — keep them as written so the source of truth is faithful). Use detected_language to report which language the CV is written in.
+
 {
   "full_name": "string",
   "email": "string or null",
   "phone": "string or null",
   "location": "string or null",
   "experience_years": number,
-  "education": "string",
-  "skills": ["array of skills"],
-  "certifications": ["array of certifications"],
+  "education": "string (in the CV's original language)",
+  "skills": ["array of skills (original language)"],
+  "certifications": ["array of certifications (original language)"],
   "previous_roles": [
     {
-      "title": "string",
-      "company": "string",
+      "title": "string (original language)",
+      "company": "string (proper noun, keep as-is)",
       "duration": "string",
-      "description": "string"
+      "description": "string (original language)"
     }
   ],
   "job_categories": ["array of category keys that match this candidate from: architect, architect_licensed, architect_intern, draftsman, engineer, engineer_civil, engineer_structural, engineer_mep, engineer_electrical, engineer_mechanical, project_manager, site_engineer, finance, finance_accountant, finance_controller, finance_bookkeeper, quantity_surveyor, hr, secretary, procurement, marketing, foreman, construction_worker, construction_worker_concrete, construction_worker_iron, construction_worker_formwork, construction_worker_finishing, construction_worker_general, qc_inspector, hse_officer, document_controller, other"],
   "custom_category": "string or null - if 'other' is selected, specify what",
   "suggested_job_confidence": number between 0-100,
-  "classification_reasoning": "1 sentence explaining category choice"
+  "classification_reasoning": "1 sentence explaining category choice",
+  "detected_language": "he | en | tl | unknown"
 }
 
 CV Text:
@@ -88,6 +109,9 @@ ${truncated}`,
   }
 
   const parsed = extractJSON<CVParseResult>(content.text);
+  const detected = parsed.detected_language;
+  const safeDetected: CVParseResult["detected_language"] =
+    detected === "he" || detected === "en" || detected === "tl" ? detected : "unknown";
 
   // Ensure required fields have defaults
   return {
@@ -105,6 +129,7 @@ ${truncated}`,
     classification_reasoning: parsed.classification_reasoning || null,
     job_categories: Array.isArray(parsed.job_categories) ? parsed.job_categories : (parsed.suggested_job_category ? [parsed.suggested_job_category] : []),
     custom_category: parsed.custom_category || null,
+    detected_language: safeDetected,
   };
 }
 
@@ -115,7 +140,8 @@ export async function scoreCandidate(
   experienceYears: number,
   skills: string[],
   previousRoles: { title: string; company: string; duration: string; description: string }[],
-  education: string
+  education: string,
+  locale: ClaudeLocale = "en"
 ): Promise<AIScoreResult> {
   const anthropic = getAnthropicClient();
   const message = await anthropic.messages.create({
@@ -143,7 +169,7 @@ Return ONLY valid JSON:
   "strengths": ["top 3 strengths"],
   "weaknesses": ["top 2 gaps"],
   "recommendation": "strong_yes | yes | maybe | no"
-}`,
+}${localeInstruction(locale)}`,
       },
     ],
   });
@@ -167,7 +193,11 @@ Return ONLY valid JSON:
   };
 }
 
-export async function analyzeCV(cvText: string, jobTitle?: string): Promise<Record<string, unknown>> {
+export async function analyzeCV(
+  cvText: string,
+  jobTitle?: string,
+  locale: ClaudeLocale = "en"
+): Promise<Record<string, unknown>> {
   const truncated = cvText.length > 15000 ? cvText.slice(0, 15000) + "\n...[truncated]" : cvText;
   const anthropic = getAnthropicClient();
 
@@ -232,7 +262,7 @@ If the candidate is in construction labor:
 
 Adjust scoring criteria based on the specific profession. Be strict for senior roles, lenient for entry-level.
 
-Important: Base analysis strictly on CV content. Flag missing info as "Not mentioned". Be direct and honest about weaknesses.`;
+Important: Base analysis strictly on CV content. Flag missing info as "Not mentioned". Be direct and honest about weaknesses.${localeInstruction(locale)}`;
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -257,7 +287,11 @@ export interface DocumentClassification {
   reasoning: string;
 }
 
-export async function classifyDocument(text: string, fileName: string): Promise<DocumentClassification> {
+export async function classifyDocument(
+  text: string,
+  fileName: string,
+  locale: ClaudeLocale = "en"
+): Promise<DocumentClassification> {
   const truncated = text.length > 5000 ? text.slice(0, 5000) + "\n...[truncated]" : text;
   const anthropic = getAnthropicClient();
 
@@ -293,7 +327,7 @@ Classification rules:
 - "education_certificate" = University degree, diploma, academic transcript
 - "other" = Anything that doesn't fit above categories
 
-CRITICAL: Extract the person's name accurately. Check for name in header, signature, or "prepared by" sections.`
+CRITICAL: Extract the person's name accurately. Check for name in header, signature, or "prepared by" sections.${localeInstruction(locale)}`
     }],
   });
 

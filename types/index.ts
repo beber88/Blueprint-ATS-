@@ -142,6 +142,7 @@ export interface CVParseResult {
   classification_reasoning?: string | null;
   job_categories?: string[];
   custom_category?: string | null;
+  detected_language?: "he" | "en" | "tl" | "unknown";
 }
 
 export interface AIScoreResult {

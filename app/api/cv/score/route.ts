@@ -11,7 +11,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "AI service not configured" }, { status: 500 });
     }
 
-    const { candidateId, jobId } = await request.json();
+    const { candidateId, jobId, locale: localeRaw } = await request.json();
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "tl" ? localeRaw : "en";
 
     if (!candidateId) {
       return NextResponse.json({ error: "candidateId is required" }, { status: 400 });
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       `Previous Roles: ${JSON.stringify(candidate.previous_roles || [])}`,
     ].join("\n");
 
-    const analysis = await analyzeCV(cvText, (job as Record<string, string>)?.title || undefined);
+    const analysis = await analyzeCV(cvText, (job as Record<string, string>)?.title || undefined, locale);
     const totalScore = (analysis.total_score as number) || 0;
     const verdict = analysis.verdict as Record<string, unknown> | undefined;
 
@@ -72,12 +74,14 @@ export async function POST(request: NextRequest) {
         const newStatus = advancedStatuses.includes(existingApp.status) ? existingApp.status : "scored";
         const r = await supabase.from("applications").update({
           ai_score: totalScore, ai_reasoning: (verdict?.summary as string) || "", status: newStatus,
+          gen_locale: locale, translations: {},
         }).eq("id", existingApp.id).select().single();
         application = r.data; appError = r.error;
       } else {
         const r = await supabase.from("applications").insert({
           candidate_id: candidateId, job_id: jobId,
           ai_score: totalScore, ai_reasoning: (verdict?.summary as string) || "", status: "scored",
+          gen_locale: locale,
         }).select().single();
         application = r.data; appError = r.error;
       }

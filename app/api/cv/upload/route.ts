@@ -79,6 +79,9 @@ export async function POST(request: NextRequest) {
     const jobId = formData.get("jobId") as string | null;
     const batchId = formData.get("batchId") as string | null;
     const forceType = formData.get("forceType") as string | null; // "cv" to skip classification
+    const localeRaw = formData.get("locale") as string | null;
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "tl" ? localeRaw : "en";
 
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     if (!forceType) {
       try {
-        classification = await classifyDocument(extractedText, file.name);
+        classification = await classifyDocument(extractedText, file.name, locale);
         docType = classification.document_type;
         console.log(`Upload: Classified as "${docType}" (${classification.confidence}%) - ${classification.reasoning}`);
       } catch (classErr) {
@@ -178,7 +181,9 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Save candidate
+      // Save candidate. original_language is what Claude detected the CV is
+      // written in, so the LocalizedText render-helper can decide whether
+      // to show the source columns as-is or fetch a translation.
       const { data: candidate, error: dbError } = await supabase.from("candidates").insert({
         full_name: parsed.full_name,
         email: parsed.email,
@@ -198,6 +203,7 @@ export async function POST(request: NextRequest) {
         suggested_job: (parsed.job_categories || [])[0] || parsed.suggested_job_category || null,
         classification_confidence: parsed.suggested_job_confidence || null,
         bulk_upload_batch: batchId || null,
+        original_language: parsed.detected_language || "unknown",
       }).select().single();
 
       if (dbError) {
@@ -224,7 +230,7 @@ export async function POST(request: NextRequest) {
         jobTitle = job?.title;
       }
       try {
-        aiAnalysis = await analyzeCV(extractedText, jobTitle);
+        aiAnalysis = await analyzeCV(extractedText, jobTitle, locale);
         console.log(`Upload: AI analysis done`);
       } catch (err) {
         console.error("Upload: AI analysis failed (non-fatal)", { error: err instanceof Error ? err.message : err });
@@ -252,6 +258,7 @@ export async function POST(request: NextRequest) {
           ai_score: totalScore || null,
           ai_reasoning: verdict?.summary as string || null,
           status: totalScore ? "scored" : "new",
+          gen_locale: locale,
         });
       }
 

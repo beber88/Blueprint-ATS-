@@ -60,12 +60,18 @@ export async function POST(request: NextRequest) {
         const confidence = parsed.suggested_job_confidence || 0;
         const suggestedJob = categories[0] || parsed.suggested_job_category || null;
 
-        await supabase.from("candidates").update({
+        // parseCV preserves the CV's source language; capture it so the
+        // render-side localizer knows whether to translate.
+        const updatePayload: Record<string, unknown> = {
           job_categories: categories,
           classification_confidence: confidence,
           suggested_job: suggestedJob,
           custom_category: parsed.custom_category || null,
-        }).eq("id", candidate.id);
+        };
+        if (parsed.detected_language) {
+          updatePayload.original_language = parsed.detected_language;
+        }
+        await supabase.from("candidates").update(updatePayload).eq("id", candidate.id);
 
         classified++;
         results.push({ id: candidate.id, name: candidate.full_name, categories, status: "classified" });

@@ -24,6 +24,12 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   try {
     if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: "AI not configured" }, { status: 500 });
 
+    const body = await request.json().catch(() => ({}));
+    const localeRaw = body?.locale;
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "tl" ? localeRaw : "en";
+    const langName = locale === "he" ? "Hebrew (עברית)" : locale === "tl" ? "Tagalog" : "English";
+
     const supabase = createAdminClient();
     const { data: job } = await supabase.from("jobs").select("*").eq("id", params.id).single();
     const { data: requirements } = await supabase.from("job_requirements").select("*").eq("job_id", params.id).single();
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
           const response = await client.messages.create({
             model: "claude-sonnet-4-20250514", max_tokens: 800,
-            messages: [{ role: "user", content: `Score candidate vs job. Weights: Exp${requirements.weight_experience}% Skills${requirements.weight_skills}% Edu${requirements.weight_education}% Certs${requirements.weight_certifications}% Portfolio${requirements.weight_portfolio}% Personality${requirements.weight_personality}%\n\nJOB:\n${req}\n\nCANDIDATE:\n${ctx}\n\nReturn ONLY JSON: {"total_score":0,"experience_score":0,"skills_score":0,"education_score":0,"certifications_score":0,"portfolio_score":0,"personality_score":0,"strengths":[],"weaknesses":[],"recommendation":"strong_match|good_match|partial_match|weak_match|not_recommended","ai_reasoning":"","interview_questions":[]}` }]
+            messages: [{ role: "user", content: `Score candidate vs job. Weights: Exp${requirements.weight_experience}% Skills${requirements.weight_skills}% Edu${requirements.weight_education}% Certs${requirements.weight_certifications}% Portfolio${requirements.weight_portfolio}% Personality${requirements.weight_personality}%\n\nJOB:\n${req}\n\nCANDIDATE:\n${ctx}\n\nReturn ONLY JSON: {"total_score":0,"experience_score":0,"skills_score":0,"education_score":0,"certifications_score":0,"portfolio_score":0,"personality_score":0,"strengths":[],"weaknesses":[],"recommendation":"strong_match|good_match|partial_match|weak_match|not_recommended","ai_reasoning":"","interview_questions":[]}\n\nLANGUAGE REQUIREMENT (CRITICAL): All free-text values (strengths, weaknesses, ai_reasoning, interview_questions) MUST be written in ${langName}. Numeric scores, the recommendation enum, JSON keys, and proper nouns (company/software names) stay as-is. The viewer's UI locale is ${langName}.` }]
           });
 
           const text = response.content[0].type === "text" ? response.content[0].text : "{}";
@@ -59,6 +65,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
           await supabase.from("candidate_job_matches").upsert({
             candidate_id: c.id, job_id: params.id, ...parsed, scored_at: new Date().toISOString(),
+            gen_locale: locale,
           }, { onConflict: "candidate_id,job_id" });
           matched++;
         } catch (e) { failed++; console.error(`Match failed ${c.full_name}:`, e instanceof Error ? e.message : e); }

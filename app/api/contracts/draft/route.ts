@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const sourceText: string = (body.source_text || "").trim();
     const sourceKind: string = body.source_kind || "paste";
+    const localeRaw: unknown = body.locale;
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "tl" ? localeRaw : "en";
 
     if (sourceText.length < 50) {
       return NextResponse.json(
@@ -33,7 +36,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const extracted = await extractContractFields(sourceText);
+    const extracted = await extractContractFields(sourceText, locale);
 
     const admin = createAdminClient();
     const { data: draft, error: draftErr } = await admin

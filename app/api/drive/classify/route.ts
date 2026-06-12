@@ -35,6 +35,9 @@ export async function POST(request: NextRequest) {
     const limit = Math.min(BATCH_LIMIT, Math.max(1, Number(body.limit) || BATCH_LIMIT));
     const syncStateId: string | undefined = body.syncStateId;
     const mode: string = body.mode === "metadata" ? "metadata" : "content";
+    const localeRaw: unknown = body.locale;
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "tl" ? localeRaw : "en";
 
     const admin = createAdminClient();
     let query = admin
@@ -88,6 +91,7 @@ export async function POST(request: NextRequest) {
                 parentFolderPath: file.parent_folder_path,
                 mimeType: file.mime_type,
                 content,
+                locale,
               });
               usedContent = true;
             }
@@ -101,6 +105,7 @@ export async function POST(request: NextRequest) {
             fileName: file.name || "(unnamed)",
             parentFolderPath: file.parent_folder_path,
             mimeType: file.mime_type,
+            locale,
           });
         }
 

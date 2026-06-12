@@ -1,6 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { DriveContent } from "./download";
 
+export type ClassifierLocale = "he" | "en" | "tl";
+
+function langName(locale: ClassifierLocale): string {
+  if (locale === "he") return "Hebrew (עברית)";
+  if (locale === "tl") return "Tagalog";
+  return "English";
+}
+
 export interface HrDocumentClassification {
   document_type:
     | "contract"
@@ -59,8 +67,11 @@ export async function classifyDriveFileByMetadata(input: {
   fileName: string;
   parentFolderPath?: string | null;
   mimeType?: string | null;
+  locale?: ClassifierLocale;
 }): Promise<HrDocumentClassification> {
   const client = getClient();
+  const locale: ClassifierLocale = input.locale ?? "en";
+  const lang = langName(locale);
   const message = await client.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 600,
@@ -77,11 +88,11 @@ Return ONLY valid JSON:
 {
   "document_type": "contract | payslip | id | government | certificate | warning | achievement | report | attendance | medical | tax | other",
   "confidence": number 0-100,
-  "employee_name": "full name extracted from filename/path, or null",
+  "employee_name": "full name extracted from filename/path, or null (keep proper noun as-is)",
   "effective_date": "ISO date YYYY-MM-DD if you can infer one, else null",
-  "language": "he | en | tl | unknown",
-  "summary": "1 short sentence",
-  "reasoning": "1 sentence",
+  "language": "he | en | tl | unknown — DETECTED language of the filename/path",
+  "summary": "1 short sentence in ${lang}",
+  "reasoning": "1 sentence in ${lang}",
   "target_table_hint": "hr_employee_documents | hr_payslips | ct_contracts | hr_attendance | skip"
 }
 
@@ -92,7 +103,9 @@ Rules:
 - daily time record / DTR / attendance sheet => attendance, target=hr_attendance
 - ID, passport, driver's license => id, target=hr_employee_documents
 - Anything you cannot confidently classify with > 50 confidence => "other" with target_table_hint="skip"
-- Only return target_table_hint=skip when truly unrouteable.`,
+- Only return target_table_hint=skip when truly unrouteable.
+
+CRITICAL: summary and reasoning MUST be written in ${lang}. The "language" field reports the DETECTED source language, not the output language.`,
       },
     ],
   });
@@ -156,18 +169,23 @@ export async function classifyDriveFileByContent(input: {
   parentFolderPath?: string | null;
   mimeType?: string | null;
   content: DriveContent;
+  locale?: ClassifierLocale;
 }): Promise<HrDocumentClassification> {
   if (input.content.kind === "unsupported") {
     throw new Error(`content unavailable: ${input.content.reason}`);
   }
 
   const client = getClient();
+  const locale: ClassifierLocale = input.locale ?? "en";
+  const lang = langName(locale);
   const header = `You are an HR document router for a construction company. Classify this Drive document from its actual content. Documents mix Hebrew, English, and Tagalog (Filipino).
 
 File name: ${input.fileName}
 Folder path: ${input.parentFolderPath || "(unknown)"}
 
-${CLASSIFICATION_SCHEMA}`;
+${CLASSIFICATION_SCHEMA}
+
+CRITICAL: summary and reasoning MUST be written in ${lang}. The "language" field reports the DETECTED language of the source document, not the output language.`;
 
   const blocks: Anthropic.ContentBlockParam[] = [{ type: "text", text: header }];
 
