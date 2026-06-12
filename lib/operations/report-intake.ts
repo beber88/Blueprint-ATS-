@@ -149,6 +149,7 @@ export async function createAndProcessReport(src: IntakeSource): Promise<IntakeR
       report_date: src.reportDate || new Date().toISOString().slice(0, 10),
       storage_path: storagePath,
       processing_status: processNow ? "processing" : "queued",
+      original_language: src.locale || "he",
     })
     .select()
     .single();
@@ -328,6 +329,7 @@ async function runExtraction(
       priority: it.priority,
       next_action: it.next_action,
       category: it.category,
+      original_language: input.locale || "he",
     });
   }
 

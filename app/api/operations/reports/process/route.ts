@@ -23,6 +23,7 @@ export const maxDuration = 300;
 
 interface ProcessBody {
   report_id: string;
+  locale?: "he" | "en" | "tl";
 }
 
 function classifyImage(contentType: string): "image/jpeg" | "image/png" | "image/webp" | "image/gif" | null {
@@ -42,6 +43,8 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as ProcessBody;
     reportId = body.report_id;
     if (!reportId) return NextResponse.json({ error: "report_id required" }, { status: 400 });
+    const locale: "he" | "en" | "tl" =
+      body.locale === "en" || body.locale === "tl" ? body.locale : "he";
 
     const supabase = createAdminClient();
     const { data: report } = await supabase.from("op_reports").select("*").eq("id", reportId).single();
@@ -109,6 +112,7 @@ export async function POST(request: NextRequest) {
               reporterName,
               defaultProject: defaultProjectName,
               reportDate: report.report_date,
+              locale,
             });
             imageItems.push(imgRes);
           } else {
@@ -125,6 +129,7 @@ export async function POST(request: NextRequest) {
         reporterName,
         defaultProject: defaultProjectName,
         reportDate: report.report_date,
+        locale,
       });
     }
 
@@ -159,6 +164,7 @@ export async function POST(request: NextRequest) {
         priority: it.priority,
         next_action: it.next_action,
         category: it.category,
+        original_language: locale,
       });
     }
 
@@ -180,6 +186,7 @@ export async function POST(request: NextRequest) {
       .update({
         processing_status: "completed",
         processed_at: new Date().toISOString(),
+        original_language: locale,
         source_meta: {
           ...(report.source_meta || {}),
           claude_confidence: overallConfidence,

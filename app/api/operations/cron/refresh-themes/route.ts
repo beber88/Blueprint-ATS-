@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     model: "claude-sonnet-4-20250514",
     max_tokens: 4000,
     system:
-      "You cluster a list of operational issues from a construction company into recurring themes. Hebrew + English mixed input is normal. Return ONLY a JSON array. Each element: {theme: string short HE label, occurrence_count: number, sample_issues: string[] up to 3, project_name: string|null, department_code: string|null}. Only return themes with occurrence_count >= 2. Max 15 themes.",
+      "You cluster a list of operational issues from a construction company into recurring themes. Hebrew + English + Tagalog mixed input is normal. Return ONLY a JSON array. Each element: {theme: string short ENGLISH label, occurrence_count: number, sample_issues: string[] up to 3, project_name: string|null, department_code: string|null}. The theme label MUST be written in English — render-side LocalizedText translates it per viewer locale on demand and caches the result in op_recurring_themes.translations. Only return themes with occurrence_count >= 2. Max 15 themes.",
     messages: [{ role: "user", content: `Cluster these issues:\n${corpus}\n\nReturn the JSON array now.` }],
   });
 

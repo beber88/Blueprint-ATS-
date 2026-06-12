@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
@@ -23,6 +23,9 @@ interface Item {
   department_raw: string | null;
   project_raw: string | null;
   report_date: string;
+  // i18n metadata (migration 019 + render-side LocalizedText helpers)
+  original_language?: "he" | "en" | "tl" | "unknown" | null;
+  translations?: Record<string, { issue: string; next_action?: string | null; missing_information?: string | null }> | null;
   department?: { name: string; name_he?: string; color?: string } | null;
   project?: { name: string } | null;
   employee?: { full_name: string } | null;
@@ -76,13 +79,65 @@ export function ItemsTable({ items, onChange, employees = [], departments = [], 
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setTranslatedItems(data.translations || {});
-      toast.success(t("operations.toast.translated"));
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } catch {
+      // Auto-translate failures should fail silently — the original text
+      // is still shown. The manual translate button still surfaces toasts.
     } finally {
       setTranslating(false);
     }
   };
+
+  // Auto-translate on locale switch: pre-populate the in-memory map from
+  // cached translations on each row, then fire one batch request for the
+  // items that aren't yet cached in this locale. The /api/operations/items/
+  // translate endpoint persists results to op_report_items.translations so
+  // the next view is instant.
+  useEffect(() => {
+    if (items.length === 0) return;
+
+    const preFilled: typeof translatedItems = {};
+    const toFetch: string[] = [];
+
+    for (const it of items) {
+      if (it.original_language === locale) continue; // native, no need
+      const cached = it.translations?.[locale];
+      if (cached && cached.issue) {
+        preFilled[it.id] = cached;
+      } else if (it.issue) {
+        toFetch.push(it.id);
+      }
+    }
+
+    if (Object.keys(preFilled).length > 0) {
+      setTranslatedItems((prev) => ({ ...prev, ...preFilled }));
+    }
+
+    if (toFetch.length === 0) return;
+    if (translating) return;
+
+    let aborted = false;
+    setTranslating(true);
+    fetch("/api/operations/items/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itemIds: toFetch, targetLang: locale }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!aborted && data?.translations) {
+          setTranslatedItems((prev) => ({ ...prev, ...data.translations }));
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!aborted) setTranslating(false);
+      });
+
+    return () => {
+      aborted = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, items]);
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
