@@ -34,7 +34,7 @@ const statusColors: Record<string, { bg: string; color: string }> = {
 };
 
 export default function JobsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const employmentTypeLabels = getEmploymentTypeLabels(t);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +68,7 @@ export default function JobsPage() {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, locale }),
       });
       if (!res.ok) throw new Error("Failed");
       toast.success(t("jobs.created_success"));

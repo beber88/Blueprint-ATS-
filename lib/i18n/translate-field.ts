@@ -101,7 +101,11 @@ export async function invalidateFieldTranslations(
 
   const next: Record<string, Record<string, string>> = {};
   for (const [locale, fields] of Object.entries(row.translations as Record<string, Record<string, string>>)) {
-    const { [field]: _removed, ...rest } = fields ?? {};
+    if (!fields) continue;
+    const rest: Record<string, string> = {};
+    for (const [k, v] of Object.entries(fields)) {
+      if (k !== field) rest[k] = v;
+    }
     if (Object.keys(rest).length > 0) next[locale] = rest;
   }
 

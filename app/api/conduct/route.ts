@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const type: string = body.type;
+    const localeRaw = body.locale;
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "en" || localeRaw === "tl" ? localeRaw : "en";
 
     if (!body.employee_id || !body.title || !EVENT_TYPES.includes(type as ConductType)) {
       return NextResponse.json(
@@ -115,6 +118,7 @@ export async function POST(request: NextRequest) {
         description: body.description || null,
         actor_user_id: user.id,
         metadata,
+        original_language: locale,
       })
       .select(SELECT)
       .single();

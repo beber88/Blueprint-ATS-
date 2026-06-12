@@ -64,6 +64,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "application_id, or candidate_id and job_id are required" }, { status: 400 });
     }
 
+    const localeRaw = body.locale;
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "en" || localeRaw === "tl" ? localeRaw : "en";
+
     const { data, error } = await supabase
       .from("interviews")
       .insert({
@@ -73,6 +77,7 @@ export async function POST(request: NextRequest) {
         interviewer: body.interviewer || null,
         type: body.type || "in-person",
         notes: body.notes || null,
+        original_language: locale,
       })
       .select()
       .single();

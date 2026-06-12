@@ -44,6 +44,10 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
     const body = await request.json();
 
+    const localeRaw = body.locale;
+    const locale: "he" | "en" | "tl" =
+      localeRaw === "he" || localeRaw === "en" || localeRaw === "tl" ? localeRaw : "en";
+
     const { data, error } = await supabase
       .from("jobs")
       .insert({
@@ -54,6 +58,7 @@ export async function POST(request: NextRequest) {
         location: body.location || null,
         employment_type: body.employment_type || "full-time",
         status: "active",
+        original_language: locale,
       })
       .select()
       .single();

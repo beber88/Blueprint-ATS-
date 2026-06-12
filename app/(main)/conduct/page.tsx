@@ -259,7 +259,7 @@ function ConductDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const employees = useEmployees(true);
   const [busy, setBusy] = useState(false);
   const isDiscipline = type === "disciplinary_action";
@@ -300,7 +300,7 @@ function ConductDialog({
       const res = await fetch("/api/conduct", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, locale }),
       });
       const data = await res.json();
       if (!res.ok) {

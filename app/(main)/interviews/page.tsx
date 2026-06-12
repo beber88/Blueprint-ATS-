@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n/context";
 
 export default function InterviewsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
@@ -54,6 +54,7 @@ export default function InterviewsPage() {
         body: JSON.stringify({
           ...form,
           duration_minutes: parseInt(form.duration_minutes),
+          locale,
         }),
       });
       if (!res.ok) throw new Error("Failed");
